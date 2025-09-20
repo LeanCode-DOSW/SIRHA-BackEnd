@@ -9,7 +9,7 @@
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
 		<version>3.5.5</version>
-		<relativePath/> <!-- lookup parent from repository -->
+		<relativePath/>
 	</parent>
 
 	<groupId>edu.dosw.lab</groupId>
@@ -20,18 +20,23 @@
 
 	<properties>
 		<java.version>17</java.version>
-		<maven.compiler.target>17</maven.compiler.target>
 		<maven.compiler.source>17</maven.compiler.source>
-		<maven.compiler.release>17</maven.compiler.release>
+		<maven.compiler.target>17</maven.compiler.target>
 	</properties>
 
 	<dependencies>
-		<!-- Testing con JUnit -->
+		<!-- OpenAPI (Swagger) -->
 		<dependency>
-			<groupId>org.junit.jupiter</groupId>
-			<artifactId>junit-jupiter</artifactId>
-			<version>5.10.2</version>
-			<scope>test</scope>
+			<groupId>org.springdoc</groupId>
+			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+			<version>2.6.0</version>
+		</dependency>
+
+		<!-- Validaciones con @NotBlank, @NotNull, etc -->
+		<dependency>
+			<groupId>jakarta.validation</groupId>
+			<artifactId>jakarta.validation-api</artifactId>
+			<version>3.0.2</version>
 		</dependency>
 
 		<!-- Starter básico de Spring Boot -->
@@ -40,16 +45,31 @@
 			<artifactId>spring-boot-starter</artifactId>
 		</dependency>
 
-		<!-- 🚀 Necesario para usar ResponseEntity, @RestController, etc. -->
+		<!-- Web (ResponseEntity, @RestController, etc.) -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
 
-		<!-- Starter de pruebas con Spring -->
+		<!-- Testing con JUnit 5 + Spring Boot -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+			<exclusions>
+				<!-- excluimos vintage para evitar conflictos -->
+				<exclusion>
+					<groupId>org.junit.vintage</groupId>
+					<artifactId>junit-vintage-engine</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
+		<!-- Forzar versión JUnit Jupiter explícita -->
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter</artifactId>
+			<version>5.10.2</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
@@ -62,17 +82,20 @@
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
 
-			<!-- Plugin de cobertura JaCoCo -->
+			<!-- Plugin JaCoCo -->
 			<plugin>
 				<groupId>org.jacoco</groupId>
 				<artifactId>jacoco-maven-plugin</artifactId>
 				<version>0.8.12</version>
 				<executions>
+					<!-- Agente JaCoCo -->
 					<execution>
 						<goals>
 							<goal>prepare-agent</goal>
 						</goals>
 					</execution>
+
+					<!-- Generación de reportes -->
 					<execution>
 						<id>report</id>
 						<phase>test</phase>
@@ -81,10 +104,12 @@
 						</goals>
 						<configuration>
 							<excludes>
-								<exclude>/configurators</exclude>
+								<exclude>**/configurators/**</exclude>
 							</excludes>
 						</configuration>
 					</execution>
+
+					<!-- Verificación de cobertura -->
 					<execution>
 						<id>jacoco-check</id>
 						<goals>
@@ -111,3 +136,4 @@
 	</build>
 
 </project>
+
