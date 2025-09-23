@@ -29,9 +29,6 @@ public class MapperUtils {
      * - Lista de IDs de solicitudes asociadas (si existen)
      * - Omite información sensible como el hash de contraseña
      * 
-     * El método maneja de forma segura los valores null, evitando excepciones
-     * de NullPointerException durante la conversión.
-     * 
      * @param student la entidad Student del dominio a convertir.
      *               Puede ser null, en cuyo caso se retorna null.
      * @return el DTO correspondiente al estudiante, o null si el parámetro es null
