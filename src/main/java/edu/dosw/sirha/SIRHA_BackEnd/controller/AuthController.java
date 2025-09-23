@@ -16,15 +16,7 @@ import org.springframework.web.bind.annotation.*;
  * 
  * Todos los endpoints están mapeados bajo la ruta base "/api/auth" y manejan
  * peticiones HTTP con formato JSON para el intercambio de datos.
- * 
- * La autenticación actualmente utiliza un token JWT simulado ("fake-jwt-token")
- * para fines de desarrollo. En producción, debe implementarse un sistema
- * completo de generación y validación de tokens JWT.
- * 
- * @author Equipo SIRHA
- * @version 1.0
- * @since 2023-12-01
- * 
+
  * @see AuthService
  * @see AuthRequest
  * @see AuthResponse
@@ -33,18 +25,8 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/auth")
 public class AuthController {
 
-    /**
-     * Servicio de autenticación inyectado para manejar la lógica de negocio
-     * relacionada con login, registro y validación de credenciales.
-     */
     private final AuthService authService;
 
-    /**
-     * Constructor del controlador con inyección de dependencias.
-     * 
-     * @param authService el servicio de autenticación a utilizar.
-     *                   No debe ser null.
-     */
     public AuthController(AuthService authService) {
         this.authService = authService;
     }
@@ -110,9 +92,6 @@ public class AuthController {
      *            No debe ser null.
      * @return ResponseEntity<User> con código 200 y el usuario creado,
      *         incluyendo el ID asignado automáticamente
-     * 
-     * @throws IllegalArgumentException si los datos del usuario son inválidos
-     * @throws RuntimeException si el username ya existe en el sistema
      * 
      * @example
      * POST /api/auth/register

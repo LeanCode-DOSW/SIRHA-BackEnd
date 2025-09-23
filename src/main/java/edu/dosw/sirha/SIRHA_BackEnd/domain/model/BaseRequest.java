@@ -1,7 +1,6 @@
 package edu.dosw.sirha.SIRHA_BackEnd.domain.model;
 
 import java.time.LocalDateTime;
-import java.util.Objects;
 
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.*;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.port.*;
@@ -28,40 +27,15 @@ import edu.dosw.sirha.SIRHA_BackEnd.domain.port.*;
  * - APROBADA: Solicitud aceptada y procesada
  * - RECHAZADA: Solicitud denegada con razón específica
  * 
- * @author Equipo SIRHA
- * @version 1.0
- * @since 2023-12-01
- * 
  * @see RequestState
  * @see Request
  * @see CambioGrupo
  * @see CambioMateria
  */
 public abstract class BaseRequest implements Request {
-    
-    /**
-     * Identificador único de la solicitud en el sistema.
-     * Generado automáticamente por la base de datos.
-     */
     private String id;
-    
-    /**
-     * Nivel de prioridad de la solicitud.
-     * Valores más altos indican mayor prioridad.
-     * Rango típico: 1 (baja) a 5 (crítica).
-     */
     private int prioridad;
-    
-    /**
-     * Estado actual de la solicitud.
-     * Controla el flujo de procesamiento de la solicitud.
-     */
     private RequestState estado;
-    
-    /**
-     * Timestamp de cuándo fue creada la solicitud.
-     * Se asigna automáticamente en el constructor.
-     */
     private LocalDateTime creadoEn;
 
     /**
@@ -71,119 +45,20 @@ public abstract class BaseRequest implements Request {
      * automáticamente el estado como PENDIENTE y el timestamp de creación.
      * 
      * @param prioridad nivel de prioridad de la solicitud.
-     *                 Debe estar en el rango 1-5 donde:
-     *                 1 = Baja prioridad
-     *                 2 = Normal 
-     *                 3 = Media
-     *                 4 = Alta
-     *                 5 = Crítica/Urgente
-     * @throws IllegalArgumentException si la prioridad está fuera del rango válido
-     * 
-     * @example
-     * <pre>
-     * public class CambioGrupo extends BaseRequest {
-     *     public CambioGrupo(int prioridad, String grupoOrigen, String grupoDestino) {
-     *         super(prioridad);  // Inicializa con prioridad específica
-     *         // ... inicialización específica del cambio de grupo
-     *     }
-     * }
-     * </pre>
      */
     public BaseRequest(int prioridad) {
-        if (prioridad < 1 || prioridad > 5) {
-            throw new IllegalArgumentException("La prioridad debe estar entre 1 y 5");
-        }
-        
         this.prioridad = prioridad;
         this.estado = RequestState.PENDIENTE;
         this.creadoEn = LocalDateTime.now();
     }
 
-    /**
-     * Método abstracto para aprobar la solicitud.
-     * 
-     * Cada tipo de solicitud debe implementar su lógica específica de aprobación.
-     * La implementación debe:
-     * 1. Validar que la solicitud se puede aprobar
-     * 2. Realizar los cambios correspondientes en el sistema
-     * 3. Cambiar el estado a APROBADA
-     * 4. Notificar al estudiante del resultado
-     * 
-     * @throws IllegalStateException si la solicitud no se puede aprobar en su estado actual
-     * @throws RuntimeException si ocurre un error durante el procesamiento
-     * 
-     * @implNote Las clases concretas deben validar el estado antes de procesar
-     */
-    public abstract void aprobar();
 
-    /**
-     * Método abstracto para rechazar la solicitud.
-     * 
-     * Cada tipo de solicitud debe implementar su lógica específica de rechazo.
-     * La implementación debe:
-     * 1. Establecer la razón del rechazo
-     * 2. Cambiar el estado a RECHAZADA
-     * 3. Notificar al estudiante con la razón del rechazo
-     * 4. Registrar el rechazo para auditoría
-     * 
-     * @throws IllegalStateException si la solicitud no se puede rechazar en su estado actual
-     * 
-     * @implNote Las clases concretas deben proporcionar razones específicas del rechazo
-     */
+    public abstract void aprobar();
     public abstract void rechazar();
 
-    /**
-     * Verifica si la solicitud puede ser procesada (aprobada o rechazada).
-     * 
-     * @return true si está en estado PENDIENTE, false en caso contrario
-     */
-    public boolean puedeSerProcesada() {
-        return estado == RequestState.PENDIENTE;
-    }
-
-    /**
-     * Verifica si la solicitud está en estado final (aprobada o rechazada).
-     * 
-     * @return true si está aprobada o rechazada, false si está pendiente
-     */
-    public boolean estaFinalizada() {
-        return estado == RequestState.APROBADA || estado == RequestState.RECHAZADA;
-    }
-
-    /**
-     * Calcula la edad de la solicitud en días.
-     * 
-     * @return número de días desde que se creó la solicitud
-     */
-    public long getDiasDesdeCreacion() {
-        return java.time.temporal.ChronoUnit.DAYS.between(creadoEn.toLocalDate(), LocalDateTime.now().toLocalDate());
-    }
-
-    /**
-     * Verifica si la solicitud es urgente basada en su prioridad.
-     * 
-     * @return true si la prioridad es 4 o 5 (alta/crítica)
-     */
-    public boolean esUrgente() {
-        return prioridad >= 4;
-    }
-
-    // Getters y Setters con documentación
-
-    /**
-     * Obtiene el identificador único de la solicitud.
-     * @return ID de la solicitud, puede ser null si no se ha persistido
-     */
     public String getId() {
         return id;
     }
-
-    /**
-     * Establece el identificador de la solicitud.
-     * Normalmente usado por el sistema de persistencia.
-     * 
-     * @param id nuevo identificador único
-     */
     public void setId(String id) {
         this.id = id;
     }
@@ -208,9 +83,11 @@ public abstract class BaseRequest implements Request {
         if (prioridad < 1 || prioridad > 5) {
             throw new IllegalArgumentException("La prioridad debe estar entre 1 y 5");
         }
+        /*
         if (!puedeSerProcesada()) {
             throw new IllegalStateException("No se puede cambiar la prioridad de una solicitud finalizada");
         }
+            */
         this.prioridad = prioridad;
     }
 
@@ -259,23 +136,6 @@ public abstract class BaseRequest implements Request {
             throw new IllegalArgumentException("La fecha de creación no puede ser futura");
         }
         this.creadoEn = creadoEn;
-    }
-
-    /**
-     * Compara solicitudes para determinar igualdad basada en ID.
-     */
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (obj == null || getClass() != obj.getClass()) return false;
-        
-        BaseRequest request = (BaseRequest) obj;
-        return Objects.equals(id, request.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id);
     }
 
     /**

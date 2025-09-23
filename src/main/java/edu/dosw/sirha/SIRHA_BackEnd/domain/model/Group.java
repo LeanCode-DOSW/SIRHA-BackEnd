@@ -1,7 +1,6 @@
 package edu.dosw.sirha.SIRHA_BackEnd.domain.model;
 
 import java.util.*;
-import java.util.Objects;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.port.GroupState;
 
 /**
@@ -21,66 +20,21 @@ import edu.dosw.sirha.SIRHA_BackEnd.domain.port.GroupState;
  * 
  * Estados del grupo:
  * - ABIERTO: Acepta nuevas inscripciones si hay cupos
- * - CERRADO: No acepta inscripciones (administrativamente cerrado)
- * - LLENO: Capacidad máxima alcanzada
- * 
- * @author Equipo SIRHA
- * @version 1.0
- * @since 2023-12-01
- * 
+ * - CERRADO: No acepta mas inscripciones 
  * @see GroupState
  * @see Professor
  * @see Subject
  * @see Student
  */
 public class Group {
-    
-    /**
-     * Identificador único del grupo en el sistema.
-     */
     private String id;
-    
-    /**
-     * Capacidad máxima de estudiantes que puede tener el grupo.
-     * Debe ser un valor positivo mayor a cero.
-     */
     private int capacidad;
-    
-    /**
-     * Número actual de estudiantes inscritos en el grupo.
-     * Debe ser siempre menor o igual a la capacidad.
-     */
     private int inscritos;
-    
-    /**
-     * Estado actual del grupo que controla las inscripciones.
-     * Implementa el patrón State para manejar diferentes comportamientos
-     * según el estado del grupo (Abierto, Cerrado, Lleno).
-     */
-    private GroupState estadoGrupo;
-    
-    /**
-     * Profesor asignado al grupo.
-     * Contiene información del docente responsable.
-     */
+    private GroupState estadoGrupo; // State Pattern
     private Professor profesor;
-    
-    /**
-     * Curso/materia que se dicta en este grupo.
-     * Contiene información de la asignatura.
-     */
     private Subject curso;
-    
-    /**
-     * Aula asignada para las clases del grupo.
-     * Formato típico: edificio + número (ej: "A101", "Lab-Sistemas")
-     */
+    //private Schedule horario;
     private String aula;
-    
-    /**
-     * Lista de estudiantes inscritos en el grupo.
-     * Se mantiene sincronizada con el contador 'inscritos'.
-     */
     private List<Student> estudiantes;
 
     /**
@@ -91,7 +45,6 @@ public class Group {
      * 
      * @param capacidad capacidad máxima de estudiantes para el grupo.
      *                 Debe ser un valor positivo mayor a cero.
-     * @throws IllegalArgumentException si la capacidad es menor o igual a cero
      * 
      * @example
      * <pre>
@@ -111,18 +64,6 @@ public class Group {
         this.estadoGrupo = new StatusOpen(); // Estado inicial: abierto
         this.estudiantes = new ArrayList<>();
     }
-
-    /**
-     * Establece el estado del grupo.
-     * 
-     * Permite cambiar dinámicamente el estado del grupo para controlar
-     * el comportamiento de las inscripciones. El cambio de estado puede
-     * ser iniciado por el sistema automáticamente (cuando se llena) o
-     * manualmente por un administrador.
-     * 
-     * @param estado nuevo estado a asignar al grupo. No debe ser null.
-     * @throws IllegalArgumentException si el estado es null
-     */
     public void setEstadoGrupo(GroupState estado) {
         if (estado == null) {
             throw new IllegalArgumentException("El estado del grupo no puede ser null");
@@ -151,21 +92,6 @@ public class Group {
      * - Cambiar el estado del grupo si es necesario
      * 
      * @param estudiante estudiante a inscribir en el grupo. No debe ser null.
-     * @throws IllegalArgumentException si el estudiante es null
-     * @throws IllegalStateException si el grupo no acepta inscripciones
-     * 
-     * @example
-     * <pre>
-     * Group grupo = new Group(30);
-     * Student estudiante = new Student("1", "juan", "pass", "ESTUDIANTE", "202112345");
-     * 
-     * try {
-     *     grupo.inscribirEstudiante(estudiante);
-     *     System.out.println("Estudiante inscrito exitosamente");
-     * } catch (IllegalStateException e) {
-     *     System.out.println("No se pudo inscribir: " + e.getMessage());
-     * }
-     * </pre>
      */
     public void inscribirEstudiante(Student estudiante) {
         if (estudiante == null) {

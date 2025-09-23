@@ -12,26 +12,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
  * - Generación automática de salt
  * - Múltiples rondas de hash para mayor seguridad
  * - Resistencia a ataques de rainbow table
- * 
- * @author Equipo SIRHA
- * @version 1.0
- * @since 2023-12-01
  */
 public class PasswordUtils {
-    
-    /**
-     * Instancia del encoder BCrypt utilizado para todas las operaciones de hash.
-     * Se utiliza una instancia estática para optimizar el rendimiento.
-     */
     private static final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-
-    /**
-     * Constructor privado para prevenir la instanciación de esta clase utilitaria.
-     * Todas las operaciones se realizan a través de métodos estáticos.
-     */
-    private PasswordUtils() {
-        throw new IllegalStateException("Clase utilitaria - no se puede instanciar");
-    }
 
     /**
      * Genera un hash seguro de una contraseña en texto plano.
@@ -44,8 +27,6 @@ public class PasswordUtils {
      *                   No debe ser null o vacía.
      * @return el hash seguro de la contraseña, incluyendo el salt.
      *         El formato del hash es compatible con BCrypt.
-     * @throws IllegalArgumentException si rawPassword es null o vacía
-     * 
      * @example
      * <pre>
      * String password = "miContraseñaSegura123";
@@ -73,8 +54,6 @@ public class PasswordUtils {
      *                      Debe ser un hash válido generado por BCrypt.
      *                      No debe ser null.
      * @return true si la contraseña coincide con el hash, false en caso contrario
-     * @throws IllegalArgumentException si alguno de los parámetros es null
-     * 
      * @example
      * <pre>
      * String password = "miContraseñaSegura123";

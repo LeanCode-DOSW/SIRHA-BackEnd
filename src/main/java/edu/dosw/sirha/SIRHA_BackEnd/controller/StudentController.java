@@ -5,9 +5,6 @@ import edu.dosw.sirha.SIRHA_BackEnd.dto.StudentDTO;
 import edu.dosw.sirha.SIRHA_BackEnd.service.StudentService;
 import edu.dosw.sirha.SIRHA_BackEnd.util.MapperUtils;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.http.ResponseEntity;
-import org.springframework.http.HttpStatus;
-
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -26,10 +23,6 @@ import java.util.stream.Collectors;
  * Los endpoints están mapeados bajo la ruta base "/api/students" siguiendo
  * las convenciones REST para recursos de colección.
  * 
- * @author Equipo SIRHA
- * @version 1.0
- * @since 2023-12-01
- * 
  * @see StudentService
  * @see StudentDTO
  * @see Student
@@ -39,18 +32,8 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/students")
 public class StudentController {
 
-    /**
-     * Servicio de estudiantes inyectado para manejar la lógica de negocio
-     * relacionada con las operaciones de estudiantes.
-     */
     private final StudentService studentService;
 
-    /**
-     * Constructor del controlador con inyección de dependencias.
-     * 
-     * @param studentService el servicio de estudiantes a utilizar.
-     *                      No debe ser null.
-     */
     public StudentController(StudentService studentService) {
         this.studentService = studentService;
     }
@@ -153,9 +136,6 @@ public class StudentController {
      *           No debe ser null.
      * @return StudentDTO del estudiante creado, incluyendo el ID asignado
      * 
-     * @throws IllegalArgumentException si los datos del DTO son inválidos
-     * @throws RuntimeException si el username o código ya existen
-     * 
      * @example
      * POST /api/students
      * Content-Type: application/json
@@ -189,7 +169,7 @@ public class StudentController {
         return MapperUtils.toDTO(savedStudent);
     }
 
-    // TODO: Implementar endpoints adicionales en futuras versiones:
+    //Implementar endpoints adicionales en futuras versiones:
     // - PUT /{id} para actualizar estudiante existente
     // - DELETE /{id} para eliminar estudiante
     // - GET /{id}/solicitudes para obtener solicitudes del estudiante
