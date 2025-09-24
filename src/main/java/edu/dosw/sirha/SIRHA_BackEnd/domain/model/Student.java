@@ -200,7 +200,7 @@ public class Student extends User {
      */
     @Override
     public String toString() {
-        return String.format("Student{id='%s', userName='%s', codigo='%s', numSolicitudes=%d}", 
+        return String.format("Student{id='%s', username='%s', codigo='%s', numSolicitudes=%d}", 
                             getId(), getUsername(), codigo, 
                             solicitudes != null ? solicitudes.size() : 0);
     }

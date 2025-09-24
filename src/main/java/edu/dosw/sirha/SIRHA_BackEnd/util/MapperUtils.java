@@ -56,7 +56,7 @@ public class MapperUtils {
         StudentDTO dto = new StudentDTO();
         dto.setId(student.getId());
         dto.setUsername(student.getUsername());
-        dto.setCodigo(student.getCodigo());
+        dto.setCodigo(student.getCodigo()); 
 
         // Conversión segura de la lista de solicitudes a IDs
         if (student.getSolicitudes() != null) {

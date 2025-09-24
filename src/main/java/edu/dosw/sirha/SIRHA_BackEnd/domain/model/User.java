@@ -10,17 +10,17 @@ public abstract class User implements Authenticable {
     @Id
     private String id;
     @Field("username")
-    private String userName;
+    private String username;
     @Field("email")
     private String email;
     @Field("password")
     private String password;
 
     public User() {}
-    
-    public User(String id, String userName, String email, String password) {
+
+    public User(String id, String username, String email, String password) {
         this.id = id;
-        this.userName = userName;
+        this.username = username;
         this.email = email;
         this.password = password.startsWith("$2a$") ? password : PasswordUtils.hashPassword(password);
     }
@@ -30,10 +30,10 @@ public abstract class User implements Authenticable {
     }
 
     public String getUsername(){
-        return userName;
+        return username;
     }
-    public void setUsername(String userName){
-        this.userName = userName;
+    public void setUsername(String username){
+        this.username = username;
     }
     public String getId(){
         return id;

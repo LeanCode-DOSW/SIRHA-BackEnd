@@ -159,8 +159,8 @@ public class StudentController {
         Student newStudent = new Student(
             dto.getId(), 
             dto.getUsername(), 
-            "defaultPass",  // Contraseña temporal - debe ser actualizada
-            "ESTUDIANTE",   // Rol por defecto para estudiantes
+            dto.getUsername() + "@esuelaing.edu.com",  
+            "defaultPass", // Contraseña temporal - debe ser actualizada
             dto.getCodigo()
         );
         
