@@ -71,10 +71,6 @@ public class Student extends User {
         this.codigo = codigo;
     }
 
-    public SemaforoColores getColorMateria(String Materia) {
-        return semaforo.getColor(Materia);
-    }
-
     /**
      * Agrega una nueva solicitud a la lista del estudiante.
      * 
