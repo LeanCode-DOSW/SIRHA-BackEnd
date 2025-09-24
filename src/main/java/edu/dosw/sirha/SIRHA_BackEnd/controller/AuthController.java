@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
  */
 @RestController
 @RequestMapping("/api/auth")
+@CrossOrigin(origins = "*")
 public class AuthController {
 
     private final AuthService authService;
@@ -46,27 +47,6 @@ public class AuthController {
      * @return ResponseEntity con AuthResponse conteniendo:
      *         - Código 200: token y username si las credenciales son válidas
      *         - Código 401: mensaje de error si las credenciales son inválidas
-     * 
-     * @example
-     * POST /api/auth/login
-     * Content-Type: application/json
-     * 
-     * {
-     *   "username": "juan.perez",
-     *   "password": "miContraseña123"
-     * }
-     * 
-     * Respuesta exitosa (200):
-     * {
-     *   "token": "fake-jwt-token",
-     *   "username": "juan.perez"
-     * }
-     * 
-     * Respuesta de error (401):
-     * {
-     *   "token": null,
-     *   "username": "Credenciales inválidas"
-     * }
      */
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody AuthRequest request) {
@@ -92,27 +72,16 @@ public class AuthController {
      *            No debe ser null.
      * @return ResponseEntity<User> con código 200 y el usuario creado,
      *         incluyendo el ID asignado automáticamente
-     * 
-     * @example
-     * POST /api/auth/register
-     * Content-Type: application/json
-     * 
-     * {
-     *   "username": "maria.garcia",
-     *   "passwordHash": "contraseñaSegura456",
-     *   "rol": "ESTUDIANTE"
-     * }
-     * 
-     * Respuesta (200):
-     * {
-     *   "id": "generated-id-12345",
-     *   "username": "maria.garcia",
-     *   "passwordHash": "$2a$10$hashGeneradoAutomaticamente...",
-     *   "rol": "ESTUDIANTE"
-     * }
      */
     @PostMapping("/register")
     public ResponseEntity<User> register(@RequestBody User user) {
         return ResponseEntity.ok(authService.register(user));
     }
+
+    @GetMapping("/check-email/{email}")
+    public ResponseEntity<?> checkEmailAvailability(@PathVariable String email) {
+        boolean exists = authService.existsByEmail(email);
+        return ResponseEntity.ok(new AuthResponse(null, exists ? "Email ya en uso" : "Email disponible"));
+    }
+
 }
