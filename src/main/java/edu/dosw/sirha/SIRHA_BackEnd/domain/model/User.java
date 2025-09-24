@@ -3,10 +3,11 @@ package edu.dosw.sirha.SIRHA_BackEnd.domain.model;
 import org.springframework.data.annotation.*;
 import org.springframework.data.mongodb.core.mapping.*;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.port.Authenticable;
+import edu.dosw.sirha.SIRHA_BackEnd.domain.port.Schedulable;
 import edu.dosw.sirha.SIRHA_BackEnd.util.PasswordUtils;
 
 @Document(collection = "users")
-public abstract class User implements Authenticable {
+public abstract class User implements Authenticable, Schedulable {
     @Id
     private String id;
     @Field("username")
