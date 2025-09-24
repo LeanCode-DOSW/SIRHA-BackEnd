@@ -5,22 +5,22 @@ import edu.dosw.sirha.SIRHA_BackEnd.domain.port.GroupState;
 
 /**
  * Entidad del dominio que representa un grupo académico en el sistema SIRHA.
- * 
+ *
  * Un grupo es una instancia específica de una materia en un semestre determinado,
  * con un profesor asignado, un aula, horarios específicos y una capacidad máxima
  * de estudiantes. Esta clase implementa el patrón State para manejar los diferentes
  * estados del grupo (Abierto, Cerrado, Lleno).
- * 
+ *
  * Características principales:
  * - Gestión de capacidad y cupos disponibles
  * - Estado dinámico que controla las inscripciones (State Pattern)
  * - Lista de estudiantes inscritos
  * - Información del profesor y curso asignado
  * - Control de inscripciones duplicadas
- * 
+ *
  * Estados del grupo:
  * - ABIERTO: Acepta nuevas inscripciones si hay cupos
- * - CERRADO: No acepta mas inscripciones 
+ * - CERRADO: No acepta mas inscripciones
  * @see GroupState
  * @see Professor
  * @see Subject
@@ -33,19 +33,19 @@ public class Group {
     private GroupState estadoGrupo; // State Pattern
     private Professor profesor;
     private Subject curso;
-    //private Schedule horario;
+    private List<Schedule> horarios;
     private String aula;
     private List<Student> estudiantes;
 
     /**
      * Constructor principal para crear un nuevo grupo académico.
-     * 
+     *
      * Inicializa el grupo con una capacidad específica y lo establece
      * en estado ABIERTO por defecto. La lista de estudiantes se inicializa vacía.
-     * 
+     *
      * @param capacidad capacidad máxima de estudiantes para el grupo.
      *                 Debe ser un valor positivo mayor a cero.
-     * 
+     *
      * @example
      * <pre>
      * Group grupo = new Group(30);  // Grupo con capacidad para 30 estudiantes
@@ -58,7 +58,7 @@ public class Group {
         if (capacidad <= 0) {
             throw new IllegalArgumentException("La capacidad del grupo debe ser mayor a cero");
         }
-        
+
         this.capacidad = capacidad;
         this.inscritos = 0;
         this.estadoGrupo = new StatusOpen(); // Estado inicial: abierto
@@ -81,29 +81,29 @@ public class Group {
 
     /**
      * Intenta inscribir un estudiante en el grupo.
-     * 
+     *
      * Delega la operación de inscripción al estado actual del grupo,
      * que determina si la inscripción es posible según las reglas específicas
      * de cada estado (abierto, cerrado, lleno).
-     * 
+     *
      * El estado se encarga de:
      * - Validar si se puede realizar la inscripción
      * - Actualizar la lista de estudiantes y contador
      * - Cambiar el estado del grupo si es necesario
-     * 
+     *
      * @param estudiante estudiante a inscribir en el grupo. No debe ser null.
      */
     public void inscribirEstudiante(Student estudiante) {
         if (estudiante == null) {
             throw new IllegalArgumentException("El estudiante no puede ser null");
         }
-        
+
         estadoGrupo.inscribirEstudiante(this, estudiante);
     }
 
     /**
      * Calcula el número de cupos disponibles en el grupo.
-     * 
+     *
      * @return número de cupos libres (capacidad - inscritos).
      *         Retorna 0 si el grupo está lleno.
      */
@@ -113,46 +113,40 @@ public class Group {
 
     /**
      * Agrega un estudiante directamente a la lista del grupo.
-     * 
+     *
      * Este método es utilizado internamente por los estados del grupo
      * para realizar la inscripción efectiva. Actualiza tanto la lista
      * de estudiantes como el contador de inscritos.
-     * 
+     *
      * Validaciones realizadas:
      * - Verifica que el estudiante no esté ya inscrito
      * - Mantiene consistencia entre la lista y el contador
-     * 
+     *
      * @param estudiante estudiante a agregar. No debe ser null.
      * @throws IllegalArgumentException si el estudiante ya está inscrito
      *                                o si el parámetro es null
-     * 
+     *
      * @implNote Este método es package-private para uso interno del estado
      */
     public void addEstudiante(Student estudiante) {
         if (estudiante == null) {
             throw new IllegalArgumentException("El estudiante no puede ser null");
         }
-        
+
         if (estudiantes.contains(estudiante)) {
             throw new IllegalArgumentException("El estudiante ya está inscrito en el grupo");
         }
-        
+
         estudiantes.add(estudiante);
         inscritos++;
-        
-        // Verificar si el grupo se llenó y cambiar estado automáticamente
-        if (inscritos >= capacidad && !(estadoGrupo instanceof StatusClosed)) {
-            // Cambiar a estado "lleno" cuando se alcance la capacidad
-            // (implementación específica dependería de la clase StatusFull)
-        }
     }
 
     /**
      * Remueve un estudiante del grupo.
-     * 
+     *
      * Elimina al estudiante de la lista y actualiza el contador.
      * Puede cambiar el estado del grupo si es necesario.
-     * 
+     *
      * @param estudiante estudiante a remover. No debe ser null.
      * @return true si el estudiante fue removido, false si no estaba inscrito
      * @throws IllegalArgumentException si el estudiante es null
@@ -161,17 +155,14 @@ public class Group {
         if (estudiante == null) {
             throw new IllegalArgumentException("El estudiante no puede ser null");
         }
-        
+
         boolean removed = estudiantes.remove(estudiante);
         if (removed) {
             inscritos--;
-            
-            // Si el grupo estaba lleno y ahora tiene cupos, podría cambiar a abierto
-            if (inscritos < capacidad) {
-                // Lógica para cambiar estado si es necesario
-            }
+
+
         }
-        
+
         return removed;
     }
 
@@ -213,7 +204,7 @@ public class Group {
     /**
      * Establece la capacidad máxima del grupo.
      * Solo debe modificarse si no hay estudiantes inscritos.
-     * 
+     *
      * @param capacidad nueva capacidad. Debe ser mayor a cero.
      * @throws IllegalArgumentException si la capacidad es inválida
      * @throws IllegalStateException si hay estudiantes inscritos
@@ -225,6 +216,11 @@ public class Group {
         if (inscritos > 0) {
             throw new IllegalStateException("No se puede cambiar la capacidad con estudiantes inscritos");
         }
+
+        if (capacidad < inscritos) {
+            throw new IllegalArgumentException("La nueva capacidad no puede ser menor que el número actual de inscritos");
+        }
+
         this.capacidad = capacidad;
     }
 
@@ -276,7 +272,7 @@ public class Group {
     public boolean equals(Object obj) {
         if (this == obj) return true;
         if (obj == null || getClass() != obj.getClass()) return false;
-        
+
         Group group = (Group) obj;
         return Objects.equals(id, group.id);
     }
@@ -288,8 +284,22 @@ public class Group {
 
     @Override
     public String toString() {
-        return String.format("Group{id='%s', capacidad=%d, inscritos=%d, aula='%s', estado=%s}", 
-                            id, capacidad, inscritos, aula, 
-                            estadoGrupo != null ? estadoGrupo.getClass().getSimpleName() : "null");
+        return String.format("Group{id='%s', capacidad=%d, inscritos=%d, aula='%s', estado=%s}",
+                id, capacidad, inscritos, aula,
+                estadoGrupo != null ? estadoGrupo.getClass().getSimpleName() : "null");
+    }
+
+
+    public void addHorario(Schedule horario) {
+        for (Schedule existente : horarios) {
+            if (existente.seSolapaCon(horario)) {
+                throw new IllegalArgumentException("El horario se solapa con otro ya asignado en el grupo");
+            }
+        }
+        horarios.add(horario);
+    }
+
+    public List<Schedule> getHorarios() {
+        return horarios;
     }
 }

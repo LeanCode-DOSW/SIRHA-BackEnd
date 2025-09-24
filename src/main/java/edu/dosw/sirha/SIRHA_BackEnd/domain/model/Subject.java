@@ -1,41 +1,110 @@
 package edu.dosw.sirha.SIRHA_BackEnd.domain.model;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
-import org.springframework.data.mongodb.core.mapping.Field;
-
+/**
+ * Representa una materia o asignatura dentro del sistema académico.
+ *
+ * Reglas:
+ * - Una materia puede tener múltiples grupos.
+ * - Cada materia debe tener un nombre único y un identificador.
+ */
 public class Subject {
-    @Field("codigo")
-    private String codigo;
-    @Field("nombre")
-    private String nombre;
-    @Field("creditos")
+    private String id;
+    private String name;
     private int creditos;
-    @Field("grupos")
-    private List<Group> grupos = new ArrayList<>();
+    private List<Group> groups;
 
+    public Subject(String id, String name, int creditos) {
+        if (name == null || name.isBlank()) {
+            throw new IllegalArgumentException("El nombre de la materia no puede estar vacío");
+        }
+        if (creditos <= 0) {
+            throw new IllegalArgumentException("La materia debe tener al menos 1 crédito");
+        }
+        this.id = id;
+        this.name = name;
+        this.creditos = creditos;
+        this.groups = new ArrayList<>();
+    }
 
-    public Subject(String nombre, String codigo, int creditos) {
-        this.nombre = nombre;
-        this.codigo = codigo;
+    /**
+     * Asocia un grupo a la materia.
+     */
+    public void addGrupo(Group g) {
+        if (g == null) {
+            throw new IllegalArgumentException("El grupo no puede ser nulo");
+        }
+        groups.add(g);
+    }
+
+    /**
+     * Elimina un grupo de la materia.
+     */
+    public boolean removeGrupo(Group g) {
+        return groups.remove(g);
+    }
+
+    // ---------- Getters y Setters ----------
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        if (name == null || name.isBlank()) {
+            throw new IllegalArgumentException("El nombre no puede estar vacío");
+        }
+        this.name = name;
+    }
+
+    public int getCreditos() {
+        return creditos;
+    }
+
+    public void setCreditos(int creditos) {
+        if (creditos <= 0) {
+            throw new IllegalArgumentException("La materia debe tener al menos 1 crédito");
+        }
         this.creditos = creditos;
     }
-    
 
-    public void addGrupo(Group g) {
-        grupos.add(g);
+    public List<Group> getGroups() {
+        return groups;
     }
 
-    public String getNombre() { return nombre; }
-    public void setNombre(String nombre) { this.nombre = nombre; }
+    // ---------- equals, hashCode y toString ----------
 
-    public String getCodigo() { return codigo; }
-    public void setCodigo(String codigo) { this.codigo = codigo; }
-    
-    public int getCreditos() { return creditos; }
-    public void setCreditos(int creditos) { this.creditos = creditos; }
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Subject)) return false;
+        Subject subject = (Subject) o;
+        return Objects.equals(id, subject.id);
+    }
 
-    public List<Group> getGrupos() { return grupos; }
-    public void setGrupos(List<Group> grupos) { this.grupos = grupos; }
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
 
+    @Override
+    public String toString() {
+        return "Subject{" +
+                "id='" + id + '\'' +
+                ", name='" + name + '\'' +
+                ", creditos=" + creditos +
+                ", grupos=" + groups.size() +
+                '}';
+    }
 }
