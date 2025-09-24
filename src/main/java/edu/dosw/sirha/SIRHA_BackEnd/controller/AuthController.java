@@ -1,9 +1,13 @@
 package edu.dosw.sirha.SIRHA_BackEnd.controller;
 
-import edu.dosw.sirha.SIRHA_BackEnd.dto.AuthRequest;
-import edu.dosw.sirha.SIRHA_BackEnd.dto.AuthResponse;   
+import edu.dosw.sirha.SIRHA_BackEnd.dto.AuthResponse;
+import edu.dosw.sirha.SIRHA_BackEnd.dto.LoginRequest;
+import edu.dosw.sirha.SIRHA_BackEnd.dto.RegisterRequest;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.User;
 import edu.dosw.sirha.SIRHA_BackEnd.service.AuthService;
+import jakarta.validation.Valid;
+
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,8 +22,8 @@ import org.springframework.web.bind.annotation.*;
  * peticiones HTTP con formato JSON para el intercambio de datos.
 
  * @see AuthService
- * @see AuthRequest
  * @see AuthResponse
+ * @see LoginRequest
  */
 @RestController
 @RequestMapping("/api/auth")
@@ -44,15 +48,17 @@ public class AuthController {
      * 
      * @param request objeto que contiene las credenciales de autenticación
      *               (username y password). No debe ser null.
-     * @return ResponseEntity con AuthResponse conteniendo:
-     *         - Código 200: token y username si las credenciales son válidas
-     *         - Código 401: mensaje de error si las credenciales son inválidas
      */
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody AuthRequest request) {
-        return authService.login(request.getUsername(), request.getPassword())
-                .map(user -> ResponseEntity.ok(new AuthResponse("fake-jwt-token", user.getUsername())))
-                .orElse(ResponseEntity.status(401).body(new AuthResponse(null, "Credenciales inválidas")));
+    public ResponseEntity<?> login(@Valid @RequestBody LoginRequest request) {
+        try {
+            AuthResponse response = authService.loginStudent(request);
+            return ResponseEntity.ok(response);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(401).body(new LoginRequest(null, e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(new LoginRequest(null, "Error interno del servidor"));
+        }
     }
 
     /**
@@ -70,18 +76,19 @@ public class AuthController {
      * @param user objeto User con la información del nuevo usuario.
      *            Debe contener username, passwordHash y rol válidos.
      *            No debe ser null.
-     * @return ResponseEntity<User> con código 200 y el usuario creado,
-     *         incluyendo el ID asignado automáticamente
      */
     @PostMapping("/register")
-    public ResponseEntity<User> register(@RequestBody User user) {
-        return ResponseEntity.ok(authService.register(user));
+    public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest request) {
+        try{
+            AuthResponse response = authService.registerStudent(request);
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
     }
 
-    @GetMapping("/check-email/{email}")
-    public ResponseEntity<?> checkEmailAvailability(@PathVariable String email) {
-        boolean exists = authService.existsByEmail(email);
-        return ResponseEntity.ok(new AuthResponse(null, exists ? "Email ya en uso" : "Email disponible"));
-    }
+    
 
 }
