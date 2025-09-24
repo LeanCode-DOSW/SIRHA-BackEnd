@@ -6,7 +6,7 @@ import edu.dosw.sirha.SIRHA_BackEnd.domain.port.SubjectState;
 public class ReprobadaState implements SubjectState {
 
     @Override
-    public void setEstado(SubjectDecorator materia) {
+    public void setState(SubjectDecorator materia) {
         materia.setEstadoColor(SemaforoColores.ROJO);
     }
 
@@ -17,7 +17,7 @@ public class ReprobadaState implements SubjectState {
 
     @Override
     public void inscribir(SubjectDecorator materia) {
-        materia.setEstado(new EnCursoState());
+        materia.setState(new EnCursoState());
         materia.setEstadoColor(SemaforoColores.AMARILLO);
         System.out.println("Reinscripción de materia reprobada.");
     }

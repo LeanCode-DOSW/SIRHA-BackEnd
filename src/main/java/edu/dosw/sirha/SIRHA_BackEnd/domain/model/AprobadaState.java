@@ -6,7 +6,7 @@ import edu.dosw.sirha.SIRHA_BackEnd.domain.port.SubjectState;
 public class AprobadaState implements SubjectState {
 
     @Override
-    public void setEstado(SubjectDecorator materia) {
+    public void setState(SubjectDecorator materia) {
         materia.setEstadoColor(SemaforoColores.VERDE);
     }
 

@@ -8,7 +8,7 @@ public class NoCursadaState implements SubjectState {
     public NoCursadaState() {}
 
     @Override
-    public void setEstado(SubjectDecorator materia) {
+    public void setState(SubjectDecorator materia) {
         materia.setEstadoColor(SemaforoColores.GRIS);
     }
 
@@ -19,7 +19,7 @@ public class NoCursadaState implements SubjectState {
 
     @Override
     public void inscribir(SubjectDecorator materia) {
-        materia.setEstado(new EnCursoState());
+        materia.setState(new EnCursoState());
         materia.setEstadoColor(SemaforoColores.AMARILLO);
         materia.setSemestreMateria(1);  //semestreActual()
         System.out.println("Materia inscrita. Ahora está en curso.");

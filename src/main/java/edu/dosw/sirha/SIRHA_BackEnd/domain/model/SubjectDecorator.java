@@ -15,25 +15,24 @@ public class SubjectDecorator {
     @Field("semestre")
     private int semestre;
 
-    private SubjectState estado;
+    private SubjectState state;
 
     public SubjectDecorator(Subject subject) {
         this.subject = subject;
-        this.estado = new NoCursadaState();
+        this.state = new NoCursadaState();
     }
 
 
-    public String getNombre() {return subject.getNombre();}
-    public String getCodigo() {return subject.getCodigo();}
+    public String getName() {return subject.getName();}
     public int getCreditos() {return subject.getCreditos();}
-    public List<Group> getGrupos() {return subject.getGrupos();}
+    public List<Group> getGroups() {return subject.getGroups();}
 
-    public void setEstado(SubjectState estado) {this.estado = estado;}
+    public void setState(SubjectState state) {this.state = state;}
     public void setEstadoColor(SemaforoColores estadoColor) {this.estadoColor = estadoColor;}
     public void setSemestreMateria(int semestre){this.semestre = semestre;}
 
 
-    public void inscribir() { estado.inscribir(this); }
-    public void aprobar()   { estado.aprobar(this); }
-    public void reprobar()  { estado.reprobar(this); }
+    public void inscribir() { state.inscribir(this); }
+    public void aprobar()   { state.aprobar(this); }
+    public void reprobar()  { state.reprobar(this); }
 }

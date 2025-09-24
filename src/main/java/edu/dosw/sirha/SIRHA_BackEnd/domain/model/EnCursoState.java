@@ -6,7 +6,7 @@ import edu.dosw.sirha.SIRHA_BackEnd.domain.port.SubjectState;
 public class EnCursoState implements SubjectState {
 
     @Override
-    public void setEstado(SubjectDecorator materia) {
+    public void setState(SubjectDecorator materia) {
         materia.setEstadoColor(SemaforoColores.AMARILLO);
     }
 
@@ -22,14 +22,14 @@ public class EnCursoState implements SubjectState {
 
     @Override
     public void aprobar(SubjectDecorator materia) {
-        materia.setEstado(new AprobadaState());
+        materia.setState(new AprobadaState());
         materia.setEstadoColor(SemaforoColores.VERDE);
         System.out.println("Materia aprobada.");
     }
 
     @Override
     public void reprobar(SubjectDecorator materia) {
-        materia.setEstado(new ReprobadaState());
+        materia.setState(new ReprobadaState());
         materia.setEstadoColor(SemaforoColores.ROJO);
         System.out.println("Materia reprobada.");
     }
