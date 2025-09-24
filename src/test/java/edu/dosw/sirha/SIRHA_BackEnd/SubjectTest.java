@@ -1,3 +1,5 @@
+package edu.dosw.sirha.SIRHA_BackEnd;
+
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.Group;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.Subject;
 import org.junit.jupiter.api.Test;
