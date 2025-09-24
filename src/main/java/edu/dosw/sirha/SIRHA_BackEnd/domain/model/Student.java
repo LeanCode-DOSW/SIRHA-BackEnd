@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Objects;
 
+import org.springframework.data.mongodb.core.mapping.Document;
+
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.SemaforoColores;
 
 /**
@@ -29,11 +31,17 @@ import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.SemaforoColores;
  * @see Semaforo
  * @see BaseRequest
  */
+@Document(collection = "students")
 public class Student extends User {
     private String codigo;
     private StudyPlan planGeneral;
     private Semaforo semaforo;
     private List<BaseRequest> solicitudes;
+
+
+    public Student() {
+        super();
+    }
 
     /**
      * Constructor principal para crear un nuevo estudiante.
@@ -192,7 +200,7 @@ public class Student extends User {
      */
     @Override
     public String toString() {
-        return String.format("Student{id='%s', username='%s', codigo='%s', numSolicitudes=%d}", 
+        return String.format("Student{id='%s', userName='%s', codigo='%s', numSolicitudes=%d}", 
                             getId(), getUsername(), codigo, 
                             solicitudes != null ? solicitudes.size() : 0);
     }
