@@ -79,6 +79,7 @@ public abstract class BaseRequest implements Request {
      * @throws IllegalArgumentException si la prioridad está fuera del rango
      * @throws IllegalStateException si la solicitud no está pendiente
      */
+    
     public void setPrioridad(int prioridad) {
         if (prioridad < 1 || prioridad > 5) {
             throw new IllegalArgumentException("La prioridad debe estar entre 1 y 5");

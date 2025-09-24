@@ -33,5 +33,4 @@ public class StudentDTO {
     public void setSolicitudesIds(List<String> solicitudesIds) {
         this.solicitudesIds = solicitudesIds;
     }
-    
 }

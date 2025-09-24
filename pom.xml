@@ -133,16 +133,25 @@
 					<!-- Generación de reportes -->
 					<execution>
 						<id>report</id>
-						<phase>test</phase>
-						<goals>
-							<goal>report</goal>
-						</goals>
-						<configuration>
-							<excludes>
-								<exclude>**/configurators/**</exclude>
-							</excludes>
+							<phase>test</phase>
+								<goals>
+									<goal>report</goal>
+								</goals>
+								<configuration>
+									<includes>
+									<include>**/domain/**</include>
+									<include>**/util/**</include>
+									</includes>
+									<excludes>
+									<exclude>**/controller/**</exclude>
+									<exclude>**/service/**</exclude>
+									<exclude>**/repository/**</exclude>
+									<exclude>**/dto/**</exclude>
+									<exclude>**/config/**</exclude>
+								</excludes>
 						</configuration>
 					</execution>
+
 
 					<!-- Verificación de cobertura -->
 					<execution>

@@ -1,6 +1,7 @@
 package edu.dosw.sirha.SIRHA_BackEnd.domain.model;
 
 import edu.dosw.sirha.SIRHA_BackEnd.domain.port.Authenticable;
+import edu.dosw.sirha.SIRHA_BackEnd.util.PasswordUtils;
 
 public abstract class User implements Authenticable {
     private String id;
@@ -12,12 +13,11 @@ public abstract class User implements Authenticable {
         this.id = id;
         this.name = name;
         this.email = email;
-        this.password = password;
+        this.password = password.startsWith("$2a$") ? password : PasswordUtils.hashPassword(password);
     }
     
     public boolean verificarContraseña(String rawPassword) {
-        // Aquí usarás BCrypt u otra utilidad
-        return password.equals(rawPassword);
+        return PasswordUtils.verifyPassword(rawPassword, this.password);
     }
     
     public String getUsername(){
@@ -36,7 +36,7 @@ public abstract class User implements Authenticable {
         return password;
     }
     public void setPasswordHash(String passwordHash){
-        this.password = passwordHash;
+        this.password = PasswordUtils.hashPassword(passwordHash);
     }
     public String getEmail(){
         return email;

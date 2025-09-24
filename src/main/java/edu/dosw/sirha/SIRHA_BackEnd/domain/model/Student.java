@@ -90,22 +90,6 @@ public class Student extends User {
     }
 
     /**
-     * Verifica si el estudiante puede realizar una solicitud específica.
-     * 
-     * Evalúa las condiciones académicas y reglamentarias para determinar
-     * si el estudiante está habilitado para realizar cierto tipo de solicitud.
-     * 
-     * @param tipoSolicitud tipo de solicitud a evaluar
-     * @return true si puede realizar la solicitud, false en caso contrario
-     */
-    public boolean puedeRealizarSolicitud(String tipoSolicitud) {
-        // Lógica de validación será implementada según reglas de negocio
-        return true; // Placeholder - implementar lógica específica
-    }
-
-    // Getters y Setters con documentación
-
-    /**
      * Obtiene el código estudiantil.
      * @return código único del estudiante
      */

@@ -1,7 +1,12 @@
 package edu.dosw.sirha.SIRHA_BackEnd;
 
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.Student;
+import edu.dosw.sirha.SIRHA_BackEnd.dto.AuthResponse;
+import edu.dosw.sirha.SIRHA_BackEnd.dto.LoginRequest;
+import edu.dosw.sirha.SIRHA_BackEnd.dto.RegisterRequest;
 import edu.dosw.sirha.SIRHA_BackEnd.dto.StudentDTO;
+import edu.dosw.sirha.SIRHA_BackEnd.service.AuthService;
+import edu.dosw.sirha.SIRHA_BackEnd.service.impl.AuthServiceImpl;
 import edu.dosw.sirha.SIRHA_BackEnd.util.MapperUtils;
 import edu.dosw.sirha.SIRHA_BackEnd.util.PasswordUtils;
 import org.junit.jupiter.api.Test;
@@ -129,7 +134,7 @@ class SirhaBackEndApplicationTests {
         assertEquals("juan.perez", student.getUsername());
         assertEquals("EST001", student.getCodigo());
 		assertEquals("12345", student.getId());
-		assertEquals("hashedPass", student.getPasswordHash());
+		assertTrue(PasswordUtils.verifyPassword("hashedPass", student.getPasswordHash()));
 		assertEquals("juan.perez@example.com", student.getEmail());
     }
     
