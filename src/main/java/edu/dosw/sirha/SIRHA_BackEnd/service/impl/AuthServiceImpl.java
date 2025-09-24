@@ -80,17 +80,18 @@ public class AuthServiceImpl implements AuthService {
         Optional<Student> studentOpt = studentService.findByUsername(request.getUsername());
         
         if (studentOpt.isEmpty()) {
+            System.out.println("No se encontró por username, intentando por email...");
             studentOpt = studentService.findByEmail(request.getUsername());
         }
         
         if (studentOpt.isEmpty()) {
-            throw new IllegalArgumentException("Credenciales inválidas");
+            throw new IllegalArgumentException("Credenciales inválidas: usuario no encontrado");
         }
         
         Student student = studentOpt.get();
         
         if (!student.verificarContraseña(request.getPassword())) {
-            throw new IllegalArgumentException("Credenciales inválidas");
+            throw new IllegalArgumentException("Credenciales inválidas: contraseña incorrecta");
         }
         
         return new AuthResponse(

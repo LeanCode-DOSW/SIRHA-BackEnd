@@ -153,8 +153,6 @@ Contiene las configuraciones específicas de Spring Boot para seguridad, documen
 
     compilar ->  mvn clean compile/verify
 
-    ejecutar ->  mvn exec:java -Dexec.mainClass="eci.edu.dosw.proyecto.SIRHA_BackEnd.SirhaBackEndApplication"
-
     ejecutar ->  mvn spring-boot:run
 
     pruebas  ->  mvn test

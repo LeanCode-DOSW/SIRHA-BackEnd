@@ -1,17 +1,26 @@
 package edu.dosw.sirha.SIRHA_BackEnd.domain.model;
 
+import org.springframework.data.annotation.*;
+import org.springframework.data.mongodb.core.mapping.*;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.port.Authenticable;
 import edu.dosw.sirha.SIRHA_BackEnd.util.PasswordUtils;
 
+@Document(collection = "users")
 public abstract class User implements Authenticable {
+    @Id
     private String id;
-    private String name;
+    @Field("username")
+    private String username;
+    @Field("email")
     private String email;
+    @Field("password")
     private String password;
 
-    public User(String id, String name, String email, String password) {
+    public User() {}
+
+    public User(String id, String username, String email, String password) {
         this.id = id;
-        this.name = name;
+        this.username = username;
         this.email = email;
         this.password = password.startsWith("$2a$") ? password : PasswordUtils.hashPassword(password);
     }
@@ -19,12 +28,12 @@ public abstract class User implements Authenticable {
     public boolean verificarContraseña(String rawPassword) {
         return PasswordUtils.verifyPassword(rawPassword, this.password);
     }
-    
+
     public String getUsername(){
-        return name;
+        return username;
     }
     public void setUsername(String username){
-        this.name = username;
+        this.username = username;
     }
     public String getId(){
         return id;

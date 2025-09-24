@@ -55,8 +55,10 @@ public class AuthController {
             AuthResponse response = authService.loginStudent(request);
             return ResponseEntity.ok(response);
         } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
             return ResponseEntity.status(401).body(new LoginRequest(null, e.getMessage()));
         } catch (Exception e) {
+            System.out.println(e.getMessage());
             return ResponseEntity.status(500).body(new LoginRequest(null, "Error interno del servidor"));
         }
     }
