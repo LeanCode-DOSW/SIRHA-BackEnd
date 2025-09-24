@@ -302,4 +302,5 @@ public class Group {
     public List<Schedule> getHorarios() {
         return horarios;
     }
+
 }

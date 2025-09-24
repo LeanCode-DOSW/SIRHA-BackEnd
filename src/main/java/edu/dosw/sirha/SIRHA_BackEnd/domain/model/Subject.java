@@ -107,4 +107,16 @@ public class Subject {
                 ", grupos=" + groups.size() +
                 '}';
     }
+    public String getNombre(){
+        return name;
+    }
+    public String getCodigo(){
+        return id;
+    }
+    public List<Group> getGrupos(){
+        return groups;
+    }
+    public boolean isHasGroup(Group group){
+        return groups.contains(group);
+    }
 }
