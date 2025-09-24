@@ -4,13 +4,13 @@ import java.util.*;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.SemaforoColores;
 
 public class Semaforo {
-    private Map<String, SemaforoColores> estados = new HashMap<>();
+    List<SubjectDecorator> subjects;
+    StudyPlan studyPlan;
 
-    public SemaforoColores getColor(String materiaCodigo) {
-        return estados.getOrDefault(materiaCodigo, SemaforoColores.GRIS);
+    public Semaforo(StudyPlan studyPlan) {
+        this.subjects = new ArrayList<>();
+        this.studyPlan = studyPlan;
     }
 
-    public void actualizarEstado(String materiaCodigo, SemaforoColores color) {
-        estados.put(materiaCodigo, color);
-    }
+
 }
