@@ -16,6 +16,11 @@ public class ReprobadaState implements SubjectState {
     }
 
     @Override
+    public void agregarGrupo(SubjectDecorator materia, Group grupo) {
+        System.out.println("No puedes agregar un grupo a una materia reprobada, tiene el grupo con el que viste y repobaste hasta que la vuelvas a ver.");
+    }
+
+    @Override
     public void inscribir(SubjectDecorator materia) {
         materia.setState(new EnCursoState());
         materia.setEstadoColor(SemaforoColores.AMARILLO);

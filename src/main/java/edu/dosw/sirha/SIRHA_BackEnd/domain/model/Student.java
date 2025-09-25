@@ -69,6 +69,7 @@ public class Student extends User {
             throw new IllegalArgumentException("El código de estudiante no puede ser null o vacío");
         }
         this.codigo = codigo;
+        solicitudes = new ArrayList<>();
     }
 
     /**
@@ -199,5 +200,118 @@ public class Student extends User {
         return String.format("Student{id='%s', username='%s', codigo='%s', numSolicitudes=%d}", 
                             getId(), getUsername(), codigo, 
                             solicitudes != null ? solicitudes.size() : 0);
+    }
+
+
+    /**
+     * Inscribe al estudiante en una materia manteniendo la consistencia entre horario y semáforo.
+     * 
+     * @param subject la materia a inscribir
+     * @param semestre el semestre en el que se inscribe
+     */
+    public void inscribirMateria(SubjectDecorator subject, int semestre) { //Mirar
+        if (subject == null) {
+            return;
+        }
+        if (semaforo.estaInscrito(subject.getName())) {
+            return;
+        }
+        //faltaria verificar si el grupo al que se inscribe tiene conflictos con horario o tiene grupos
+        semaforo.actualizarEstadoMateria(subject.getName(), SemaforoColores.AMARILLO);
+        semaforo.setSemestreMateria(subject.getName(), semestre);
+    }
+
+    /**
+     * Actualiza el estado de una materia en el semáforo.
+     * 
+     * @param subjectId ID de la materia
+     * @param nuevoColor nuevo color del semáforo
+     * @return true si la actualización fue exitosa
+     */
+    public void actualizarEstadoMateria(String subjectId, SemaforoColores nuevoColor) {
+        if (semaforo == null || subjectId == null || nuevoColor == null) {
+            return;
+        }
+        semaforo.actualizarEstadoMateria(subjectId, nuevoColor);
+    }
+
+
+    /**
+     * Obtiene las materias de un semestre específico.
+     * 
+     * @param semestre el semestre a consultar
+     * @return lista de materias del semestre
+     */
+    public List<SubjectDecorator> getMateriasPorSemestre(int semestre) { 
+        if (this.semaforo == null) {
+            return new ArrayList<>();
+        }
+        return semaforo.getMateriasPorSemestre(semestre);
+    }
+
+    /**
+     * Calcula el total de créditos por estado del semáforo.
+     * 
+     * @param color el color del semáforo a filtrar
+     * @return total de créditos
+     */
+    public int getCreditosPorColor(SemaforoColores color) {
+        if (this.semaforo == null) {
+            return 0;
+        }
+        return semaforo.getCreditosPorColor(color);
+    }
+
+    /**
+     * Verifica si el estudiante tiene materias con conflictos de horario.
+     * 
+     */
+    public boolean tieneConflictosConHorario(SubjectDecorator subject) {
+        return semaforo.tieneConflictosHorario(subject);
+        
+    }
+    public List<SubjectDecorator> getMateriasCursando() {
+        if (this.semaforo == null) {
+            return new ArrayList<>();
+        }
+        return semaforo.getMateriasCursando();
+    }
+    public int getMateriasCursandoCount() {
+        if (this.semaforo == null) {
+            return 0;
+        }
+        return semaforo.getMateriasCursandoCount();
+    }
+    public int getMateriasAprobadasCount() {
+        if (this.semaforo == null) {
+            return 0;
+        }
+        return semaforo.getMateriasAprobadasCount();
+    }
+    
+    public int getMateriasReprobadasCount() {
+        if (this.semaforo == null) {
+            return 0;
+        }
+        return semaforo.getMateriasReprobadasCount();
+    }
+
+    /**
+     * Obtiene un resumen del progreso académico del estudiante.
+     * 
+     * @return string con el resumen
+     */
+    public String getResumenAcademico() {
+        int aprobadas = semaforo.getMateriasAprobadasCount();
+        int cursando = semaforo.getMateriasCursandoCount();
+        int reprobadas = semaforo.getMateriasReprobadasCount();
+        int noCursadas = semaforo.getMateriasNoCursadasCount();
+        int creditosAprobados = getCreditosPorColor(SemaforoColores.VERDE);
+        int creditosCursando = getCreditosPorColor(SemaforoColores.AMARILLO);
+
+        return String.format(
+            "Estudiante: %s - Aprobadas: %d (%d créditos) | Cursando: %d (%d créditos) | Reprobadas: %d | No Cursadas: %d",
+            codigo, aprobadas, creditosAprobados, cursando, creditosCursando, reprobadas, noCursadas
+        );
     }
 }

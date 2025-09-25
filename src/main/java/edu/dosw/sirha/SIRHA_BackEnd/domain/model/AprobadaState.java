@@ -14,6 +14,10 @@ public class AprobadaState implements SubjectState {
     public void setSemestre(SubjectDecorator materia, int semestre) {
         materia.setSemestreMateria(semestre);
     }
+    @Override
+    public void agregarGrupo(SubjectDecorator materia, Group grupo) {
+        System.out.println("No puedes agregar un grupo a una materia aprobada, ya debe de tener un grupo asignado con la que se aprobo.");
+    }
 
     @Override
     public void inscribir(SubjectDecorator materia) {

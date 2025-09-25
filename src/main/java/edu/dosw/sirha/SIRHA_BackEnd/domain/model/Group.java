@@ -63,6 +63,7 @@ public class Group {
         this.inscritos = 0;
         this.estadoGrupo = new StatusOpen(); // Estado inicial: abierto
         this.estudiantes = new ArrayList<>();
+        horarios = new ArrayList<>();
     }
     public void setEstadoGrupo(GroupState estado) {
         if (estado == null) {
@@ -301,5 +302,27 @@ public class Group {
 
     public List<Schedule> getHorarios() {
         return horarios;
+    }
+
+    public boolean conflictoConHorario(Schedule horario) {
+        for (Schedule existente : horarios) {
+            if (existente.seSolapaCon(horario)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+    public boolean conflictoConHorario(Group otroGrupo) {
+        if (otroGrupo == null || otroGrupo.getHorarios() == null) {
+            return false;
+        }
+        for (Schedule horarioOtro : otroGrupo.getHorarios()) {
+            if (this.conflictoConHorario(horarioOtro)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

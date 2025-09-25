@@ -16,6 +16,10 @@ public class NoCursadaState implements SubjectState {
     public void setSemestre(SubjectDecorator materia,int semestre) {
         materia.setSemestreMateria(0); // No aplica lanzar excepcion
     }
+    @Override
+    public void agregarGrupo(SubjectDecorator materia, Group grupo) {
+        System.out.println("No puedes agregar un grupo a una materia que no has visto.");
+    }
 
     @Override
     public void inscribir(SubjectDecorator materia) {

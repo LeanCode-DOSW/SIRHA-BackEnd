@@ -14,6 +14,15 @@ public class EnCursoState implements SubjectState {
     public void setSemestre(SubjectDecorator materia, int semestre) {
         materia.setSemestreMateria(semestre); // semestre en que se cursa
     }
+    @Override
+    public void agregarGrupo(SubjectDecorator materia, Group grupo) {
+        if (grupo != null) {
+            materia.setGroup(grupo);
+            System.out.println("Grupo agregado a la materia en curso.");
+        } else {
+            System.out.println("No puedes agregar un grupo nulo.");
+        }
+    }
 
     @Override
     public void inscribir(SubjectDecorator materia) {
