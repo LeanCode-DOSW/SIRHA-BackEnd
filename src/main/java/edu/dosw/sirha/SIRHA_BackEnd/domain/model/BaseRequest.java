@@ -37,6 +37,12 @@ public abstract class BaseRequest implements Request {
     private int prioridad;
     private RequestState estado;
     private LocalDateTime creadoEn;
+    private Student student;
+    private Subject previousSubject;
+    private Group previousGroup;    
+    private Subject newSubject;
+    private Group newGroup;
+    private String motivo;
 
     /**
      * Constructor base para todas las solicitudes.
@@ -45,16 +51,54 @@ public abstract class BaseRequest implements Request {
      * automáticamente el estado como PENDIENTE y el timestamp de creación.
      * 
      * @param prioridad nivel de prioridad de la solicitud.
+     * @param previousSubject materia previa del estudiante
+     * @param previousGroup grupo previo del estudiante
+     * @param newSubject nueva materia solicitada
+     * @param newGroup nuevo grupo solicitado
+     * @param motivo razón o justificación de la solicitud
+     * @param student estudiante que realiza la solicitud
+     * 
      */
-    public BaseRequest(int prioridad) {
+    public BaseRequest(Subject previousSubject, Group previousGroup, Subject newSubject, Group newGroup, String motivo, int prioridad, Student student) {
         this.prioridad = prioridad;
         this.estado = RequestState.PENDIENTE;
         this.creadoEn = LocalDateTime.now();
+        this.previousSubject = previousSubject;
+        this.previousGroup = previousGroup;
+        this.newSubject = newSubject;
+        this.newGroup = newGroup;
+        this.motivo = motivo;
+        this.student = student;
     }
 
 
+    /**
+     * Implementación del método de validación de la solicitud.
+     * si la solicitud no afecta las demas materias, existe el grupo y la materia, sera valida
+     * de lo contrario sera rechazada
+     */
+    public boolean valideResquest(){
+        if (validar(newSubject, newGroup)){
+            return true;
+        }else{
+            setEstado(RequestState.RECHAZADA);
+            return false;
+        }
+    };
+    
+
+    
+    public AdminState approveRequest(){
+        //LOGICA PARA COMUNICARSE CON DECANATURA O PROFESORES Y MANEJARLA
+        // establecer el estado a aprobado o rechazado
+        setEstado(RequestState.APROBADA);
+        return AdminState.APROBAR;
+    };
+    
+
     public abstract void aprobar();
     public abstract void rechazar();
+
 
     public String getId() {
         return id;
@@ -138,6 +182,9 @@ public abstract class BaseRequest implements Request {
         }
         this.creadoEn = creadoEn;
     }
+    public Student getStudent() {
+        return student;
+    }
 
     /**
      * Representación en string de la solicitud con información básica.
@@ -147,4 +194,6 @@ public abstract class BaseRequest implements Request {
         return String.format("%s{id='%s', prioridad=%d, estado=%s, creadoEn=%s}", 
                             getClass().getSimpleName(), id, prioridad, estado, creadoEn);
     }
+
+
 }

@@ -1,18 +1,33 @@
 package edu.dosw.sirha.SIRHA_BackEnd.domain.model;
 
-public class CambioGrupo extends BaseRequest {
-    private String fromGroupId;   // cada id es unica entre todas las materias
-    private String toGroupId;
+import java.util.Map;
 
-    public CambioGrupo(int prioridad, String fromGroupId, String toGroupId) {
-        super(prioridad);
-        this.fromGroupId = fromGroupId;
-        this.toGroupId = toGroupId;
+import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.AdminState;
+import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.SemaforoColores;
+
+public class CambioGrupo extends BaseRequest {
+
+    public CambioGrupo(Subject previousSubject, Group previousGroup,
+                       Subject newSubject, Group newGroup, String motivo,int prioridad, Student student) {
+        super(previousSubject, previousGroup, newSubject, newGroup, motivo,prioridad, student);
+       
     }
 
     @Override
-    public boolean validar() {
-        return false;
+    public boolean validar(Subject newSubject, Group newGroup) {
+        String subjectName = newSubject.getName();
+
+        Student student = this.getStudent();
+        Semaforo semaforo = student.getSemaforo();
+        Map<String, SemaforoColores> colores = semaforo.getAll();
+
+        
+
+        if (colores.get(subjectName) == SemaforoColores.ROJO){
+            return false;
+        }
+        return true;
+
     }
 
     @Override
@@ -22,10 +37,23 @@ public class CambioGrupo extends BaseRequest {
 
     @Override
     public void aprobar() {
+        
     }
 
     @Override
     public void rechazar() {
     }
 
+    @Override
+    public boolean valideResquest() {
+        return false;
+    }
+
+    @Override
+    public AdminState approveRequest() {
+        return null;
+    }
+    @Override
+    public void proccessRequest() {
+    }
 }
