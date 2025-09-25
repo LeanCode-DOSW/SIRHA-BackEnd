@@ -10,7 +10,7 @@ public class CambioMateria extends BaseRequest {
     }
 
     @Override
-    public boolean validar() {
+    public boolean validar(Subject newSubject, Group newGroup) {
         return false;
     }
 

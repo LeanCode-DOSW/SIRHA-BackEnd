@@ -1,4 +1,5 @@
 package edu.dosw.sirha.SIRHA_BackEnd.domain.port;
+import edu.dosw.sirha.SIRHA_BackEnd.domain.model.*;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.*;
 
 /**
@@ -18,6 +19,6 @@ public interface Request {
     void proccessRequest();
 
     // metodos para validar la solicitud
-    boolean validar();
+    boolean validar(Subject newSubject, Group newGroup);
     boolean aplicar();
 }

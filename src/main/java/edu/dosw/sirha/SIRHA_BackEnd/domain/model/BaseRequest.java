@@ -71,6 +71,20 @@ public abstract class BaseRequest implements Request {
         this.student = student;
     }
 
+
+    /**
+     * Implementación del método de validación de la solicitud.
+     * si la solicitud no afecta las demas materias, existe el grupo y la materia, sera valida
+     * de lo contrario sera rechazada
+     */
+    public boolean valideResquest(){
+        if (validar(newSubject, newGroup)){
+            return true;
+        }else{
+            setEstado(RequestState.RECHAZADA);
+            return false;
+        }
+    };
     
 
     
@@ -80,6 +94,7 @@ public abstract class BaseRequest implements Request {
         setEstado(RequestState.APROBADA);
         return AdminState.APROBAR;
     };
+    
 
     public abstract void aprobar();
     public abstract void rechazar();
@@ -166,6 +181,9 @@ public abstract class BaseRequest implements Request {
             throw new IllegalArgumentException("La fecha de creación no puede ser futura");
         }
         this.creadoEn = creadoEn;
+    }
+    public Student getStudent() {
+        return student;
     }
 
     /**
