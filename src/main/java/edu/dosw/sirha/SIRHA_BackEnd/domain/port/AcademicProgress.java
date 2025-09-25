@@ -66,4 +66,10 @@ public interface AcademicProgress {
      * @return array con [aprobadas, cursando, reprobadas, noCursadas]
      */
     int[] getContadoresPorEstado();
+
+
+    int getMateriasAprobadasCount();
+    int getMateriasCursandoCount();
+    int getMateriasReprobadasCount();
+    int getMateriasNoCursadasCount();
 }

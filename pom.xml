@@ -163,9 +163,9 @@
 								<configuration>
 									<includes>
 									<include>**/domain/**</include>
-									<include>**/util/**</include>
 									</includes>
 									<excludes>
+									<exclude>**/util/**</exclude>
 									<exclude>**/controller/**</exclude>
 									<exclude>**/service/**</exclude>
 									<exclude>**/repository/**</exclude>

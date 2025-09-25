@@ -134,28 +134,28 @@ public class Student extends User {
         if (this.academicProgress == null) {
             return 0;
         }
-        return academicProgress.getMateriasCursando().size();
+        return academicProgress.getMateriasCursandoCount();
     }
     
     public int getMateriasAprobadasCount() {
         if (this.academicProgress == null) {
             return 0;
         }
-        return academicProgress.getMateriasAprobadas().size();
+        return academicProgress.getMateriasAprobadasCount();
     }
    
     public int getMateriasReprobadasCount() {
         if (this.academicProgress == null) {
             return 0;
         }
-        return academicProgress.getMateriasReprobadas().size();
+        return academicProgress.getMateriasReprobadasCount();
     }
     
     public int getMateriasNoCursadasCount() {
         if (this.academicProgress == null) {
             return 0;
         }
-        return academicProgress.getMateriasNoCursadas().size();
+        return academicProgress.getMateriasNoCursadasCount();
     }
     /**
      * Representación en string del estudiante.
@@ -222,7 +222,79 @@ public class Student extends User {
             .filter(materia -> materia.getGroup() != null)
             .anyMatch(materia -> materia.getGroup().conflictoConHorario(nuevoGrupo));
     }
-   
+    
+    /**
+     * Obtiene todos los semestres únicos de las materias del estudiante.
+     * 
+     * @return conjunto de semestres ordenados
+     */
+    public List<Integer> getSemestresHistoricos() {
+        if (academicProgress == null) {
+            return new ArrayList<>();
+        }
+        
+        return academicProgress.getSubjects().stream()
+            .map(SubjectDecorator::getSemestre)
+            .filter(s -> s > 0)
+            .distinct()
+            .sorted()
+            .toList();
+    }
+    
+    /**
+     * Obtiene los horarios de las materias en curso (materias amarillas).
+     * 
+     * @return lista de horarios de Schedule
+     */
+    public List<Schedule> getHorariosActuales() {
+        if (academicProgress == null) {
+            return new ArrayList<>();
+        }
+        
+        return getMateriasCursando().stream()
+            .filter(materia -> materia.getGroup() != null)
+            .flatMap(materia -> materia.getGroup().getHorarios().stream())
+            .toList();
+    }
+    
+    /**
+     * Verifica si el estudiante tiene alguna materia inscrita en el semestre actual.
+     * 
+     * @return true si tiene materias cursando, false en caso contrario
+     */
+    public boolean tieneMateriasEnCurso() {
+        return getMateriasCursandoCount() > 0;
+    }
+    
+    /**
+     * Obtiene el total de créditos que está cursando actualmente.
+     * 
+     * @return total de créditos en curso
+     */
+    public int getCreditosEnCurso() {
+        return getCreditosPorColor(SemaforoColores.AMARILLO);
+    }
+    
+    /**
+     * Obtiene el semestre académico actual basado en las materias en curso.
+     * Calcula el semestre promedio de las materias que está cursando.
+     * 
+     * @return semestre actual calculado
+     */
+    public int getSemestreActual() {
+        List<SubjectDecorator> cursando = getMateriasCursando();
+        if (cursando.isEmpty()) {
+            return 1; // Si no tiene materias en curso, asume primer semestre
+        }
+        
+        double promedioSemestre = cursando.stream()
+            .mapToInt(SubjectDecorator::getSemestre)
+            .filter(s -> s > 0)
+            .average()
+            .orElse(1.0);
+            
+        return (int) Math.ceil(promedioSemestre);
+    }
    
 }
  
