@@ -33,26 +33,6 @@ public class Student extends User {
         super();
     }
  
-    /**
-     * Constructor principal para crear un nuevo estudiante.
-     *
-     * Inicializa un estudiante con los datos básicos requeridos.
-     * El gestor de solicitudes se inicializa automáticamente.
-     * El plan de estudios y progreso académico deben ser asignados posteriormente.
-     *
-     * @param id identificador único del estudiante en el sistema.
-     *          No debe ser null o vacío.
-     * @param username nombre de usuario para acceso al sistema.
-     *                Debe ser único. No debe ser null o vacío.
-     * @param passwordHash hash de la contraseña del estudiante.
-     *                    Debe estar previamente hasheado por seguridad.
-     * @param rol rol del usuario en el sistema (típicamente "ESTUDIANTE").
-     *           No debe ser null.
-     * @param codigo código estudiantil único.
-     *              No debe ser null o vacío.
-     *
-     * @throws IllegalArgumentException si algún parámetro requerido es null o vacío
-     */
     public Student(String id, String username, String email, String passwordHash, String codigo) {
         super(id, username, email, passwordHash);
         if (codigo == null || codigo.trim().isEmpty()) {
@@ -101,10 +81,7 @@ public class Student extends User {
         this.planGeneral = planGeneral;
     }
  
-    /**
-     * Obtiene el progreso académico del estudiante.
-     * @return progreso académico, puede ser null si no se ha inicializado
-     */
+
     public AcademicProgress getAcademicProgress() {
         return academicProgress;
     }
@@ -113,11 +90,7 @@ public class Student extends User {
     public AcademicProgress getSemaforo() {
         return  academicProgress;
     }
- 
-    /**
-     * Establece el progreso académico del estudiante.
-     * @param academicProgress nuevo progreso académico a asignar
-     */
+
     public void setAcademicProgress(AcademicProgress academicProgress) {
         this.academicProgress = academicProgress;
     }
@@ -146,12 +119,6 @@ public class Student extends User {
         return Objects.equals(codigo, student.codigo);
     }
     
-    /**
-     * Genera el código hash para este estudiante.
-     * Debe ser consistente con equals() - estudiantes iguales deben tener el mismo hashCode.
-     *
-     * @return código hash basado en el código del estudiante
-     */
     @Override
     public int hashCode() {
         return Objects.hash(super.hashCode(), codigo);

@@ -4,13 +4,12 @@ import java.util.List;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.SemaforoColores;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.port.*;
 
-public class SubjectDecorator {    
+public class SubjectDecorator {
     private final Subject subject;
     private SemaforoColores estadoColor;
     private int semestre;
     private SubjectState state;
     private Group group;
-
 
     public SubjectDecorator(Subject subject) {
         this.subject = subject;

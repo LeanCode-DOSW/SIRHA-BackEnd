@@ -9,8 +9,6 @@ import edu.dosw.sirha.SIRHA_BackEnd.domain.port.AcademicProgress;
 /**
  * Implementación del progreso académico que mantiene el estado de las materias
  * de un estudiante mediante un sistema de semáforo por colores.
- * 
- * Implementa AcademicProgress para cumplir con el principio de Inversión de Dependencias.
  */
 public class Semaforo implements AcademicProgress {
     private Map<String, SubjectDecorator> subjects;
