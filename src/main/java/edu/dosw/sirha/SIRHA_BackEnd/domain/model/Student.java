@@ -6,8 +6,9 @@ import java.util.Objects;
  
 import org.springframework.data.mongodb.core.mapping.Document;
  
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.SemaforoColores;
- 
+import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.*;
+import edu.dosw.sirha.SIRHA_BackEnd.domain.port.*;
+
 /**
  * Entidad del dominio que representa a un estudiante en el sistema SIRHA.
  *
@@ -19,24 +20,13 @@ import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.SemaforoColores;
  * principales (inscripciones, cambios de grupo, solicitudes) se realizan en
  * torno a esta entidad.
  *
- * Características principales:
- * - Hereda propiedades básicas de User (id, username, password, rol)
- * - Tiene un código estudiantil único en el sistema
- * - Posee un plan de estudios asignado
- * - Mantiene un semáforo de estado académico por materia
- * - Gestiona una lista de solicitudes académicas
- *
- * @see User
- * @see StudyPlan
- * @see Semaforo
- * @see BaseRequest
  */
 @Document(collection = "students")
 public class Student extends User {
     private String codigo;
     private StudyPlan planGeneral;
-    private Semaforo semaforo;
     private List<BaseRequest> solicitudes;
+    private AcademicProgress academicProgress;
  
  
     public Student() {
@@ -47,8 +37,8 @@ public class Student extends User {
      * Constructor principal para crear un nuevo estudiante.
      *
      * Inicializa un estudiante con los datos básicos requeridos.
-     * La lista de solicitudes se inicializa como lista vacía.
-     * El plan de estudios y semáforo deben ser asignados posteriormente.
+     * El gestor de solicitudes se inicializa automáticamente.
+     * El plan de estudios y progreso académico deben ser asignados posteriormente.
      *
      * @param id identificador único del estudiante en el sistema.
      *          No debe ser null o vacío.
@@ -69,7 +59,10 @@ public class Student extends User {
             throw new IllegalArgumentException("El código de estudiante no puede ser null o vacío");
         }
         this.codigo = codigo;
-        solicitudes = new ArrayList<>();
+    }
+    
+    public List<BaseRequest> getSolicitudes(){
+        return solicitudes;
     }
  
     /**
@@ -109,32 +102,32 @@ public class Student extends User {
     }
  
     /**
-     * Obtiene el semáforo académico del estudiante.
-     * @return semáforo académico, puede ser null si no se ha inicializado
+     * Obtiene el progreso académico del estudiante.
+     * @return progreso académico, puede ser null si no se ha inicializado
      */
-    public Semaforo getSemaforo() {
-        return semaforo;
+    public AcademicProgress getAcademicProgress() {
+        return academicProgress;
+    }
+    
+
+    public AcademicProgress getSemaforo() {
+        return  academicProgress;
     }
  
     /**
-     * Establece el semáforo académico del estudiante.
-     * @param semaforo nuevo semáforo a asignar
+     * Establece el progreso académico del estudiante.
+     * @param academicProgress nuevo progreso académico a asignar
      */
+    public void setAcademicProgress(AcademicProgress academicProgress) {
+        this.academicProgress = academicProgress;
+    }
+    
+
     public void setSemaforo(Semaforo semaforo) {
-        this.semaforo = semaforo;
+        this.academicProgress = semaforo;
     }
- 
-    /**
-     * Obtiene la lista de solicitudes del estudiante.
-     * @return lista de solicitudes, nunca null (inicializada como lista vacía)
-     */
-    public List<BaseRequest> getSolicitudes() {
-        if (solicitudes == null) {
-            solicitudes = new ArrayList<>();
-        }
-        return solicitudes;
-    }
- 
+
+    
  
     /**
      * Compara este estudiante con otro objeto para determinar igualdad.
@@ -152,37 +145,50 @@ public class Student extends User {
         Student student = (Student) obj;
         return Objects.equals(codigo, student.codigo);
     }
- 
+    
+    /**
+     * Genera el código hash para este estudiante.
+     * Debe ser consistente con equals() - estudiantes iguales deben tener el mismo hashCode.
+     *
+     * @return código hash basado en el código del estudiante
+     */
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), codigo);
+    }
+    
     public List<SubjectDecorator> getMateriasCursando() {
-        if (this.semaforo == null) {
+        if (this.academicProgress == null) {
             return new ArrayList<>();
         }
-        return semaforo.getMateriasCursando();
+        return academicProgress.getMateriasCursando();
     }
     public int getMateriasCursandoCount() {
-        if (this.semaforo == null) {
+        if (this.academicProgress == null) {
             return 0;
         }
-        return semaforo.getMateriasCursandoCount();
+        return academicProgress.getMateriasCursando().size();
     }
+    
     public int getMateriasAprobadasCount() {
-        if (this.semaforo == null) {
+        if (this.academicProgress == null) {
             return 0;
         }
-        return semaforo.getMateriasAprobadasCount();
+        return academicProgress.getMateriasAprobadas().size();
     }
    
     public int getMateriasReprobadasCount() {
-        if (this.semaforo == null) {
+        if (this.academicProgress == null) {
             return 0;
         }
-        return semaforo.getMateriasReprobadasCount();
+        return academicProgress.getMateriasReprobadas().size();
     }
+    
     public int getMateriasNoCursadasCount() {
-        if (this.semaforo == null) {
+        if (this.academicProgress == null) {
             return 0;
         }
-        return semaforo.getMateriasNoCursadasCount();
+        return academicProgress.getMateriasNoCursadas().size();
     }
     /**
      * Representación en string del estudiante.
@@ -190,9 +196,8 @@ public class Student extends User {
      */
     @Override
     public String toString() {
-        return String.format("Student{id='%s', username='%s', codigo='%s', numSolicitudes=%d}",
-                            getId(), getUsername(), codigo,
-                            solicitudes != null ? solicitudes.size() : 0);
+        return String.format("Student{id='%s', username='%s', codigo='%s'}",
+                            getId(), getUsername(), codigo);
     }
     /**
      * Obtiene las materias de un semestre específico.
@@ -201,10 +206,10 @@ public class Student extends User {
      * @return lista de materias del semestre
      */
     public List<SubjectDecorator> getMateriasPorSemestre(int semestre) {
-        if (this.semaforo == null) {
+        if (this.academicProgress == null) {
             return new ArrayList<>();
         }
-        return semaforo.getMateriasPorSemestre(semestre);
+        return academicProgress.getMateriasPorSemestre(semestre);
     }
  
     /**
@@ -214,10 +219,10 @@ public class Student extends User {
      * @return total de créditos
      */
     public int getCreditosPorColor(SemaforoColores color) {
-        if (this.semaforo == null) {
+        if (this.academicProgress == null) {
             return 0;
         }
-        return semaforo.getCreditosPorColor(color);
+        return academicProgress.getCreditosPorColor(color);
     }
  
    
@@ -242,7 +247,7 @@ public class Student extends User {
  
  
     public boolean tieneConflictoConHorario(Group nuevoGrupo) {
-        if (nuevoGrupo == null || semaforo == null) {
+        if (nuevoGrupo == null || academicProgress == null) {
             return false;
         }
  

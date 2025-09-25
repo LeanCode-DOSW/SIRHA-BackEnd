@@ -1,9 +1,13 @@
 package edu.dosw.sirha.SIRHA_BackEnd.domain.model;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.SemaforoColores;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.port.SubjectState;
 
 public class AprobadaState implements SubjectState {
+    private static final Logger logger = LoggerFactory.getLogger(AprobadaState.class);
 
     @Override
     public void setState(SubjectDecorator materia) {
@@ -26,7 +30,8 @@ public class AprobadaState implements SubjectState {
 
     @Override
     public void aprobar(SubjectDecorator materia) {
-        System.out.println("Ya está aprobada.");
+        logger.info("Intento de aprobar materia que ya está aprobada: {}", 
+                   materia.getSubject().getName());
     }
 
     @Override

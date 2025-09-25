@@ -4,8 +4,15 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.SemaforoColores;
+import edu.dosw.sirha.SIRHA_BackEnd.domain.port.AcademicProgress;
 
-public class Semaforo {
+/**
+ * Implementación del progreso académico que mantiene el estado de las materias
+ * de un estudiante mediante un sistema de semáforo por colores.
+ * 
+ * Implementa AcademicProgress para cumplir con el principio de Inversión de Dependencias.
+ */
+public class Semaforo implements AcademicProgress {
     private Map<String, SubjectDecorator> subjects;
     private final StudyPlan studyPlan;
 
@@ -94,6 +101,16 @@ public class Semaforo {
             }
         }
         return materiasSemestre;
+    }
+
+    @Override
+    public int[] getContadoresPorEstado() {
+        return new int[]{
+            getMateriasAprobadasCount(),
+            getMateriasCursandoCount(), 
+            getMateriasReprobadasCount(),
+            getMateriasNoCursadasCount()
+        };
     }
 
 }
