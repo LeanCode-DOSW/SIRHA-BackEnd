@@ -1,13 +1,13 @@
 package edu.dosw.sirha.SIRHA_BackEnd.domain.model;
 
-public class CambioGrupo extends BaseRequest {
-    private String fromGroupId;   // cada id es unica entre todas las materias
-    private String toGroupId;
+import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.AdminState;
 
-    public CambioGrupo(int prioridad, String fromGroupId, String toGroupId) {
-        super(prioridad);
-        this.fromGroupId = fromGroupId;
-        this.toGroupId = toGroupId;
+public class CambioGrupo extends BaseRequest {
+
+    public CambioGrupo(Subject previousSubject, Group previousGroup,
+                       Subject newSubject, Group newGroup, String motivo,int prioridad, Student student) {
+        super(previousSubject, previousGroup, newSubject, newGroup, motivo,prioridad, student);
+       
     }
 
     @Override
@@ -29,4 +29,16 @@ public class CambioGrupo extends BaseRequest {
     public void rechazar() {
     }
 
+    @Override
+    public boolean valideResquest() {
+        return false;
+    }
+
+    @Override
+    public AdminState approveRequest() {
+        return null;
+    }
+    @Override
+    public void proccessRequest() {
+    }
 }

@@ -38,6 +38,11 @@ public abstract class BaseRequest implements Request {
     private RequestState estado;
     private LocalDateTime creadoEn;
     private Student student;
+    private Subject previousSubject;
+    private Group previousGroup;    
+    private Subject newSubject;
+    private Group newGroup;
+    private String motivo;
 
     /**
      * Constructor base para todas las solicitudes.
@@ -46,34 +51,34 @@ public abstract class BaseRequest implements Request {
      * automáticamente el estado como PENDIENTE y el timestamp de creación.
      * 
      * @param prioridad nivel de prioridad de la solicitud.
+     * @param previousSubject materia previa del estudiante
+     * @param previousGroup grupo previo del estudiante
+     * @param newSubject nueva materia solicitada
+     * @param newGroup nuevo grupo solicitado
+     * @param motivo razón o justificación de la solicitud
+     * @param student estudiante que realiza la solicitud
+     * 
      */
-    public BaseRequest(int prioridad) {
+    public BaseRequest(Subject previousSubject, Group previousGroup, Subject newSubject, Group newGroup, String motivo, int prioridad, Student student) {
         this.prioridad = prioridad;
         this.estado = RequestState.PENDIENTE;
         this.creadoEn = LocalDateTime.now();
-        // this.student = student;
+        this.previousSubject = previousSubject;
+        this.previousGroup = previousGroup;
+        this.newSubject = newSubject;
+        this.newGroup = newGroup;
+        this.motivo = motivo;
+        this.student = student;
     }
 
     
 
-    /**
-     * usando el patrón template method se generan 3 pasos que se repiten en todas las solicitudes
-     * ya sea de cambio de grupo como de materia 
-     * Aun 
-     * 
-     */
-    public void approveRequest(){
+    
+    public AdminState approveRequest(){
         //LOGICA PARA COMUNICARSE CON DECANATURA O PROFESORES Y MANEJARLA
         // establecer el estado a aprobado o rechazado
-        processRequest();
-    };
-
-    public void processRequest(){
-        if(getEstado() == RequestState.APROBADA){
-            aprobar();
-        } else if(getEstado() == RequestState.RECHAZADA){
-            rechazar();
-        }
+        setEstado(RequestState.APROBADA);
+        return AdminState.APROBAR;
     };
 
     public abstract void aprobar();

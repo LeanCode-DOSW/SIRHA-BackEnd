@@ -6,7 +6,10 @@ import java.util.Objects;
 
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import com.fasterxml.jackson.databind.JsonSerializable.Base;
+
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.SemaforoColores;
+import edu.dosw.sirha.SIRHA_BackEnd.domain.port.SolicitudFactory;
 
 /**
  * Entidad del dominio que representa a un estudiante en el sistema SIRHA.
@@ -32,7 +35,7 @@ import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.SemaforoColores;
  * @see BaseRequest
  */
 @Document(collection = "students")
-public class Student extends User {
+public class Student extends User implements SolicitudFactory {
     private String codigo;
     private StudyPlan planGeneral;
     private Semaforo semaforo;
@@ -200,4 +203,24 @@ public class Student extends User {
                             getId(), getUsername(), codigo, 
                             solicitudes != null ? solicitudes.size() : 0);
     }
-}
+
+    
+
+    /**
+     * @return 
+     * 
+     */
+    public BaseRequest requestConstructor(Subject previousSubject, Group previousGroup, Subject newSubject, Group newGroup, String motivo) {
+        ArrayList<BaseRequest> requests = (ArrayList<BaseRequest>) this.getSolicitudes();
+        if (previousSubject.equals(newSubject)|| !previousGroup.equals(newGroup)) {
+            CambioGrupo request = new CambioGrupo(previousSubject, previousGroup, newSubject, newGroup, motivo,requests.size()+1,this);
+            solicitudes.add(request);
+            return request;
+        } else{
+            CambioMateria request = new CambioMateria(previousSubject, previousGroup, newSubject, newGroup, motivo,requests.size()+1,this);
+            solicitudes.add(request);
+            return request;
+        }
+    }
+} 
+
