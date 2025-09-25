@@ -22,6 +22,7 @@ public class CambioGrupo extends BaseRequest {
 
     @Override
     public void aprobar() {
+        
     }
 
     @Override

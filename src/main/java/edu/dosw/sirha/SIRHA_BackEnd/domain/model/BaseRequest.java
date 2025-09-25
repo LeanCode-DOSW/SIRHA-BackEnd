@@ -37,6 +37,7 @@ public abstract class BaseRequest implements Request {
     private int prioridad;
     private RequestState estado;
     private LocalDateTime creadoEn;
+    private Student student;
 
     /**
      * Constructor base para todas las solicitudes.
@@ -50,11 +51,34 @@ public abstract class BaseRequest implements Request {
         this.prioridad = prioridad;
         this.estado = RequestState.PENDIENTE;
         this.creadoEn = LocalDateTime.now();
+        // this.student = student;
     }
 
+    
+
+    /**
+     * usando el patrón template method se generan 3 pasos que se repiten en todas las solicitudes
+     * ya sea de cambio de grupo como de materia 
+     * Aun 
+     * 
+     */
+    public void approveRequest(){
+        //LOGICA PARA COMUNICARSE CON DECANATURA O PROFESORES Y MANEJARLA
+        // establecer el estado a aprobado o rechazado
+        processRequest();
+    };
+
+    public void processRequest(){
+        if(getEstado() == RequestState.APROBADA){
+            aprobar();
+        } else if(getEstado() == RequestState.RECHAZADA){
+            rechazar();
+        }
+    };
 
     public abstract void aprobar();
     public abstract void rechazar();
+
 
     public String getId() {
         return id;
@@ -147,4 +171,6 @@ public abstract class BaseRequest implements Request {
         return String.format("%s{id='%s', prioridad=%d, estado=%s, creadoEn=%s}", 
                             getClass().getSimpleName(), id, prioridad, estado, creadoEn);
     }
+
+
 }
