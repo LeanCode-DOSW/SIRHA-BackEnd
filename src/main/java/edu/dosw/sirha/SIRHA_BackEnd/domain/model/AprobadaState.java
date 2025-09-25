@@ -12,16 +12,16 @@ public class AprobadaState implements SubjectState {
 
     @Override
     public void setSemestre(SubjectDecorator materia, int semestre) {
-        materia.setSemestreMateria(semestre);
+        throw new IllegalStateException("No se puede cambiar semestre de materia aprobada");
     }
     @Override
-    public void agregarGrupo(SubjectDecorator materia, Group grupo) {
-        System.out.println("No puedes agregar un grupo a una materia aprobada, ya debe de tener un grupo asignado con la que se aprobo.");
+    public void setGroup(SubjectDecorator materia, Group grupo) {
+        throw new IllegalStateException("No se puede asignar grupo a materia aprobada");
     }
 
     @Override
     public void inscribir(SubjectDecorator materia) {
-        System.out.println("No puedes reinscribir una materia aprobada.");
+        throw new IllegalStateException("No se puede inscribir una materia ya aprobada");
     }
 
     @Override
@@ -31,6 +31,23 @@ public class AprobadaState implements SubjectState {
 
     @Override
     public void reprobar(SubjectDecorator materia) {
-        System.out.println("No puedes reprobar una materia aprobada.");
+        throw new IllegalStateException("No se puede reprobar una materia aprobada");
     }
+    @Override
+    public void retirar(SubjectDecorator materia) {
+        throw new IllegalStateException("No se puede retirar una materia aprobada");
+    }
+    
+    @Override
+    public boolean puedeInscribirse() { return false; }
+    @Override
+    public boolean puedeAprobar() { return false; }
+    @Override
+    public boolean puedeReprobar() { return false; }
+    @Override
+    public boolean puedeRetirar() { return false; }
+    @Override
+    public boolean tieneGrupoAsignado() { return true; }
+    @Override
+    public String getEstadoNombre() { return "Aprobada"; }
 }

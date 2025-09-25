@@ -307,19 +307,21 @@ public class Group {
     public boolean conflictoConHorario(Schedule horario) {
         for (Schedule existente : horarios) {
             if (existente.seSolapaCon(horario)) {
+                System.out.println("Conflicto detectado entre horarios: " + existente + " y " + horario);
                 return true;
             }
         }
+        System.out.println("No se detectaron conflictos con el horario: " + horario);
         return false;
     }
 
 
     public boolean conflictoConHorario(Group otroGrupo) {
         if (otroGrupo == null || otroGrupo.getHorarios() == null) {
-            return false;
+            throw new IllegalArgumentException("El otro grupo o sus horarios no pueden ser nulos");
         }
         for (Schedule horarioOtro : otroGrupo.getHorarios()) {
-            if (this.conflictoConHorario(horarioOtro)) {
+            if (conflictoConHorario(horarioOtro)) {
                 return true;
             }
         }

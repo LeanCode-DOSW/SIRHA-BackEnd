@@ -12,34 +12,52 @@ public class EnCursoState implements SubjectState {
 
     @Override
     public void setSemestre(SubjectDecorator materia, int semestre) {
-        materia.setSemestreMateria(semestre); // semestre en que se cursa
+        throw new IllegalStateException("No se puede cambiar semestre mientras está en curso");
     }
     @Override
-    public void agregarGrupo(SubjectDecorator materia, Group grupo) {
-        if (grupo != null) {
-            materia.setGroup(grupo);
-            System.out.println("Grupo agregado a la materia en curso.");
-        } else {
-            System.out.println("No puedes agregar un grupo nulo.");
-        }
+    public void setGroup(SubjectDecorator materia, Group grupo) {
+        throw new IllegalStateException("La materia ya tiene un grupo asignado");
     }
 
     @Override
     public void inscribir(SubjectDecorator materia) {
-        System.out.println("Ya estás inscrito en esta materia.");
+        throw new IllegalStateException("La materia ya está inscrita");
+    }
+    @Override
+    public void retirar(SubjectDecorator materia) {
+        /*if (materia.getGroup() != null) {
+            materia.getGroup().desinscribirEstudiante();
+        }*/
+        materia.setState(new NoCursadaState());
+        materia.getState().setState(materia);
+        materia.setGroup(null);
+        System.out.println("Materia retirada.");
     }
 
     @Override
     public void aprobar(SubjectDecorator materia) {
         materia.setState(new AprobadaState());
-        materia.setEstadoColor(SemaforoColores.VERDE);
+        materia.getState().setState(materia);
         System.out.println("Materia aprobada.");
     }
 
     @Override
     public void reprobar(SubjectDecorator materia) {
         materia.setState(new ReprobadaState());
-        materia.setEstadoColor(SemaforoColores.ROJO);
+        materia.getState().setState(materia); 
         System.out.println("Materia reprobada.");
     }
+
+    @Override
+    public boolean puedeInscribirse() { return false; }
+    @Override
+    public boolean puedeAprobar() { return true; }
+    @Override
+    public boolean puedeReprobar() { return true; }
+    @Override
+    public boolean puedeRetirar() { return true; }
+    @Override
+    public boolean tieneGrupoAsignado() { return true; }
+    @Override
+    public String getEstadoNombre() { return "En Curso"; }
 }

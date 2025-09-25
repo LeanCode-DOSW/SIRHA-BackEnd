@@ -1,5 +1,7 @@
 package edu.dosw.sirha.SIRHA_BackEnd.domain.model;
 
+import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.DiasSemana;
+
 /**
  * Representa un horario de clase con un día y un rango de horas.
  * Se utiliza para verificar solapamientos entre horarios
@@ -15,7 +17,7 @@ package edu.dosw.sirha.SIRHA_BackEnd.domain.model;
 public class Schedule {
 
     /** Día de la semana (ej: "Lunes", "Martes"). */
-    private String dia;
+    private DiasSemana dia;
 
     /** Hora de inicio en formato 24h (ej: 8 para las 08:00). */
     private int horaInicio;
@@ -31,7 +33,7 @@ public class Schedule {
      * @param horaFin    Hora de fin (en 24h, debe ser mayor que la hora de inicio).
      * @throws IllegalArgumentException si la hora de inicio no es menor a la hora de fin.
      */
-    public Schedule(String dia, int horaInicio, int horaFin) {
+    public Schedule(DiasSemana dia, int horaInicio, int horaFin) {
         if (horaInicio >= horaFin) {
             throw new IllegalArgumentException("La hora de inicio debe ser menor que la hora de fin");
         }
@@ -49,7 +51,7 @@ public class Schedule {
      * @return {@code true} si los horarios se solapan, {@code false} en caso contrario.
      */
     public boolean seSolapaCon(Schedule otro) {
-        if (!this.dia.equalsIgnoreCase(otro.dia)) {
+        if (!dia.equals(otro.dia)) {
             return false;
         }
         return this.horaInicio < otro.horaFin && otro.horaInicio < this.horaFin;
@@ -78,7 +80,7 @@ public class Schedule {
      *
      * @return Día en texto (ej: "Lunes").
      */
-    public String getDia() {
+    public DiasSemana getDia() {
         return dia;
     }
 
@@ -96,21 +98,9 @@ public class Schedule {
         Schedule that = (Schedule) o;
         return horaInicio == that.horaInicio &&
                 horaFin == that.horaFin &&
-                dia.equalsIgnoreCase(that.dia);
+                dia.equals(that.dia);
     }
 
-    /**
-     * Genera un hash consistente con {@link #equals(Object)}.
-     *
-     * @return Código hash del objeto.
-     */
-    @Override
-    public int hashCode() {
-        int result = dia.toLowerCase().hashCode();
-        result = 31 * result + horaInicio;
-        result = 31 * result + horaFin;
-        return result;
-    }
 
     /**
      * Representación en texto del horario.

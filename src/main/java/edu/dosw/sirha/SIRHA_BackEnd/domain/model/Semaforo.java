@@ -1,6 +1,8 @@
 package edu.dosw.sirha.SIRHA_BackEnd.domain.model;
 
 import java.util.*;
+import java.util.stream.Collectors;
+
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.SemaforoColores;
 
 public class Semaforo {
@@ -15,11 +17,13 @@ public class Semaforo {
 
     private void iniciarSemaforo() {
         studyPlan.getMaterias().forEach((name, subject) -> {
-            SubjectDecorator sd = new SubjectDecorator(subject);
-            sd.setEstadoColor(SemaforoColores.GRIS);
-            sd.setSemestreMateria(0);
-            subjects.put(name, sd);
+            SubjectDecorator decorator = new SubjectDecorator(subject);
+            subjects.put(name, decorator);
         });
+    }
+
+    public SubjectDecorator getSubject(String nombre) {
+        return subjects.get(nombre);
     }
 
     public Collection<SubjectDecorator> getSubjects() {
@@ -33,13 +37,30 @@ public class Semaforo {
     public StudyPlan getStudyPlan() {
         return studyPlan;
     }
-
-
-    public void addSubject(SubjectDecorator subject) {
-        if (subject != null) {
-            this.subjects.put(subject.getName(), subject);
-        }
+    public List<SubjectDecorator> getMateriasAprobadas() {
+        return subjects.values().stream()
+            .filter(s -> s.getEstadoColor() == SemaforoColores.VERDE)
+            .collect(Collectors.toList());
     }
+
+    public List<SubjectDecorator> getMateriasCursando() {
+        return subjects.values().stream()
+            .filter(s -> s.getEstadoColor() == SemaforoColores.AMARILLO)
+            .collect(Collectors.toList());
+    }
+
+    public List<SubjectDecorator> getMateriasReprobadas() {
+        return subjects.values().stream()
+            .filter(s -> s.getEstadoColor() == SemaforoColores.ROJO)
+            .collect(Collectors.toList());
+    }
+
+    public List<SubjectDecorator> getMateriasNoCursadas() {
+        return subjects.values().stream()
+            .filter(s -> s.getEstadoColor() == SemaforoColores.GRIS)
+            .collect(Collectors.toList());
+    }
+
 
     public int getSubjectsCount() {
         return subjects.size();
@@ -58,50 +79,11 @@ public class Semaforo {
         return getMateriasNoCursadas().size();
     }
 
-    public List<SubjectDecorator> getMateriasAprobadas() {
-        List<SubjectDecorator> aprobadas = new ArrayList<>();
-        for (SubjectDecorator sd : subjects.values()) {
-            if (sd.getEstadoColor() == SemaforoColores.VERDE) {
-                aprobadas.add(sd);
-            }
-        }
-        return aprobadas;
-    }
-    public List<SubjectDecorator> getMateriasCursando() {
-        List<SubjectDecorator> cursando = new ArrayList<>();
-        for (SubjectDecorator sd : subjects.values()) {
-            if (sd.getEstadoColor() == SemaforoColores.AMARILLO) {
-                cursando.add(sd);
-            }
-        }
-        return cursando;
-    }
-    public List<SubjectDecorator> getMateriasReprobadas() {
-        List<SubjectDecorator> reprobadas = new ArrayList<>();
-        for (SubjectDecorator sd : subjects.values()) {
-            if (sd.getEstadoColor() == SemaforoColores.ROJO) {
-                reprobadas.add(sd);
-            }
-        }
-        return reprobadas;
-    }
-    public List<SubjectDecorator> getMateriasNoCursadas() {
-        List<SubjectDecorator> noCursadas = new ArrayList<>();
-        for (SubjectDecorator sd : subjects.values()) {
-            if (sd.getEstadoColor() == SemaforoColores.GRIS) {
-                noCursadas.add(sd);
-            }
-        }
-        return noCursadas;
-    }
     public int getCreditosPorColor(SemaforoColores color) {
-        int totalCreditos = 0;
-        for (SubjectDecorator sd : subjects.values()) {
-            if (sd.getEstadoColor() == color) {
-                totalCreditos += sd.getCreditos();
-            }
-        }
-        return totalCreditos;
+        return subjects.values().stream()
+            .filter(s -> s.getEstadoColor() == color)
+            .mapToInt(SubjectDecorator::getCreditos)
+            .sum();
     }
 
     public List<SubjectDecorator> getMateriasPorSemestre(int semestre) {
@@ -114,38 +96,4 @@ public class Semaforo {
         return materiasSemestre;
     }
 
-    public void actualizarEstadoMateria(String subjectName, SemaforoColores nuevoEstado) {
-        SubjectDecorator sd = subjects.get(subjectName);
-        if (sd != null) {
-            sd.setEstadoColor(nuevoEstado);
-        }
-        else {
-            System.out.println("Materia no encontrada: " + subjectName);
-        }
-    }
-
-    public void setSemestreMateria(String subjectName, int semestre) {
-        SubjectDecorator sd = subjects.get(subjectName);
-        if (sd != null) {
-            sd.setSemestreMateria(semestre);
-        }
-        else {
-            System.out.println("Materia no encontrada: " + subjectName);
-        }
-    }
-
-    public boolean estaInscrito(String subjectName) {
-        return subjects.containsKey(subjectName) && 
-               subjects.get(subjectName).getEstadoColor() == SemaforoColores.AMARILLO;
-    }
-
-    public boolean tieneConflictosHorario(SubjectDecorator subject) {
-        List<SubjectDecorator> cursando = getMateriasCursando();
-        for (SubjectDecorator sd : cursando) {
-            if (sd.tieneConflictoConHorario(subject)) {
-                return true;
-            }
-        }
-        return false;
-    }
 }

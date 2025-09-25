@@ -7,8 +7,8 @@ public class Professor extends User {
         super();
     }
     
-    public Professor(String id, String username, String passwordHash, String rol, String horario) {
-        super(id, username, passwordHash, rol);
+    public Professor(String id, String username, String email, String passwordHash, String codigo) {
+        super(id, username, email, passwordHash);
         this.horario = horario;
     }
 }

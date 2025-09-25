@@ -8,27 +8,18 @@ import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.SemaforoColores;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.port.*;
 
 public class SubjectDecorator {
-    @Field("subject")
-    private Subject subject;
-    @Field("estadoColor")
+    private final Subject subject;
     private SemaforoColores estadoColor;
-    @Field("semestre")
     private int semestre;
     private SubjectState state;
-
     private Group group;
 
     public SubjectDecorator(Subject subject) {
         this.subject = subject;
         this.state = new NoCursadaState();
+        System.out.println(estadoColor);
     }
-
-    public boolean tieneConflictoConHorario(SubjectDecorator subject) {
-        if (this.group == null || subject == null) {
-            return false;
-        }
-        return group.conflictoConHorario(subject.getGroup());
-    }
+    
     
     public String getName() {return subject.getName();}
     public int getCreditos() {return subject.getCreditos();}
@@ -37,7 +28,7 @@ public class SubjectDecorator {
     public void setState(SubjectState state) {this.state = state;}
     public void setEstadoColor(SemaforoColores estadoColor) {this.estadoColor = estadoColor;}
     public void setSemestreMateria(int semestre){this.semestre = semestre;}
-    public void setGroup(Group group) { this.group = group; }
+    public void setGroup(Group group) { state.setGroup(this, group); }
 
     public SemaforoColores getEstadoColor() {return estadoColor;}
     public int getSemestre() {return semestre;}
@@ -48,4 +39,13 @@ public class SubjectDecorator {
     public void inscribir() { state.inscribir(this); }
     public void aprobar()   { state.aprobar(this); }
     public void reprobar()  { state.reprobar(this); }
+    public void retirar()   { state.retirar(this); }
+    
+    public boolean puedeInscribirse() {
+        return state.puedeInscribirse();
+    }
+
+    public boolean estaCursando() {
+        return estadoColor == SemaforoColores.AMARILLO;
+    }
 }
