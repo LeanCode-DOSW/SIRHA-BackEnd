@@ -27,7 +27,7 @@ public class GroupTests {
     @Test
     public void inscribirEstudianteTest(){
         Group g = new Group(5);
-        Student jacobo = new Student("1", "jacobo", "jacobo@test.com", "hash123", "20231001");
+        Student jacobo = new Student("jacobo", "jacobo@test.com", "hash123", "20231001");
         g.addEstudiante(jacobo);
         List<Student> estudiantes = g.getEstudiantes();
         assertTrue(estudiantes.contains(jacobo));
@@ -36,7 +36,7 @@ public class GroupTests {
     @Test
     public void cuposDisponiblesTest(){
         Group g = new Group(5);
-        Student jacobo = new Student("1", "jacobo", "jacobo@test.com", "hash123", "20231001");
+        Student jacobo = new Student("jacobo", "jacobo@test.com", "hash123", "20231001");
         g.addEstudiante(jacobo);
         assertEquals(4, g.getCuposDisponibles());
     }
@@ -45,7 +45,7 @@ public class GroupTests {
     public void estaLLenoTest(){
         Group g = new Group(4);
         for(int i = 0; i < 4; i++){
-            Student s = new Student(String.valueOf(i), "student" + i, "email" + i + "@test.com", "hash", "202310" + String.format("%02d", i));
+            Student s = new Student("student" + i, "email" + i + "@test.com", "hash", "202310" + String.format("%02d", i));
             g.addEstudiante(s);
         }
         assertTrue(g.estaLleno());
@@ -55,7 +55,7 @@ public class GroupTests {
     public void inavlidEstaLLenoTest(){
         Group g = new Group(4);
         for(int i = 0; i < 3; i++){
-            Student s = new Student(String.valueOf(i), "student" + i, "email" + i + "@test.com", "hash", "202310" + String.format("%02d", i));
+            Student s = new Student("student" + i, "email" + i + "@test.com", "hash", "202310" + String.format("%02d", i));
             g.addEstudiante(s);
         }
         assertFalse(g.estaLleno());
@@ -64,7 +64,7 @@ public class GroupTests {
     @Test
     public void contieneEstudianteTest(){
         Group g = new Group(4);
-        Student s = new Student("1", "test", "test@email.com", "hash", "20231001");
+        Student s = new Student("test", "test@email.com", "hash", "20231001");
         g.addEstudiante(s);
         assertTrue(g.contieneEstudiante(s));
     }
@@ -88,8 +88,8 @@ public class GroupTests {
     @Test
     public void removerEstudianteTest() {
         Group g = new Group(5);
-        Student s1 = new Student("1", "jacobo", "jacobo@test.com", "hash123", "20231001");
-        Student s2 = new Student("2", "maria", "maria@test.com", "hash456", "20231002");
+        Student s1 = new Student("jacobo", "jacobo@test.com", "hash123", "20231001");
+        Student s2 = new Student("maria", "maria@test.com", "hash456", "20231002");
 
         g.addEstudiante(s1);
         g.addEstudiante(s2);
@@ -105,8 +105,8 @@ public class GroupTests {
     @Test
     public void removerEstudianteNoExisteTest() {
         Group g = new Group(5);
-        Student s1 = new Student("1", "jacobo", "jacobo@test.com", "hash123", "20231001");
-        Student s2 = new Student("2", "maria", "maria@test.com", "hash456", "20231002");
+        Student s1 = new Student("jacobo", "jacobo@test.com", "hash123", "20231001");
+        Student s2 = new Student("maria", "maria@test.com", "hash456", "20231002");
 
         g.addEstudiante(s1);
 
@@ -119,7 +119,7 @@ public class GroupTests {
     @Test
     public void inscribirEstudianteViaStatePatternTest() {
         Group g = new Group(5);
-        Student s1 = new Student("1", "jacobo", "jacobo@test.com", "hash123", "20231001");
+        Student s1 = new Student("jacobo", "jacobo@test.com", "hash123", "20231001");
 
         // Test usando el método que delega al State Pattern
         g.inscribirEstudiante(s1);
@@ -132,7 +132,7 @@ public class GroupTests {
     @Test
     public void setProfesorTest() {
         Group g = new Group(5);
-        Professor profesor = new Professor("Prof001", "Dr. Smith", "smith@university.edu", "hash", "Matemáticas");
+        Professor profesor = new Professor("Dr. Smith", "smith@university.edu", "hash", "Matemáticas");
 
         g.setProfesor(profesor);
 
@@ -152,7 +152,7 @@ public class GroupTests {
     @Test
     public void setCapacidadConEstudiantesInscritosTest() {
         Group g = new Group(5);
-        Student s1 = new Student("1", "jacobo", "jacobo@test.com", "hash123", "20231001");
+        Student s1 = new Student("jacobo", "jacobo@test.com", "hash123", "20231001");
         g.addEstudiante(s1);
 
         // No debería permitir cambiar capacidad con estudiantes inscritos
@@ -164,8 +164,8 @@ public class GroupTests {
     @Test
     public void setCapacidadMenorQueInscritosTest() {
         Group g = new Group(5);
-        Student s1 = new Student("1", "jacobo", "jacobo@test.com", "hash123", "20231001");
-        Student s2 = new Student("2", "maria", "maria@test.com", "hash456", "20231002");
+        Student s1 = new Student( "jacobo", "jacobo@test.com", "hash123", "20231001");
+        Student s2 = new Student("maria", "maria@test.com", "hash456", "20231002");
 
         g.addEstudiante(s1);
         g.addEstudiante(s2);
@@ -186,7 +186,7 @@ public class GroupTests {
     @Test
     public void addEstudianteDuplicadoTest() {
         Group g = new Group(5);
-        Student s1 = new Student("1", "jacobo", "jacobo@test.com", "hash123", "20231001");
+        Student s1 = new Student("jacobo", "jacobo@test.com", "hash123", "20231001");
 
         g.addEstudiante(s1);
 
@@ -240,8 +240,8 @@ public class GroupTests {
     @Test
     public void getEstudiantesInmutableTest() {
         Group g = new Group(5);
-        Student s1 = new Student("1", "jacobo", "jacobo@test.com", "hash123", "20231001");
-        Student s2 = new Student("2", "maria", "maria@test.com", "hash456", "20231002");
+        Student s1 = new Student( "jacobo", "jacobo@test.com", "hash123", "20231001");
+        Student s2 = new Student("maria", "maria@test.com", "hash456", "20231002");
 
         g.addEstudiante(s1);
         List<Student> estudiantes = g.getEstudiantes();
@@ -257,7 +257,7 @@ public class GroupTests {
         Group g = new Group(5);
         // Llenar el grupo completamente
         for(int i = 0; i < 5; i++) {
-            Student s = new Student(String.valueOf(i), "student" + i, "email" + i + "@test.com", "hash", "202310" + String.format("%02d", i));
+            Student s = new Student("student" + i, "email" + i + "@test.com", "hash", "202310" + String.format("%02d", i));
             g.addEstudiante(s);
         }
 
@@ -269,7 +269,7 @@ public class GroupTests {
     @Test
     public void toStringTest() {
         Group g = new Group(5);
-        Student s1 = new Student("1", "jacobo", "jacobo@test.com", "hash123", "20231001");
+        Student s1 = new Student( "jacobo", "jacobo@test.com", "hash123", "20231001");
 
         g.setId("GROUP001");
         g.setAula("A101");

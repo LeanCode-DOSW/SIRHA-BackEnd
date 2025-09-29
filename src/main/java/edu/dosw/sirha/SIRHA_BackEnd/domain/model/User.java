@@ -5,6 +5,7 @@ import org.springframework.data.mongodb.core.mapping.*;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.port.Authenticable;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.port.Schedulable;
 import edu.dosw.sirha.SIRHA_BackEnd.util.PasswordUtils;
+import jakarta.validation.constraints.Email;
 
 @Document(collection = "users")
 public abstract class User implements Authenticable, Schedulable {
@@ -13,14 +14,14 @@ public abstract class User implements Authenticable, Schedulable {
     @Field("username")
     private String username;
     @Field("email")
+    @Email
     private String email;
     @Field("password")
     private String password;
 
     public User() {}
 
-    public User(String id, String username, String email, String password) {
-        this.id = id;
+    public User(String username, String email, String password) {
         this.username = username;
         this.email = email;
         this.password = password.startsWith("$2a$") ? password : PasswordUtils.hashPassword(password);

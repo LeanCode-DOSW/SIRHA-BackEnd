@@ -1,43 +1,19 @@
 package edu.dosw.sirha.SIRHA_BackEnd.domain.model;
 
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.AdminState;
-
 public class CambioMateria extends BaseRequest {
-    public CambioMateria(Subject previousSubject, Group previousGroup,
-                       Subject newSubject, Group newGroup, String motivo,int prioridad, Student student) {
-        super(previousSubject, previousGroup, newSubject, newGroup, motivo,prioridad, student);
-       
+
+    private Subject oldSubject;
+    private Subject newSubject;
+
+    public CambioMateria(Student student, Subject oldSubject, Subject newSubject) {
+        super(student);
+        this.oldSubject = oldSubject;
+        this.newSubject = newSubject;
     }
 
     @Override
-    public boolean validar(Subject newSubject, Group newGroup) {
+    public boolean validateRequest() {// para validar si se puede hacer el cambio de materia necesitamos ver si la materia nueva no tiene problemas con el horario y si el estudiante cumple con los requisitos para cursarla
         return false;
     }
-
-    @Override
-    public boolean aplicar() {
-        return false;
-    }
-
-    @Override
-    public void aprobar() {
-    }
-
-    @Override
-    public void rechazar() {
-    }
-    @Override
-    public boolean valideResquest() {
-        return false;
-    }
-
-    @Override
-    public AdminState approveRequest() {
-        return null;
-    }
-    @Override
-    public void proccessRequest() {
-    }
-
 
 }

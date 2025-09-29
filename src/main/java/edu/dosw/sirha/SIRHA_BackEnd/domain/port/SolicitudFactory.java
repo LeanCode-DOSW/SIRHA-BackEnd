@@ -5,5 +5,8 @@ import edu.dosw.sirha.SIRHA_BackEnd.domain.model.Group;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.Subject;
 
 public interface SolicitudFactory {
-    BaseRequest requestConstructor(Subject previosSubject, Group previousGroup, Subject newSubject, Group newGroup, String motivo);
+    //Request createSolicitudCambioGrupo(Subject subject, Group newGroup);
+    //Request createSolicitudCambioMateria(Subject oldSubject, Subject newSubject);
+    
+    //Request createSolicitudInscripcionMateria(Subject subject);
 }

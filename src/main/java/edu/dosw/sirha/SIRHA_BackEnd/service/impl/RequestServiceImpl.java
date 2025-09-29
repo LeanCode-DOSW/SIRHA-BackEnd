@@ -35,7 +35,7 @@ public class RequestServiceImpl implements RequestService {
     public void aprobarSolicitud(String id) {
         BaseRequest request = repository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Solicitud no encontrada"));
-        request.aprobar();
+        //request.aprobar();
         repository.save(request);
     }
 
@@ -43,7 +43,7 @@ public class RequestServiceImpl implements RequestService {
     public void rechazarSolicitud(String id) {
         BaseRequest request = repository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Solicitud no encontrada"));
-        request.rechazar();
+        //request.rechazar();
         repository.save(request);
     }
 }

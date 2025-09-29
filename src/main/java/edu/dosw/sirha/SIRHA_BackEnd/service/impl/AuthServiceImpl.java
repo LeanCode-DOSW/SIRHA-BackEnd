@@ -57,7 +57,6 @@ public class AuthServiceImpl implements AuthService {
         }
         
         Student student = new Student(
-            null,
             request.getUsername(),
             request.getEmail(),
             request.getPassword(),

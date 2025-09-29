@@ -16,7 +16,6 @@ public class Semaforo {
 
     public SemaforoColores getColor(String materia) {
         return materias.getOrDefault(materia, SemaforoColores.VERDE);
-        // Default VERDE por si no está asignada
     }
 
     public Map<String, SemaforoColores> getAll() {

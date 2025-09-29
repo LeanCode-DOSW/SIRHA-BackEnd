@@ -86,10 +86,9 @@ public class StudentServiceImpl implements StudentService {
         
         // Crear nuevo estudiante
         Student student = new Student(
-            null, // ID se genera automáticamente
             request.getUsername(),
             request.getEmail(),
-            request.getPassword(), // Se hashea en el método register
+            request.getPassword(),
             request.getCodigo()
         );
         

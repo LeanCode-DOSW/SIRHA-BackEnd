@@ -5,8 +5,9 @@ import java.util.List;
 public class StudentDTO {
     private String id;
     private String username;
+    private String email;
     private String codigo;
-    private List<String> solicitudesIds;
+    private List<Integer> solicitudesIds;
 
 
     public String getId() {
@@ -27,10 +28,16 @@ public class StudentDTO {
     public void setCodigo(String codigo) {
         this.codigo = codigo;
     }
-    public List<String> getSolicitudesIds() {
+    public List<Integer> getSolicitudesIds() {
         return solicitudesIds;
     }
-    public void setSolicitudesIds(List<String> solicitudesIds) {
+    public void setSolicitudesIds(List<Integer> solicitudesIds) {
         this.solicitudesIds = solicitudesIds;
+    }
+    public String getEmail() {
+        return email;
+    }
+    public void setEmail(String email) {
+        this.email = email;
     }
 }

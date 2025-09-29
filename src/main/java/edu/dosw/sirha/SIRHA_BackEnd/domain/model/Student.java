@@ -6,9 +6,8 @@ import java.util.Objects;
 
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import com.fasterxml.jackson.databind.JsonSerializable.Base;
-
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.SemaforoColores;
+import edu.dosw.sirha.SIRHA_BackEnd.domain.port.Request;
+import edu.dosw.sirha.SIRHA_BackEnd.domain.port.RequestProcess;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.port.SolicitudFactory;
 
 /**
@@ -39,7 +38,7 @@ public class Student extends User implements SolicitudFactory {
     private String codigo;
     private StudyPlan planGeneral;
     private Semaforo semaforo;
-    private List<BaseRequest> solicitudes;
+    private List<RequestProcess> solicitudes;
 
 
     public Student() {
@@ -52,22 +51,9 @@ public class Student extends User implements SolicitudFactory {
      * Inicializa un estudiante con los datos básicos requeridos.
      * La lista de solicitudes se inicializa como lista vacía.
      * El plan de estudios y semáforo deben ser asignados posteriormente.
-     * 
-     * @param id identificador único del estudiante en el sistema.
-     *          No debe ser null o vacío.
-     * @param username nombre de usuario para acceso al sistema.
-     *                Debe ser único. No debe ser null o vacío.
-     * @param passwordHash hash de la contraseña del estudiante.
-     *                    Debe estar previamente hasheado por seguridad.
-     * @param rol rol del usuario en el sistema (típicamente "ESTUDIANTE").
-     *           No debe ser null.
-     * @param codigo código estudiantil único.
-     *              No debe ser null o vacío.
-     * 
-     * @throws IllegalArgumentException si algún parámetro requerido es null o vacío
      */
-    public Student(String id, String username, String email, String passwordHash, String codigo) {
-        super(id, username, email, passwordHash);
+    public Student(String username, String email, String passwordHash, String codigo) {
+        super(username, email, passwordHash);
         if (codigo == null || codigo.trim().isEmpty()) {
             throw new IllegalArgumentException("El código de estudiante no puede ser null o vacío");
         }
@@ -80,11 +66,8 @@ public class Student extends User implements SolicitudFactory {
      * Añade una solicitud académica (cambio de grupo, cambio de materia, etc.)
      * a la lista de solicitudes del estudiante. La solicitud debe estar
      * completamente inicializada antes de agregarla.
-     * 
-     * @param solicitud la solicitud a agregar. No debe ser null.
-     * @throws IllegalArgumentException si la solicitud es null
      */
-    public void agregarSolicitud(BaseRequest solicitud) {
+    public void agregarSolicitud(RequestProcess solicitud) {
         if (solicitud == null) {
             throw new IllegalArgumentException("La solicitud no puede ser null");
         }
@@ -152,7 +135,7 @@ public class Student extends User implements SolicitudFactory {
      * Obtiene la lista de solicitudes del estudiante.
      * @return lista de solicitudes, nunca null (inicializada como lista vacía)
      */
-    public List<BaseRequest> getSolicitudes() {
+    public List<RequestProcess> getSolicitudes() {
         if (solicitudes == null) {
             solicitudes = new ArrayList<>();
         }
@@ -163,7 +146,7 @@ public class Student extends User implements SolicitudFactory {
      * Establece la lista completa de solicitudes del estudiante.
      * @param solicitudes nueva lista de solicitudes. Si es null, se inicializa como lista vacía.
      */
-    public void setSolicitudes(List<BaseRequest> solicitudes) {
+    public void setSolicitudes(List<RequestProcess> solicitudes) {
         this.solicitudes = solicitudes != null ? solicitudes : new ArrayList<>();
     }
 
@@ -204,23 +187,10 @@ public class Student extends User implements SolicitudFactory {
                             solicitudes != null ? solicitudes.size() : 0);
     }
 
-    
 
-    /**
-     * @return 
-     * 
-     */
-    public BaseRequest requestConstructor(Subject previousSubject, Group previousGroup, Subject newSubject, Group newGroup, String motivo) {
-        ArrayList<BaseRequest> requests = (ArrayList<BaseRequest>) this.getSolicitudes();
-        if (previousSubject.equals(newSubject)|| !previousGroup.equals(newGroup)) {
-            CambioGrupo request = new CambioGrupo(previousSubject, previousGroup, newSubject, newGroup, motivo,requests.size()+1,this);
-            solicitudes.add(request);
-            return request;
-        } else{
-            CambioMateria request = new CambioMateria(previousSubject, previousGroup, newSubject, newGroup, motivo,requests.size()+1,this);
-            solicitudes.add(request);
-            return request;
-        }
-    }
+
+
+
+
 } 
 

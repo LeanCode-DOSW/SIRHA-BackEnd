@@ -56,19 +56,18 @@ public class MapperUtils {
         StudentDTO dto = new StudentDTO();
         dto.setId(student.getId());
         dto.setUsername(student.getUsername());
+        dto.setEmail(student.getEmail());
         dto.setCodigo(student.getCodigo()); 
 
-        // Conversión segura de la lista de solicitudes a IDs
         if (student.getSolicitudes() != null) {
             dto.setSolicitudesIds(
                 student.getSolicitudes().stream()
-                        .filter(solicitud -> solicitud != null) // Filtrar nulls
+                        .filter(solicitud -> solicitud != null)
                         .map(solicitud -> solicitud.getId())
-                        .filter(id -> id != null) // Filtrar IDs null
+                        .filter(id -> id != null)
                         .collect(Collectors.toList())
             );
         } else {
-            // Inicializar con lista vacía si no hay solicitudes
             dto.setSolicitudesIds(java.util.Collections.emptyList());
         }
 
@@ -97,7 +96,7 @@ public class MapperUtils {
      * // student.getSolicitudes() = null (debe ser cargado por separado)
      * </pre>
      */
-    public static Student fromDTO(StudentDTO dto) {
+    public static Student fromDTOnewStudent(StudentDTO dto) {
         if (dto == null) {
             return null;
         }
@@ -105,11 +104,11 @@ public class MapperUtils {
         // Crear entidad Student con contraseña por defecto
         // En un escenario real, la contraseña debería ser manejada por separado
         return new Student(
-            dto.getId(),
             dto.getUsername(),
+            dto.getEmail(),
             "defaultPassword", // Contraseña temporal - debe ser actualizada
-            "ESTUDIANTE", // Rol por defecto
             dto.getCodigo()
         );
     }
+    
 }

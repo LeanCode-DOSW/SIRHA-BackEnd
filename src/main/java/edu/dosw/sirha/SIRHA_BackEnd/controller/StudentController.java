@@ -157,9 +157,8 @@ public class StudentController {
     public StudentDTO create(@RequestBody StudentDTO dto) {
         // Crear nueva instancia de Student con datos del DTO
         Student newStudent = new Student(
-            dto.getId(), 
             dto.getUsername(), 
-            dto.getUsername() + "@esuelaing.edu.com",  
+            dto.getEmail(),  
             "defaultPass", // Contraseña temporal - debe ser actualizada
             dto.getCodigo()
         );
@@ -169,9 +168,4 @@ public class StudentController {
         return MapperUtils.toDTO(savedStudent);
     }
 
-    //Implementar endpoints adicionales en futuras versiones:
-    // - PUT /{id} para actualizar estudiante existente
-    // - DELETE /{id} para eliminar estudiante
-    // - GET /{id}/solicitudes para obtener solicitudes del estudiante
-    // - POST /{id}/solicitudes para crear nueva solicitud
 }

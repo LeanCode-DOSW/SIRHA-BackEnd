@@ -1,13 +1,14 @@
-package edu.dosw.sirha.SIRHA_BackEnd.domain.model;
+package edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateSubjectDec;
 
+import edu.dosw.sirha.SIRHA_BackEnd.domain.model.SubjectDecorator;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.SemaforoColores;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.port.SubjectState;
 
-public class AprobadaState implements SubjectState {
+public class ReprobadaState implements SubjectState {
 
     @Override
     public void setEstado(SubjectDecorator materia) {
-        materia.setEstadoColor(SemaforoColores.VERDE);
+        materia.setEstadoColor(SemaforoColores.ROJO);
     }
 
     @Override
@@ -17,16 +18,18 @@ public class AprobadaState implements SubjectState {
 
     @Override
     public void inscribir(SubjectDecorator materia) {
-        System.out.println("No puedes reinscribir una materia aprobada.");
+        materia.setEstado(new EnCursoState());
+        materia.setEstadoColor(SemaforoColores.AMARILLO);
+        System.out.println("Reinscripción de materia reprobada.");
     }
 
     @Override
     public void aprobar(SubjectDecorator materia) {
-        System.out.println("Ya está aprobada.");
+        System.out.println("Debes cursar de nuevo antes de aprobar.");
     }
 
     @Override
     public void reprobar(SubjectDecorator materia) {
-        System.out.println("No puedes reprobar una materia aprobada.");
+        System.out.println("Ya está reprobada.");
     }
 }
