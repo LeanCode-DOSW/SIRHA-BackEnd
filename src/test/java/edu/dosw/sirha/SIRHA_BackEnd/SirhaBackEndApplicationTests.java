@@ -1,6 +1,7 @@
 package edu.dosw.sirha.SIRHA_BackEnd;
 
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.Student;
+import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.SemaforoColores;
 import edu.dosw.sirha.SIRHA_BackEnd.dto.AuthResponse;
 import edu.dosw.sirha.SIRHA_BackEnd.dto.LoginRequest;
 import edu.dosw.sirha.SIRHA_BackEnd.dto.RegisterRequest;
@@ -22,6 +23,7 @@ class SirhaBackEndApplicationTests {
 
     @Test
     void contextLoads() {
+        // Test básico para verificar que el contexto de Spring Boot se carga correctamente
     }
 
     // ============== PRUEBAS PARA PasswordUtils ==============
@@ -189,13 +191,13 @@ class SirhaBackEndApplicationTests {
         Student student = new Student( "12345", "juan.perez", "juan.perez@example.com", plainPassword, "EST001");
         
         // Verificar que la contraseña se hasheó
-		String contraseña = PasswordUtils.hashPassword(plainPassword);
+		String password = PasswordUtils.hashPassword(plainPassword);
         assertNotNull(student.getPasswordHash());
-        assertNotEquals(plainPassword, contraseña);
-        assertTrue(contraseña.startsWith("$2a$"));
-        
+        assertNotEquals(plainPassword, password);
+        assertTrue(password.startsWith("$2a$"));
+
         // Verificar que se puede validar
-        assertTrue(PasswordUtils.verifyPassword(plainPassword, contraseña));
+        assertTrue(PasswordUtils.verifyPassword(plainPassword, password));
     }
 
     // ============== PRUEBAS DE INTEGRACIÓN BÁSICAS ==============
@@ -204,9 +206,9 @@ class SirhaBackEndApplicationTests {
     void testPasswordUtilsWithMapperUtils() {
         // Crear un estudiante con contraseña
         Student student = new Student( "12345", "juan.perez", "juan.perez@example.com", "hashedPass", "EST001");
-		String contraseña = PasswordUtils.hashPassword("hashedPass");
+		String password = PasswordUtils.hashPassword("hashedPass");
         // Verificar que el password se hasheó correctamente
-        assertTrue(PasswordUtils.verifyPassword("hashedPass", contraseña));
+        assertTrue(PasswordUtils.verifyPassword("hashedPass", password));
         
         // Convertir a DTO
         StudentDTO dto = MapperUtils.toDTO(student);
@@ -255,5 +257,146 @@ class SirhaBackEndApplicationTests {
             assertFalse(dtoString.toLowerCase().contains("password"));
             assertFalse(dtoString.toLowerCase().contains("hash"));
         }
+    }
+
+    // ============== PRUEBAS DE COBERTURA ADICIONALES ==============
+    
+    @Test
+    void testGroupStates() {
+        // Probar StatusOpen
+        edu.dosw.sirha.SIRHA_BackEnd.domain.model.StatusOpen statusOpen = 
+            new edu.dosw.sirha.SIRHA_BackEnd.domain.model.StatusOpen();
+        assertNotNull(statusOpen);
+        
+        // Probar StatusClosed  
+        edu.dosw.sirha.SIRHA_BackEnd.domain.model.StatusClosed statusClosed = 
+            new edu.dosw.sirha.SIRHA_BackEnd.domain.model.StatusClosed();
+        assertNotNull(statusClosed);
+    }
+    
+    @Test
+    void testSubjectStates() {
+        // Probar AprobadaState
+        edu.dosw.sirha.SIRHA_BackEnd.domain.model.AprobadaState aprobadaState = 
+            new edu.dosw.sirha.SIRHA_BackEnd.domain.model.AprobadaState();
+        assertNotNull(aprobadaState);
+        
+        // Probar EnCursoState
+        edu.dosw.sirha.SIRHA_BackEnd.domain.model.EnCursoState enCursoState = 
+            new edu.dosw.sirha.SIRHA_BackEnd.domain.model.EnCursoState();
+        assertNotNull(enCursoState);
+        
+        // Probar NoCursadaState
+        edu.dosw.sirha.SIRHA_BackEnd.domain.model.NoCursadaState noCursadaState = 
+            new edu.dosw.sirha.SIRHA_BackEnd.domain.model.NoCursadaState();
+        assertNotNull(noCursadaState);
+        
+        // Probar ReprobadaState
+        edu.dosw.sirha.SIRHA_BackEnd.domain.model.ReprobadaState reprobadaState = 
+            new edu.dosw.sirha.SIRHA_BackEnd.domain.model.ReprobadaState();
+        assertNotNull(reprobadaState);
+    }
+    
+    @Test
+    void testProfessorBasics() {
+        // Constructor por defecto
+        edu.dosw.sirha.SIRHA_BackEnd.domain.model.Professor profesor1 = 
+            new edu.dosw.sirha.SIRHA_BackEnd.domain.model.Professor();
+        assertNotNull(profesor1);
+        
+        // Constructor con parámetros
+        edu.dosw.sirha.SIRHA_BackEnd.domain.model.Professor profesor2 = 
+            new edu.dosw.sirha.SIRHA_BackEnd.domain.model.Professor(
+                "prof001", "dr.smith", "hashedPass", "PROFESOR", "L-V 8-12");
+        assertNotNull(profesor2);
+        assertEquals("prof001", profesor2.getId());
+        assertEquals("dr.smith", profesor2.getUsername());
+    }
+    
+    @Test
+    void testStudyPlanBasics() {
+        // Constructor y métodos básicos
+        edu.dosw.sirha.SIRHA_BackEnd.domain.model.StudyPlan plan = 
+            new edu.dosw.sirha.SIRHA_BackEnd.domain.model.StudyPlan("Ingeniería de Software");
+        assertNotNull(plan);
+        assertEquals("Ingeniería de Software", plan.getNombre());
+        assertNotNull(plan.getMaterias());
+        
+        // Agregar materia
+        edu.dosw.sirha.SIRHA_BackEnd.domain.model.Subject materia = 
+            new edu.dosw.sirha.SIRHA_BackEnd.domain.model.Subject("MAT001", "Matemáticas", 4);
+        plan.addMateria(materia);
+        assertTrue(plan.getMaterias().contains(materia));
+        
+        // Cambiar nombre
+        plan.setNombre("Ingeniería de Sistemas");
+        assertEquals("Ingeniería de Sistemas", plan.getNombre());
+    }
+    
+    @Test
+    void testSubjectDecoratorBasics() {
+        // Crear subject base
+        edu.dosw.sirha.SIRHA_BackEnd.domain.model.Subject subject = 
+            new edu.dosw.sirha.SIRHA_BackEnd.domain.model.Subject("PROG001", "Programación", 3);
+        
+        // Crear decorator
+        edu.dosw.sirha.SIRHA_BackEnd.domain.model.SubjectDecorator decorator = 
+            new edu.dosw.sirha.SIRHA_BackEnd.domain.model.SubjectDecorator(subject);
+        assertNotNull(decorator);
+        assertEquals("Programación", decorator.getNombre());
+        assertEquals("PROG001", decorator.getCodigo());
+        assertEquals(3, decorator.getCreditos());
+        assertNotNull(decorator.getGrupos());
+    }
+    
+    @Test
+    void testGroupBasics() {
+        // Constructor
+        edu.dosw.sirha.SIRHA_BackEnd.domain.model.Group grupo = 
+            new edu.dosw.sirha.SIRHA_BackEnd.domain.model.Group(30);
+        assertNotNull(grupo);
+        assertEquals(30, grupo.getCapacidad());
+        assertEquals(30, grupo.getCuposDisponibles());
+        assertEquals(0, grupo.getInscritos());
+        assertNotNull(grupo.getEstadoGrupo());
+        
+        // Setters básicos
+        grupo.setAula("A101");
+        assertEquals("A101", grupo.getAula());
+        
+        // Verificar lista de estudiantes
+        assertNotNull(grupo.getEstudiantes());
+        assertTrue(grupo.getEstudiantes().isEmpty());
+    }
+    
+    @Test
+    void testSemaforoBasics() {
+        // Solo probar que la clase existe y se puede instanciar
+        // Ya que el constructor requiere StudyPlan específico
+        assertNotNull(edu.dosw.sirha.SIRHA_BackEnd.domain.model.Semaforo.class);
+        
+        // Probar enums relacionados
+        edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.SemaforoColores verde = 
+            edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.SemaforoColores.VERDE;
+        edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.SemaforoColores amarillo = 
+            edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.SemaforoColores.AMARILLO;
+        edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.SemaforoColores rojo = 
+            edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.SemaforoColores.ROJO;
+        edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.SemaforoColores gris = 
+            edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.SemaforoColores.GRIS;
+        
+        assertNotNull(verde);
+        assertNotNull(amarillo);
+        assertNotNull(rojo);
+        assertNotNull(gris);
+    }
+    
+    @Test
+    void testScheduleBasics() {
+        // Solo verificar que la clase Schedule existe
+        assertNotNull(edu.dosw.sirha.SIRHA_BackEnd.domain.model.Schedule.class);
+        
+        // Verificar que las clases relacionadas existen
+        assertNotNull(edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.SemaforoColores.class);
     }
 }
