@@ -32,18 +32,11 @@
 		<maven.compiler.target>17</maven.compiler.target>
 		
 		<!-- SonarQube Properties -->
-		<sonar.projectKey>edu.dosw.sirha:SIRHA-BackEnd</sonar.projectKey>
-		<sonar.projectName>SIRHA-BackEnd</sonar.projectName>
-		<sonar.projectVersion>${project.version}</sonar.projectVersion>
+		<sonar.projectKey>library</sonar.projectKey>
+		<sonar.projectName>library</sonar.projectName>
 		<sonar.host.url>http://localhost:9000</sonar.host.url>
-		<sonar.branch.name>develop</sonar.branch.name>
-		<sonar.projectDescription>Sistema Integral de Reporte de Horarios y Actividades - Backend</sonar.projectDescription>
-		<sonar.sources>src/main/java</sonar.sources>
-		<sonar.tests>src/test/java</sonar.tests>
-		<sonar.java.binaries>target/classes</sonar.java.binaries>
 		<sonar.coverage.jacoco.xmlReportPaths>target/site/jacoco/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
 		<sonar.coverage.exclusions>**/util/**,**/controller/**,**/service/**,**/repository/**,**/dto/**,**/config/**</sonar.coverage.exclusions>
-		<sonar.junit.reportPaths>target/surefire-reports</sonar.junit.reportPaths>
 	</properties>
 
 	<!-- Dependency Management para MongoDB -->
