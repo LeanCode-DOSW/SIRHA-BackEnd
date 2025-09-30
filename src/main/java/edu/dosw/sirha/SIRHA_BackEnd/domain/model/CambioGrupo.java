@@ -1,31 +1,21 @@
 package edu.dosw.sirha.SIRHA_BackEnd.domain.model;
 
 public class CambioGrupo extends BaseRequest {
-    private String fromGroupId;   // cada id es unica entre todas las materias
-    private String toGroupId;
+    private Subject subject;
+    private Group group;
 
-    public CambioGrupo(int prioridad, String fromGroupId, String toGroupId) {
-        super(prioridad);
-        this.fromGroupId = fromGroupId;
-        this.toGroupId = toGroupId;
+    public CambioGrupo(Student student, Subject subject, Group group) {
+        super(student);
+        this.subject = subject;
+        this.group = group;
     }
 
     @Override
-    public boolean validar() {
+    public boolean validateRequest() {// para validar si se puede hacer el cambio de grupo necesitamos, primero ver el grupo que antes tenia, ver si el nuevo no tiene problemas con el horario
         return false;
     }
 
-    @Override
-    public boolean aplicar() {
-        return false;
-    }
-
-    @Override
-    public void aprobar() {
-    }
-
-    @Override
-    public void rechazar() {
-    }
+    
+    
 
 }

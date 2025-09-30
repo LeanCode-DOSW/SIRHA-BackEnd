@@ -66,7 +66,6 @@ public class Semaforo implements AcademicProgress {
             .collect(Collectors.toList());
     }
 
-
     public int getSubjectsCount() {
         return subjects.size();
     }

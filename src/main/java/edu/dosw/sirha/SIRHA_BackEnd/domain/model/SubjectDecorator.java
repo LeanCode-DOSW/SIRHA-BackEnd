@@ -2,6 +2,7 @@ package edu.dosw.sirha.SIRHA_BackEnd.domain.model;
 
 import java.util.List;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.SemaforoColores;
+import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateSubjectDec.NoCursadaState;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.port.*;
 
 public class SubjectDecorator {
@@ -44,4 +45,5 @@ public class SubjectDecorator {
     public boolean estaCursando() {
         return estadoColor == SemaforoColores.AMARILLO;
     }
+    public int getId() { return subject.getId(); }
 }

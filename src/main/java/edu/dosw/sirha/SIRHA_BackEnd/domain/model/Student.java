@@ -5,9 +5,12 @@ import java.util.ArrayList;
 import java.util.Objects;
  
 import org.springframework.data.mongodb.core.mapping.Document;
- 
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.*;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.port.*;
+
+import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.SemaforoColores;
+import edu.dosw.sirha.SIRHA_BackEnd.domain.port.AcademicProgress;
+import edu.dosw.sirha.SIRHA_BackEnd.domain.port.Request;
+import edu.dosw.sirha.SIRHA_BackEnd.domain.port.RequestProcess;
+import edu.dosw.sirha.SIRHA_BackEnd.domain.port.SolicitudFactory;
 
 /**
  * Entidad del dominio que representa a un estudiante en el sistema SIRHA.
@@ -22,12 +25,11 @@ import edu.dosw.sirha.SIRHA_BackEnd.domain.port.*;
  *
  */
 @Document(collection = "students")
-public class Student extends User {
+public class Student extends User implements SolicitudFactory {
     private String codigo;
     private StudyPlan planGeneral;
-    private List<BaseRequest> solicitudes;
     private AcademicProgress academicProgress;
- 
+    private List<RequestProcess> solicitudes;
  
     public Student() {
         super();
@@ -35,14 +37,40 @@ public class Student extends User {
  
     public Student(String id, String username, String email, String passwordHash, String codigo) {
         super(id, username, email, passwordHash);
+    }
+
+    /**
+     * Constructor principal para crear un nuevo estudiante.
+     * 
+     * Inicializa un estudiante con los datos básicos requeridos.
+     * La lista de solicitudes se inicializa como lista vacía.
+     * El plan de estudios y semáforo deben ser asignados posteriormente.
+     */
+    public Student(String username, String email, String passwordHash, String codigo) {
+        super(username, email, passwordHash);
         if (codigo == null || codigo.trim().isEmpty()) {
             throw new IllegalArgumentException("El código de estudiante no puede ser null o vacío");
         }
         this.codigo = codigo;
     }
-    
-    public List<BaseRequest> getSolicitudes(){
-        return solicitudes;
+
+    /**
+     * Agrega una nueva solicitud a la lista del estudiante.
+     * 
+     * Añade una solicitud académica (cambio de grupo, cambio de materia, etc.)
+     * a la lista de solicitudes del estudiante. La solicitud debe estar
+     * completamente inicializada antes de agregarla.
+     */
+    public void agregarSolicitud(RequestProcess solicitud) {
+        if (solicitud == null) {
+            throw new IllegalArgumentException("La solicitud no puede ser null");
+        }
+        
+        if (this.solicitudes == null) {
+            this.solicitudes = new ArrayList<>();
+        }
+        
+        this.solicitudes.add(solicitud);
     }
  
     /**
@@ -98,6 +126,25 @@ public class Student extends User {
 
     public void setSemaforo(Semaforo semaforo) {
         this.academicProgress = semaforo;
+    }
+
+    /**
+     * Obtiene la lista de solicitudes del estudiante.
+     * @return lista de solicitudes, nunca null (inicializada como lista vacía)
+     */
+    public List<RequestProcess> getSolicitudes() {
+        if (solicitudes == null) {
+            solicitudes = new ArrayList<>();
+        }
+        return solicitudes;
+    }
+
+    /**
+     * Establece la lista completa de solicitudes del estudiante.
+     * @param solicitudes nueva lista de solicitudes. Si es null, se inicializa como lista vacía.
+     */
+    public void setSolicitudes(List<RequestProcess> solicitudes) {
+        this.solicitudes = solicitudes != null ? solicitudes : new ArrayList<>();
     }
 
     

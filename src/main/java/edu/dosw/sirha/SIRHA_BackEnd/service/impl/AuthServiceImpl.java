@@ -1,15 +1,10 @@
 package edu.dosw.sirha.SIRHA_BackEnd.service.impl;
 
-import edu.dosw.sirha.SIRHA_BackEnd.repository.mongo.StudentMongoRepository;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.*;
 import edu.dosw.sirha.SIRHA_BackEnd.dto.AuthResponse;
 import edu.dosw.sirha.SIRHA_BackEnd.dto.LoginRequest;
 import edu.dosw.sirha.SIRHA_BackEnd.dto.RegisterRequest;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.validation.ValidationUtils;
-
 import java.util.Optional;  
 import edu.dosw.sirha.SIRHA_BackEnd.service.*;
 import edu.dosw.sirha.SIRHA_BackEnd.util.*;
@@ -57,7 +52,6 @@ public class AuthServiceImpl implements AuthService {
         }
         
         Student student = new Student(
-            null,
             request.getUsername(),
             request.getEmail(),
             request.getPassword(),

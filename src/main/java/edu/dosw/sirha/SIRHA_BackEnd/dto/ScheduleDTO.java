@@ -12,7 +12,7 @@ public class ScheduleDTO {
     private DiasSemana dia;
     private int horaInicio;
     private int horaFin;
-    private String materiaId;
+    private int materiaId;
     private String materiaNombre;
     private String profesorNombre;
     private String aula;
@@ -22,7 +22,7 @@ public class ScheduleDTO {
     // Constructores
     public ScheduleDTO() {}
 
-    public ScheduleDTO(DiasSemana dia, int horaInicio, int horaFin, String materiaId, 
+    public ScheduleDTO(DiasSemana dia, int horaInicio, int horaFin, int materiaId, 
                       String materiaNombre, String profesorNombre, String aula, 
                       String grupoId, int creditos) {
         this.dia = dia;
@@ -61,11 +61,11 @@ public class ScheduleDTO {
         this.horaFin = horaFin;
     }
 
-    public String getMateriaId() {
+    public int getMateriaId() {
         return materiaId;
     }
 
-    public void setMateriaId(String materiaId) {
+    public void setMateriaId(int materiaId) {
         this.materiaId = materiaId;
     }
 

@@ -1,6 +1,6 @@
 package edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums;
 
-public enum RequestState {
+public enum RequestStateEnum {
     PENDIENTE,
     APROBADA,
     RECHAZADA,
