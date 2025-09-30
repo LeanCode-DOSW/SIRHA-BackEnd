@@ -3,7 +3,6 @@ package edu.dosw.sirha.SIRHA_BackEnd.controller;
 import edu.dosw.sirha.SIRHA_BackEnd.dto.AuthResponse;
 import edu.dosw.sirha.SIRHA_BackEnd.dto.LoginRequest;
 import edu.dosw.sirha.SIRHA_BackEnd.dto.RegisterRequest;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.User;
 import edu.dosw.sirha.SIRHA_BackEnd.service.AuthService;
 import jakarta.validation.Valid;
 

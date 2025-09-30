@@ -1,28 +1,28 @@
 package edu.dosw.sirha.SIRHA_BackEnd.domain.model;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 @Document(collection = "study_plans")
 public class StudyPlan {
-     @Field("nombre")
+    @Field("nombre")
     private String nombre;
     @Field("materias")
-    private List<Subject> materias = new ArrayList<>();
+    private Map<String, Subject> materias;
 
 
     public StudyPlan(String nombre) {
         this.nombre = nombre;
+        this.materias = new HashMap<>();
     }
 
     public void addMateria(Subject m) {
-        materias.add(m);
+        materias.put(m.getName(), m);
     }
 
-    public List<Subject> getMaterias() {
+    public Map<String, Subject> getMaterias() {
         return materias;
     }
     

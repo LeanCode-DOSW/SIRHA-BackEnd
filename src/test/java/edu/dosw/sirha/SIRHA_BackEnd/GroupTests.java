@@ -3,11 +3,11 @@ package edu.dosw.sirha.SIRHA_BackEnd;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.*;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.port.GroupState;
 import org.junit.jupiter.api.Test;
-
+import org.springframework.boot.test.context.SpringBootTest;
 import java.util.List;
-
 import static org.junit.jupiter.api.Assertions.*;
 
+@SpringBootTest
 public class GroupTests {
 
     @Test
@@ -72,8 +72,8 @@ public class GroupTests {
     @Test
     public void verificateIdTest(){
         Group g = new Group(4);
-        g.setId("11111");
-        assertEquals("11111", g.getId());
+        g.setId(11111);
+        assertEquals(11111, g.getId());
     }
 
     @Test
@@ -142,8 +142,8 @@ public class GroupTests {
     @Test
     public void setCursoTest() {
         Group g = new Group(5);
-        Subject curso = new Subject("MATH101", "Cálculo I", 4);
-
+        Subject curso = new Subject(101, "Cálculo I", 4);
+        
         g.setCurso(curso);
 
         assertEquals(curso, g.getCurso());
@@ -271,13 +271,13 @@ public class GroupTests {
         Group g = new Group(5);
         Student s1 = new Student( "jacobo", "jacobo@test.com", "hash123", "20231001");
 
-        g.setId("GROUP001");
+        g.setId(100000);
         g.setAula("A101");
         g.addEstudiante(s1);
 
         String resultado = g.toString();
 
-        assertTrue(resultado.contains("GROUP001"));
+        assertTrue(resultado.contains("100000"));
         assertTrue(resultado.contains("5")); // capacidad
         assertTrue(resultado.contains("1")); // inscritos
         assertTrue(resultado.contains("A101")); // aula
@@ -288,8 +288,8 @@ public class GroupTests {
         Group group1 = new Group(5);
         Group group2 = new Group(5);
 
-        group1.setId("SAME_ID");
-        group2.setId("SAME_ID");
+        group1.setId(1);
+        group2.setId(1);
 
         assertEquals(group1, group2);
     }
@@ -299,21 +299,10 @@ public class GroupTests {
         Group group1 = new Group(5);
         Group group2 = new Group(5);
 
-        group1.setId("ID1");
-        group2.setId("ID2");
+        group1.setId(1);
+        group2.setId(2);
 
         assertNotEquals(group1, group2);
-    }
-
-    @Test
-    public void hashCodeTest() {
-        Group group1 = new Group(5);
-        Group group2 = new Group(5);
-
-        group1.setId("SAME_ID");
-        group2.setId("SAME_ID");
-
-        assertEquals(group1.hashCode(), group2.hashCode());
     }
 
     @Test

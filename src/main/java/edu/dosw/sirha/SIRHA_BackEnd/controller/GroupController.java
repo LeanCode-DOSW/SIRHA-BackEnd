@@ -26,7 +26,7 @@ public class GroupController {
     }
 
     @GetMapping("/{groupId}")
-    public Group getById(@PathVariable String groupId) {
+    public Group getById(@PathVariable Integer groupId) {
         return groupService.findById(groupId);
     }
 
@@ -36,7 +36,7 @@ public class GroupController {
     }
 
     @DeleteMapping("/{groupId}")
-    public void delete(@PathVariable String groupId) {
+    public void delete(@PathVariable Integer groupId) {
         groupService.delete(groupId);
     }
 
@@ -44,31 +44,31 @@ public class GroupController {
 
     // Consultar cupos disponibles
     @GetMapping("/{groupId}/cupos")
-    public int getCuposDisponibles(@PathVariable String groupId) {
+    public int getCuposDisponibles(@PathVariable Integer groupId) {
         return groupService.getCuposDisponibles(groupId);
     }
 
     // Asignar profesor
     @PostMapping("/{groupId}/profesor")
-    public void asignarProfesor(@PathVariable String groupId, @RequestBody Professor professor) {
+    public void asignarProfesor(@PathVariable Integer groupId, @RequestBody Professor professor) {
         groupService.asignarProfesor(groupId, professor);
     }
 
     // Consultar profesor asignado
     @GetMapping("/{groupId}/profesor")
-    public Professor getProfesor(@PathVariable String groupId) {
+    public Professor getProfesor(@PathVariable Integer groupId) {
         return groupService.getProfesor(groupId);
     }
 
     // Agregar horario al grupo
     @PostMapping("/{groupId}/horarios")
-    public void agregarHorario(@PathVariable String groupId, @RequestBody Schedule schedule) {
+    public void agregarHorario(@PathVariable Integer groupId, @RequestBody Schedule schedule) {
         groupService.agregarHorario(groupId, schedule);
     }
 
     // Consultar horarios de un grupo
     @GetMapping("/{groupId}/horarios")
-    public List<Schedule> getHorarios(@PathVariable String groupId) {
+    public List<Schedule> getHorarios(@PathVariable Integer groupId) {
         return groupService.getHorarios(groupId);
     }
 }

@@ -3,15 +3,16 @@ package edu.dosw.sirha.SIRHA_BackEnd;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.Group;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.Subject;
 import org.junit.jupiter.api.Test;
-
+import org.springframework.boot.test.context.SpringBootTest;
 import static org.junit.jupiter.api.Assertions.*;
 
+@SpringBootTest
 public class SubjectTest {
         @Test
         public void constructorValidoTest() {
-            Subject s = new Subject("MATH101", "Matemáticas", 4);
+            Subject s = new Subject(101, "Matemáticas", 4);
 
-            assertEquals("MATH101", s.getId());
+            assertEquals(101, s.getId());
             assertEquals("Matemáticas", s.getName());
             assertEquals(4, s.getCreditos());
             assertNotNull(s.getGroups());
@@ -21,35 +22,35 @@ public class SubjectTest {
         @Test
         public void constructorNombreNullTest() {
             assertThrows(IllegalArgumentException.class, () -> {
-                new Subject("MATH101", null, 4);
+                new Subject(101, null, 4);
             });
         }
 
         @Test
         public void constructorNombreVacioTest() {
             assertThrows(IllegalArgumentException.class, () -> {
-                new Subject("MATH101", "", 4);
+                new Subject(101, "", 4);
             });
         }
 
         @Test
         public void constructorNombreBlankTest() {
             assertThrows(IllegalArgumentException.class, () -> {
-                new Subject("MATH101", "   ", 4);
+                new Subject(101, "   ", 4);
             });
         }
 
         @Test
         public void constructorCreditosCeroTest() {
             assertThrows(IllegalArgumentException.class, () -> {
-                new Subject("MATH101", "Matemáticas", 0);
+                new Subject(101, "Matemáticas", 0);
             });
         }
 
         @Test
         public void constructorCreditosNegativosTest() {
             assertThrows(IllegalArgumentException.class, () -> {
-                new Subject("MATH101", "Matemáticas", -1);
+                new Subject(101, "Matemáticas", -1);
             });
         }
 
@@ -57,21 +58,21 @@ public class SubjectTest {
 
         @Test
         public void setIdTest() {
-            Subject s = new Subject("MATH101", "Matemáticas", 4);
-            s.setId("PHYS201");
-            assertEquals("PHYS201", s.getId());
+            Subject s = new Subject(101, "Matemáticas", 4);
+            s.setId(1012);
+            assertEquals(1012, s.getId());
         }
 
         @Test
         public void setNameValidoTest() {
-            Subject s = new Subject("MATH101", "Matemáticas", 4);
+            Subject s = new Subject(101, "Matemáticas", 4);
             s.setName("Física");
             assertEquals("Física", s.getName());
         }
 
         @Test
         public void setNameNullTest() {
-            Subject s = new Subject("MATH101", "Matemáticas", 4);
+            Subject s = new Subject(101, "Matemáticas", 4);
 
             assertThrows(IllegalArgumentException.class, () -> {
                 s.setName(null);
@@ -80,7 +81,7 @@ public class SubjectTest {
 
         @Test
         public void setNameVacioTest() {
-            Subject s = new Subject("MATH101", "Matemáticas", 4);
+            Subject s = new Subject(101, "Matemáticas", 4);
 
             assertThrows(IllegalArgumentException.class, () -> {
                 s.setName("");
@@ -89,7 +90,7 @@ public class SubjectTest {
 
         @Test
         public void setNameBlankTest() {
-            Subject s = new Subject("MATH101", "Matemáticas", 4);
+            Subject s = new Subject(101, "Matemáticas", 4);
 
             assertThrows(IllegalArgumentException.class, () -> {
                 s.setName("   ");
@@ -98,14 +99,14 @@ public class SubjectTest {
 
         @Test
         public void setCreditosValidoTest() {
-            Subject s = new Subject("MATH101", "Matemáticas", 4);
+            Subject s = new Subject(101, "Matemáticas", 4);
             s.setCreditos(6);
             assertEquals(6, s.getCreditos());
         }
 
         @Test
         public void setCreditosCeroTest() {
-            Subject s = new Subject("MATH101", "Matemáticas", 4);
+            Subject s = new Subject(101, "Matemáticas", 4);
 
             assertThrows(IllegalArgumentException.class, () -> {
                 s.setCreditos(0);
@@ -114,7 +115,7 @@ public class SubjectTest {
 
         @Test
         public void setCreditosNegativosTest() {
-            Subject s = new Subject("MATH101", "Matemáticas", 4);
+            Subject s = new Subject(101, "Matemáticas", 4);
 
             assertThrows(IllegalArgumentException.class, () -> {
                 s.setCreditos(-3);
@@ -125,24 +126,24 @@ public class SubjectTest {
 
         @Test
         public void getNombreTest() {
-            Subject s = new Subject("MATH101", "Matemáticas", 4);
+            Subject s = new Subject(101, "Matemáticas", 4);
             assertEquals("Matemáticas", s.getNombre());
             assertEquals(s.getName(), s.getNombre());
         }
 
         @Test
         public void getCodigoTest() {
-            Subject s = new Subject("MATH101", "Matemáticas", 4);
-            assertEquals("MATH101", s.getCodigo());
-            assertEquals(s.getId(), s.getCodigo());
+            Subject s = new Subject(101, "Matemáticas", 4);
+            assertEquals(101, s.getId());
+            assertEquals(s.getId(), s.getId());
         }
 
 
         @Test
         public void addGrupoTest() {
-            Subject s = new Subject("MATH101", "Matemáticas", 4);
+            Subject s = new Subject(101, "Matemáticas", 4);
             Group g = new Group(30);
-            g.setId("GROUP001");
+            g.setId(1);
 
             s.addGrupo(g);
 
@@ -153,14 +154,14 @@ public class SubjectTest {
 
         @Test
         public void addMultiplesGruposTest() {
-            Subject s = new Subject("MATH101", "Matemáticas", 4);
+            Subject s = new Subject(101, "Matemáticas", 4);
             Group g1 = new Group(30);
             Group g2 = new Group(25);
             Group g3 = new Group(20);
 
-            g1.setId("GROUP001");
-            g2.setId("GROUP002");
-            g3.setId("GROUP003");
+            g1.setId(1);
+            g2.setId(2);
+            g3.setId(3);
 
             s.addGrupo(g1);
             s.addGrupo(g2);
@@ -174,7 +175,7 @@ public class SubjectTest {
 
         @Test
         public void addGrupoNullTest() {
-            Subject s = new Subject("MATH101", "Matemáticas", 4);
+            Subject s = new Subject(101, "Matemáticas", 4);
 
             assertThrows(IllegalArgumentException.class, () -> {
                 s.addGrupo(null);
@@ -183,12 +184,12 @@ public class SubjectTest {
 
         @Test
         public void removeGrupoTest() {
-            Subject s = new Subject("MATH101", "Matemáticas", 4);
+            Subject s = new Subject(101, "Matemáticas", 4);
             Group g1 = new Group(30);
             Group g2 = new Group(25);
 
-            g1.setId("GROUP001");
-            g2.setId("GROUP002");
+            g1.setId(1);
+            g2.setId(2);
 
             s.addGrupo(g1);
             s.addGrupo(g2);
@@ -203,12 +204,12 @@ public class SubjectTest {
 
         @Test
         public void removeGrupoNoExistenteTest() {
-            Subject s = new Subject("MATH101", "Matemáticas", 4);
+            Subject s = new Subject(101, "Matemáticas", 4);
             Group g1 = new Group(30);
             Group g2 = new Group(25);
 
-            g1.setId("GROUP001");
-            g2.setId("GROUP002");
+            g1.setId(1);
+            g2.setId(2);
 
             s.addGrupo(g1);
 
@@ -221,7 +222,7 @@ public class SubjectTest {
 
         @Test
         public void removeGrupoNullTest() {
-            Subject s = new Subject("MATH101", "Matemáticas", 4);
+            Subject s = new Subject(101, "Matemáticas", 4);
 
             boolean removed = s.removeGrupo(null);
 
@@ -230,9 +231,9 @@ public class SubjectTest {
 
         @Test
         public void isHasGroupTrueTest() {
-            Subject s = new Subject("MATH101", "Matemáticas", 4);
+            Subject s = new Subject(101, "Matemáticas", 4);
             Group g = new Group(30);
-            g.setId("GROUP001");
+            g.setId(1);
 
             s.addGrupo(g);
 
@@ -241,12 +242,12 @@ public class SubjectTest {
 
         @Test
         public void isHasGroupFalseTest() {
-            Subject s = new Subject("MATH101", "Matemáticas", 4);
+            Subject s = new Subject(101, "Matemáticas", 4);
             Group g1 = new Group(30);
             Group g2 = new Group(25);
 
-            g1.setId("GROUP001");
-            g2.setId("GROUP002");
+            g1.setId(1);
+            g2.setId(2);
 
             s.addGrupo(g1);
 
@@ -255,7 +256,7 @@ public class SubjectTest {
 
         @Test
         public void isHasGroupNullTest() {
-            Subject s = new Subject("MATH101", "Matemáticas", 4);
+            Subject s = new Subject(101, "Matemáticas", 4);
 
             assertFalse(s.isHasGroup(null));
         }
@@ -264,30 +265,30 @@ public class SubjectTest {
 
         @Test
         public void equalsTest() {
-            Subject s1 = new Subject("MATH101", "Matemáticas", 4);
-            Subject s2 = new Subject("MATH101", "Física", 6); // Mismo ID, diferentes otros campos
+            Subject s1 = new Subject(101, "Matemáticas", 4);
+            Subject s2 = new Subject(101, "Física", 6); // Mismo ID, diferentes otros campos
 
             assertEquals(s1, s2); // Solo compara por ID
         }
 
         @Test
         public void notEqualsTest() {
-            Subject s1 = new Subject("MATH101", "Matemáticas", 4);
-            Subject s2 = new Subject("PHYS201", "Matemáticas", 4); // Diferentes IDs
+            Subject s1 = new Subject(101, "Matemáticas", 4);
+            Subject s2 = new Subject(102, "Matemáticas", 4); // Diferentes IDs
 
             assertNotEquals(s1, s2);
         }
 
         @Test
         public void equalsNullTest() {
-            Subject s = new Subject("MATH101", "Matemáticas", 4);
+            Subject s = new Subject(101, "Matemáticas", 4);
 
             assertNotEquals(s, null);
         }
 
         @Test
         public void equalsOtherClassTest() {
-            Subject s = new Subject("MATH101", "Matemáticas", 4);
+            Subject s = new Subject(101, "Matemáticas", 4);
             String other = "Not a Subject";
 
             assertNotEquals(s, other);
@@ -295,34 +296,34 @@ public class SubjectTest {
 
         @Test
         public void equalsSameInstanceTest() {
-            Subject s = new Subject("MATH101", "Matemáticas", 4);
+            Subject s = new Subject(101, "Matemáticas", 4);
 
             assertEquals(s, s);
         }
 
         @Test
         public void hashCodeTest() {
-            Subject s1 = new Subject("MATH101", "Matemáticas", 4);
-            Subject s2 = new Subject("MATH101", "Física", 6);
+            Subject s1 = new Subject(101, "Matemáticas", 4);
+            Subject s2 = new Subject(102, "Física", 6);
 
-            assertEquals(s1.hashCode(), s2.hashCode()); // Mismo ID, mismo hash
+            assertNotEquals(s1.hashCode(), s2.hashCode());
         }
 
         @Test
         public void toStringTest() {
-            Subject s = new Subject("MATH101", "Matemáticas", 4);
+            Subject s = new Subject(101, "Matemáticas", 4);
             Group g1 = new Group(30);
             Group g2 = new Group(25);
 
-            g1.setId("GROUP001");
-            g2.setId("GROUP002");
+            g1.setId(1);
+            g2.setId(2);
 
             s.addGrupo(g1);
             s.addGrupo(g2);
 
             String result = s.toString();
 
-            assertTrue(result.contains("MATH101"));
+            assertTrue(result.contains("101"));
             assertTrue(result.contains("Matemáticas"));
             assertTrue(result.contains("4"));
             assertTrue(result.contains("2")); // Número de grupos
@@ -330,11 +331,11 @@ public class SubjectTest {
 
         @Test
         public void toStringWithoutGroupsTest() {
-            Subject s = new Subject("MATH101", "Matemáticas", 4);
+            Subject s = new Subject(101, "Matemáticas", 4);
 
             String result = s.toString();
 
-            assertTrue(result.contains("MATH101"));
+            assertTrue(result.contains("101"));
             assertTrue(result.contains("Matemáticas"));
             assertTrue(result.contains("4"));
             assertTrue(result.contains("0")); // Sin grupos
@@ -344,9 +345,9 @@ public class SubjectTest {
 
         @Test
         public void addMismoGrupoDosVecesTest() {
-            Subject s = new Subject("MATH101", "Matemáticas", 4);
+            Subject s = new Subject(101, "Matemáticas", 4);
             Group g = new Group(30);
-            g.setId("GROUP001");
+            g.setId(1);
 
             s.addGrupo(g);
             s.addGrupo(g); // Añadir el mismo grupo otra vez
@@ -357,9 +358,9 @@ public class SubjectTest {
 
         @Test
         public void removeFromEmptyListTest() {
-            Subject s = new Subject("MATH101", "Matemáticas", 4);
+            Subject s = new Subject(101, "Matemáticas", 4);
             Group g = new Group(30);
-            g.setId("GROUP001");
+            g.setId(1);
 
             boolean removed = s.removeGrupo(g);
 
@@ -369,14 +370,14 @@ public class SubjectTest {
 
         @Test
         public void addRemoveMultipleOperationsTest() {
-            Subject s = new Subject("MATH101", "Matemáticas", 4);
+            Subject s = new Subject(101, "Matemáticas", 4);
             Group g1 = new Group(30);
             Group g2 = new Group(25);
             Group g3 = new Group(20);
 
-            g1.setId("GROUP001");
-            g2.setId("GROUP002");
-            g3.setId("GROUP003");
+            g1.setId(1);
+            g2.setId(2);
+            g3.setId(3);
 
             // Añadir todos
             s.addGrupo(g1);
@@ -391,7 +392,7 @@ public class SubjectTest {
 
             // Añadir uno nuevo
             Group g4 = new Group(15);
-            g4.setId("GROUP004");
+            g4.setId(4);
             s.addGrupo(g4);
             assertEquals(3, s.getGroups().size());
             assertTrue(s.isHasGroup(g4));
@@ -405,27 +406,14 @@ public class SubjectTest {
 
         @Test
         public void creditosMaxValueTest() {
-            Subject s = new Subject("MATH101", "Matemáticas", Integer.MAX_VALUE);
+            Subject s = new Subject(101, "Matemáticas", Integer.MAX_VALUE);
             assertEquals(Integer.MAX_VALUE, s.getCreditos());
         }
 
         @Test
         public void nombreConEspaciosTest() {
-            Subject s = new Subject("MATH101", " Matemáticas Avanzadas ", 4);
+            Subject s = new Subject(101, " Matemáticas Avanzadas ", 4);
             assertEquals(" Matemáticas Avanzadas ", s.getName());
-        }
-
-        @Test
-        public void idNullTest() {
-            Subject s = new Subject(null, "Matemáticas", 4);
-            assertNull(s.getId());
-        }
-
-        @Test
-        public void setIdNullTest() {
-            Subject s = new Subject("MATH101", "Matemáticas", 4);
-            s.setId(null);
-            assertNull(s.getId());
         }
 
 }

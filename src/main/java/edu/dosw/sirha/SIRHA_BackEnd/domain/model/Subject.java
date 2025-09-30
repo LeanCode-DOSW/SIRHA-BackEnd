@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import org.springframework.data.annotation.Id;
+
 /**
  * Representa una materia o asignatura dentro del sistema académico.
  *
@@ -12,12 +14,13 @@ import java.util.Objects;
  * - Cada materia debe tener un nombre único y un identificador.
  */
 public class Subject {
-    private String id;
+    @Id
+    private int id;
     private String name;
     private int creditos;
     private List<Group> groups;
 
-    public Subject(String id, String name, int creditos) {
+    public Subject(int id, String name, int creditos) {
         if (name == null || name.isBlank()) {
             throw new IllegalArgumentException("El nombre de la materia no puede estar vacío");
         }
@@ -49,11 +52,11 @@ public class Subject {
 
     // ---------- Getters y Setters ----------
 
-    public String getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(int id) {
         this.id = id;
     }
 
@@ -110,9 +113,7 @@ public class Subject {
     public String getNombre(){
         return name;
     }
-    public String getCodigo(){
-        return id;
-    }
+
     public List<Group> getGrupos(){
         return groups;
     }

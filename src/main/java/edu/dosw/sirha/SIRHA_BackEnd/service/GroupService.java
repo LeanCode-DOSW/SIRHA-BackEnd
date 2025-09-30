@@ -9,23 +9,23 @@ public interface GroupService {
 
     // ===== CRUD de grupos =====
     List<Group> findAll();
-    Group findById(String id);
+    Group findById(Integer id);
     Group save(Group group);
-    void delete(String id);
+    void delete(Integer id);
 
     // Gestión de profesores
-    Group asignarProfesor(String groupId, Professor professor);
-    Professor getProfesor(String groupId);
+    Group asignarProfesor(Integer groupId, Professor professor);
+    Professor getProfesor(Integer groupId);
 
     // Gestión de horarios
-    Group agregarHorario(String groupId, Schedule schedule);
-    List<Schedule> getHorarios(String groupId);
+    Group agregarHorario(Integer groupId, Schedule schedule);
+    List<Schedule> getHorarios(Integer groupId);
 
     // Capacidad
-    boolean estaLleno(String groupId);
-    int getCuposDisponibles(String groupId);
+    boolean estaLleno(Integer groupId);
+    int getCuposDisponibles(Integer groupId);
 
     // Estado del grupo
-    Group cerrarGrupo(String groupId);
-    Group abrirGrupo(String groupId);
+    Group cerrarGrupo(Integer groupId);
+    Group abrirGrupo(Integer groupId);
 }

@@ -75,7 +75,7 @@ public class GroupServiceImpl implements GroupService {
     }
 
     /** Elimina un grupo por su ID. */
-    public void eliminarGrupo(String id) {
+    public void eliminarGrupo(Integer id) {
         if (!groupRepository.existsById(id)) {
             throw new RuntimeException("Grupo con id " + id + " no existe");
         }
@@ -90,7 +90,7 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    public Group findById(String id) {
+    public Group findById(Integer id) {
         return groupRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Grupo con id " + id + " no encontrado"));
     }
@@ -101,62 +101,62 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    public void delete(String id) {
+    public void delete(Integer id) {
         eliminarGrupo(id);
     }
 
     // ---------- Métodos de gestión de profesores ----------
 
     @Override
-    public Group asignarProfesor(String groupId, Professor professor) {
+    public Group asignarProfesor(Integer groupId, Professor professor) {
         Group group = findById(groupId);
         group.setProfesor(professor);
         return groupRepository.save(group);
     }
 
     @Override
-    public Professor getProfesor(String groupId) {
+    public Professor getProfesor(Integer groupId) {
         return findById(groupId).getProfesor();
     }
 
     // ---------- Métodos de gestión de horarios ----------
 
     @Override
-    public Group agregarHorario(String groupId, Schedule schedule) {
+    public Group agregarHorario(Integer groupId, Schedule schedule) {
         Group group = findById(groupId);
         group.getHorarios().add(schedule);
         return groupRepository.save(group);
     }
 
     @Override
-    public List<Schedule> getHorarios(String groupId) {
+    public List<Schedule> getHorarios(Integer groupId) {
         return findById(groupId).getHorarios();
     }
 
     // ---------- Métodos de capacidad ----------
 
     @Override
-    public boolean estaLleno(String groupId) {
+    public boolean estaLleno(Integer groupId) {
         Group group = findById(groupId);
         return group.getCuposDisponibles() <= 0;
     }
 
     @Override
-    public int getCuposDisponibles(String groupId) {
+    public int getCuposDisponibles(Integer groupId) {
         return findById(groupId).getCuposDisponibles();
     }
 
     // ---------- Estado del grupo ----------
 
     @Override
-    public Group cerrarGrupo(String groupId) {
+    public Group cerrarGrupo(Integer groupId) {
         Group group = findById(groupId);
         group.setEstadoGrupo(new StatusClosed()); // cambia el estado al cerrado
         return groupRepository.save(group);
     }
 
     @Override
-    public Group abrirGrupo(String groupId) {
+    public Group abrirGrupo(Integer groupId) {
         Group group = findById(groupId);
         group.setEstadoGrupo(new StatusOpen()); // cambia el estado al abierto
         return groupRepository.save(group);

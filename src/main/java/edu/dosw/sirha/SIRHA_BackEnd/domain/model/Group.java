@@ -27,7 +27,7 @@ import edu.dosw.sirha.SIRHA_BackEnd.domain.port.GroupState;
  * @see Student
  */
 public class Group {
-    private String id;
+    private int id;
     private int capacidad;
     private int inscritos;
     private GroupState estadoGrupo; // State Pattern
@@ -63,6 +63,7 @@ public class Group {
         this.inscritos = 0;
         this.estadoGrupo = new StatusOpen(); // Estado inicial: abierto
         this.estudiantes = new ArrayList<>();
+        horarios = new ArrayList<>();
     }
     public void setEstadoGrupo(GroupState estado) {
         if (estado == null) {
@@ -185,11 +186,11 @@ public class Group {
 
     // Getters y Setters con documentación
 
-    public String getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(int id) {
         this.id = id;
     }
 
@@ -303,4 +304,27 @@ public class Group {
         return horarios;
     }
 
+    public boolean conflictoConHorario(Schedule horario) {
+        for (Schedule existente : horarios) {
+            if (existente.seSolapaCon(horario)) {
+                System.out.println("Conflicto detectado entre horarios: " + existente + " y " + horario);
+                return true;
+            }
+        }
+        System.out.println("No se detectaron conflictos con el horario: " + horario);
+        return false;
+    }
+
+
+    public boolean conflictoConHorario(Group otroGrupo) {
+        if (otroGrupo == null || otroGrupo.getHorarios() == null) {
+            throw new IllegalArgumentException("El otro grupo o sus horarios no pueden ser nulos");
+        }
+        for (Schedule horarioOtro : otroGrupo.getHorarios()) {
+            if (conflictoConHorario(horarioOtro)) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

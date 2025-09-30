@@ -26,6 +26,12 @@ public abstract class User implements Authenticable, Schedulable {
         this.email = email;
         this.password = password.startsWith("$2a$") ? password : PasswordUtils.hashPassword(password);
     }
+    public User(String id, String username, String email, String password) {
+        this.id = id;
+        this.username = username;
+        this.email = email;
+        this.password = password.startsWith("$2a$") ? password : PasswordUtils.hashPassword(password);
+    }
     
     public boolean verificarContraseña(String rawPassword) {
         return PasswordUtils.verifyPassword(rawPassword, this.password);

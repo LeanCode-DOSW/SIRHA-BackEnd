@@ -81,20 +81,6 @@ public class MapperUtils {
      * y necesitan ser convertidos a entidades del dominio para procesamiento
      * en la lógica de negocio.
      * 
-     * @param dto el DTO a convertir a entidad del dominio.
-     * @return la entidad Student correspondiente
-     * @example
-     * <pre>
-     * StudentDTO dto = new StudentDTO();
-     * dto.setId("1");
-     * dto.setUsername("maria.garcia");
-     * dto.setCodigo("202112346");
-     * Student student = MapperUtils.fromDTO(dto);
-     * // student.getId() = "1"
-     * // student.getUsername() = "maria.garcia"
-     * // student.getCodigo() = "202112346"
-     * // student.getSolicitudes() = null (debe ser cargado por separado)
-     * </pre>
      */
     public static Student fromDTOnewStudent(StudentDTO dto) {
         if (dto == null) {

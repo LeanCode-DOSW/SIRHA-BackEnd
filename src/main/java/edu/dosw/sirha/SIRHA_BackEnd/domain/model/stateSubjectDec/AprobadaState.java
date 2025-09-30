@@ -1,5 +1,6 @@
 package edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateSubjectDec;
 
+import edu.dosw.sirha.SIRHA_BackEnd.domain.model.Group;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.SubjectDecorator;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.SemaforoColores;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.port.SubjectState;
@@ -7,18 +8,22 @@ import edu.dosw.sirha.SIRHA_BackEnd.domain.port.SubjectState;
 public class AprobadaState implements SubjectState {
 
     @Override
-    public void setEstado(SubjectDecorator materia) {
+    public void setState(SubjectDecorator materia) {
         materia.setEstadoColor(SemaforoColores.VERDE);
     }
 
     @Override
     public void setSemestre(SubjectDecorator materia, int semestre) {
-        materia.setSemestreMateria(semestre);
+        throw new IllegalStateException("No se puede cambiar semestre de materia aprobada");
+    }
+    @Override
+    public void setGroup(SubjectDecorator materia, Group grupo) {
+        throw new IllegalStateException("No se puede asignar grupo a materia aprobada");
     }
 
     @Override
     public void inscribir(SubjectDecorator materia) {
-        System.out.println("No puedes reinscribir una materia aprobada.");
+        throw new IllegalStateException("No se puede inscribir una materia ya aprobada");
     }
 
     @Override
@@ -28,6 +33,23 @@ public class AprobadaState implements SubjectState {
 
     @Override
     public void reprobar(SubjectDecorator materia) {
-        System.out.println("No puedes reprobar una materia aprobada.");
+        throw new IllegalStateException("No se puede reprobar una materia aprobada");
     }
+    @Override
+    public void retirar(SubjectDecorator materia) {
+        throw new IllegalStateException("No se puede retirar una materia aprobada");
+    }
+    
+    @Override
+    public boolean puedeInscribirse() { return false; }
+    @Override
+    public boolean puedeAprobar() { return false; }
+    @Override
+    public boolean puedeReprobar() { return false; }
+    @Override
+    public boolean puedeRetirar() { return false; }
+    @Override
+    public boolean tieneGrupoAsignado() { return true; }
+    @Override
+    public String getEstadoNombre() { return "Aprobada"; }
 }

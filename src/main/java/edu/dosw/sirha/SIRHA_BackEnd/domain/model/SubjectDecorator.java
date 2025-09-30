@@ -1,40 +1,49 @@
 package edu.dosw.sirha.SIRHA_BackEnd.domain.model;
 
 import java.util.List;
-
-import org.springframework.data.mongodb.core.mapping.Field;
-
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.SemaforoColores;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateSubjectDec.NoCursadaState;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.port.*;
 
 public class SubjectDecorator {
-    @Field("subject")
-    private Subject subject;
-    @Field("estadoColor")
+    private final Subject subject;
     private SemaforoColores estadoColor;
-    @Field("semestre")
     private int semestre;
-
-    private SubjectState estado;
+    private SubjectState state;
+    private Group group;
 
     public SubjectDecorator(Subject subject) {
         this.subject = subject;
-        this.estado = new NoCursadaState();
+        this.state = new NoCursadaState();
     }
-
-
-    public String getNombre() {return subject.getNombre();}
-    public String getCodigo() {return subject.getCodigo();}
+    
+    
+    public String getName() {return subject.getName();}
     public int getCreditos() {return subject.getCreditos();}
-    public List<Group> getGrupos() {return subject.getGrupos();}
+    public List<Group> getGroups() {return subject.getGroups();}
 
-    public void setEstado(SubjectState estado) {this.estado = estado;}
+    public void setState(SubjectState state) {this.state = state;}
     public void setEstadoColor(SemaforoColores estadoColor) {this.estadoColor = estadoColor;}
     public void setSemestreMateria(int semestre){this.semestre = semestre;}
+    public void setGroup(Group group) { state.setGroup(this, group); }
 
+    public SemaforoColores getEstadoColor() {return estadoColor;}
+    public int getSemestre() {return semestre;}
+    public Subject getSubject() {return subject;}
+    public SubjectState getState() {return state;}
+    public Group getGroup() { return group; }
 
-    public void inscribir() { estado.inscribir(this); }
-    public void aprobar()   { estado.aprobar(this); }
-    public void reprobar()  { estado.reprobar(this); }
+    public void inscribir() { state.inscribir(this); }
+    public void aprobar()   { state.aprobar(this); }
+    public void reprobar()  { state.reprobar(this); }
+    public void retirar()   { state.retirar(this); }
+    
+    public boolean puedeInscribirse() {
+        return state.puedeInscribirse();
+    }
+
+    public boolean estaCursando() {
+        return estadoColor == SemaforoColores.AMARILLO;
+    }
+    public int getId() { return subject.getId(); }
 }
