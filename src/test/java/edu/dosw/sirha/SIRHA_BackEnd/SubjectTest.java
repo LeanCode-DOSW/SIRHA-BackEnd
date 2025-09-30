@@ -3,9 +3,10 @@ package edu.dosw.sirha.SIRHA_BackEnd;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.Group;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.Subject;
 import org.junit.jupiter.api.Test;
-
+import org.springframework.boot.test.context.SpringBootTest;
 import static org.junit.jupiter.api.Assertions.*;
 
+@SpringBootTest
 public class SubjectTest {
         @Test
         public void constructorValidoTest() {
@@ -142,7 +143,7 @@ public class SubjectTest {
         public void addGrupoTest() {
             Subject s = new Subject(101, "Matemáticas", 4);
             Group g = new Group(30);
-            g.setId("GROUP001");
+            g.setId(1);
 
             s.addGrupo(g);
 
@@ -158,9 +159,9 @@ public class SubjectTest {
             Group g2 = new Group(25);
             Group g3 = new Group(20);
 
-            g1.setId("GROUP001");
-            g2.setId("GROUP002");
-            g3.setId("GROUP003");
+            g1.setId(1);
+            g2.setId(2);
+            g3.setId(3);
 
             s.addGrupo(g1);
             s.addGrupo(g2);
@@ -187,8 +188,8 @@ public class SubjectTest {
             Group g1 = new Group(30);
             Group g2 = new Group(25);
 
-            g1.setId("GROUP001");
-            g2.setId("GROUP002");
+            g1.setId(1);
+            g2.setId(2);
 
             s.addGrupo(g1);
             s.addGrupo(g2);
@@ -207,8 +208,8 @@ public class SubjectTest {
             Group g1 = new Group(30);
             Group g2 = new Group(25);
 
-            g1.setId("GROUP001");
-            g2.setId("GROUP002");
+            g1.setId(1);
+            g2.setId(2);
 
             s.addGrupo(g1);
 
@@ -232,7 +233,7 @@ public class SubjectTest {
         public void isHasGroupTrueTest() {
             Subject s = new Subject(101, "Matemáticas", 4);
             Group g = new Group(30);
-            g.setId("GROUP001");
+            g.setId(1);
 
             s.addGrupo(g);
 
@@ -245,8 +246,8 @@ public class SubjectTest {
             Group g1 = new Group(30);
             Group g2 = new Group(25);
 
-            g1.setId("GROUP001");
-            g2.setId("GROUP002");
+            g1.setId(1);
+            g2.setId(2);
 
             s.addGrupo(g1);
 
@@ -314,8 +315,8 @@ public class SubjectTest {
             Group g1 = new Group(30);
             Group g2 = new Group(25);
 
-            g1.setId("GROUP001");
-            g2.setId("GROUP002");
+            g1.setId(1);
+            g2.setId(2);
 
             s.addGrupo(g1);
             s.addGrupo(g2);
@@ -346,7 +347,7 @@ public class SubjectTest {
         public void addMismoGrupoDosVecesTest() {
             Subject s = new Subject(101, "Matemáticas", 4);
             Group g = new Group(30);
-            g.setId("GROUP001");
+            g.setId(1);
 
             s.addGrupo(g);
             s.addGrupo(g); // Añadir el mismo grupo otra vez
@@ -359,7 +360,7 @@ public class SubjectTest {
         public void removeFromEmptyListTest() {
             Subject s = new Subject(101, "Matemáticas", 4);
             Group g = new Group(30);
-            g.setId("GROUP001");
+            g.setId(1);
 
             boolean removed = s.removeGrupo(g);
 
@@ -374,9 +375,9 @@ public class SubjectTest {
             Group g2 = new Group(25);
             Group g3 = new Group(20);
 
-            g1.setId("GROUP001");
-            g2.setId("GROUP002");
-            g3.setId("GROUP003");
+            g1.setId(1);
+            g2.setId(2);
+            g3.setId(3);
 
             // Añadir todos
             s.addGrupo(g1);
@@ -391,7 +392,7 @@ public class SubjectTest {
 
             // Añadir uno nuevo
             Group g4 = new Group(15);
-            g4.setId("GROUP004");
+            g4.setId(4);
             s.addGrupo(g4);
             assertEquals(3, s.getGroups().size());
             assertTrue(s.isHasGroup(g4));

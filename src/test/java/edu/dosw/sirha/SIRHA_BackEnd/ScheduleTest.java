@@ -2,11 +2,11 @@ package edu.dosw.sirha.SIRHA_BackEnd;
 
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.Schedule;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.DiasSemana;
-
 import org.junit.jupiter.api.Test;
-
+import org.springframework.boot.test.context.SpringBootTest;
 import static org.junit.jupiter.api.Assertions.*;
 
+@SpringBootTest
 public class ScheduleTest {
         @Test
         void constructorValido_creaObjeto() {

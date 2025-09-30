@@ -8,9 +8,11 @@ import edu.dosw.sirha.SIRHA_BackEnd.dto.StudentDTO;
 import edu.dosw.sirha.SIRHA_BackEnd.util.*;
 import java.util.*;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
+
 import static org.junit.jupiter.api.Assertions.*;
 
-//@SpringBootTest
+@SpringBootTest
 class SirhaBackEndApplicationTests {
 
     @Test

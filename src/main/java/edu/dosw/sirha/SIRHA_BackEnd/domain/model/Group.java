@@ -27,7 +27,7 @@ import edu.dosw.sirha.SIRHA_BackEnd.domain.port.GroupState;
  * @see Student
  */
 public class Group {
-    private String id;
+    private int id;
     private int capacidad;
     private int inscritos;
     private GroupState estadoGrupo; // State Pattern
@@ -186,11 +186,11 @@ public class Group {
 
     // Getters y Setters con documentación
 
-    public String getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(int id) {
         this.id = id;
     }
 
