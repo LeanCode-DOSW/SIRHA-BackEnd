@@ -22,7 +22,7 @@ public class Semaforo implements AcademicProgress {
     }
 
     private void iniciarSemaforo() {
-        studyPlan.getMaterias().forEach((name, subject) -> {
+        studyPlan.getSubjects().forEach((name, subject) -> {
             SubjectDecorator decorator = new SubjectDecorator(subject);
             subjects.put(name, decorator);
         });
@@ -102,6 +102,28 @@ public class Semaforo implements AcademicProgress {
     }
 
     @Override
+    public boolean hasSubject(SubjectDecorator subject) {
+        if (subject == null) {
+            return false;
+        }
+        return subjects.containsKey(subject.getName());
+    }
+
+    @Override
+    public void addSubject(SubjectDecorator subject) {  //mas logica de negocio
+        if (subject != null) {
+            subjects.put(subject.getName(), subject);
+        }
+    }
+
+    @Override
+    public void removeSubject(SubjectDecorator subject) {  //mas logica de negocio
+        if (subject != null) {
+            subjects.remove(subject.getName());
+        }
+    }
+
+    @Override
     public int[] getContadoresPorEstado() {
         return new int[]{
             getMateriasAprobadasCount(),
@@ -109,6 +131,18 @@ public class Semaforo implements AcademicProgress {
             getMateriasReprobadasCount(),
             getMateriasNoCursadasCount()
         };
+    }
+
+    @Override
+    public boolean isSubjectApproved(Subject subject) {
+        if (subject == null) {
+            return false;
+        }
+        if (!subjects.containsKey(subject.getName())) {
+            return false;
+        }
+        SubjectDecorator decorator = subjects.get(subject.getName());
+        return decorator != null && decorator.getEstadoColor() == SemaforoColores.VERDE;
     }
 
 }

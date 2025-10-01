@@ -48,8 +48,8 @@ public class GroupServiceImpl implements GroupService {
 
         // Validar conflictos de horarios con grupos existentes
         for (Group gExistente : subject.getGroups()) {
-            for (Schedule hNuevo : grupo.getHorarios()) {
-                for (Schedule hExistente : gExistente.getHorarios()) {
+            for (Schedule hNuevo : grupo.getSchedules()) {
+                for (Schedule hExistente : gExistente.getSchedules()) {
                     if (hNuevo.seSolapaCon(hExistente)) {
                         throw new RuntimeException("Conflicto de horario con grupo existente: " + gExistente.getId());
                     }
@@ -127,13 +127,13 @@ public class GroupServiceImpl implements GroupService {
     @Override
     public Group agregarHorario(Integer groupId, Schedule schedule) {
         Group group = findById(groupId);
-        group.getHorarios().add(schedule);
+        group.getSchedules().add(schedule);
         return groupRepository.save(group);
     }
 
     @Override
     public List<Schedule> getHorarios(Integer groupId) {
-        return findById(groupId).getHorarios();
+        return findById(groupId).getSchedules();
     }
 
     // ---------- Métodos de capacidad ----------

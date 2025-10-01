@@ -8,25 +8,32 @@ import org.springframework.data.mongodb.core.mapping.Field;
 @Document(collection = "study_plans")
 public class StudyPlan {
     @Field("nombre")
-    private String nombre;
+    private String name;
     @Field("materias")
-    private Map<String, Subject> materias;
+    private Map<String, Subject> subjects;
 
 
-    public StudyPlan(String nombre) {
-        this.nombre = nombre;
-        this.materias = new HashMap<>();
+    public StudyPlan(String name) {
+        this.name = name;
+        this.subjects = new HashMap<>();
     }
 
-    public void addMateria(Subject m) {
-        materias.put(m.getName(), m);
+    public void addSubject(Subject m) {
+        subjects.put(m.getName(), m);
     }
 
-    public Map<String, Subject> getMaterias() {
-        return materias;
+    public Map<String, Subject> getSubjects() {
+        return subjects;
+    }
+
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+    public boolean hasSubject(Subject subject) {
+        return subjects.containsKey(subject.getName());
+    }
+    public Subject getSubjectByName(String name) {
+        return subjects.get(name);
     }
     
-    public String getNombre() { return nombre; }
-    public void setNombre(String nombre) { this.nombre = nombre; }
 }
 

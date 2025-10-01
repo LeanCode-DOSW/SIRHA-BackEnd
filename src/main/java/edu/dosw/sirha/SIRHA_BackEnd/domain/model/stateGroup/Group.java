@@ -13,7 +13,7 @@ import edu.dosw.sirha.SIRHA_BackEnd.domain.port.GroupState;
  * Entidad del dominio que representa un grupo académico en el sistema SIRHA.
  *
  * Un grupo es una instancia específica de una materia en un semestre determinado,
- * con un profesor asignado, un aula, horarios específicos y una capacidad máxima
+ * con un profesor asignado, un aula, schedules específicos y una capacidad máxima
  * de estudiantes. Esta clase implementa el patrón State para manejar los diferentes
  * estados del grupo (Abierto, Cerrado, Lleno).
  *
@@ -39,7 +39,7 @@ public class Group {
     private GroupState estadoGrupo; // State Pattern
     private Professor profesor;
     private Subject curso;
-    private List<Schedule> horarios;
+    private List<Schedule> schedules;
     private String aula;
     private AcademicPeriod currentPeriod;
     private List<Student> estudiantes;
@@ -61,7 +61,7 @@ public class Group {
         this.inscritos = 0;
         this.estadoGrupo = new StatusOpen(); // Estado inicial: abierto
         this.estudiantes = new ArrayList<>();
-        horarios = new ArrayList<>();
+        schedules = new ArrayList<>();
     }
     public void setEstadoGrupo(GroupState estado) {
         if (estado == null) {
@@ -74,7 +74,7 @@ public class Group {
      * Obtiene el estado actual del grupo.
      * @return estado actual del grupo, nunca null
      */
-    public GroupState getEstadoGrupo() {
+    public GroupState getGroupState() {
         return estadoGrupo;
     }
 
@@ -164,8 +164,12 @@ public class Group {
      * Verifica si el grupo está lleno.
      * @return true si no hay cupos disponibles, false en caso contrario
      */
-    public boolean estaLleno() {
+    public boolean isFull() {
         return inscritos >= capacidad;
+    }
+
+    public boolean isOpen() {
+        return estadoGrupo instanceof StatusOpen;
     }
 
     /**
@@ -285,23 +289,23 @@ public class Group {
     }
 
 
-    public void addHorario(Schedule horario) {
-        for (Schedule existente : horarios) {
+    public void addSchedule(Schedule horario) {
+        for (Schedule existente : schedules) {
             if (existente.seSolapaCon(horario)) {
                 throw new IllegalArgumentException("El horario se solapa con otro ya asignado en el grupo");
             }
         }
-        horarios.add(horario);
+        schedules.add(horario);
     }
 
-    public List<Schedule> getHorarios() {
-        return horarios;
+    public List<Schedule> getSchedules() {
+        return schedules;
     }
 
     public boolean conflictoConHorario(Schedule horario) {
-        for (Schedule existente : horarios) {
+        for (Schedule existente : schedules) {
             if (existente.seSolapaCon(horario)) {
-                System.out.println("Conflicto detectado entre horarios: " + existente + " y " + horario);
+                System.out.println("Conflicto detectado entre schedules: " + existente + " y " + horario);
                 return true;
             }
         }
@@ -311,14 +315,18 @@ public class Group {
 
 
     public boolean conflictoConHorario(Group otroGrupo) {
-        if (otroGrupo == null || otroGrupo.getHorarios() == null) {
-            throw new IllegalArgumentException("El otro grupo o sus horarios no pueden ser nulos");
+        if (otroGrupo == null || otroGrupo.getSchedules() == null) {
+            throw new IllegalArgumentException("El otro grupo o sus schedules no pueden ser nulos");
         }
-        for (Schedule horarioOtro : otroGrupo.getHorarios()) {
+        for (Schedule horarioOtro : otroGrupo.getSchedules()) {
             if (conflictoConHorario(horarioOtro)) {
                 return true;
             }
         }
         return false;
+    }
+
+    public void closeGroup() {
+        this.estadoGrupo = new StatusClosed();
     }
 }

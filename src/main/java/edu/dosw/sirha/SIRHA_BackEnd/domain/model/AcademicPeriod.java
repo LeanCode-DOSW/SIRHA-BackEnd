@@ -10,32 +10,32 @@ public class AcademicPeriod {
     @Id
     private String id;
     private String periodo; // "2024-1"
-    private LocalDate fechaInicio;
-    private LocalDate fechaFin;
-    private LocalDate fechaInicioInscripciones;
-    private LocalDate fechaFinInscripciones;
+    private LocalDate startDate;
+    private LocalDate endDate;
+    private LocalDate startDateInscripciones;
+    private LocalDate endDateInscripciones;
 
     public AcademicPeriod() {
     }
-    public AcademicPeriod(String periodo, LocalDate fechaInicio, LocalDate fechaFin) {
+    public AcademicPeriod(String periodo, LocalDate startDate, LocalDate endDate) {
         this();
         this.periodo = periodo;
-        this.fechaInicio = fechaInicio;
-        this.fechaFin = fechaFin;
+        this.startDate = startDate;
+        this.endDate = endDate;
     }
 
-    public boolean esPeriodoActivo() {
+    public boolean isActive() {
         LocalDate hoy = LocalDate.now();
-        return isActivo() && !hoy.isBefore(fechaInicio) && !hoy.isAfter(fechaFin);
+        return isActivo() && !hoy.isBefore(startDate) && !hoy.isAfter(endDate);
     }
 
-    public boolean esPeriodoInscripcionesAbiertas() {
+    public boolean isPeriodInscripcionesAbiertas() {
         LocalDate hoy = LocalDate.now();
-        return esPeriodoActivo() && 
-               fechaInicioInscripciones != null && 
-               fechaFinInscripciones != null &&
-               !hoy.isBefore(fechaInicioInscripciones) && 
-               !hoy.isAfter(fechaFinInscripciones);
+        return isActive() && 
+               startDateInscripciones != null && 
+               endDateInscripciones != null &&
+               !hoy.isBefore(startDateInscripciones) && 
+               !hoy.isAfter(endDateInscripciones);
     }
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
@@ -43,24 +43,24 @@ public class AcademicPeriod {
     public String getPeriodo() { return periodo; }
     public void setPeriodo(String periodo) { this.periodo = periodo; }
 
-    public LocalDate getFechaInicio() { return fechaInicio; }
-    public void setFechaInicio(LocalDate fechaInicio) { this.fechaInicio = fechaInicio; }
-    
-    public LocalDate getFechaFin() { return fechaFin; }
-    public void setFechaFin(LocalDate fechaFin) { this.fechaFin = fechaFin; }
-    
-    public LocalDate getFechaInicioInscripciones() { return fechaInicioInscripciones; }
-    public void setFechaInicioInscripciones(LocalDate fechaInicioInscripciones) { 
-        this.fechaInicioInscripciones = fechaInicioInscripciones; 
+    public LocalDate getStartDate() { return startDate; }
+    public void setStartDate(LocalDate startDate) { this.startDate = startDate; }
+
+    public LocalDate getEndDate() { return endDate; }
+    public void setEndDate(LocalDate endDate) { this.endDate = endDate; }
+
+    public LocalDate getStartDateInscripciones() { return startDateInscripciones; }
+    public void setStartDateInscripciones(LocalDate startDateInscripciones) { 
+        this.startDateInscripciones = startDateInscripciones; 
     }
-    
-    public LocalDate getFechaFinInscripciones() { return fechaFinInscripciones; }
-    public void setFechaFinInscripciones(LocalDate fechaFinInscripciones) { 
-        this.fechaFinInscripciones = fechaFinInscripciones; 
+
+    public LocalDate getEndDateInscripciones() { return endDateInscripciones; }
+    public void setEndDateInscripciones(LocalDate endDateInscripciones) { 
+        this.endDateInscripciones = endDateInscripciones; 
     }
     
     public boolean isActivo() { 
-        return !fechaInicio.isAfter(LocalDate.now()) && !fechaFin.isBefore(LocalDate.now());
+        return !startDate.isAfter(LocalDate.now()) && !endDate.isBefore(LocalDate.now());
     }
 
     @Override
@@ -74,6 +74,6 @@ public class AcademicPeriod {
     @Override
     public String toString() {
         return String.format("AcademicPeriod{id='%s', periodo='%s', activo=%s, fechas=%s a %s}", 
-                           id, periodo, isActivo(), fechaInicio, fechaFin);
+                           id, periodo, isActivo(), startDate, endDate);
     }
 }

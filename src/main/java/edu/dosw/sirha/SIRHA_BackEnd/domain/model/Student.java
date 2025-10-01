@@ -9,8 +9,11 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.SemaforoColores;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateGroup.Group;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateSubjectDec.SubjectDecorator;
+import edu.dosw.sirha.SIRHA_BackEnd.domain.port.AcademicOperations;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.port.AcademicProgress;
+import edu.dosw.sirha.SIRHA_BackEnd.domain.port.AcademicProgressViewer;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.port.RequestProcess;
+import edu.dosw.sirha.SIRHA_BackEnd.domain.port.ScheduleManager;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.port.SolicitudFactory;
 
 /**
@@ -26,7 +29,7 @@ import edu.dosw.sirha.SIRHA_BackEnd.domain.port.SolicitudFactory;
  *
  */
 @Document(collection = "students")
-public class Student extends User implements SolicitudFactory {
+public class Student extends User implements SolicitudFactory, ScheduleManager, AcademicProgressViewer, AcademicOperations {
     private String codigo;
     private StudyPlan planGeneral;
     private AcademicProgress academicProgress;
@@ -37,7 +40,7 @@ public class Student extends User implements SolicitudFactory {
         super();
     }
  
-    public Student(String id, String username, String email, String passwordHash, String codigo) {
+    public Student(int id, String username, String email, String passwordHash, String codigo) {
         super(id, username, email, passwordHash);
     }
 
@@ -116,19 +119,10 @@ public class Student extends User implements SolicitudFactory {
         return academicProgress;
     }
     
-
-    public AcademicProgress getSemaforo() {
-        return  academicProgress;
-    }
-
     public void setAcademicProgress(AcademicProgress academicProgress) {
         this.academicProgress = academicProgress;
     }
     
-
-    public void setSemaforo(Semaforo semaforo) {
-        this.academicProgress = semaforo;
-    }
 
     /**
      * Obtiene la lista de solicitudes del estudiante.
@@ -294,7 +288,7 @@ public class Student extends User implements SolicitudFactory {
         
         return getMateriasCursando().stream()
             .filter(materia -> materia.getGroup() != null)
-            .flatMap(materia -> materia.getGroup().getHorarios().stream())
+            .flatMap(materia -> materia.getGroup().getSchedules().stream())
             .toList();
     }
     
@@ -344,6 +338,14 @@ public class Student extends User implements SolicitudFactory {
         this.currentPeriod = currentPeriod;
     }
 
+    public boolean hasSubject(SubjectDecorator subject) {
+        if (subject == null || academicProgress == null) {
+            return false;
+        }
+        return academicProgress.hasSubject(subject);
+    }
+
+
     /**
      * Representación en string del estudiante.
      * @return string con información básica del estudiante
@@ -352,6 +354,24 @@ public class Student extends User implements SolicitudFactory {
     public String toString() {
         return String.format("Student{id='%s', username='%s', codigo='%s'}",
                             getId(), getUsername(), codigo);
+    }
+
+    @Override
+    public boolean canEnroll(Subject subject) {
+        return false;
+    }
+
+    @Override
+    public void enrollSubject(Subject subject) {
+    }
+
+    @Override
+    public void unenrollSubject(Subject subject) {
+    }
+
+    @Override
+    public boolean hasSubject(Subject subject) {
+        return false;
     }
 }
  

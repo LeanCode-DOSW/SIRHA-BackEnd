@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -29,7 +30,7 @@ public class GroupTests {
         Group g = new Group(5, period);
         GroupState estado = new StatusClosed();
         g.setEstadoGrupo(estado);
-        assertEquals(estado, g.getEstadoGrupo());
+        assertEquals(estado, g.getGroupState());
     }
 
     @Test
@@ -52,25 +53,25 @@ public class GroupTests {
     }
 
     @Test
-    void estaLLenoTest(){
+    void isFullTest(){
         AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
         Group g = new Group(4, period);
         for(int i = 0; i < 4; i++){
             Student s = new Student("student" + i, "email" + i + "@test.com", "hash", "202310" + String.format("%02d", i));
             g.enrollStudent(s);
         }
-        assertTrue(g.estaLleno());
+        assertTrue(g.isFull());
     }
 
     @Test
-    void invalidEstaLLenoTest(){
+    void invalidisFullTest(){
         AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
         Group g = new Group(4, period);
         for(int i = 0; i < 3; i++){
             Student s = new Student("student" + i, "email" + i + "@test.com", "hash", "202310" + String.format("%02d", i));
             g.enrollStudent(s);
         }
-        assertFalse(g.estaLleno());
+        assertFalse(g.isFull());
     }
 
     @Test
@@ -350,7 +351,7 @@ public class GroupTests {
         AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
         Group g = new Group(5, period);
         // Verificar que el estado inicial es StatusOpen
-        assertTrue(g.getEstadoGrupo() instanceof StatusOpen);
+        assertTrue(g.getGroupState() instanceof StatusOpen);
     }
 
     @Test
@@ -367,8 +368,8 @@ public class GroupTests {
         AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
         Group group = new Group(5, period);
         
-        assertTrue(group.getEstadoGrupo() instanceof StatusOpen);
-        assertFalse(group.estaLleno());
+        assertTrue(group.getGroupState() instanceof StatusOpen);
+        assertFalse(group.isFull());
         
         group.inscribirEstudiante(new Student("testuser", "testuser@example.com", "password", "EST001"));
         assertEquals(1, group.getInscritos());
@@ -386,8 +387,8 @@ public class GroupTests {
         group.inscribirEstudiante(new Student("testuser", "testuser@example.com", "password", "EST001"));
         group.inscribirEstudiante(new Student("testuser2", "testuser2@example.com", "password", "EST002"));
         
-        assertTrue(group.getEstadoGrupo() instanceof StatusClosed);
-        assertTrue(group.estaLleno());
+        assertTrue(group.getGroupState() instanceof StatusClosed);
+        assertTrue(group.isFull());
         assertEquals(0, group.getCuposDisponibles());
         
         assertThrows(RuntimeException.class, () -> group.inscribirEstudiante(new Student("testuser3", "testuser3@example.com", "password", "EST003")));
@@ -401,12 +402,12 @@ public class GroupTests {
         group.inscribirEstudiante(student);
         group.inscribirEstudiante(new Student("testuser2", "testuser2@example.com", "password", "EST002"));
         group.inscribirEstudiante(new Student("testuser3", "testuser3@example.com", "password", "EST003"));
-        assertTrue(group.getEstadoGrupo() instanceof StatusClosed);
+        assertTrue(group.getGroupState() instanceof StatusClosed);
 
         group.unenrollStudent(student);
         assertEquals(2, group.getInscritos());
-        assertTrue(group.getEstadoGrupo() instanceof StatusOpen);
-        assertFalse(group.estaLleno());
+        assertTrue(group.getGroupState() instanceof StatusOpen);
+        assertFalse(group.isFull());
     }
 
     @Test
@@ -416,11 +417,11 @@ public class GroupTests {
         Group group2 = new Group(10, period);
         
         // Agregar horarios que se solapan
-        Schedule horario1 = new Schedule(DiasSemana.LUNES, 8, 10);
-        Schedule horario2 = new Schedule(DiasSemana.LUNES, 9, 11); // Conflicto
-        
-        group1.addHorario(horario1);
-        group2.addHorario(horario2);
+        Schedule horario1 = new Schedule(DiasSemana.LUNES, LocalTime.of(8, 0), LocalTime.of(10, 0));
+        Schedule horario2 = new Schedule(DiasSemana.LUNES, LocalTime.of(9, 0), LocalTime.of(11, 0)); // Conflicto
+
+        group1.addSchedule(horario1);
+        group2.addSchedule(horario2);
         
         // Verificar conflicto
         assertTrue(group1.conflictoConHorario(group2));
@@ -434,11 +435,11 @@ public class GroupTests {
         Group group2 = new Group(10, period);
         
         // Agregar horarios que NO se solapan
-        Schedule horario1 = new Schedule(DiasSemana.LUNES, 8, 10);
-        Schedule horario2 = new Schedule(DiasSemana.MARTES, 8, 10); // Diferente día
-        
-        group1.addHorario(horario1);
-        group2.addHorario(horario2);
+        Schedule horario1 = new Schedule(DiasSemana.LUNES, LocalTime.of(8, 0), LocalTime.of(10, 0));
+        Schedule horario2 = new Schedule(DiasSemana.MARTES, LocalTime.of(8, 0), LocalTime.of(10, 0)); // Diferente día
+
+        group1.addSchedule(horario1);
+        group2.addSchedule(horario2);
         
         // No debería haber conflicto
         assertFalse(group1.conflictoConHorario(group2));

@@ -3,6 +3,7 @@ package edu.dosw.sirha.SIRHA_BackEnd.domain.port;
 import java.util.List;
 import java.util.Collection;
 
+import edu.dosw.sirha.SIRHA_BackEnd.domain.model.Subject;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.SemaforoColores;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateSubjectDec.SubjectDecorator;
 
@@ -67,6 +68,11 @@ public interface AcademicProgress {
      */
     int[] getContadoresPorEstado();
 
+    boolean hasSubject(SubjectDecorator subject);
+    void addSubject(SubjectDecorator subject);
+    void removeSubject(SubjectDecorator subject);
+
+    boolean isSubjectApproved(Subject subject);
 
     int getMateriasAprobadasCount();
     int getMateriasCursandoCount();

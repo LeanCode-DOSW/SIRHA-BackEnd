@@ -100,7 +100,7 @@ class SirhaBackEndApplicationTests {
     @Test
     void testFromStudentDTO() {
         StudentDTO dto = new StudentDTO();
-        dto.setId("67890");
+        dto.setId(67890);
         dto.setUsername("maria.garcia");
         dto.setCodigo("EST002");
         
@@ -134,11 +134,11 @@ class SirhaBackEndApplicationTests {
     @Test
     void testStudentDefaultConstructor() {
         Student student = new Student(  "juan.perez", "juan.perez@example.com", "hashedPass", "EST001");
-        student.setId("12345");
+        student.setId(12345);
         assertNotNull(student);
         assertEquals("juan.perez", student.getUsername());
         assertEquals("EST001", student.getCodigo());
-		assertEquals("12345", student.getId());
+		assertEquals(12345, student.getId());
 		assertTrue(PasswordUtils.verifyPassword("hashedPass", student.getPasswordHash()));
 		assertEquals("juan.perez@example.com", student.getEmail());
     }
@@ -166,16 +166,16 @@ class SirhaBackEndApplicationTests {
     @Test
     void testStudentSetId() {
         Student student = new Student( "juan.perez", "juan.perez@example.com", "hashedPass", "EST001");
-        student.setId("456");
+        student.setId(456);
         
-        assertEquals("456", student.getId());
+        assertEquals(456, student.getId());
         assertEquals("juan.perez", student.getUsername());
     }
     
     @Test
     void testStudentToString() {
         Student student = new Student( "juan.perez", "juan.perez@example.com", "hashedPass", "EST001");
-        student.setId("12345");
+        student.setId(12345);
         String result = student.toString();
         assertNotNull(result);
         assertFalse(result.isEmpty());
@@ -252,19 +252,19 @@ class SirhaBackEndApplicationTests {
     
     @Test
     void testCreateStudentWithSemaforo() {
-        Student student = new Student("STU001", "juan.perez", "juan@example.com", "hashedPassword", "20231001");
+        Student student = new Student(1, "juan.perez", "juan@example.com", "hashedPassword", "20231001");
         
         StudyPlan studyPlan = new StudyPlan("Ingeniería de Sistemas");
         Subject matematicas = new Subject(101, "Matemáticas I", 4);
-        studyPlan.addMateria(matematicas);
+        studyPlan.addSubject(matematicas);
         
         Semaforo semaforo = new Semaforo(studyPlan);
         
         student.setPlanGeneral(studyPlan);
-        student.setSemaforo(semaforo);
-        
-        assertNotNull(student.getSemaforo());
-        assertEquals(semaforo, student.getSemaforo());
+        student.setAcademicProgress(semaforo);
+
+        assertNotNull(student.getAcademicProgress());
+        assertEquals(semaforo, student.getAcademicProgress());
         assertEquals(studyPlan, student.getPlanGeneral());
     }
     
@@ -318,9 +318,9 @@ class SirhaBackEndApplicationTests {
         assertNotNull(profesor1);
         
         Professor profesor2 = new Professor("dr.smith", "hashedPass", "PROFESOR", "L-V 8-12");
-        profesor2.setId("prof001");
+        profesor2.setId(1);
         assertNotNull(profesor2);
-        assertEquals("prof001", profesor2.getId());
+        assertEquals(1, profesor2.getId());
         assertEquals("dr.smith", profesor2.getUsername());
     }
     
@@ -328,15 +328,15 @@ class SirhaBackEndApplicationTests {
     void testStudyPlanBasics() {
         StudyPlan plan = new StudyPlan("Ingeniería de Software");
         assertNotNull(plan);
-        assertEquals("Ingeniería de Software", plan.getNombre());
-        assertNotNull(plan.getMaterias());
-        
-        Subject materia = new Subject(001, "Matemáticas", 4);
-        plan.addMateria(materia);
-        assertTrue(plan.getMaterias().containsKey(materia.getName()));
-        
-        plan.setNombre("Ingeniería de Sistemas");
-        assertEquals("Ingeniería de Sistemas", plan.getNombre());
+        assertEquals("Ingeniería de Software", plan.getName());
+        assertNotNull(plan.getSubjects());
+
+        Subject subject = new Subject(001, "Matemáticas", 4);
+        plan.addSubject(subject);
+        assertTrue(plan.getSubjects().containsKey(subject.getName()));
+
+        plan.setName("Ingeniería de Sistemas");
+        assertEquals("Ingeniería de Sistemas", plan.getName());
     }
     
     @Test
@@ -359,7 +359,7 @@ class SirhaBackEndApplicationTests {
         assertEquals(30, grupo.getCapacidad());
         assertEquals(30, grupo.getCuposDisponibles());
         assertEquals(0, grupo.getInscritos());
-        assertNotNull(grupo.getEstadoGrupo());
+        assertNotNull(grupo.getGroupState());
         
         grupo.setAula("A101");
         assertEquals("A101", grupo.getAula());
@@ -386,10 +386,10 @@ class SirhaBackEndApplicationTests {
     @Test
     void testAcademicPeriod() {
         AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
-        period.setFechaInicioInscripciones(LocalDate.now());
-        period.setFechaFinInscripciones(LocalDate.now().plusMonths(1));
+        period.setStartDateInscripciones(LocalDate.now());
+        period.setEndDateInscripciones(LocalDate.now().plusMonths(1));
 
-        assertTrue(period.esPeriodoActivo());
+        assertTrue(period.isActive());
         
         Subject subject = new Subject(101, "Matemáticas", 4);
         Group group = new Group(30, period);

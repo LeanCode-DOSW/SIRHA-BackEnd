@@ -6,47 +6,49 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.time.LocalTime;
+
 @SpringBootTest
 public class ScheduleTest {
         @Test
         void constructorValido_creaObjeto() {
-            Schedule s = new Schedule(DiasSemana.LUNES, 8, 10);
+            Schedule s = new Schedule(DiasSemana.LUNES, LocalTime.of(8, 0), LocalTime.of(10, 0));
             assertEquals(DiasSemana.LUNES, s.getDia());
-            assertEquals(8, s.getHoraInicio());
-            assertEquals(10, s.getHoraFin());
+            assertEquals(LocalTime.of(8, 0), s.getHoraInicio());
+            assertEquals(LocalTime.of(10, 0), s.getHoraFin());
         }
 
         @Test
         void constructorInvalido_lanzaExcepcion() {
-            assertThrows(IllegalArgumentException.class, () -> new Schedule(DiasSemana.LUNES, 10, 8));
-            assertThrows(IllegalArgumentException.class, () -> new Schedule(DiasSemana.MARTES, 5, 5));
+            assertThrows(IllegalArgumentException.class, () -> new Schedule(DiasSemana.LUNES, LocalTime.of(10, 0), LocalTime.of(8, 0)));
+            assertThrows(IllegalArgumentException.class, () -> new Schedule(DiasSemana.MARTES, LocalTime.of(5, 0), LocalTime.of(5, 0)));
         }
 
         @Test
         void seSolapaCon_mismoDia_horariosSeCruzan() {
-            Schedule s1 = new Schedule(DiasSemana.LUNES, 8, 10);
-            Schedule s2 = new Schedule(DiasSemana.LUNES, 9, 11);
+            Schedule s1 = new Schedule(DiasSemana.LUNES, LocalTime.of(8, 0), LocalTime.of(10, 0));
+            Schedule s2 = new Schedule(DiasSemana.LUNES, LocalTime.of(9, 0), LocalTime.of(11, 0));
             assertTrue(s1.seSolapaCon(s2));
             assertTrue(s2.seSolapaCon(s1));
         }
 
         @Test
         void seSolapaCon_mismoDia_horariosNoSeCruzan() {
-            Schedule s1 = new Schedule(DiasSemana.LUNES, 8, 10);
-            Schedule s2 = new Schedule(DiasSemana.LUNES, 10, 12); // justo al final
+            Schedule s1 = new Schedule(DiasSemana.LUNES, LocalTime.of(8, 0), LocalTime.of(10, 0));
+            Schedule s2 = new Schedule(DiasSemana.LUNES, LocalTime.of(10, 0), LocalTime.of(12, 0)); // justo al final
             assertFalse(s1.seSolapaCon(s2));
         }
 
         @Test
         void seSolapaCon_diasDistintos_noSeCruzan() {
-            Schedule s1 = new Schedule(DiasSemana.LUNES, 8, 10);
-            Schedule s2 = new Schedule(DiasSemana.MARTES, 9, 11);
+            Schedule s1 = new Schedule(DiasSemana.LUNES, LocalTime.of(8, 0), LocalTime.of(10, 0));
+            Schedule s2 = new Schedule(DiasSemana.MARTES, LocalTime.of(9, 0), LocalTime.of(11, 0));
             assertFalse(s1.seSolapaCon(s2));
         }
 
         @Test
         void toString_devuelveTextoEsperado() {
-            Schedule s = new Schedule(DiasSemana.MIERCOLES, 14, 16);
+            Schedule s = new Schedule(DiasSemana.MIERCOLES, LocalTime.of(14, 0), LocalTime.of(16, 0));
             String texto = s.toString();
             System.out.println(texto);
             assertTrue(texto.contains("MIERCOLES"));

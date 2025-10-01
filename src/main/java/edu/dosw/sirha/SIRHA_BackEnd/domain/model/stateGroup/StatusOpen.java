@@ -7,7 +7,7 @@ public class StatusOpen implements GroupState {
 
     @Override
     public boolean addStudent(Group group, Student student) {
-        if (!group.estaLleno()) {
+        if (!group.isFull()) {
             group.addStudent(student);
             System.out.println("Estudiante inscrito en el grupo.");
             if (group.getCuposDisponibles() == 0) {

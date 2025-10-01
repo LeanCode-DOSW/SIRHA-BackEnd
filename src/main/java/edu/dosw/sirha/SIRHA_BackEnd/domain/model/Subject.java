@@ -7,6 +7,8 @@ import java.util.Objects;
 import org.springframework.data.annotation.Id;
 
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateGroup.Group;
+import edu.dosw.sirha.SIRHA_BackEnd.domain.port.AcademicProgress;
+import edu.dosw.sirha.SIRHA_BackEnd.domain.port.PrerequisiteRule;
 
 /**
  * Representa una materia o asignatura dentro del sistema académico.
@@ -21,6 +23,7 @@ public class Subject {
     private String name;
     private int creditos;
     private List<Group> groups;
+    private List<PrerequisiteRule> prerequisites;
 
     public Subject(int id, String name, int creditos) {
         if (name == null || name.isBlank()) {
@@ -33,6 +36,7 @@ public class Subject {
         this.name = name;
         this.creditos = creditos;
         this.groups = new ArrayList<>();
+        this.prerequisites = new ArrayList<>();
     }
 
     /**
@@ -122,4 +126,26 @@ public class Subject {
     public boolean isHasGroup(Group group){
         return groups.contains(group);
     }
+
+
+    public List<PrerequisiteRule> getPrerequisites() {
+        return prerequisites;
+    }
+
+    public void setPrerequisites(List<PrerequisiteRule> prerequisites) {
+        this.prerequisites = prerequisites;
+    }
+    public boolean canEnroll(AcademicProgress progress) {
+        if (prerequisites.isEmpty()) {
+            return true;
+        }
+        return prerequisites.stream().allMatch(rule -> rule.canEnroll(this, progress));
+    }
+    public boolean hasPrerequisites() {
+        return !prerequisites.isEmpty();
+    }
+    public void addPrerequisite(PrerequisiteRule prerequisite) {
+        this.prerequisites.add(prerequisite);
+    }
+    
 }
