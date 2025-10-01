@@ -3,8 +3,10 @@ package edu.dosw.sirha.SIRHA_BackEnd.domain.port;
 import java.util.List;
 import java.util.Collection;
 
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.SubjectDecorator;
+import edu.dosw.sirha.SIRHA_BackEnd.domain.model.Subject;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.SemaforoColores;
+import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateGroup.Group;
+import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateSubjectDec.SubjectDecorator;
 
 /**
  * Interface que define el contrato para el progreso académico de un estudiante.
@@ -67,9 +69,19 @@ public interface AcademicProgress {
      */
     int[] getContadoresPorEstado();
 
+    boolean hasSubject(Subject subject);
+
+    boolean isSubjectApproved(Subject subject);
+    boolean isSubjectCursando(Subject subject);
+    boolean isSubjectReprobada(Subject subject);
+    boolean isSubjectNoCursada(Subject subject);
 
     int getMateriasAprobadasCount();
     int getMateriasCursandoCount();
     int getMateriasReprobadasCount();
     int getMateriasNoCursadasCount();
+
+
+    void enrollSubjectInGroup(Subject subject, Group group);
+    //void unenrollSubjectFromGroup(Subject subject, Group group);
 }

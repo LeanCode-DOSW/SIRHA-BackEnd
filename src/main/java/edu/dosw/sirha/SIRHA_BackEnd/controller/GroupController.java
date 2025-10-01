@@ -1,7 +1,7 @@
 package edu.dosw.sirha.SIRHA_BackEnd.controller;
 
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.Group;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.Schedule;
+import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateGroup.Group;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.Professor;
 import edu.dosw.sirha.SIRHA_BackEnd.service.GroupService;
 import org.springframework.web.bind.annotation.*;

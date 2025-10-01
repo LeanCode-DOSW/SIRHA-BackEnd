@@ -7,9 +7,14 @@ import java.util.Objects;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.SemaforoColores;
+import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateGroup.Group;
+import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateSubjectDec.SubjectDecorator;
+import edu.dosw.sirha.SIRHA_BackEnd.domain.port.AcademicOperations;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.port.AcademicProgress;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.port.Request;
+import edu.dosw.sirha.SIRHA_BackEnd.domain.port.AcademicProgressViewer;
+import edu.dosw.sirha.SIRHA_BackEnd.domain.port.PrerequisiteRule;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.port.RequestProcess;
+import edu.dosw.sirha.SIRHA_BackEnd.domain.port.ScheduleManager;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.port.SolicitudFactory;
 
 /**
@@ -25,17 +30,18 @@ import edu.dosw.sirha.SIRHA_BackEnd.domain.port.SolicitudFactory;
  *
  */
 @Document(collection = "students")
-public class Student extends User implements SolicitudFactory {
+public class Student extends User implements SolicitudFactory, ScheduleManager, AcademicProgressViewer, AcademicOperations {
     private String codigo;
     private StudyPlan planGeneral;
     private AcademicProgress academicProgress;
     private List<RequestProcess> solicitudes;
+    private AcademicPeriod currentPeriod;
  
     public Student() {
         super();
     }
  
-    public Student(String id, String username, String email, String passwordHash, String codigo) {
+    public Student(int id, String username, String email, String passwordHash, String codigo) {
         super(id, username, email, passwordHash);
     }
 
@@ -114,19 +120,10 @@ public class Student extends User implements SolicitudFactory {
         return academicProgress;
     }
     
-
-    public AcademicProgress getSemaforo() {
-        return  academicProgress;
-    }
-
     public void setAcademicProgress(AcademicProgress academicProgress) {
         this.academicProgress = academicProgress;
     }
     
-
-    public void setSemaforo(Semaforo semaforo) {
-        this.academicProgress = semaforo;
-    }
 
     /**
      * Obtiene la lista de solicitudes del estudiante.
@@ -204,15 +201,7 @@ public class Student extends User implements SolicitudFactory {
         }
         return academicProgress.getMateriasNoCursadasCount();
     }
-    /**
-     * Representación en string del estudiante.
-     * @return string con información básica del estudiante
-     */
-    @Override
-    public String toString() {
-        return String.format("Student{id='%s', username='%s', codigo='%s'}",
-                            getId(), getUsername(), codigo);
-    }
+    
     /**
      * Obtiene las materias de un semestre específico.
      *
@@ -300,7 +289,7 @@ public class Student extends User implements SolicitudFactory {
         
         return getMateriasCursando().stream()
             .filter(materia -> materia.getGroup() != null)
-            .flatMap(materia -> materia.getGroup().getHorarios().stream())
+            .flatMap(materia -> materia.getGroup().getSchedules().stream())
             .toList();
     }
     
@@ -324,7 +313,6 @@ public class Student extends User implements SolicitudFactory {
     
     /**
      * Obtiene el semestre académico actual basado en las materias en curso.
-     * Calcula el semestre promedio de las materias que está cursando.
      * 
      * @return semestre actual calculado
      */
@@ -342,6 +330,105 @@ public class Student extends User implements SolicitudFactory {
             
         return (int) Math.ceil(promedioSemestre);
     }
-   
+
+
+    public AcademicPeriod getCurrentPeriod() {
+        return currentPeriod;
+    }
+    public void setCurrentPeriod(AcademicPeriod currentPeriod) {
+        this.currentPeriod = currentPeriod;
+    }
+
+    public boolean hasSubject(SubjectDecorator subject) {
+        if (subject == null || academicProgress == null) {
+            return false;
+        }
+        return hasSubject(subject.getSubject());
+    }
+
+
+    /**
+     * Representación en string del estudiante.
+     * @return string con información básica del estudiante
+     */
+    @Override
+    public String toString() {
+        return String.format("Student{id='%s', username='%s', codigo='%s'}",
+                            getId(), getUsername(), codigo);
+    }
+
+    @Override
+    public boolean canEnroll(Subject subject) {
+        // 1. Verificar que la materia esté en el plan de estudios
+        if (planGeneral == null || !planGeneral.hasSubject(subject)) {
+            return false;
+        }
+        
+        // 2. Verificar que la materia no esté ya inscrita
+        if (academicProgress == null || !academicProgress.isSubjectNoCursada(subject)) {
+            return false;
+        }
+        
+        // 3. Verificar prerrequisitos
+        if (subject.hasPrerequisites()) {
+            return subject.canEnroll(academicProgress);
+        }
+        return true;
+    }
+    @Override
+    public boolean canEnrollInGroup(Subject subject, Group group) {
+        // Primero verificar las validaciones básicas de la materia
+        if (!canEnroll(subject)) {
+            return false;
+        }
+        
+        // 4. Verificar que el grupo esté abierto
+        if (!group.isOpen()) {
+            return false;
+        }
+        
+        // 6. Verificar período académico activo
+        if (currentPeriod == null || !currentPeriod.isActive() || !group.sameAcademicPeriod(currentPeriod)) {
+            return false;
+        }
+        
+        // 7. Verificar conflicto de horarios
+        if (tieneConflictoConHorario(group)) {
+            return false;
+        }
+        
+        // 9. Verificar límite de créditos por semestre FALTA IMPLEMENTAR AAAAAAAAAAAAAAAAAAA
+
+        return true;
+    }
+
+    @Override
+    public void enrollSubject(Subject subject, Group group) {
+        if (!canEnrollInGroup(subject, group)) {
+            throw new IllegalStateException("No se puede inscribir en la materia o grupo especificado");
+        }
+        
+        try {
+            group.enrollStudent(this);
+            academicProgress.enrollSubjectInGroup(subject, group);
+            //academicProgress.recordEnrollment(subject, group, currentPeriod); despues
+            
+        } catch (Exception e) {
+            throw new RuntimeException("Error durante la inscripción: " + e.getMessage(), e);
+            //rollback si es necesario
+        }
+    }
+
+    @Override
+    public void unenrollSubject(Subject subject, Group group) {
+        throw new UnsupportedOperationException("Método no implementado aún"); //:C
+    }
+
+    @Override
+    public boolean hasSubject(Subject subject) {
+        return academicProgress != null && academicProgress.hasSubject(subject);
+    }
+
+    
 }
  

@@ -1,6 +1,9 @@
 package edu.dosw.sirha.SIRHA_BackEnd.service.impl;
 
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.*;
+import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateGroup.Group;
+import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateGroup.StatusClosed;
+import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateGroup.StatusOpen;
 import edu.dosw.sirha.SIRHA_BackEnd.repository.mongo.GroupMongoRepository;
 import edu.dosw.sirha.SIRHA_BackEnd.repository.mongo.SubjectMongoRepository;
 import edu.dosw.sirha.SIRHA_BackEnd.service.GroupService;
@@ -45,8 +48,8 @@ public class GroupServiceImpl implements GroupService {
 
         // Validar conflictos de horarios con grupos existentes
         for (Group gExistente : subject.getGroups()) {
-            for (Schedule hNuevo : grupo.getHorarios()) {
-                for (Schedule hExistente : gExistente.getHorarios()) {
+            for (Schedule hNuevo : grupo.getSchedules()) {
+                for (Schedule hExistente : gExistente.getSchedules()) {
                     if (hNuevo.seSolapaCon(hExistente)) {
                         throw new RuntimeException("Conflicto de horario con grupo existente: " + gExistente.getId());
                     }
@@ -54,7 +57,7 @@ public class GroupServiceImpl implements GroupService {
             }
         }
 
-        subject.addGrupo(grupo);
+        subject.addGroup(grupo);
         subjectRepository.save(subject);
         return groupRepository.save(grupo);
     }
@@ -124,13 +127,13 @@ public class GroupServiceImpl implements GroupService {
     @Override
     public Group agregarHorario(Integer groupId, Schedule schedule) {
         Group group = findById(groupId);
-        group.getHorarios().add(schedule);
+        group.getSchedules().add(schedule);
         return groupRepository.save(group);
     }
 
     @Override
     public List<Schedule> getHorarios(Integer groupId) {
-        return findById(groupId).getHorarios();
+        return findById(groupId).getSchedules();
     }
 
     // ---------- Métodos de capacidad ----------

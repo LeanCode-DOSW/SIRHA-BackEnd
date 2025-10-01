@@ -1,7 +1,6 @@
 package edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateSubjectDec;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.Group;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.SubjectDecorator;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.SemaforoColores;
+import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateGroup.Group;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.port.SubjectState;
 
 public class ReprobadaState implements SubjectState {
@@ -22,9 +21,10 @@ public class ReprobadaState implements SubjectState {
     }
 
     @Override
-    public void inscribir(SubjectDecorator materia) {
+    public void inscribir(SubjectDecorator materia, Group grupo) {
         materia.setState(new EnCursoState());
         materia.getState().setState(materia);
+        materia.setGroup(grupo);
         System.out.println("Materia re-inscrita después de reprobar.");
     }
 
@@ -37,7 +37,7 @@ public class ReprobadaState implements SubjectState {
 
     @Override
     public void reprobar(SubjectDecorator materia) {
-        System.out.println("Ya está reprobada.");
+        throw new IllegalStateException("No se puede reprobar una materia que ya está reprobada");
     }
     @Override
     public void retirar(SubjectDecorator materia) {
@@ -51,7 +51,7 @@ public class ReprobadaState implements SubjectState {
     @Override
     public boolean puedeReprobar() { return false; }
     @Override
-    public boolean puedeRetirar() { return true; }
+    public boolean puedeRetirar() { return false; }
     @Override
     public boolean tieneGrupoAsignado() { return true; }
     @Override

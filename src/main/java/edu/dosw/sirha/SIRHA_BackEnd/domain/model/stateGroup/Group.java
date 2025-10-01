@@ -1,13 +1,19 @@
-package edu.dosw.sirha.SIRHA_BackEnd.domain.model;
+package edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateGroup;
 
 import java.util.*;
+
+import edu.dosw.sirha.SIRHA_BackEnd.domain.model.AcademicPeriod;
+import edu.dosw.sirha.SIRHA_BackEnd.domain.model.Professor;
+import edu.dosw.sirha.SIRHA_BackEnd.domain.model.Schedule;
+import edu.dosw.sirha.SIRHA_BackEnd.domain.model.Student;
+import edu.dosw.sirha.SIRHA_BackEnd.domain.model.Subject;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.port.GroupState;
 
 /**
  * Entidad del dominio que representa un grupo académico en el sistema SIRHA.
  *
  * Un grupo es una instancia específica de una materia en un semestre determinado,
- * con un profesor asignado, un aula, horarios específicos y una capacidad máxima
+ * con un profesor asignado, un aula, schedules específicos y una capacidad máxima
  * de estudiantes. Esta clase implementa el patrón State para manejar los diferentes
  * estados del grupo (Abierto, Cerrado, Lleno).
  *
@@ -33,37 +39,29 @@ public class Group {
     private GroupState estadoGrupo; // State Pattern
     private Professor profesor;
     private Subject curso;
-    private List<Schedule> horarios;
+    private List<Schedule> schedules;
     private String aula;
+    private AcademicPeriod currentPeriod;
     private List<Student> estudiantes;
+
 
     /**
      * Constructor principal para crear un nuevo grupo académico.
      *
      * Inicializa el grupo con una capacidad específica y lo establece
      * en estado ABIERTO por defecto. La lista de estudiantes se inicializa vacía.
-     *
-     * @param capacidad capacidad máxima de estudiantes para el grupo.
-     *                 Debe ser un valor positivo mayor a cero.
-     *
-     * @example
-     * <pre>
-     * Group grupo = new Group(30);  // Grupo con capacidad para 30 estudiantes
-     * grupo.setProfesor(profesor);
-     * grupo.setCurso(curso);
-     * grupo.setAula("A101");
-     * </pre>
      */
-    public Group(int capacidad) {
+    public Group(int capacidad, AcademicPeriod currentPeriod) {
         if (capacidad <= 0) {
             throw new IllegalArgumentException("La capacidad del grupo debe ser mayor a cero");
         }
 
-        this.capacidad = capacidad;
+        setCapacidad(capacidad);
+        setCurrentPeriod(currentPeriod);
         this.inscritos = 0;
         this.estadoGrupo = new StatusOpen(); // Estado inicial: abierto
         this.estudiantes = new ArrayList<>();
-        horarios = new ArrayList<>();
+        schedules = new ArrayList<>();
     }
     public void setEstadoGrupo(GroupState estado) {
         if (estado == null) {
@@ -76,7 +74,7 @@ public class Group {
      * Obtiene el estado actual del grupo.
      * @return estado actual del grupo, nunca null
      */
-    public GroupState getEstadoGrupo() {
+    public GroupState getGroupState() {
         return estadoGrupo;
     }
 
@@ -99,7 +97,7 @@ public class Group {
             throw new IllegalArgumentException("El estudiante no puede ser null");
         }
 
-        estadoGrupo.inscribirEstudiante(this, estudiante);
+        estadoGrupo.addStudent(this, estudiante);
     }
 
     /**
@@ -113,7 +111,7 @@ public class Group {
     }
 
     /**
-     * Agrega un estudiante directamente a la lista del grupo.
+     * Agrega un estudiante directamente a la lista del grupo. Se usa internamente por los estados.
      *
      * Este método es utilizado internamente por los estados del grupo
      * para realizar la inscripción efectiva. Actualiza tanto la lista
@@ -123,13 +121,8 @@ public class Group {
      * - Verifica que el estudiante no esté ya inscrito
      * - Mantiene consistencia entre la lista y el contador
      *
-     * @param estudiante estudiante a agregar. No debe ser null.
-     * @throws IllegalArgumentException si el estudiante ya está inscrito
-     *                                o si el parámetro es null
-     *
-     * @implNote Este método es package-private para uso interno del estado
      */
-    public void addEstudiante(Student estudiante) {
+    void addStudent(Student estudiante) {
         if (estudiante == null) {
             throw new IllegalArgumentException("El estudiante no puede ser null");
         }
@@ -143,36 +136,40 @@ public class Group {
     }
 
     /**
-     * Remueve un estudiante del grupo.
+     * Remueve un estudiante del grupo. Se usa internamente por los estados.
      *
      * Elimina al estudiante de la lista y actualiza el contador.
      * Puede cambiar el estado del grupo si es necesario.
-     *
-     * @param estudiante estudiante a remover. No debe ser null.
-     * @return true si el estudiante fue removido, false si no estaba inscrito
-     * @throws IllegalArgumentException si el estudiante es null
      */
-    public boolean removerEstudiante(Student estudiante) {
+    void removeStudent(Student estudiante) {
         if (estudiante == null) {
             throw new IllegalArgumentException("El estudiante no puede ser null");
         }
-
-        boolean removed = estudiantes.remove(estudiante);
-        if (removed) {
-            inscritos--;
-
-
+        if (!estudiantes.contains(estudiante)) {
+            throw new IllegalArgumentException("El estudiante no está inscrito en el grupo");
         }
 
-        return removed;
+        estudiantes.remove(estudiante);
+        inscritos--;
+  
+    }
+    public boolean enrollStudent(Student estudiante) {
+        return estadoGrupo.addStudent(this, estudiante);
+    }
+    public boolean unenrollStudent(Student student) {
+        return estadoGrupo.removeStudent(this, student);
     }
 
     /**
      * Verifica si el grupo está lleno.
      * @return true si no hay cupos disponibles, false en caso contrario
      */
-    public boolean estaLleno() {
+    public boolean isFull() {
         return inscritos >= capacidad;
+    }
+
+    public boolean isOpen() {
+        return estadoGrupo instanceof StatusOpen;
     }
 
     /**
@@ -192,6 +189,12 @@ public class Group {
 
     public void setId(int id) {
         this.id = id;
+    }
+    public AcademicPeriod getCurrentPeriod() {
+        return currentPeriod;
+    }
+    public void setCurrentPeriod(AcademicPeriod currentPeriod) {
+        this.currentPeriod = currentPeriod;
     }
 
     /**
@@ -279,11 +282,6 @@ public class Group {
     }
 
     @Override
-    public int hashCode() {
-        return Objects.hash(id);
-    }
-
-    @Override
     public String toString() {
         return String.format("Group{id='%s', capacidad=%d, inscritos=%d, aula='%s', estado=%s}",
                 id, capacidad, inscritos, aula,
@@ -291,23 +289,23 @@ public class Group {
     }
 
 
-    public void addHorario(Schedule horario) {
-        for (Schedule existente : horarios) {
+    public void addSchedule(Schedule horario) {
+        for (Schedule existente : schedules) {
             if (existente.seSolapaCon(horario)) {
                 throw new IllegalArgumentException("El horario se solapa con otro ya asignado en el grupo");
             }
         }
-        horarios.add(horario);
+        schedules.add(horario);
     }
 
-    public List<Schedule> getHorarios() {
-        return horarios;
+    public List<Schedule> getSchedules() {
+        return schedules;
     }
 
     public boolean conflictoConHorario(Schedule horario) {
-        for (Schedule existente : horarios) {
+        for (Schedule existente : schedules) {
             if (existente.seSolapaCon(horario)) {
-                System.out.println("Conflicto detectado entre horarios: " + existente + " y " + horario);
+                System.out.println("Conflicto detectado entre schedules: " + existente + " y " + horario);
                 return true;
             }
         }
@@ -317,14 +315,21 @@ public class Group {
 
 
     public boolean conflictoConHorario(Group otroGrupo) {
-        if (otroGrupo == null || otroGrupo.getHorarios() == null) {
-            throw new IllegalArgumentException("El otro grupo o sus horarios no pueden ser nulos");
+        if (otroGrupo == null || otroGrupo.getSchedules() == null) {
+            throw new IllegalArgumentException("El otro grupo o sus schedules no pueden ser nulos");
         }
-        for (Schedule horarioOtro : otroGrupo.getHorarios()) {
+        for (Schedule horarioOtro : otroGrupo.getSchedules()) {
             if (conflictoConHorario(horarioOtro)) {
                 return true;
             }
         }
         return false;
+    }
+
+    public void closeGroup() {
+        this.estadoGrupo = new StatusClosed();
+    }
+    public boolean sameAcademicPeriod(AcademicPeriod period){
+        return this.currentPeriod.equals(period);
     }
 }

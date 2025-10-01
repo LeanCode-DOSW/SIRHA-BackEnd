@@ -3,17 +3,17 @@ package edu.dosw.sirha.SIRHA_BackEnd.dto;
 import java.util.List;
 
 public class StudentDTO {
-    private String id;
+    private int id;
     private String username;
     private String email;
     private String codigo;
     private List<Integer> solicitudesIds;
 
 
-    public String getId() {
+    public int getId() {
         return id;
     }
-    public void setId(String id) {
+    public void setId(int id) {
         this.id = id;
     }
     public String getUsername() {

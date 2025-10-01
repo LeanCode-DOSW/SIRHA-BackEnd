@@ -10,7 +10,7 @@ import jakarta.validation.constraints.Email;
 @Document(collection = "users")
 public abstract class User implements Authenticable, Schedulable {
     @Id
-    private String id;
+    private int id;
     @Field("username")
     private String username;
     @Field("email")
@@ -26,7 +26,7 @@ public abstract class User implements Authenticable, Schedulable {
         this.email = email;
         this.password = password.startsWith("$2a$") ? password : PasswordUtils.hashPassword(password);
     }
-    public User(String id, String username, String email, String password) {
+    public User(int id, String username, String email, String password) {
         this.id = id;
         this.username = username;
         this.email = email;
@@ -43,17 +43,14 @@ public abstract class User implements Authenticable, Schedulable {
     public void setUsername(String username){
         this.username = username;
     }
-    public String getId(){
+    public int getId(){
         return id;
     }
-    public void setId(String id){
+    public void setId(int id){
         this.id = id;
     }
     public String getPasswordHash(){
         return password;
-    }
-    public void setPasswordHash(String passwordHash){
-        this.password = PasswordUtils.hashPassword(passwordHash);
     }
     public String getEmail(){
         return email;

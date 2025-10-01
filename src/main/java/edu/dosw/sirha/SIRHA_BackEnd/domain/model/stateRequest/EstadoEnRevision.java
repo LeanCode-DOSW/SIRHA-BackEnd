@@ -8,6 +8,7 @@ public class EstadoEnRevision implements RequestState {
 
     @Override
     public void approveRequest(BaseRequest solicitud) {}
+
     @Override
     public void rejectRequest(BaseRequest solicitud) {}
 

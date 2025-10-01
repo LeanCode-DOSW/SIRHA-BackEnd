@@ -1,5 +1,7 @@
 package edu.dosw.sirha.SIRHA_BackEnd.domain.model;
 
+import java.time.LocalTime;
+
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.DiasSemana;
 
 /**
@@ -20,10 +22,10 @@ public class Schedule {
     private DiasSemana dia;
 
     /** Hora de inicio en formato 24h (ej: 8 para las 08:00). */
-    private int horaInicio;
+    private LocalTime horaInicio;
 
     /** Hora de fin en formato 24h (ej: 10 para las 10:00). */
-    private int horaFin;
+    private LocalTime horaFin;
 
     /**
      * Crea un nuevo horario.
@@ -33,8 +35,8 @@ public class Schedule {
      * @param horaFin    Hora de fin (en 24h, debe ser mayor que la hora de inicio).
      * @throws IllegalArgumentException si la hora de inicio no es menor a la hora de fin.
      */
-    public Schedule(DiasSemana dia, int horaInicio, int horaFin) {
-        if (horaInicio >= horaFin) {
+    public Schedule(DiasSemana dia, LocalTime horaInicio, LocalTime horaFin) {
+        if (horaInicio.isAfter(horaFin) || horaInicio.equals(horaFin)) {
             throw new IllegalArgumentException("La hora de inicio debe ser menor que la hora de fin");
         }
         this.dia = dia;
@@ -54,7 +56,7 @@ public class Schedule {
         if (!dia.equals(otro.dia)) {
             return false;
         }
-        return this.horaInicio < otro.horaFin && otro.horaInicio < this.horaFin;
+        return this.horaInicio.isBefore(otro.horaFin) && otro.horaInicio.isBefore(this.horaFin);
     }
 
     /**
@@ -62,7 +64,7 @@ public class Schedule {
      *
      * @return Hora de fin en formato 24h.
      */
-    public int getHoraFin() {
+    public LocalTime getHoraFin() {
         return horaFin;
     }
 
@@ -71,7 +73,7 @@ public class Schedule {
      *
      * @return Hora de inicio en formato 24h.
      */
-    public int getHoraInicio() {
+    public LocalTime getHoraInicio() {
         return horaInicio;
     }
 
@@ -96,8 +98,8 @@ public class Schedule {
         if (this == o) return true;
         if (!(o instanceof Schedule)) return false;
         Schedule that = (Schedule) o;
-        return horaInicio == that.horaInicio &&
-                horaFin == that.horaFin &&
+        return horaInicio.equals(that.horaInicio) &&
+                horaFin.equals(that.horaFin) &&
                 dia.equals(that.dia);
     }
 
