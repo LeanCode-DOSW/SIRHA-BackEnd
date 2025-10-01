@@ -20,7 +20,7 @@ public class EnCursoState implements SubjectState {
     }
 
     @Override
-    public void inscribir(SubjectDecorator materia) {
+    public void inscribir(SubjectDecorator materia, Group grupo) {
         throw new IllegalStateException("La materia ya está inscrita");
     }
     @Override

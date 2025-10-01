@@ -12,6 +12,7 @@ import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateSubjectDec.SubjectDecorato
 import edu.dosw.sirha.SIRHA_BackEnd.domain.port.AcademicOperations;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.port.AcademicProgress;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.port.AcademicProgressViewer;
+import edu.dosw.sirha.SIRHA_BackEnd.domain.port.PrerequisiteRule;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.port.RequestProcess;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.port.ScheduleManager;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.port.SolicitudFactory;
@@ -342,7 +343,7 @@ public class Student extends User implements SolicitudFactory, ScheduleManager, 
         if (subject == null || academicProgress == null) {
             return false;
         }
-        return academicProgress.hasSubject(subject);
+        return hasSubject(subject.getSubject());
     }
 
 
@@ -358,20 +359,76 @@ public class Student extends User implements SolicitudFactory, ScheduleManager, 
 
     @Override
     public boolean canEnroll(Subject subject) {
-        return false;
+        // 1. Verificar que la materia esté en el plan de estudios
+        if (planGeneral == null || !planGeneral.hasSubject(subject)) {
+            return false;
+        }
+        
+        // 2. Verificar que la materia no esté ya inscrita
+        if (academicProgress == null || !academicProgress.isSubjectNoCursada(subject)) {
+            return false;
+        }
+        
+        // 3. Verificar prerrequisitos
+        if (subject.hasPrerequisites()) {
+            return subject.canEnroll(academicProgress);
+        }
+        return true;
+    }
+    @Override
+    public boolean canEnrollInGroup(Subject subject, Group group) {
+        // Primero verificar las validaciones básicas de la materia
+        if (!canEnroll(subject)) {
+            return false;
+        }
+        
+        // 4. Verificar que el grupo esté abierto
+        if (!group.isOpen()) {
+            return false;
+        }
+        
+        // 6. Verificar período académico activo
+        if (currentPeriod == null || !currentPeriod.isActive() || !group.sameAcademicPeriod(currentPeriod)) {
+            return false;
+        }
+        
+        // 7. Verificar conflicto de horarios
+        if (tieneConflictoConHorario(group)) {
+            return false;
+        }
+        
+        // 9. Verificar límite de créditos por semestre FALTA IMPLEMENTAR AAAAAAAAAAAAAAAAAAA
+
+        return true;
     }
 
     @Override
-    public void enrollSubject(Subject subject) {
+    public void enrollSubject(Subject subject, Group group) {
+        if (!canEnrollInGroup(subject, group)) {
+            throw new IllegalStateException("No se puede inscribir en la materia o grupo especificado");
+        }
+        
+        try {
+            group.enrollStudent(this);
+            academicProgress.enrollSubjectInGroup(subject, group);
+            //academicProgress.recordEnrollment(subject, group, currentPeriod); despues
+            
+        } catch (Exception e) {
+            throw new RuntimeException("Error durante la inscripción: " + e.getMessage(), e);
+            //rollback si es necesario
+        }
     }
 
     @Override
-    public void unenrollSubject(Subject subject) {
+    public void unenrollSubject(Subject subject, Group group) {
+        throw new UnsupportedOperationException("Método no implementado aún"); //:C
     }
 
     @Override
     public boolean hasSubject(Subject subject) {
-        return false;
+        return academicProgress != null && academicProgress.hasSubject(subject);
     }
+
+    
 }
  

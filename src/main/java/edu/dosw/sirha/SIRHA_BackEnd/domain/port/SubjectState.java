@@ -9,7 +9,7 @@ public interface SubjectState  {
     void setSemestre(SubjectDecorator materia, int semestre);
     void setGroup(SubjectDecorator materia, Group grupo);
 
-    void inscribir(SubjectDecorator materia);
+    void inscribir(SubjectDecorator materia, Group grupo);
     void aprobar(SubjectDecorator materia);
     void reprobar(SubjectDecorator materia);
     void retirar(SubjectDecorator materia);

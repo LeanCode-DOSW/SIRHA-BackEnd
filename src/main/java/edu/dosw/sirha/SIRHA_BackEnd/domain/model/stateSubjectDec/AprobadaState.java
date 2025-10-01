@@ -21,7 +21,7 @@ public class AprobadaState implements SubjectState {
     }
 
     @Override
-    public void inscribir(SubjectDecorator materia) {
+    public void inscribir(SubjectDecorator materia, Group grupo) {
         throw new IllegalStateException("No se puede inscribir una materia ya aprobada");
     }
 

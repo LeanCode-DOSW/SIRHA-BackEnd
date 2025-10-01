@@ -37,7 +37,7 @@ public class SubjectDecorator {
     public SubjectState getState() {return state;}
     public Group getGroup() { return group; }
 
-    public void inscribir() { state.inscribir(this); }
+    public void inscribir(Group grupo) { state.inscribir(this, grupo); }
     public void aprobar()   { state.aprobar(this); }
     public void reprobar()  { state.reprobar(this); }
     public void retirar()   { state.retirar(this); }

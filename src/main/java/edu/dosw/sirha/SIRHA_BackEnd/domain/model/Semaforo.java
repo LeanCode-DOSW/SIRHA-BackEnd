@@ -4,6 +4,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.SemaforoColores;
+import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateGroup.Group;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateSubjectDec.SubjectDecorator;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.port.AcademicProgress;
 
@@ -102,25 +103,11 @@ public class Semaforo implements AcademicProgress {
     }
 
     @Override
-    public boolean hasSubject(SubjectDecorator subject) {
+    public boolean hasSubject(Subject subject) {
         if (subject == null) {
             return false;
         }
         return subjects.containsKey(subject.getName());
-    }
-
-    @Override
-    public void addSubject(SubjectDecorator subject) {  //mas logica de negocio
-        if (subject != null) {
-            subjects.put(subject.getName(), subject);
-        }
-    }
-
-    @Override
-    public void removeSubject(SubjectDecorator subject) {  //mas logica de negocio
-        if (subject != null) {
-            subjects.remove(subject.getName());
-        }
     }
 
     @Override
@@ -143,6 +130,55 @@ public class Semaforo implements AcademicProgress {
         }
         SubjectDecorator decorator = subjects.get(subject.getName());
         return decorator != null && decorator.getEstadoColor() == SemaforoColores.VERDE;
+    }
+    @Override
+    public boolean isSubjectCursando(Subject subject) {
+        if (subject == null) {
+            return false;
+        }
+        if (!subjects.containsKey(subject.getName())) {
+            return false;
+        }
+        SubjectDecorator decorator = subjects.get(subject.getName());
+        return decorator != null && decorator.getEstadoColor() == SemaforoColores.AMARILLO;
+    }
+    @Override
+    public boolean isSubjectReprobada(Subject subject) {
+        if (subject == null) {
+            return false;
+        }
+        if (!subjects.containsKey(subject.getName())) {
+            return false;
+        }
+        SubjectDecorator decorator = subjects.get(subject.getName());
+        return decorator != null && decorator.getEstadoColor() == SemaforoColores.ROJO;
+    }
+    @Override
+    public boolean isSubjectNoCursada(Subject subject) {
+        if (subject == null) {
+            return false;
+        }
+        if (!subjects.containsKey(subject.getName())) {
+            return false;
+        }
+        SubjectDecorator decorator = subjects.get(subject.getName());
+        return decorator != null && decorator.getEstadoColor() == SemaforoColores.GRIS;
+    }
+
+    @Override
+    public void enrollSubjectInGroup(Subject subject, Group group) {
+        if (subject == null || group == null) {
+            throw new IllegalArgumentException("La materia y el grupo no pueden ser nulos");
+        }
+        SubjectDecorator decorator = subjects.get(subject.getName());
+        if (decorator == null) {
+            throw new IllegalArgumentException("La materia no está en el semáforo");
+        }
+        if (!subject.isHasGroup(group)) {
+            throw new IllegalArgumentException("El grupo no pertenece a la materia especificada");
+        }
+        decorator.inscribir(group);
+        //faltaria set semestre
     }
 
 }

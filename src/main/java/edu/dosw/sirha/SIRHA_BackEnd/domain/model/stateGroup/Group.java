@@ -329,4 +329,7 @@ public class Group {
     public void closeGroup() {
         this.estadoGrupo = new StatusClosed();
     }
+    public boolean sameAcademicPeriod(AcademicPeriod period){
+        return this.currentPeriod.equals(period);
+    }
 }

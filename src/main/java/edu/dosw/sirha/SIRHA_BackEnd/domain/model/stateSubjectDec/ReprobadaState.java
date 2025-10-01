@@ -21,9 +21,10 @@ public class ReprobadaState implements SubjectState {
     }
 
     @Override
-    public void inscribir(SubjectDecorator materia) {
+    public void inscribir(SubjectDecorator materia, Group grupo) {
         materia.setState(new EnCursoState());
         materia.getState().setState(materia);
+        materia.setGroup(grupo);
         System.out.println("Materia re-inscrita después de reprobar.");
     }
 
