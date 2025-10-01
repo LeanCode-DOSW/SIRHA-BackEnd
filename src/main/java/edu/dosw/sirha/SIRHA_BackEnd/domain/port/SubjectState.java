@@ -1,6 +1,8 @@
 package edu.dosw.sirha.SIRHA_BackEnd.domain.port;
 
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.*;
+import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateGroup.Group;
+import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateSubjectDec.SubjectDecorator;
 
 public interface SubjectState  {
     void setState(SubjectDecorator materia);

@@ -7,8 +7,9 @@ import java.util.Objects;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.SemaforoColores;
+import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateGroup.Group;
+import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateSubjectDec.SubjectDecorator;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.port.AcademicProgress;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.port.Request;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.port.RequestProcess;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.port.SolicitudFactory;
 
@@ -30,6 +31,7 @@ public class Student extends User implements SolicitudFactory {
     private StudyPlan planGeneral;
     private AcademicProgress academicProgress;
     private List<RequestProcess> solicitudes;
+    private AcademicPeriod currentPeriod;
  
     public Student() {
         super();
@@ -204,15 +206,7 @@ public class Student extends User implements SolicitudFactory {
         }
         return academicProgress.getMateriasNoCursadasCount();
     }
-    /**
-     * Representación en string del estudiante.
-     * @return string con información básica del estudiante
-     */
-    @Override
-    public String toString() {
-        return String.format("Student{id='%s', username='%s', codigo='%s'}",
-                            getId(), getUsername(), codigo);
-    }
+    
     /**
      * Obtiene las materias de un semestre específico.
      *
@@ -324,7 +318,6 @@ public class Student extends User implements SolicitudFactory {
     
     /**
      * Obtiene el semestre académico actual basado en las materias en curso.
-     * Calcula el semestre promedio de las materias que está cursando.
      * 
      * @return semestre actual calculado
      */
@@ -342,6 +335,23 @@ public class Student extends User implements SolicitudFactory {
             
         return (int) Math.ceil(promedioSemestre);
     }
-   
+
+
+    public AcademicPeriod getCurrentPeriod() {
+        return currentPeriod;
+    }
+    public void setCurrentPeriod(AcademicPeriod currentPeriod) {
+        this.currentPeriod = currentPeriod;
+    }
+
+    /**
+     * Representación en string del estudiante.
+     * @return string con información básica del estudiante
+     */
+    @Override
+    public String toString() {
+        return String.format("Student{id='%s', username='%s', codigo='%s'}",
+                            getId(), getUsername(), codigo);
+    }
 }
  

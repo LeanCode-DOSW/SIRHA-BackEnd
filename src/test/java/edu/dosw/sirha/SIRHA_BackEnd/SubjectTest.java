@@ -1,10 +1,14 @@
 package edu.dosw.sirha.SIRHA_BackEnd;
 
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.Group;
+import edu.dosw.sirha.SIRHA_BackEnd.domain.model.AcademicPeriod;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.Subject;
+import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateGroup.Group;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import static org.junit.jupiter.api.Assertions.*;
+
+import java.time.LocalDate;
 
 @SpringBootTest
 public class SubjectTest {
@@ -142,10 +146,11 @@ public class SubjectTest {
         @Test
         public void addGrupoTest() {
             Subject s = new Subject(101, "Matemáticas", 4);
-            Group g = new Group(30);
+            AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
+            Group g = new Group(30, period);
             g.setId(1);
 
-            s.addGrupo(g);
+            s.addGroup(g);
 
             assertTrue(s.isHasGroup(g));
             assertEquals(1, s.getGroups().size());
@@ -155,17 +160,18 @@ public class SubjectTest {
         @Test
         public void addMultiplesGruposTest() {
             Subject s = new Subject(101, "Matemáticas", 4);
-            Group g1 = new Group(30);
-            Group g2 = new Group(25);
-            Group g3 = new Group(20);
+            AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
+            Group g1 = new Group(30, period);
+            Group g2 = new Group(25, period);
+            Group g3 = new Group(20, period);
 
             g1.setId(1);
             g2.setId(2);
             g3.setId(3);
 
-            s.addGrupo(g1);
-            s.addGrupo(g2);
-            s.addGrupo(g3);
+            s.addGroup(g1);
+            s.addGroup(g2);
+            s.addGroup(g3);
 
             assertEquals(3, s.getGroups().size());
             assertTrue(s.isHasGroup(g1));
@@ -178,23 +184,24 @@ public class SubjectTest {
             Subject s = new Subject(101, "Matemáticas", 4);
 
             assertThrows(IllegalArgumentException.class, () -> {
-                s.addGrupo(null);
+                s.addGroup(null);
             });
         }
 
         @Test
-        public void removeGrupoTest() {
+        public void removeGroupTest() {
             Subject s = new Subject(101, "Matemáticas", 4);
-            Group g1 = new Group(30);
-            Group g2 = new Group(25);
+            AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
+            Group g1 = new Group(30, period);
+            Group g2 = new Group(25, period);
 
             g1.setId(1);
             g2.setId(2);
 
-            s.addGrupo(g1);
-            s.addGrupo(g2);
+            s.addGroup(g1);
+            s.addGroup(g2);
 
-            boolean removed = s.removeGrupo(g2);
+            boolean removed = s.removeGroup(g2);
 
             assertTrue(removed);
             assertFalse(s.isHasGroup(g2));
@@ -205,15 +212,16 @@ public class SubjectTest {
         @Test
         public void removeGrupoNoExistenteTest() {
             Subject s = new Subject(101, "Matemáticas", 4);
-            Group g1 = new Group(30);
-            Group g2 = new Group(25);
+            AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
+            Group g1 = new Group(30, period);
+            Group g2 = new Group(25, period);
 
             g1.setId(1);
             g2.setId(2);
 
-            s.addGrupo(g1);
+            s.addGroup(g1);
 
-            boolean removed = s.removeGrupo(g2);
+            boolean removed = s.removeGroup(g2);
 
             assertFalse(removed);
             assertTrue(s.isHasGroup(g1));
@@ -224,7 +232,7 @@ public class SubjectTest {
         public void removeGrupoNullTest() {
             Subject s = new Subject(101, "Matemáticas", 4);
 
-            boolean removed = s.removeGrupo(null);
+            boolean removed = s.removeGroup(null);
 
             assertFalse(removed);
         }
@@ -232,10 +240,11 @@ public class SubjectTest {
         @Test
         public void isHasGroupTrueTest() {
             Subject s = new Subject(101, "Matemáticas", 4);
-            Group g = new Group(30);
+            AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
+            Group g = new Group(30, period);
             g.setId(1);
 
-            s.addGrupo(g);
+            s.addGroup(g);
 
             assertTrue(s.isHasGroup(g));
         }
@@ -243,13 +252,14 @@ public class SubjectTest {
         @Test
         public void isHasGroupFalseTest() {
             Subject s = new Subject(101, "Matemáticas", 4);
-            Group g1 = new Group(30);
-            Group g2 = new Group(25);
+            AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
+            Group g1 = new Group(30, period);
+            Group g2 = new Group(25, period);
 
             g1.setId(1);
             g2.setId(2);
 
-            s.addGrupo(g1);
+            s.addGroup(g1);
 
             assertFalse(s.isHasGroup(g2));
         }
@@ -312,14 +322,15 @@ public class SubjectTest {
         @Test
         public void toStringTest() {
             Subject s = new Subject(101, "Matemáticas", 4);
-            Group g1 = new Group(30);
-            Group g2 = new Group(25);
+            AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
+            Group g1 = new Group(30, period);
+            Group g2 = new Group(25, period);
 
             g1.setId(1);
             g2.setId(2);
 
-            s.addGrupo(g1);
-            s.addGrupo(g2);
+            s.addGroup(g1);
+            s.addGroup(g2);
 
             String result = s.toString();
 
@@ -346,11 +357,12 @@ public class SubjectTest {
         @Test
         public void addMismoGrupoDosVecesTest() {
             Subject s = new Subject(101, "Matemáticas", 4);
-            Group g = new Group(30);
+            AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
+            Group g = new Group(30, period);
             g.setId(1);
 
-            s.addGrupo(g);
-            s.addGrupo(g); // Añadir el mismo grupo otra vez
+            s.addGroup(g);
+            s.addGroup(g); // Añadir el mismo grupo otra vez
 
             assertEquals(2, s.getGroups().size()); // ArrayList permite duplicados
             assertTrue(s.isHasGroup(g));
@@ -359,10 +371,11 @@ public class SubjectTest {
         @Test
         public void removeFromEmptyListTest() {
             Subject s = new Subject(101, "Matemáticas", 4);
-            Group g = new Group(30);
+            AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
+            Group g = new Group(30, period);
             g.setId(1);
 
-            boolean removed = s.removeGrupo(g);
+            boolean removed = s.removeGroup(g);
 
             assertFalse(removed);
             assertEquals(0, s.getGroups().size());
@@ -371,36 +384,37 @@ public class SubjectTest {
         @Test
         public void addRemoveMultipleOperationsTest() {
             Subject s = new Subject(101, "Matemáticas", 4);
-            Group g1 = new Group(30);
-            Group g2 = new Group(25);
-            Group g3 = new Group(20);
+            AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
+            Group g1 = new Group(30, period);
+            Group g2 = new Group(25, period);
+            Group g3 = new Group(20, period);
 
             g1.setId(1);
             g2.setId(2);
             g3.setId(3);
 
             // Añadir todos
-            s.addGrupo(g1);
-            s.addGrupo(g2);
-            s.addGrupo(g3);
+            s.addGroup(g1);
+            s.addGroup(g2);
+            s.addGroup(g3);
             assertEquals(3, s.getGroups().size());
 
             // Remover uno del medio
-            s.removeGrupo(g2);
+            s.removeGroup(g2);
             assertEquals(2, s.getGroups().size());
             assertFalse(s.isHasGroup(g2));
 
             // Añadir uno nuevo
-            Group g4 = new Group(15);
+            Group g4 = new Group(15, period);
             g4.setId(4);
-            s.addGrupo(g4);
+            s.addGroup(g4);
             assertEquals(3, s.getGroups().size());
             assertTrue(s.isHasGroup(g4));
 
             // Remover todos
-            s.removeGrupo(g1);
-            s.removeGrupo(g3);
-            s.removeGrupo(g4);
+            s.removeGroup(g1);
+            s.removeGroup(g3);
+            s.removeGroup(g4);
             assertEquals(0, s.getGroups().size());
         }
 

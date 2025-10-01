@@ -1,9 +1,15 @@
 package edu.dosw.sirha.SIRHA_BackEnd;
 
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.*;
+import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.DiasSemana;
+import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateGroup.Group;
+import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateGroup.StatusClosed;
+import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateGroup.StatusOpen;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.port.GroupState;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+
+import java.time.LocalDate;
 import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -11,74 +17,83 @@ import static org.junit.jupiter.api.Assertions.*;
 public class GroupTests {
 
     @Test
-    public void groupTest(){
-        Group g = new Group(5);
+    void groupTest(){
+        AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
+        Group g = new Group(5, period);
         assertEquals(5, g.getCapacidad());
     }
 
     @Test
-    public void setEstadoTest(){
-        Group g = new Group(5);
+    void setEstadoTest(){
+        AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
+        Group g = new Group(5, period);
         GroupState estado = new StatusClosed();
         g.setEstadoGrupo(estado);
         assertEquals(estado, g.getEstadoGrupo());
     }
 
     @Test
-    public void inscribirEstudianteTest(){
-        Group g = new Group(5);
+    void inscribirEstudianteTest(){
+        AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
+        Group g = new Group(5, period);
         Student jacobo = new Student("jacobo", "jacobo@test.com", "hash123", "20231001");
-        g.addEstudiante(jacobo);
+        g.enrollStudent(jacobo);
         List<Student> estudiantes = g.getEstudiantes();
         assertTrue(estudiantes.contains(jacobo));
     }
 
     @Test
-    public void cuposDisponiblesTest(){
-        Group g = new Group(5);
+    void cuposDisponiblesTest(){
+        AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
+        Group g = new Group(5, period);
         Student jacobo = new Student("jacobo", "jacobo@test.com", "hash123", "20231001");
-        g.addEstudiante(jacobo);
+        g.enrollStudent(jacobo);
         assertEquals(4, g.getCuposDisponibles());
     }
 
     @Test
-    public void estaLLenoTest(){
-        Group g = new Group(4);
+    void estaLLenoTest(){
+        AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
+        Group g = new Group(4, period);
         for(int i = 0; i < 4; i++){
             Student s = new Student("student" + i, "email" + i + "@test.com", "hash", "202310" + String.format("%02d", i));
-            g.addEstudiante(s);
+            g.enrollStudent(s);
         }
         assertTrue(g.estaLleno());
     }
 
     @Test
-    public void inavlidEstaLLenoTest(){
-        Group g = new Group(4);
+    void invalidEstaLLenoTest(){
+        AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
+        Group g = new Group(4, period);
         for(int i = 0; i < 3; i++){
             Student s = new Student("student" + i, "email" + i + "@test.com", "hash", "202310" + String.format("%02d", i));
-            g.addEstudiante(s);
+            g.enrollStudent(s);
         }
         assertFalse(g.estaLleno());
     }
 
     @Test
-    public void contieneEstudianteTest(){
-        Group g = new Group(4);
+    void contieneEstudianteTest(){
+        AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
+        Group g = new Group(4, period);
         Student s = new Student("test", "test@email.com", "hash", "20231001");
-        g.addEstudiante(s);
+        g.enrollStudent(s);
         assertTrue(g.contieneEstudiante(s));
     }
 
     @Test
-    public void verificateIdTest(){
-        Group g = new Group(4);
+    void verificateIdTest(){
+        AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
+        Group g = new Group(4, period);
         g.setId(11111);
         assertEquals(11111, g.getId());
     }
 
     @Test
-    public void verificarAulaTest(){
-        Group g = new Group(4);
+    void verificarAulaTest(){
+        AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
+        Group g = new Group(4, period);
         g.setAula("Bloque A");
         assertEquals("Bloque A", g.getAula());
     }
@@ -86,15 +101,16 @@ public class GroupTests {
     // ==================== PRUEBAS ADICIONALES COMPLETADAS ====================
 
     @Test
-    public void removerEstudianteTest() {
-        Group g = new Group(5);
+    void unenrollStudentTest() {
+        AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
+        Group g = new Group(5, period);
         Student s1 = new Student("jacobo", "jacobo@test.com", "hash123", "20231001");
         Student s2 = new Student("maria", "maria@test.com", "hash456", "20231002");
 
-        g.addEstudiante(s1);
-        g.addEstudiante(s2);
+        g.enrollStudent(s1);
+        g.enrollStudent(s2);
 
-        boolean removido = g.removerEstudiante(s1);
+        boolean removido = g.unenrollStudent(s1);
 
         assertTrue(removido);
         assertEquals(1, g.getInscritos());
@@ -103,25 +119,27 @@ public class GroupTests {
     }
 
     @Test
-    public void removerEstudianteNoExisteTest() {
-        Group g = new Group(5);
+    void unenrollStudentNoExisteTest() {
+        AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
+        Group g = new Group(5, period);
         Student s1 = new Student("jacobo", "jacobo@test.com", "hash123", "20231001");
         Student s2 = new Student("maria", "maria@test.com", "hash456", "20231002");
 
-        g.addEstudiante(s1);
+        g.enrollStudent(s1);
+        assertThrows(IllegalArgumentException.class, () -> {
+                g.unenrollStudent(s2);
+            });
+        
 
-        boolean removido = g.removerEstudiante(s2);
-
-        assertFalse(removido);
         assertEquals(1, g.getInscritos());
     }
 
     @Test
-    public void inscribirEstudianteViaStatePatternTest() {
-        Group g = new Group(5);
+    void inscribirEstudianteViaStatePatternTest() {
+        AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
+        Group g = new Group(5, period);
         Student s1 = new Student("jacobo", "jacobo@test.com", "hash123", "20231001");
 
-        // Test usando el método que delega al State Pattern
         g.inscribirEstudiante(s1);
 
         assertTrue(g.contieneEstudiante(s1));
@@ -130,8 +148,9 @@ public class GroupTests {
     }
 
     @Test
-    public void setProfesorTest() {
-        Group g = new Group(5);
+    void setProfesorTest() {
+        AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
+        Group g = new Group(5, period);
         Professor profesor = new Professor("Dr. Smith", "smith@university.edu", "hash", "Matemáticas");
 
         g.setProfesor(profesor);
@@ -140,8 +159,9 @@ public class GroupTests {
     }
 
     @Test
-    public void setCursoTest() {
-        Group g = new Group(5);
+    void setCursoTest() {
+        AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
+        Group g = new Group(5, period);
         Subject curso = new Subject(101, "Cálculo I", 4);
         
         g.setCurso(curso);
@@ -150,10 +170,11 @@ public class GroupTests {
     }
 
     @Test
-    public void setCapacidadConEstudiantesInscritosTest() {
-        Group g = new Group(5);
+    void setCapacidadConEstudiantesInscritosTest() {
+        AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
+        Group g = new Group(5, period);
         Student s1 = new Student("jacobo", "jacobo@test.com", "hash123", "20231001");
-        g.addEstudiante(s1);
+        g.enrollStudent(s1);
 
         // No debería permitir cambiar capacidad con estudiantes inscritos
         assertThrows(IllegalStateException.class, () -> {
@@ -162,20 +183,21 @@ public class GroupTests {
     }
 
     @Test
-    public void setCapacidadMenorQueInscritosTest() {
-        Group g = new Group(5);
+    void setCapacidadMenorQueInscritosTest() {
+        AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
+        Group g = new Group(5, period);
         Student s1 = new Student( "jacobo", "jacobo@test.com", "hash123", "20231001");
         Student s2 = new Student("maria", "maria@test.com", "hash456", "20231002");
 
-        g.addEstudiante(s1);
-        g.addEstudiante(s2);
+        g.enrollStudent(s1);
+        g.enrollStudent(s2);
 
         // Remover estudiantes para permitir el cambio
-        g.removerEstudiante(s1);
-        g.removerEstudiante(s2);
+        g.unenrollStudent(s1);
+        g.unenrollStudent(s2);
 
         // Volver a agregar uno
-        g.addEstudiante(s1);
+        g.enrollStudent(s1);
 
         // Intentar poner capacidad menor que inscritos actuales
         assertThrows(IllegalArgumentException.class, () -> {
@@ -184,38 +206,23 @@ public class GroupTests {
     }
 
     @Test
-    public void addEstudianteDuplicadoTest() {
-        Group g = new Group(5);
+    void enrollStudentDuplicadoTest() {
+        AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
+        Group g = new Group(5, period);
         Student s1 = new Student("jacobo", "jacobo@test.com", "hash123", "20231001");
 
-        g.addEstudiante(s1);
+        g.enrollStudent(s1);
 
         assertThrows(IllegalArgumentException.class, () -> {
-            g.addEstudiante(s1);
+            g.enrollStudent(s1);
         });
     }
 
-    @Test
-    public void addEstudianteNullTest() {
-        Group g = new Group(5);
-
-        assertThrows(IllegalArgumentException.class, () -> {
-            g.addEstudiante(null);
-        });
-    }
 
     @Test
-    public void removerEstudianteNullTest() {
-        Group g = new Group(5);
-
-        assertThrows(IllegalArgumentException.class, () -> {
-            g.removerEstudiante(null);
-        });
-    }
-
-    @Test
-    public void inscribirEstudianteNullTest() {
-        Group g = new Group(5);
+    void inscribirEstudianteNullTest() {
+        AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
+        Group g = new Group(5, period);
 
         assertThrows(IllegalArgumentException.class, () -> {
             g.inscribirEstudiante(null);
@@ -223,8 +230,9 @@ public class GroupTests {
     }
 
     @Test
-    public void setEstadoNullTest() {
-        Group g = new Group(5);
+    void setEstadoNullTest() {
+        AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
+        Group g = new Group(5, period);
 
         assertThrows(IllegalArgumentException.class, () -> {
             g.setEstadoGrupo(null);
@@ -232,18 +240,20 @@ public class GroupTests {
     }
 
     @Test
-    public void contieneEstudianteNullTest() {
-        Group g = new Group(5);
+    void contieneEstudianteNullTest() {
+        AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
+        Group g = new Group(5, period);
         assertFalse(g.contieneEstudiante(null));
     }
 
     @Test
-    public void getEstudiantesInmutableTest() {
-        Group g = new Group(5);
+    void getEstudiantesInmutableTest() {
+        AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
+        Group g = new Group(5, period);
         Student s1 = new Student( "jacobo", "jacobo@test.com", "hash123", "20231001");
         Student s2 = new Student("maria", "maria@test.com", "hash456", "20231002");
 
-        g.addEstudiante(s1);
+        g.enrollStudent(s1);
         List<Student> estudiantes = g.getEstudiantes();
 
         // La lista devuelta debe ser inmutable
@@ -253,12 +263,13 @@ public class GroupTests {
     }
 
     @Test
-    public void cuposDisponiblesNuncaNegativoTest() {
-        Group g = new Group(5);
+    void cuposDisponiblesNuncaNegativoTest() {
+        AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
+        Group g = new Group(5, period);
         // Llenar el grupo completamente
         for(int i = 0; i < 5; i++) {
             Student s = new Student("student" + i, "email" + i + "@test.com", "hash", "202310" + String.format("%02d", i));
-            g.addEstudiante(s);
+            g.enrollStudent(s);
         }
 
         // Los cupos disponibles nunca deben ser negativos
@@ -267,13 +278,14 @@ public class GroupTests {
     }
 
     @Test
-    public void toStringTest() {
-        Group g = new Group(5);
+    void toStringTest() {
+        AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
+        Group g = new Group(5, period);
         Student s1 = new Student( "jacobo", "jacobo@test.com", "hash123", "20231001");
 
         g.setId(100000);
         g.setAula("A101");
-        g.addEstudiante(s1);
+        g.enrollStudent(s1);
 
         String resultado = g.toString();
 
@@ -284,9 +296,10 @@ public class GroupTests {
     }
 
     @Test
-    public void equalsTest() {
-        Group group1 = new Group(5);
-        Group group2 = new Group(5);
+    void equalsTest() {
+        AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
+        Group group1 = new Group(5, period);
+        Group group2 = new Group(5, period);
 
         group1.setId(1);
         group2.setId(1);
@@ -295,9 +308,10 @@ public class GroupTests {
     }
 
     @Test
-    public void notEqualsTest() {
-        Group group1 = new Group(5);
-        Group group2 = new Group(5);
+    void notEqualsTest() {
+        AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
+        Group group1 = new Group(5, period);
+        Group group2 = new Group(5, period);
 
         group1.setId(1);
         group2.setId(2);
@@ -306,19 +320,21 @@ public class GroupTests {
     }
 
     @Test
-    public void capacidadInvalidaTest() {
+    void capacidadInvalidaTest() {
+        AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
         assertThrows(IllegalArgumentException.class, () -> {
-            new Group(0);
+            new Group(0, period);
         });
 
         assertThrows(IllegalArgumentException.class, () -> {
-            new Group(-5);
+            new Group(-5, period);
         });
     }
 
     @Test
-    public void setCapacidadInvalidaTest() {
-        Group g = new Group(5);
+    void setCapacidadInvalidaTest() {
+        AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
+        Group g = new Group(5, period);
 
         assertThrows(IllegalArgumentException.class, () -> {
             g.setCapacidad(0);
@@ -330,19 +346,103 @@ public class GroupTests {
     }
 
     @Test
-    public void estadoInicialEsAbiertoTest() {
-        Group g = new Group(5);
+    void estadoInicialEsAbiertoTest() {
+        AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
+        Group g = new Group(5, period);
         // Verificar que el estado inicial es StatusOpen
         assertTrue(g.getEstadoGrupo() instanceof StatusOpen);
     }
 
     @Test
-    public void listaEstudiantesInicializadaTest() {
-        Group g = new Group(5);
+    void listaEstudiantesInicializadaTest() {
+        AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
+        Group g = new Group(5, period);
         // La lista de estudiantes debe estar inicializada
         assertNotNull(g.getEstudiantes());
         assertTrue(g.getEstudiantes().isEmpty());
         assertEquals(0, g.getInscritos());
+    }
+    @Test
+    void testGroupStatusOpen() {
+        AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
+        Group group = new Group(5, period);
+        
+        assertTrue(group.getEstadoGrupo() instanceof StatusOpen);
+        assertFalse(group.estaLleno());
+        
+        group.inscribirEstudiante(new Student("testuser", "testuser@example.com", "password", "EST001"));
+        assertEquals(1, group.getInscritos());
+        assertEquals(4, group.getCuposDisponibles());
+        group.inscribirEstudiante(new Student("testuser2", "testuser2@example.com", "password", "EST002"));
+        assertEquals(2, group.getInscritos());
+        assertEquals(3, group.getCuposDisponibles());
+    }
+
+    @Test
+    void testGroupStatusClosedWhenFull() {
+        AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
+        Group group = new Group(2, period); // Capacidad pequeña
+        
+        group.inscribirEstudiante(new Student("testuser", "testuser@example.com", "password", "EST001"));
+        group.inscribirEstudiante(new Student("testuser2", "testuser2@example.com", "password", "EST002"));
+        
+        assertTrue(group.getEstadoGrupo() instanceof StatusClosed);
+        assertTrue(group.estaLleno());
+        assertEquals(0, group.getCuposDisponibles());
+        
+        assertThrows(RuntimeException.class, () -> group.inscribirEstudiante(new Student("testuser3", "testuser3@example.com", "password", "EST003")));
+    }
+
+    @Test
+    void testGroupDesinscribirEstudiante() {
+        AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
+        Group group = new Group(3, period);
+        Student student = new Student("testuser", "testuser@example.com", "password", "EST001");
+        group.inscribirEstudiante(student);
+        group.inscribirEstudiante(new Student("testuser2", "testuser2@example.com", "password", "EST002"));
+        group.inscribirEstudiante(new Student("testuser3", "testuser3@example.com", "password", "EST003"));
+        assertTrue(group.getEstadoGrupo() instanceof StatusClosed);
+
+        group.unenrollStudent(student);
+        assertEquals(2, group.getInscritos());
+        assertTrue(group.getEstadoGrupo() instanceof StatusOpen);
+        assertFalse(group.estaLleno());
+    }
+
+    @Test
+    void testGroupScheduleConflicts() {
+        AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
+        Group group1 = new Group(10, period);
+        Group group2 = new Group(10, period);
+        
+        // Agregar horarios que se solapan
+        Schedule horario1 = new Schedule(DiasSemana.LUNES, 8, 10);
+        Schedule horario2 = new Schedule(DiasSemana.LUNES, 9, 11); // Conflicto
+        
+        group1.addHorario(horario1);
+        group2.addHorario(horario2);
+        
+        // Verificar conflicto
+        assertTrue(group1.conflictoConHorario(group2));
+        assertTrue(group2.conflictoConHorario(group1));
+    }
+
+    @Test
+    void testGroupNoScheduleConflicts() {
+        AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
+        Group group1 = new Group(10, period);
+        Group group2 = new Group(10, period);
+        
+        // Agregar horarios que NO se solapan
+        Schedule horario1 = new Schedule(DiasSemana.LUNES, 8, 10);
+        Schedule horario2 = new Schedule(DiasSemana.MARTES, 8, 10); // Diferente día
+        
+        group1.addHorario(horario1);
+        group2.addHorario(horario2);
+        
+        // No debería haber conflicto
+        assertFalse(group1.conflictoConHorario(group2));
+        assertFalse(group2.conflictoConHorario(group1));
     }
 
 }

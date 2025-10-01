@@ -30,13 +30,15 @@ import edu.dosw.sirha.SIRHA_BackEnd.domain.port.*;
 public abstract class BaseRequest implements Request {
     private String id;
     private LocalDateTime creadoEn;
-    private Student student;  
+    private Student student;
+    private AcademicPeriod currentPeriod;
     private ArrayList<ResponseProcess> procesos;
     private RequestState state;
 
-    public BaseRequest(Student student) {
+    public BaseRequest(Student student, AcademicPeriod currentPeriod) {
         this.creadoEn = LocalDateTime.now();
         this.student = student;
+        setCurrentPeriod(currentPeriod);
         this.procesos = new ArrayList<>();
     }
 
@@ -50,6 +52,15 @@ public abstract class BaseRequest implements Request {
 
     public void setEstado(RequestState estado) {
         state = estado;
+    }
+    public RequestState getEstado() {
+        return state;
+    }
+    public AcademicPeriod getCurrentPeriod() {
+        return currentPeriod;
+    }
+    public void setCurrentPeriod(AcademicPeriod currentPeriod) {
+        this.currentPeriod = currentPeriod;
     }
 
 

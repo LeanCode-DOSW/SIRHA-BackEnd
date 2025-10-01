@@ -5,8 +5,8 @@ public class CambioMateria extends BaseRequest {
     private Subject oldSubject;
     private Subject newSubject;
 
-    public CambioMateria(Student student, Subject oldSubject, Subject newSubject) {
-        super(student);
+    public CambioMateria(Student student, Subject oldSubject, Subject newSubject, AcademicPeriod currentPeriod) {
+        super(student, currentPeriod);
         this.oldSubject = oldSubject;
         this.newSubject = newSubject;
     }

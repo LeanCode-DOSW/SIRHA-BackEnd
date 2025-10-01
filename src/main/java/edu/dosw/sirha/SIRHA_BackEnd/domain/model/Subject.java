@@ -6,6 +6,8 @@ import java.util.Objects;
 
 import org.springframework.data.annotation.Id;
 
+import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateGroup.Group;
+
 /**
  * Representa una materia o asignatura dentro del sistema académico.
  *
@@ -36,7 +38,7 @@ public class Subject {
     /**
      * Asocia un grupo a la materia.
      */
-    public void addGrupo(Group g) {
+    public void addGroup(Group g) {
         if (g == null) {
             throw new IllegalArgumentException("El grupo no puede ser nulo");
         }
@@ -46,7 +48,7 @@ public class Subject {
     /**
      * Elimina un grupo de la materia.
      */
-    public boolean removeGrupo(Group g) {
+    public boolean removeGroup(Group g) {
         return groups.remove(g);
     }
 

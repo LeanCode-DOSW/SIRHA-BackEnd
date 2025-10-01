@@ -1,7 +1,6 @@
 package edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateSubjectDec;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.Group;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.SubjectDecorator;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.SemaforoColores;
+import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateGroup.Group;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.port.SubjectState;
 
 public class NoCursadaState implements SubjectState {
@@ -20,7 +19,7 @@ public class NoCursadaState implements SubjectState {
     @Override
     public void setGroup(SubjectDecorator materia, Group grupo) {
         if (grupo != null) {
-            materia.setGroup(grupo);
+            materia.setGroupDirect(grupo);
         } else {
             throw new IllegalArgumentException("El grupo no puede ser nulo");
         }

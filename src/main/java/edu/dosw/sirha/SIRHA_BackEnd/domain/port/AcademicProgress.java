@@ -3,8 +3,8 @@ package edu.dosw.sirha.SIRHA_BackEnd.domain.port;
 import java.util.List;
 import java.util.Collection;
 
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.SubjectDecorator;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.SemaforoColores;
+import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateSubjectDec.SubjectDecorator;
 
 /**
  * Interface que define el contrato para el progreso académico de un estudiante.

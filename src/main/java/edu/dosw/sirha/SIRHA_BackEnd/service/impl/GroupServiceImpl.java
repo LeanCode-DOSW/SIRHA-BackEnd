@@ -1,6 +1,9 @@
 package edu.dosw.sirha.SIRHA_BackEnd.service.impl;
 
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.*;
+import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateGroup.Group;
+import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateGroup.StatusClosed;
+import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateGroup.StatusOpen;
 import edu.dosw.sirha.SIRHA_BackEnd.repository.mongo.GroupMongoRepository;
 import edu.dosw.sirha.SIRHA_BackEnd.repository.mongo.SubjectMongoRepository;
 import edu.dosw.sirha.SIRHA_BackEnd.service.GroupService;
@@ -54,7 +57,7 @@ public class GroupServiceImpl implements GroupService {
             }
         }
 
-        subject.addGrupo(grupo);
+        subject.addGroup(grupo);
         subjectRepository.save(subject);
         return groupRepository.save(grupo);
     }

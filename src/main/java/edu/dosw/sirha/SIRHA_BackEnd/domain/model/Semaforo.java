@@ -4,6 +4,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.SemaforoColores;
+import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateSubjectDec.SubjectDecorator;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.port.AcademicProgress;
 
 /**

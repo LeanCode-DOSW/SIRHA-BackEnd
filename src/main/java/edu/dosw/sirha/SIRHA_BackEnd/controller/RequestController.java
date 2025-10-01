@@ -1,7 +1,8 @@
 package edu.dosw.sirha.SIRHA_BackEnd.controller;
 
-import edu.dosw.sirha.SIRHA_BackEnd.service.RequestService;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.BaseRequest;
+import edu.dosw.sirha.SIRHA_BackEnd.service.RequestService;
+
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;

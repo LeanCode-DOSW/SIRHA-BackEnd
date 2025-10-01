@@ -1,7 +1,6 @@
 package edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateSubjectDec;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.Group;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.SubjectDecorator;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.SemaforoColores;
+import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateGroup.Group;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.port.SubjectState;
 
 public class EnCursoState implements SubjectState {
@@ -26,12 +25,9 @@ public class EnCursoState implements SubjectState {
     }
     @Override
     public void retirar(SubjectDecorator materia) {
-        /*if (materia.getGroup() != null) {
-            materia.getGroup().desinscribirEstudiante();
-        }*/
         materia.setState(new NoCursadaState());
         materia.getState().setState(materia);
-        materia.setGroup(null);
+        //materia.setGroup(null);
         System.out.println("Materia retirada.");
     }
 
