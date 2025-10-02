@@ -1,6 +1,7 @@
 # SIRHA - Sistema de Reasignación de Horarios Académicos
 
 Este proyecto tiene como objetivo desarrollar un sistema de software denominado **SIRHA** para la Escuela Colombiana de Ingeniería, siguiendo buenas prácticas de ingeniería de software y metodologías ágiles.
+
 ---
 
 ## Tecnologías Utilizadas
@@ -15,6 +16,32 @@ Este proyecto tiene como objetivo desarrollar un sistema de software denominado 
 - 💬 Slack (comunicación en equipo)
 
 ---
+
+##  Estrategia de Versionamiento y Branches
+
+###  Versionamiento
+
+* Se usará **Semantic Versioning (SemVer)**:
+
+  * **MAJOR**: cambios incompatibles con versiones anteriores.
+  * **MINOR**: nuevas funcionalidades compatibles.
+  * **PATCH**: correcciones de bugs y ajustes menores.
+
+Ejemplo: `v1.2.3`
+
+* `1` → versión mayor.
+* `2` → nuevas funcionalidades.
+* `3` → correcciones menores.
+
+---
+
+### Branches (Git Flow Simplificado)
+
+* **`main`** → contiene el código estable en producción.
+* **`develop`** → rama de integración, donde se unen todas las funcionalidades antes de pasar a producción.
+* **`feature/<nombre>`** → ramas para nuevas funcionalidades. Se crean desde `develop` y se fusionan de nuevo en `develop`.
+* **`release/<versión>`** → rama para preparar entregas, pruebas finales y documentación antes de pasar a `main`.
+* **`hotfix/<nombre>`** → rama para correcciones críticas que deben aplicarse directamente a `main` y luego integrarse en `develop`.
 
 ## 📊 Estado del Proyecto
 
