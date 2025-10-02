@@ -1,19 +1,13 @@
-# SIRHA - Sistema de Reasignación de Horarios Académicos
-
-Este proyecto tiene como objetivo desarrollar un sistema de software denominado **SIRHA** para la Escuela Colombiana de Ingeniería, siguiendo buenas prácticas de ingeniería de software y metodologías ágiles.
-
----
+#  SIRHA – BackEnd
 
 ## Tecnologías Utilizadas
 
-- ☕ Java 17+
-- 🌱 Spring Boot
-- 📦 Maven (gestión de dependencias y compilación)
-- 🔍 Swagger UI (documentación de la API)
-- 🧪 JaCoCo (análisis de cobertura de pruebas)
-- 🧠 SonarQube (análisis estático de código)
-- 🛠️ Jira (gestión ágil de tareas)
-- 💬 Slack (comunicación en equipo)
+- Java 17+
+- Spring Boot
+- Maven (gestión de dependencias y compilación)
+- Swagger UI (documentación de la API)
+- JaCoCo (análisis de cobertura de pruebas)
+- SonarQube (análisis estático de código)
 
 ---
 
@@ -43,7 +37,7 @@ Ejemplo: `v1.2.3`
 * **`release/<versión>`** → rama para preparar entregas, pruebas finales y documentación antes de pasar a `main`.
 * **`hotfix/<nombre>`** → rama para correcciones críticas que deben aplicarse directamente a `main` y luego integrarse en `develop`.
 
-## 📊 Estado del Proyecto
+## Estado del Proyecto
 
 🔧 Proyecto en fase de planeación. Actualmente en construcción de estructura base (scaffolding), diseño técnico y documentación inicial.
 
@@ -56,7 +50,7 @@ Ejemplo: `v1.2.3`
 
 SIRHA Backend es una API REST desarrollada con Spring Boot que gestiona el sistema de información de recursos humanos y administrativos. El sistema permite la gestión de estudiantes, grupos, solicitudes académicas y procesos de autenticación.
 
-## 📁 Estructura del Proyecto Planeada (Scaffolding MVC)
+## Estructura del Proyecto Planeada (Scaffolding MVC)
 
 El proyecto se desarrollará bajo el patrón **MVC (Modelo - Vista - Controlador)**. Esta será la estructura básica:
 
@@ -187,7 +181,7 @@ Contiene las configuraciones específicas de Spring Boot para seguridad, documen
     swagger  -> http://localhost:8080/swagger-ui/index.html
 
 
-## 🐳 Dockerización
+## Dockerización
 
 El proyecto SIRHA está preparado para ejecutarse dentro de contenedores Docker, lo que facilita su despliegue en diferentes entornos sin necesidad de configurar dependencias locales.
 
