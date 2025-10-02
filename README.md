@@ -160,3 +160,24 @@ Contiene las configuraciones específicas de Spring Boot para seguridad, documen
     swagger  -> http://localhost:8080/swagger-ui/index.html
 
 
+## 🐳 Dockerización
+
+El proyecto SIRHA está preparado para ejecutarse dentro de contenedores Docker, lo que facilita su despliegue en diferentes entornos sin necesidad de configurar dependencias locales.
+
+compila el proyecto con Maven y genera una imagen ligera con el JAR final.
+
+Docker Compose: permite levantar fácilmente el backend y conectarlo con MongoDB Atlas.
+
+Variables de entorno: la configuración sensible (como SPRING_DATA_MONGODB_URI) se gestiona mediante el archivo .env, evitando exponer credenciales en el código.
+
+Healthcheck: se valida automáticamente la disponibilidad de la aplicación a través del endpoint /actuator/health.
+
+http://localhost:8080/actuator/health
+
+
+Esto garantiza que la aplicación sea portable, reproducible y lista para producción, manteniendo buenas prácticas de despliegue continuo.
+
+http://localhost:8080/swagger-ui.html
+
+
+![Docker](docs/imagenes/docker.png)

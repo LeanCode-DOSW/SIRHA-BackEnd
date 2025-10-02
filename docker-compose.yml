@@ -1,0 +1,9 @@
+services:
+  sirha-backend:
+    build: .
+    container_name: sirha-backend
+    ports:
+      - "8080:8080"   # host:container
+    environment:
+      SPRING_PROFILES_ACTIVE: "prod"       
+      SPRING_DATA_MONGODB_URI: "${SPRING_DATA_MONGODB_URI}"    
