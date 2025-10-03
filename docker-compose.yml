@@ -7,3 +7,6 @@ services:
     environment:
       SPRING_PROFILES_ACTIVE: "prod"       
       SPRING_DATA_MONGODB_URI: "${SPRING_DATA_MONGODB_URI}"    
+    env_file:
+      - .env
+    
