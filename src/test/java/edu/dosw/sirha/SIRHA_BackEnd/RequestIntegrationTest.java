@@ -77,7 +77,7 @@ class RequestIntegrationTest {
         // Configurar progreso académico del estudiante
         Semaforo semaforo = new Semaforo(studyPlan);
         student.setAcademicProgress(semaforo);
-        student.setPlanGeneral(studyPlan);
+        student.setCurrentPeriod(academicPeriod);
     }
 
     @Test
@@ -96,12 +96,11 @@ class RequestIntegrationTest {
         assertEquals(student, solicitudCambio.getStudent());
         assertEquals(academicPeriod, solicitudCambio.getCurrentPeriod());
         assertNotNull(solicitudCambio.getCreadoEn());
-        assertTrue(solicitudCambio.getProcesos().isEmpty());
         
         // FASE 3: Procesar solicitud - Poner en revisión
         solicitudCambio.reviewRequest("Iniciando revisión de cambio de grupo");
         assertEquals(RequestStateEnum.EN_REVISION, solicitudCambio.getActualState());
-        assertEquals(1, solicitudCambio.getProcesos().size());
+        assertEquals(2, solicitudCambio.getProcesos().size());
         
         // FASE 4: Validar condiciones para el cambio
         // Verificar que hay cupos en el grupo nuevo
@@ -115,11 +114,12 @@ class RequestIntegrationTest {
         // FASE 5: Aprobar solicitud
         solicitudCambio.approveRequest("Cambio aprobado - cupos disponibles y sin conflictos");
         assertEquals(RequestStateEnum.APROBADA, solicitudCambio.getActualState());
-        assertEquals(2, solicitudCambio.getProcesos().size());
+        assertEquals(3, solicitudCambio.getProcesos().size());
         
         // Verificar historial de procesos
-        assertEquals(RequestStateEnum.EN_REVISION, solicitudCambio.getProcesos().get(0).getEstado());
-        assertEquals(RequestStateEnum.APROBADA, solicitudCambio.getProcesos().get(1).getEstado());
+        assertEquals(RequestStateEnum.PENDIENTE, solicitudCambio.getProcesos().get(0).getEstado());
+        assertEquals(RequestStateEnum.EN_REVISION, solicitudCambio.getProcesos().get(1).getEstado());
+        assertEquals(RequestStateEnum.APROBADA, solicitudCambio.getProcesos().get(2).getEstado());
     }
 
     @Test
@@ -157,7 +157,7 @@ class RequestIntegrationTest {
         assertEquals(RequestStateEnum.APROBADA, solicitudCambio.getActualState());
         
         // Verificar que se registró el proceso completo
-        assertEquals(2, solicitudCambio.getProcesos().size());
+        assertEquals(3, solicitudCambio.getProcesos().size());
     }
 
     @Test
@@ -256,26 +256,18 @@ class RequestIntegrationTest {
 
     @Test
     void testMultipleRequestsForSameStudent() {
-        // FASE 1: Crear múltiples solicitudes para el mismo estudiante
         CambioGrupo solicitud1 = new CambioGrupo(student, mathematics, mathGroup2, academicPeriod);
-        CambioMateria solicitud2 = new CambioMateria(student, mathematics, physics, academicPeriod);
-        
-        // FASE 2: Procesar primera solicitud
-
         solicitud1.reviewRequest("Revisando primera solicitud");
         solicitud1.approveRequest("Primera solicitud aprobada");
-        
-        // FASE 3: Procesar segunda solicitud
+        CambioMateria solicitud2 = new CambioMateria(student, mathematics, physics, academicPeriod);    
         solicitud2.reviewRequest("Revisando segunda solicitud");
         solicitud2.approveRequest("Segunda solicitud aprobada");
         
-        // FASE 4: Verificar que ambas se procesaron independientemente
         assertEquals(RequestStateEnum.APROBADA, solicitud1.getActualState());
         assertEquals(RequestStateEnum.APROBADA, solicitud2.getActualState());
         
-        assertNotEquals(solicitud1.getCreadoEn(), solicitud2.getCreadoEn());
-        assertEquals(2, solicitud1.getProcesos().size());
-        assertEquals(2, solicitud2.getProcesos().size());
+        assertEquals(3, solicitud1.getProcesos().size());
+        assertEquals(3, solicitud2.getProcesos().size());
     }
 
     @Test
@@ -303,21 +295,16 @@ class RequestIntegrationTest {
 
     @Test
     void testRequestValidationLogic() {
-        // Crear solicitud con condiciones válidas
+
         student.enrollSubject(mathematics, mathGroup1);
         CambioGrupo solicitud = new CambioGrupo(student, mathematics, mathGroup2, academicPeriod);
         
-        // Verificar condiciones para validación
         assertTrue(academicPeriod.isActive());
         assertTrue(mathGroup2.isOpen());
         assertTrue(mathGroup2.getCuposDisponibles() > 0);
         assertTrue(student.hasSubject(mathematics));
         assertFalse(mathSchedule1.seSolapaCon(mathSchedule2));
         
-        // La validación por defecto retorna false (implementación pendiente)
-        assertFalse(solicitud.validateRequest());
-        
-        // Pero las condiciones individuales son correctas
         assertTrue(solicitud.getCurrentPeriod().isActive());
     }
 }

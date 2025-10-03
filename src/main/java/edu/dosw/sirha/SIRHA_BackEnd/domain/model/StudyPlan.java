@@ -28,6 +28,7 @@ public class StudyPlan {
 
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
+    
     public boolean hasSubject(Subject subject) {
         return subjects.containsKey(subject.getName());
     }

@@ -33,7 +33,6 @@ import edu.dosw.sirha.SIRHA_BackEnd.domain.port.SolicitudFactory;
 @Document(collection = "students")
 public class Student extends User implements SolicitudFactory, ScheduleManager, AcademicProgressViewer, AcademicOperations {
     private String codigo;
-    private StudyPlan planGeneral;
     private AcademicProgress academicProgress;
     private List<RequestProcess> solicitudes;
     private AcademicPeriod currentPeriod;
@@ -56,7 +55,7 @@ public class Student extends User implements SolicitudFactory, ScheduleManager, 
     public Student(String username, String email, String passwordHash, String codigo) {
         super(username, email, passwordHash);
         if (codigo == null || codigo.trim().isEmpty()) {
-            throw new IllegalArgumentException("El código de estudiante no puede ser null o vacío");
+            throw new IllegalStateException("El código de estudiante no puede ser null o vacío");
         }
         this.codigo = codigo;
     }
@@ -70,7 +69,7 @@ public class Student extends User implements SolicitudFactory, ScheduleManager, 
      */
     public void agregarSolicitud(RequestProcess solicitud) {
         if (solicitud == null) {
-            throw new IllegalArgumentException("La solicitud no puede ser null");
+            throw new IllegalStateException("La solicitud no puede ser null");
         }
         
         if (this.solicitudes == null) {
@@ -91,11 +90,11 @@ public class Student extends User implements SolicitudFactory, ScheduleManager, 
     /**
      * Establece el código estudiantil.
      * @param codigo nuevo código del estudiante. No debe ser null o vacío.
-     * @throws IllegalArgumentException si el código es null o vacío
+     * @throws IllegalStateException si el código es null o vacío
      */
     public void setCodigo(String codigo) {
         if (codigo == null || codigo.trim().isEmpty()) {
-            throw new IllegalArgumentException("El código no puede ser null o vacío");
+            throw new IllegalStateException("El código no puede ser null o vacío");
         }
         this.codigo = codigo;
     }
@@ -105,16 +104,9 @@ public class Student extends User implements SolicitudFactory, ScheduleManager, 
      * @return plan de estudios del estudiante, puede ser null si no se ha asignado
      */
     public StudyPlan getPlanGeneral() {
-        return planGeneral;
+        return academicProgress.getStudyPlan();
     }
  
-    /**
-     * Establece el plan de estudios del estudiante.
-     * @param planGeneral nuevo plan de estudios a asignar
-     */
-    public void setPlanGeneral(StudyPlan planGeneral) {
-        this.planGeneral = planGeneral;
-    }
  
 
     public AcademicProgress getAcademicProgress() {
@@ -361,41 +353,42 @@ public class Student extends User implements SolicitudFactory, ScheduleManager, 
     @Override
     public boolean canEnroll(Subject subject) {
         // 1. Verificar que la materia esté en el plan de estudios
-        if (planGeneral == null || !planGeneral.hasSubject(subject)) {
-            return false;
+        if (academicProgress.getStudyPlan() == null || !academicProgress.getStudyPlan().hasSubject(subject)) {
+            throw new IllegalStateException("La materia no está en el plan de estudios del estudiante");
         }
         
         // 2. Verificar que la materia no esté ya inscrita
         if (academicProgress == null || !academicProgress.isSubjectNoCursada(subject)) {
-            return false;
+            throw new IllegalStateException("La materia ya está inscrita");
         }
         
         // 3. Verificar prerrequisitos
-        if (subject.hasPrerequisites()) {
-            return subject.canEnroll(academicProgress);
-        }
+        if (subject.hasPrerequisites() && !subject.canEnroll(academicProgress)) {
+                throw new IllegalStateException("No se cumplen los prerrequisitos para inscribir la materia");
+            }
+        
         return true;
     }
     @Override
     public boolean canEnrollInGroup(Subject subject, Group group) {
         // Primero verificar las validaciones básicas de la materia
         if (!canEnroll(subject)) {
-            return false;
+            throw new IllegalStateException("La materia no se puede inscribir");
         }
         
         // 4. Verificar que el grupo esté abierto
         if (!group.isOpen()) {
-            return false;
+            throw new IllegalStateException("El grupo está cerrado");
         }
         
         // 6. Verificar período académico activo
         if (currentPeriod == null || !currentPeriod.isActive() || !group.sameAcademicPeriod(currentPeriod)) {
-            return false;
+            throw new IllegalStateException("El período académico no es válido");
         }
         
         // 7. Verificar conflicto de horarios
         if (tieneConflictoConHorario(group)) {
-            return false;
+            throw new IllegalStateException("Conflicto de horarios detectado");
         }
         
         // 9. Verificar límite de créditos por semestre FALTA IMPLEMENTAR AAAAAAAAAAAAAAAAAAA
@@ -409,15 +402,16 @@ public class Student extends User implements SolicitudFactory, ScheduleManager, 
             throw new IllegalStateException("No se puede inscribir en la materia o grupo especificado");
         }
         
-        try {
-            group.enrollStudent(this);
-            academicProgress.enrollSubjectInGroup(subject, group);
-            //academicProgress.recordEnrollment(subject, group, currentPeriod); despues
-            
+        
+        group.enrollStudent(this);
+        academicProgress.enrollSubjectInGroup(subject, group);
+        //academicProgress.recordEnrollment(subject, group, currentPeriod); despues
+        
+        /*try {   
         } catch (Exception e) {
             throw new RuntimeException("Error durante la inscripción: " + e.getMessage(), e);
             //rollback si es necesario
-        }
+        }*/
     }
 
     @Override
@@ -425,12 +419,13 @@ public class Student extends User implements SolicitudFactory, ScheduleManager, 
         throw new UnsupportedOperationException("Método no implementado aún"); //:C
     }
 
+    /*
+     * Verifica si el estudiante tiene una materia específica en su progreso académico.
+     */
     @Override
     public boolean hasSubject(Subject subject) {
         return academicProgress != null && academicProgress.hasSubject(subject);
     }
-
-
     
 }
  

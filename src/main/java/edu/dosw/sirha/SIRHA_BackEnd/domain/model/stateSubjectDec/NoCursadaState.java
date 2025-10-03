@@ -27,9 +27,10 @@ public class NoCursadaState implements SubjectState {
 
     @Override
     public void inscribir(SubjectDecorator materia, Group grupo) {
+        materia.setGroup(grupo);
         materia.setState(new EnCursoState());
         materia.getState().setState(materia);
-        materia.setGroup(grupo);
+        
         System.out.println("Materia inscrita. Ahora está en curso.");
     }
 

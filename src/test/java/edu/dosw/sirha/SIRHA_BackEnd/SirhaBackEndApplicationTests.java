@@ -260,7 +260,6 @@ class SirhaBackEndApplicationTests {
         
         Semaforo semaforo = new Semaforo(studyPlan);
         
-        student.setPlanGeneral(studyPlan);
         student.setAcademicProgress(semaforo);
 
         assertNotNull(student.getAcademicProgress());
