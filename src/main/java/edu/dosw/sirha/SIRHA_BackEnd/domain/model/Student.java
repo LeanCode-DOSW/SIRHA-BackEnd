@@ -13,6 +13,7 @@ import edu.dosw.sirha.SIRHA_BackEnd.domain.port.AcademicOperations;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.port.AcademicProgress;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.port.AcademicProgressViewer;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.port.PrerequisiteRule;
+import edu.dosw.sirha.SIRHA_BackEnd.domain.port.Request;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.port.RequestProcess;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.port.ScheduleManager;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.port.SolicitudFactory;
@@ -428,6 +429,7 @@ public class Student extends User implements SolicitudFactory, ScheduleManager, 
     public boolean hasSubject(Subject subject) {
         return academicProgress != null && academicProgress.hasSubject(subject);
     }
+
 
     
 }
