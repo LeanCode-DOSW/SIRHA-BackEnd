@@ -93,14 +93,14 @@ public class Semaforo implements AcademicProgress {
     public int getCreditosPorColor(SemaforoColores color) {
         return subjects.values().stream()
             .filter(s -> s.getEstadoColor() == color)
-            .mapToInt(SubjectDecorator::getCreditos)
+            .mapToInt(SubjectDecorator::getCredits)
             .sum();
     }
 
     public List<SubjectDecorator> getMateriasPorSemestre(int semestre) {
         List<SubjectDecorator> materiasSemestre = new ArrayList<>();
         for (SubjectDecorator sd : subjects.values()) {
-            if (sd.getSemestre() == semestre) {
+            if (sd.getSemester() == semestre) {
                 materiasSemestre.add(sd);
             }
         }

@@ -146,7 +146,7 @@ class CambioMateriaTest {
         // Verificar que son materias diferentes
         assertNotEquals(materiaAntigua.getId(), materiaNueva.getId());
         assertNotEquals(materiaAntigua.getName(), materiaNueva.getName());
-        assertNotEquals(materiaAntigua.getCreditos(), materiaNueva.getCreditos());
+        assertNotEquals(materiaAntigua.getCredits(), materiaNueva.getCredits());
     }
 
     @Test
@@ -201,11 +201,11 @@ class CambioMateriaTest {
         CambioMateria cambioMateria = new CambioMateria(student, materiaAntigua, materiaNueva, academicPeriod);
         
         // Comparar créditos entre materias
-        assertEquals(3, materiaAntigua.getCreditos());
-        assertEquals(4, materiaNueva.getCreditos());
+        assertEquals(3, materiaAntigua.getCredits());
+        assertEquals(4, materiaNueva.getCredits());
         
         // La materia nueva tiene más créditos
-        assertTrue(materiaNueva.getCreditos() > materiaAntigua.getCreditos());
+        assertTrue(materiaNueva.getCredits() > materiaAntigua.getCredits());
         
         assertFalse(cambioMateria.validateRequest());
     }

@@ -35,7 +35,7 @@ public abstract class BaseRequest implements Request {
     private LocalDateTime creadoEn;
     private Student student;
     private AcademicPeriod currentPeriod;
-    private ArrayList<ResponseProcess> procesos;
+    private ArrayList<RequestProcess> procesos;
     private RequestState state;
 
     public BaseRequest(Student student, AcademicPeriod currentPeriod) {
@@ -47,11 +47,11 @@ public abstract class BaseRequest implements Request {
         changeState(new ResponseProcess(RequestStateEnum.PENDIENTE, "Solicitud creada y en estado pendiente."));
     }
 
-    public void agregarProceso(ResponseProcess proceso) {
+    public void agregarProceso(RequestProcess proceso) {
         this.procesos.add(proceso);
     }
 
-    public List<ResponseProcess> getProcesos() {
+    public List<RequestProcess> getProcesos() {
         return procesos;
     }
 
@@ -95,7 +95,7 @@ public abstract class BaseRequest implements Request {
     
     public String getId() {return id;}
 
-    public ResponseProcess getActualProcess(){return procesos.get(procesos.size() - 1);}
+    public RequestProcess getActualProcess(){return procesos.get(procesos.size() - 1);}
     public RequestStateEnum getActualState(){return getActualProcess().getEstado();}
     private void setActualState(RequestStateEnum estado){getActualProcess().setEstado(estado);}
 

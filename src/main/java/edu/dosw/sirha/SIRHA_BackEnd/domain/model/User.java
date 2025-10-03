@@ -36,23 +36,12 @@ public abstract class User implements Authenticable, Schedulable {
     public boolean verificarContraseña(String rawPassword) {
         return PasswordUtils.verifyPassword(rawPassword, this.password);
     }
+    
+    public void setId(int id){this.id = id;}
 
-    public String getUsername(){
-        return username;
-    }
-    public void setUsername(String username){
-        this.username = username;
-    }
-    public int getId(){
-        return id;
-    }
-    public void setId(int id){
-        this.id = id;
-    }
-    public String getPasswordHash(){
-        return password;
-    }
-    public String getEmail(){
-        return email;
-    }
+    public String getUsername(){return username;}
+    public void setUsername(String username){this.username = username;}
+    public int getId(){return id;}
+    public String getPasswordHash(){return password;}
+    public String getEmail(){return email;}
 }

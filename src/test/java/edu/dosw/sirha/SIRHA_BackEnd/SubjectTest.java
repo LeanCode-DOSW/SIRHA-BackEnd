@@ -18,7 +18,7 @@ public class SubjectTest {
 
             assertEquals(101, s.getId());
             assertEquals("Matemáticas", s.getName());
-            assertEquals(4, s.getCreditos());
+            assertEquals(4, s.getCredits());
             assertNotNull(s.getGroups());
             assertTrue(s.getGroups().isEmpty());
         }
@@ -102,27 +102,27 @@ public class SubjectTest {
         }
 
         @Test
-        public void setCreditosValidoTest() {
+        public void setCreditsValidoTest() {
             Subject s = new Subject(101, "Matemáticas", 4);
-            s.setCreditos(6);
-            assertEquals(6, s.getCreditos());
+            s.setCredits(6);
+            assertEquals(6, s.getCredits());
         }
 
         @Test
-        public void setCreditosCeroTest() {
+        public void setCreditsCeroTest() {
             Subject s = new Subject(101, "Matemáticas", 4);
 
             assertThrows(IllegalArgumentException.class, () -> {
-                s.setCreditos(0);
+                s.setCredits(0);
             });
         }
 
         @Test
-        public void setCreditosNegativosTest() {
+        public void setCreditsNegativosTest() {
             Subject s = new Subject(101, "Matemáticas", 4);
 
             assertThrows(IllegalArgumentException.class, () -> {
-                s.setCreditos(-3);
+                s.setCredits(-3);
             });
         }
 
@@ -421,7 +421,7 @@ public class SubjectTest {
         @Test
         public void creditosMaxValueTest() {
             Subject s = new Subject(101, "Matemáticas", Integer.MAX_VALUE);
-            assertEquals(Integer.MAX_VALUE, s.getCreditos());
+            assertEquals(Integer.MAX_VALUE, s.getCredits());
         }
 
         @Test

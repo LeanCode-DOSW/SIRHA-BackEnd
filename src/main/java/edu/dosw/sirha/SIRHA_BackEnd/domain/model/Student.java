@@ -263,7 +263,7 @@ public class Student extends User implements SolicitudFactory, ScheduleManager, 
         }
         
         return academicProgress.getSubjects().stream()
-            .map(SubjectDecorator::getSemestre)
+            .map(SubjectDecorator::getSemester)
             .filter(s -> s > 0)
             .distinct()
             .sorted()
@@ -316,7 +316,7 @@ public class Student extends User implements SolicitudFactory, ScheduleManager, 
         }
         
         double promedioSemestre = cursando.stream()
-            .mapToInt(SubjectDecorator::getSemestre)
+            .mapToInt(SubjectDecorator::getSemester)
             .filter(s -> s > 0)
             .average()
             .orElse(1.0);
@@ -340,15 +340,7 @@ public class Student extends User implements SolicitudFactory, ScheduleManager, 
     }
 
 
-    /**
-     * Representación en string del estudiante.
-     * @return string con información básica del estudiante
-     */
-    @Override
-    public String toString() {
-        return String.format("Student{id='%s', username='%s', codigo='%s'}",
-                            getId(), getUsername(), codigo);
-    }
+   
 
     @Override
     public boolean canEnroll(Subject subject) {
@@ -426,6 +418,14 @@ public class Student extends User implements SolicitudFactory, ScheduleManager, 
     public boolean hasSubject(Subject subject) {
         return academicProgress != null && academicProgress.hasSubject(subject);
     }
-    
+     /**
+     * Representación en string del estudiante.
+     * @return string con información básica del estudiante
+     */
+    @Override
+    public String toString() {
+        return String.format("Student{id='%s', username='%s', codigo='%s'}",
+                            getId(), getUsername(), codigo);
+    }
 }
  

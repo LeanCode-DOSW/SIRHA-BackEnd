@@ -1,8 +1,11 @@
 package edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateSubjectDec;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import edu.dosw.sirha.SIRHA_BackEnd.domain.model.ResponseProcess;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.Subject;
+import edu.dosw.sirha.SIRHA_BackEnd.domain.model.SubjectProgress;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.SemaforoColores;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateGroup.Group;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.port.*;
@@ -13,48 +16,57 @@ public class SubjectDecorator {
     private int semestre;
     private SubjectState state;
     private Group group;
+    private int grade;
+    private List<SubjectStateProcess> history;
 
     public SubjectDecorator(Subject subject) {
         this.subject = subject;
         this.state = new NoCursadaState();
         state.setState(this);
+        history = new ArrayList<>();
     }
-    
-    
-    public String getName() {return subject.getName();}
-    public int getCreditos() {return subject.getCreditos();}
-    public List<Group> getGroups() {return subject.getGroups();}
+
+    public void setGroup(Group group) { state.setGroup(this, group); }
+    public void setSemester(int semester) { state.setSemester(this, semester); }
+    public void setGrade(int grade) { state.setGrade(this, grade); }
 
     void setState(SubjectState state) {this.state = state;}
     void setEstadoColor(SemaforoColores estadoColor) {this.estadoColor = estadoColor;}
-    public void setSemestreMateria(int semestre){this.semestre = semestre;}
-    public void setGroup(Group group) { state.setGroup(this, group); }
+    void setSemesterDirect(int semester){this.semestre = semester;}
     void setGroupDirect(Group group) { this.group = group; }
+    void setGradeDirect(int grade) { this.grade = grade; }
 
+    public void inscribir(Group grupo) { state.inscribir(this, grupo); }
+
+    public void inscribir(Group grupo, int semester) {
+        state.inscribir(this, grupo);
+        state.setSemester(this, semester);
+    }
+    public void aprobar()   { state.aprobar(this); recordChangeState(new SubjectProgress(SemaforoColores.VERDE, this.semestre, this.group, this.grade));}
+    public void reprobar()  { state.reprobar(this); recordChangeState(new SubjectProgress(SemaforoColores.ROJO, this.semestre, this.group, this.grade)); }
+    public void retirar()   { state.retirar(this); recordChangeState(new SubjectProgress(SemaforoColores.AMARILLO, this.semestre, this.group, this.grade));}
+    
+    private void recordChangeState(SubjectStateProcess stateProcess){
+        addState(stateProcess);
+    }
+
+    public boolean puedeInscribirse() {return state.puedeInscribirse();}
+    public boolean estaCursando() {return estadoColor == SemaforoColores.AMARILLO;}
+    public boolean estaAprobada() {return estadoColor == SemaforoColores.VERDE;}
+    public boolean estaReprobada() {return estadoColor == SemaforoColores.ROJO;}
+
+    public void addState(SubjectStateProcess state) {history.add(state);}
+    public SubjectStateProcess getLastStateProcess() {return history.get(history.size() - 1);}
+
+    public String getName() {return subject.getName();}
+    public int getCredits() {return subject.getCredits();}
+    public List<Group> getGroups() {return subject.getGroups();}
+    public int getId() { return subject.getId(); }
     public SemaforoColores getEstadoColor() {return estadoColor;}
-    public int getSemestre() {return semestre;}
+    public int getSemester() {return semestre;}
     public Subject getSubject() {return subject;}
     public SubjectState getState() {return state;}
     public Group getGroup() { return group; }
-
-    public void inscribir(Group grupo) { state.inscribir(this, grupo); }
-    public void aprobar()   { state.aprobar(this); }
-    public void reprobar()  { state.reprobar(this); }
-    public void retirar()   { state.retirar(this); }
-    
-    public boolean puedeInscribirse() {
-        return state.puedeInscribirse();
-    }
-
-    public boolean estaCursando() {
-        return estadoColor == SemaforoColores.AMARILLO;
-    }
-    public boolean estaAprobada() {
-        return estadoColor == SemaforoColores.VERDE;
-    }
-    public boolean estaReprobada() {
-        return estadoColor == SemaforoColores.ROJO;
-    }
-
-    public int getId() { return subject.getId(); }
+    public int getGrade() { return grade; }
+    public List<SubjectStateProcess> getHistory() { return new ArrayList<>(history); }
 }

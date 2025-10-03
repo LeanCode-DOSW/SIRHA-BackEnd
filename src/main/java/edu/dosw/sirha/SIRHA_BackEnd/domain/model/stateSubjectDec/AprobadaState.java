@@ -11,44 +11,21 @@ public class AprobadaState implements SubjectState {
         materia.setEstadoColor(SemaforoColores.VERDE);
     }
 
-    @Override
-    public void setSemestre(SubjectDecorator materia, int semestre) {
-        throw new IllegalStateException("No se puede cambiar semestre de materia aprobada");
-    }
-    @Override
-    public void setGroup(SubjectDecorator materia, Group grupo) {
-        throw new IllegalStateException("No se puede asignar grupo a materia aprobada");
-    }
+    public void setSemester(SubjectDecorator materia, int semestre) {throw new IllegalStateException("No se puede cambiar semestre de materia aprobada");}
+    public void setGroup(SubjectDecorator materia, Group grupo) {throw new IllegalStateException("No se puede asignar grupo a materia aprobada");}
+    public void setGrade(SubjectDecorator materia, int grade) {throw new IllegalStateException("No se puede cambiar la nota de una materia aprobada");}
+    public void setInscripcion(SubjectDecorator materia, Group grupo) {throw new IllegalStateException("No se puede inscribir una materia ya aprobada");}
+    public void inscribir(SubjectDecorator materia, Group grupo) {throw new IllegalStateException("No se puede inscribir una materia ya aprobada");}
+    public void aprobar(SubjectDecorator materia) {System.out.println("Ya está aprobada.");}
+    public void reprobar(SubjectDecorator materia) {throw new IllegalStateException("No se puede reprobar una materia aprobada");}
+    public void retirar(SubjectDecorator materia) {throw new IllegalStateException("No se puede retirar una materia aprobada");}
 
-    @Override
-    public void inscribir(SubjectDecorator materia, Group grupo) {
-        throw new IllegalStateException("No se puede inscribir una materia ya aprobada");
-    }
 
-    @Override
-    public void aprobar(SubjectDecorator materia) {
-        System.out.println("Ya está aprobada.");
-    }
-
-    @Override
-    public void reprobar(SubjectDecorator materia) {
-        throw new IllegalStateException("No se puede reprobar una materia aprobada");
-    }
-    @Override
-    public void retirar(SubjectDecorator materia) {
-        throw new IllegalStateException("No se puede retirar una materia aprobada");
-    }
     
-    @Override
     public boolean puedeInscribirse() { return false; }
-    @Override
     public boolean puedeAprobar() { return false; }
-    @Override
     public boolean puedeReprobar() { return false; }
-    @Override
     public boolean puedeRetirar() { return false; }
-    @Override
     public boolean tieneGrupoAsignado() { return true; }
-    @Override
     public String getEstadoNombre() { return "Aprobada"; }
 }

@@ -4,6 +4,7 @@ import edu.dosw.sirha.SIRHA_BackEnd.domain.model.*;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.RequestStateEnum;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateGroup.Group;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateRequest.*;
+import edu.dosw.sirha.SIRHA_BackEnd.domain.port.RequestProcess;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.port.RequestState;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -99,7 +100,7 @@ class BaseRequestTest {
         assertEquals(RequestStateEnum.APROBADA, cambioGrupo.getActualState());
         assertEquals(3, cambioGrupo.getProcesos().size());
         
-        ResponseProcess proceso = cambioGrupo.getActualProcess();
+        RequestProcess proceso = cambioGrupo.getActualProcess();
         assertEquals(RequestStateEnum.APROBADA, proceso.getEstado());
         assertEquals("Solicitud aprobada por disponibilidad de cupos", proceso.getComentario());
     }
@@ -115,7 +116,7 @@ class BaseRequestTest {
         assertEquals(RequestStateEnum.RECHAZADA, cambioMateria.getActualState());
         assertEquals(3, cambioMateria.getProcesos().size());
         
-        ResponseProcess proceso = cambioMateria.getActualProcess();
+        RequestProcess proceso = cambioMateria.getActualProcess();
         assertEquals(RequestStateEnum.RECHAZADA, proceso.getEstado());
         assertEquals("No cumple con los prerequisitos", proceso.getComentario());
     }
@@ -129,7 +130,7 @@ class BaseRequestTest {
         assertEquals(RequestStateEnum.EN_REVISION, cambioGrupo.getActualState());
         assertEquals(2, cambioGrupo.getProcesos().size());
         
-        ResponseProcess proceso = cambioGrupo.getActualProcess();
+        RequestProcess proceso = cambioGrupo.getActualProcess();
         assertEquals(RequestStateEnum.EN_REVISION, proceso.getEstado());
         assertEquals("Iniciando revisión", proceso.getComentario());
     }

@@ -330,7 +330,7 @@ class SirhaBackEndApplicationTests {
         assertNotNull(decorator);
         assertEquals("Programación", decorator.getName());
         assertEquals(001, decorator.getId());
-        assertEquals(3, decorator.getCreditos());
+        assertEquals(3, decorator.getCredits());
         assertNotNull(decorator.getGroups());
     }
     
@@ -369,8 +369,7 @@ class SirhaBackEndApplicationTests {
     @Test
     void testAcademicPeriod() {
         AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
-        period.setStartDateInscripciones(LocalDate.now());
-        period.setEndDateInscripciones(LocalDate.now().plusMonths(1));
+        period.setStartDatesInscripciones(LocalDate.now(), LocalDate.now().plusMonths(1));
 
         assertTrue(period.isActive());
         
@@ -381,7 +380,7 @@ class SirhaBackEndApplicationTests {
 
     }
 
-/*
+
     @Test
     void testNoCursadaStateTransitions() {
         Subject subject = new Subject(101, "Matemáticas", 4);
@@ -390,7 +389,9 @@ class SirhaBackEndApplicationTests {
         assertTrue(decorator.getState() instanceof NoCursadaState);
         assertEquals(SemaforoColores.GRIS, decorator.getEstadoColor());
         
-        decorator.inscribir();
+        AcademicPeriod academicPeriod = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
+        Group grupo = new Group(30, academicPeriod);
+        decorator.inscribir(grupo);
         assertTrue(decorator.getState() instanceof EnCursoState);
         assertEquals(SemaforoColores.AMARILLO, decorator.getEstadoColor());
     }
@@ -398,8 +399,10 @@ class SirhaBackEndApplicationTests {
     void testEnCursoStateTransitions() {
         Subject subject = new Subject(101, "Matemáticas", 4);
         SubjectDecorator decorator = new SubjectDecorator(subject);
-        
-        decorator.inscribir();
+
+        AcademicPeriod academicPeriod = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
+        Group grupo = new Group(30, academicPeriod);
+        decorator.inscribir(grupo);
         assertTrue(decorator.getState() instanceof EnCursoState);
         
         decorator.aprobar();
@@ -411,8 +414,10 @@ class SirhaBackEndApplicationTests {
         Subject subject = new Subject(101, "Matemáticas", 4);
         SubjectDecorator decorator = new SubjectDecorator(subject);
         
-        decorator.inscribir();
-        
+        AcademicPeriod academicPeriod = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
+        Group grupo = new Group(30, academicPeriod);
+        decorator.inscribir(grupo);
+
         decorator.reprobar();
         assertTrue(decorator.getState() instanceof ReprobadaState);
         assertEquals(SemaforoColores.ROJO, decorator.getEstadoColor());
@@ -421,8 +426,10 @@ class SirhaBackEndApplicationTests {
     void testEnCursoStateRetirar2() {
         Subject subject = new Subject(101, "Matemáticas", 4);
         SubjectDecorator decorator = new SubjectDecorator(subject);
-        
-        decorator.inscribir();
+
+        AcademicPeriod academicPeriod = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
+        Group grupo = new Group(30, academicPeriod);
+        decorator.inscribir(grupo);
         assertTrue(decorator.getState() instanceof EnCursoState);
         
         decorator.retirar();
@@ -434,11 +441,13 @@ class SirhaBackEndApplicationTests {
     void testAprobadaStateImmutable() {
         Subject subject = new Subject(101, "Matemáticas", 4);
         SubjectDecorator decorator = new SubjectDecorator(subject);
-        
-        decorator.inscribir();
+
+        AcademicPeriod academicPeriod = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
+        Group grupo = new Group(30, academicPeriod);
+        decorator.inscribir(grupo);
         decorator.aprobar();
-        
-        assertThrows(IllegalStateException.class, () -> decorator.inscribir());
+
+        assertThrows(IllegalStateException.class, () -> decorator.inscribir(grupo));
         assertThrows(IllegalStateException.class, () -> decorator.reprobar());
         assertThrows(IllegalStateException.class, () -> decorator.retirar());
     }
@@ -449,8 +458,10 @@ class SirhaBackEndApplicationTests {
         SubjectDecorator decorator = new SubjectDecorator(subject);
         
         assertTrue(decorator.puedeInscribirse()); 
-        
-        decorator.inscribir();
+
+        AcademicPeriod academicPeriod = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
+        Group grupo = new Group(30, academicPeriod);
+        decorator.inscribir(grupo);
         assertFalse(decorator.puedeInscribirse()); 
         
         assertTrue(decorator.estaCursando());
@@ -459,8 +470,7 @@ class SirhaBackEndApplicationTests {
         assertFalse(decorator.estaCursando()); 
         assertFalse(decorator.puedeInscribirse());
     }
-*/
-    // ============== COMPREHENSIVE TESTS FOR STATE SUBJECT DECORATOR ==============
+
     @Test
     void testSubjectDecoratorInitialState() {
         Subject subject = new Subject(101, "Matemáticas", 4);
@@ -468,9 +478,9 @@ class SirhaBackEndApplicationTests {
         
         assertNotNull(decorator);
         assertEquals("Matemáticas", decorator.getName());
-        assertEquals(4, decorator.getCreditos());
+        assertEquals(4, decorator.getCredits());
         assertEquals(SemaforoColores.GRIS, decorator.getEstadoColor());
-        assertEquals(0, decorator.getSemestre());
+        assertEquals(0, decorator.getSemester());
         assertTrue(decorator.getGroups().isEmpty());
         assertEquals(subject, decorator.getSubject());
     }
@@ -488,20 +498,22 @@ class SirhaBackEndApplicationTests {
         assertFalse(decorator.estaAprobada());
         assertFalse(decorator.estaReprobada());
     }
-/*
+
     @Test
     void testNoCursadaStateInscribir() {
         Subject subject = new Subject(101, "Matemáticas", 4);
         SubjectDecorator decorator = new SubjectDecorator(subject);
-        
-        decorator.inscribir();
-        
+
+        AcademicPeriod academicPeriod = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
+        Group grupo = new Group(30, academicPeriod);
+        decorator.inscribir(grupo);
+
         assertTrue(decorator.getState() instanceof EnCursoState);
         assertEquals(SemaforoColores.AMARILLO, decorator.getEstadoColor());
         assertTrue(decorator.estaCursando());
         assertFalse(decorator.puedeInscribirse());
     }
-*/
+
     @Test
     void testNoCursadaStateInvalidTransitions() {
         Subject subject = new Subject(101, "Matemáticas", 4);
@@ -511,13 +523,15 @@ class SirhaBackEndApplicationTests {
         assertThrows(IllegalStateException.class, () -> decorator.reprobar());
         assertThrows(IllegalStateException.class, () -> decorator.retirar());
     }
-/*
+
     @Test
     void testEnCursoStateProperties() {
         Subject subject = new Subject(101, "Matemáticas", 4);
         SubjectDecorator decorator = new SubjectDecorator(subject);
-        decorator.inscribir();
-        
+        AcademicPeriod academicPeriod = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
+        Group grupo = new Group(30, academicPeriod);
+        decorator.inscribir(grupo);
+
         assertTrue(decorator.getState() instanceof EnCursoState);
         assertEquals(SemaforoColores.AMARILLO, decorator.getEstadoColor());
         assertTrue(decorator.estaCursando());
@@ -530,8 +544,10 @@ class SirhaBackEndApplicationTests {
     void testEnCursoStateToAprobada() {
         Subject subject = new Subject(101, "Matemáticas", 4);
         SubjectDecorator decorator = new SubjectDecorator(subject);
-        decorator.inscribir();
-        
+        AcademicPeriod academicPeriod = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
+        Group grupo = new Group(30, academicPeriod);
+        decorator.inscribir(grupo);
+
         decorator.aprobar();
         
         assertTrue(decorator.getState() instanceof AprobadaState);
@@ -545,8 +561,10 @@ class SirhaBackEndApplicationTests {
     void testEnCursoStateToReprobada() {
         Subject subject = new Subject(101, "Matemáticas", 4);
         SubjectDecorator decorator = new SubjectDecorator(subject);
-        decorator.inscribir();
-        
+        AcademicPeriod academicPeriod = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
+        Group grupo = new Group(30, academicPeriod);
+        decorator.inscribir(grupo);
+
         decorator.reprobar();
         
         assertTrue(decorator.getState() instanceof ReprobadaState);
@@ -560,8 +578,10 @@ class SirhaBackEndApplicationTests {
     void testEnCursoStateRetirar() {
         Subject subject = new Subject(101, "Matemáticas", 4);
         SubjectDecorator decorator = new SubjectDecorator(subject);
-        decorator.inscribir();
-        
+        AcademicPeriod academicPeriod = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
+        Group grupo = new Group(30, academicPeriod);
+        decorator.inscribir(grupo);
+
         decorator.retirar();
         
         assertTrue(decorator.getState() instanceof NoCursadaState);
@@ -574,16 +594,20 @@ class SirhaBackEndApplicationTests {
     void testEnCursoStateInvalidInscribir() {
         Subject subject = new Subject(101, "Matemáticas", 4);
         SubjectDecorator decorator = new SubjectDecorator(subject);
-        decorator.inscribir();
-        
-        assertThrows(IllegalStateException.class, () -> decorator.inscribir());
+        AcademicPeriod academicPeriod = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
+        Group grupo = new Group(30, academicPeriod);
+        decorator.inscribir(grupo);
+
+        assertThrows(IllegalStateException.class, () -> decorator.inscribir(grupo));
     }
 
     @Test
     void testAprobadaStateProperties() {
         Subject subject = new Subject(101, "Matemáticas", 4);
         SubjectDecorator decorator = new SubjectDecorator(subject);
-        decorator.inscribir();
+        AcademicPeriod academicPeriod = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
+        Group grupo = new Group(30, academicPeriod);
+        decorator.inscribir(grupo);
         decorator.aprobar();
         
         assertTrue(decorator.getState() instanceof AprobadaState);
@@ -598,10 +622,12 @@ class SirhaBackEndApplicationTests {
     void testAprobadaStateImmutableTransitions() {
         Subject subject = new Subject(101, "Matemáticas", 4);
         SubjectDecorator decorator = new SubjectDecorator(subject);
-        decorator.inscribir();
+        AcademicPeriod academicPeriod = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
+        Group grupo = new Group(30, academicPeriod);
+        decorator.inscribir(grupo);
         decorator.aprobar();
         
-        assertThrows(IllegalStateException.class, () -> decorator.inscribir());
+        assertThrows(IllegalStateException.class, () -> decorator.inscribir(grupo));
         assertThrows(IllegalStateException.class, () -> decorator.reprobar());
         assertThrows(IllegalStateException.class, () -> decorator.retirar());
     }
@@ -610,7 +636,9 @@ class SirhaBackEndApplicationTests {
     void testReprobadaStateProperties() {
         Subject subject = new Subject(101, "Matemáticas", 4);
         SubjectDecorator decorator = new SubjectDecorator(subject);
-        decorator.inscribir();
+        AcademicPeriod academicPeriod = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
+        Group grupo = new Group(30, academicPeriod);
+        decorator.inscribir(grupo);
         decorator.reprobar();
         
         assertTrue(decorator.getState() instanceof ReprobadaState);
@@ -625,11 +653,13 @@ class SirhaBackEndApplicationTests {
     void testReprobadaStateReInscribir() {
         Subject subject = new Subject(101, "Matemáticas", 4);
         SubjectDecorator decorator = new SubjectDecorator(subject);
-        decorator.inscribir();
+        AcademicPeriod academicPeriod = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
+        Group grupo = new Group(30, academicPeriod);
+        decorator.inscribir(grupo);
         decorator.reprobar();
-        
-        decorator.inscribir();
-        
+
+        decorator.inscribir(grupo);
+
         assertTrue(decorator.getState() instanceof EnCursoState);
         assertEquals(SemaforoColores.AMARILLO, decorator.getEstadoColor());
         assertTrue(decorator.estaCursando());
@@ -639,7 +669,9 @@ class SirhaBackEndApplicationTests {
     void testReprobadaStateInvalidTransitions() {
         Subject subject = new Subject(101, "Matemáticas", 4);
         SubjectDecorator decorator = new SubjectDecorator(subject);
-        decorator.inscribir();
+        AcademicPeriod academicPeriod = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
+        Group grupo = new Group(30, academicPeriod);
+        decorator.inscribir(grupo);
         decorator.reprobar();
         
         assertThrows(IllegalStateException.class, () -> decorator.reprobar());
@@ -653,15 +685,18 @@ class SirhaBackEndApplicationTests {
         
         assertTrue(decorator.getState() instanceof NoCursadaState);
         assertTrue(decorator.puedeInscribirse());
-        
-        decorator.inscribir();
+
+        AcademicPeriod academicPeriod = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
+        Group grupo = new Group(30, academicPeriod);
+        decorator.inscribir(grupo);
         assertTrue(decorator.getState() instanceof EnCursoState);
         assertTrue(decorator.estaCursando());
         
         decorator.retirar();
         assertTrue(decorator.getState() instanceof NoCursadaState);
-        
-        decorator.inscribir();
+
+        Group grupo1 = new Group(30, academicPeriod);
+        decorator.inscribir(grupo1);
         assertTrue(decorator.getState() instanceof EnCursoState);
         
         decorator.aprobar();
@@ -673,13 +708,14 @@ class SirhaBackEndApplicationTests {
     void testFailureAndRetryLifecycle() {
         Subject subject = new Subject(101, "Matemáticas", 4);
         SubjectDecorator decorator = new SubjectDecorator(subject);
-        
-        decorator.inscribir();
+        AcademicPeriod academicPeriod = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
+        Group grupo = new Group(30, academicPeriod);
+        decorator.inscribir(grupo);
         decorator.reprobar();
         assertTrue(decorator.getState() instanceof ReprobadaState);
         assertTrue(decorator.estaReprobada());
-        
-        decorator.inscribir();
+
+        decorator.inscribir(grupo);
         assertTrue(decorator.getState() instanceof EnCursoState);
         
         decorator.aprobar();
@@ -695,11 +731,13 @@ class SirhaBackEndApplicationTests {
         List<Class<?>> stateHistory = new ArrayList<>();
         
         stateHistory.add(decorator.getState().getClass());
-        decorator.inscribir();
+        AcademicPeriod academicPeriod = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
+        Group grupo = new Group(30, academicPeriod);
+        decorator.inscribir(grupo);
         stateHistory.add(decorator.getState().getClass());
         decorator.retirar();
         stateHistory.add(decorator.getState().getClass());
-        decorator.inscribir();
+        decorator.inscribir(grupo);
         stateHistory.add(decorator.getState().getClass());
         decorator.reprobar();
         stateHistory.add(decorator.getState().getClass());
@@ -717,14 +755,16 @@ class SirhaBackEndApplicationTests {
         SubjectDecorator decorator = new SubjectDecorator(subject);
         
         assertEquals(SemaforoColores.GRIS, decorator.getEstadoColor());
-        
-        decorator.inscribir();
+
+        AcademicPeriod academicPeriod = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
+        Group grupo = new Group(30, academicPeriod);
+        decorator.inscribir(grupo);
         assertEquals(SemaforoColores.AMARILLO, decorator.getEstadoColor());
         
         decorator.retirar();
         assertEquals(SemaforoColores.GRIS, decorator.getEstadoColor());
         
-        decorator.inscribir();
+        decorator.inscribir(grupo);
         decorator.aprobar();
         assertEquals(SemaforoColores.VERDE, decorator.getEstadoColor());
     }
@@ -733,12 +773,14 @@ class SirhaBackEndApplicationTests {
     void testStateColorConsistencyAfterFailure() {
         Subject subject = new Subject(101, "Matemáticas", 4);
         SubjectDecorator decorator = new SubjectDecorator(subject);
-        
-        decorator.inscribir();
+        AcademicPeriod academicPeriod = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
+        Group grupo = new Group(30, academicPeriod);
+        decorator.inscribir(grupo);
         decorator.reprobar();
         assertEquals(SemaforoColores.ROJO, decorator.getEstadoColor());
+        assertEquals(ReprobadaState.class, decorator.getState().getClass());
         
-        decorator.inscribir();
+        decorator.inscribir(grupo);
         assertEquals(SemaforoColores.AMARILLO, decorator.getEstadoColor());
     }
 
@@ -751,11 +793,12 @@ class SirhaBackEndApplicationTests {
         SubjectDecorator mathDecorator = new SubjectDecorator(math);
         SubjectDecorator physicsDecorator = new SubjectDecorator(physics);
         SubjectDecorator chemistryDecorator = new SubjectDecorator(chemistry);
-        
-        mathDecorator.inscribir();
+        AcademicPeriod academicPeriod = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
+        Group grupo = new Group(30, academicPeriod);
+        mathDecorator.inscribir(grupo);
         mathDecorator.aprobar();
-        
-        physicsDecorator.inscribir();
+
+        physicsDecorator.inscribir(grupo);
         physicsDecorator.reprobar();
         
         
@@ -775,8 +818,9 @@ class SirhaBackEndApplicationTests {
         
         NoCursadaState initialState = (NoCursadaState) decorator.getState();
         assertNotNull(initialState);
-        
-        decorator.inscribir();
+        AcademicPeriod academicPeriod = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
+        Group grupo = new Group(30, academicPeriod);
+        decorator.inscribir(grupo);
         EnCursoState enrolledState = (EnCursoState) decorator.getState();
         assertNotNull(enrolledState);
         assertNotSame(initialState, enrolledState);
@@ -797,9 +841,11 @@ class SirhaBackEndApplicationTests {
         
         assertNotSame(decorator1.getState(), decorator2.getState());
         
-        decorator1.inscribir();
-        decorator2.inscribir();
-        
+        AcademicPeriod academicPeriod = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
+        Group grupo = new Group(30, academicPeriod);
+        decorator1.inscribir(grupo);
+        decorator2.inscribir(grupo);
+
         assertNotSame(decorator1.getState(), decorator2.getState());
         
         assertEquals(decorator1.getState().getClass(), decorator2.getState().getClass());
@@ -812,8 +858,9 @@ class SirhaBackEndApplicationTests {
         SubjectDecorator decorator = new SubjectDecorator(subject);
         
         assertTrue(decorator.getState() instanceof NoCursadaState);
-        
-        decorator.inscribir();
+        AcademicPeriod academicPeriod = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
+        Group grupo = new Group(30, academicPeriod);
+        decorator.inscribir(grupo);
         assertTrue(decorator.getState() instanceof EnCursoState);
         
         decorator.retirar();
@@ -830,20 +877,21 @@ class SirhaBackEndApplicationTests {
     void testEnCursoStateAllTransitions() {
         Subject subject = new Subject(101, "Matemáticas", 4);
         SubjectDecorator decorator = new SubjectDecorator(subject);
-        
-        decorator.inscribir();
+        AcademicPeriod academicPeriod = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
+        Group grupo = new Group(30, academicPeriod);
+        decorator.inscribir(grupo);
         assertTrue(decorator.getState() instanceof EnCursoState);
         
-        assertThrows(IllegalStateException.class, () -> decorator.inscribir());
+        assertThrows(IllegalStateException.class, () -> decorator.inscribir(grupo));
         assertTrue(decorator.getState() instanceof EnCursoState);
         
         SubjectDecorator decorator2 = new SubjectDecorator(new Subject(102, "Física", 3));
-        decorator2.inscribir();
+        decorator2.inscribir(grupo);
         decorator2.aprobar();
         assertTrue(decorator2.getState() instanceof AprobadaState);
         
         SubjectDecorator decorator3 = new SubjectDecorator(new Subject(103, "Química", 4));
-        decorator3.inscribir();
+        decorator3.inscribir(grupo);
         decorator3.reprobar();
         assertTrue(decorator3.getState() instanceof ReprobadaState);
         
@@ -855,12 +903,13 @@ class SirhaBackEndApplicationTests {
     void testAprobadaStateAllTransitions() {
         Subject subject = new Subject(101, "Matemáticas", 4);
         SubjectDecorator decorator = new SubjectDecorator(subject);
-        
-        decorator.inscribir();
+        AcademicPeriod academicPeriod = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
+        Group grupo = new Group(30, academicPeriod);
+        decorator.inscribir(grupo);
         decorator.aprobar();
         assertTrue(decorator.getState() instanceof AprobadaState);
         
-        assertThrows(IllegalStateException.class, () -> decorator.inscribir());
+        assertThrows(IllegalStateException.class, () -> decorator.inscribir(grupo));
         assertThrows(IllegalStateException.class, () -> decorator.reprobar());
         assertThrows(IllegalStateException.class, () -> decorator.retirar());
         
@@ -873,11 +922,13 @@ class SirhaBackEndApplicationTests {
         Subject subject = new Subject(101, "Matemáticas", 4);
         SubjectDecorator decorator = new SubjectDecorator(subject);
         
-        decorator.inscribir();
+        AcademicPeriod academicPeriod = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
+        Group grupo = new Group(30, academicPeriod);
+        decorator.inscribir(grupo);
         decorator.reprobar();
         assertTrue(decorator.getState() instanceof ReprobadaState);
-        
-        decorator.inscribir();
+
+        decorator.inscribir(grupo);
         assertTrue(decorator.getState() instanceof EnCursoState);
         
         decorator.reprobar();
@@ -900,8 +951,10 @@ class SirhaBackEndApplicationTests {
         assertFalse(decorator.estaCursando());
         assertFalse(decorator.estaAprobada());
         assertFalse(decorator.estaReprobada());
-        
-        decorator.inscribir();
+
+        AcademicPeriod academicPeriod = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
+        Group grupo = new Group(30, academicPeriod);
+        decorator.inscribir(grupo);
         assertTrue(decorator.getState() instanceof EnCursoState);
         assertFalse(decorator.puedeInscribirse());
         assertTrue(decorator.estaCursando());
@@ -914,8 +967,8 @@ class SirhaBackEndApplicationTests {
         assertFalse(decorator.estaCursando());
         assertFalse(decorator.estaAprobada());
         assertTrue(decorator.estaReprobada());
-        
-        decorator.inscribir();
+
+        decorator.inscribir(grupo);
         decorator.aprobar();
         assertTrue(decorator.getState() instanceof AprobadaState);
         assertFalse(decorator.puedeInscribirse());
@@ -930,20 +983,22 @@ class SirhaBackEndApplicationTests {
         SubjectDecorator decorator = new SubjectDecorator(subject);
         
         assertEquals(SemaforoColores.GRIS, decorator.getEstadoColor());
-        
-        decorator.inscribir();
+
+        AcademicPeriod academicPeriod = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
+        Group grupo = new Group(30, academicPeriod);
+        decorator.inscribir(grupo);
         assertEquals(SemaforoColores.AMARILLO, decorator.getEstadoColor());
         
         decorator.reprobar();
         assertEquals(SemaforoColores.ROJO, decorator.getEstadoColor());
-        
-        decorator.inscribir();
+
+        decorator.inscribir(grupo);
         assertEquals(SemaforoColores.AMARILLO, decorator.getEstadoColor());
         
         decorator.aprobar();
         assertEquals(SemaforoColores.VERDE, decorator.getEstadoColor());
     }
-*/
+
     @Test
     void testInvalidTransitionsPreserveState() {
         Subject subject = new Subject(101, "Matemáticas", 4);
@@ -960,22 +1015,24 @@ class SirhaBackEndApplicationTests {
         assertEquals(originalColor, decorator.getEstadoColor());
         assertEquals(originalStateClass, decorator.getState().getClass());
     }
-/*
+
     @Test
     void testReprobadaStateSpecificBehavior() {
         Subject subject = new Subject(101, "Matemáticas", 4);
         SubjectDecorator decorator = new SubjectDecorator(subject);
-        
-        decorator.inscribir();
+
+        AcademicPeriod academicPeriod = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
+        Group grupo = new Group(30, academicPeriod);
+        decorator.inscribir(grupo);
         decorator.reprobar();
         
         assertTrue(decorator.estaReprobada());
-        assertTrue(decorator.puedeInscribirse()); // Key difference from AprobadaState
+        assertTrue(decorator.puedeInscribirse()); 
         assertFalse(decorator.estaCursando());
         assertFalse(decorator.estaAprobada());
         assertEquals(SemaforoColores.ROJO, decorator.getEstadoColor());
-        
-        decorator.inscribir(); // Should work
+
+        decorator.inscribir(grupo);
         assertTrue(decorator.getState() instanceof EnCursoState);
     }
 
@@ -983,19 +1040,24 @@ class SirhaBackEndApplicationTests {
     void testEnCursoStateMultipleExitPaths() {
         Subject subject1 = new Subject(101, "Math", 4);
         SubjectDecorator decorator1 = new SubjectDecorator(subject1);
-        decorator1.inscribir();
+        AcademicPeriod academicPeriod = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
+
+        Group grupo = new Group(30, academicPeriod);
+        decorator1.inscribir(grupo);
         decorator1.aprobar();
         assertTrue(decorator1.getState() instanceof AprobadaState);
         
         Subject subject2 = new Subject(102, "Physics", 3);
         SubjectDecorator decorator2 = new SubjectDecorator(subject2);
-        decorator2.inscribir();
+        Group grupo2 = new Group(30, academicPeriod);
+        decorator2.inscribir(grupo2);
         decorator2.reprobar();
         assertTrue(decorator2.getState() instanceof ReprobadaState);
         
         Subject subject3 = new Subject(103, "Chemistry", 4);
         SubjectDecorator decorator3 = new SubjectDecorator(subject3);
-        decorator3.inscribir();
+        Group grupo3 = new Group(30, academicPeriod);
+        decorator3.inscribir(grupo3);
         decorator3.retirar();
         assertTrue(decorator3.getState() instanceof NoCursadaState);
     }
@@ -1011,19 +1073,21 @@ class SirhaBackEndApplicationTests {
         } catch (IllegalStateException e) {
             assertNotNull(e.getMessage());
         }
-        
-        decorator.inscribir();
+
+        AcademicPeriod academicPeriod = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
+        Group grupo = new Group(30, academicPeriod);
+        decorator.inscribir(grupo);
         decorator.aprobar();
         
         try {
-            decorator.inscribir();
+            decorator.inscribir(grupo);
             fail("Should have thrown IllegalStateException");
         } catch (IllegalStateException e) {
             assertNotNull(e.getMessage());
         }
     } 
 
-*/
+
     @Test
     void testNoCursadaStateCanMethods() {
         Subject subject = new Subject(101, "Matemáticas", 4);
@@ -1038,35 +1102,23 @@ class SirhaBackEndApplicationTests {
         assertFalse(decorator.getState().tieneGrupoAsignado());
         assertEquals("No Cursada", decorator.getState().getEstadoNombre());
     }
-
-    @Test
-    void testNoCursadaStateSetSemestre() {
-        Subject subject = new Subject(101, "Matemáticas", 4);
-        SubjectDecorator decorator = new SubjectDecorator(subject);
-        
-        assertTrue(decorator.getState() instanceof NoCursadaState);
-        
-        decorator.getState().setSemestre(decorator, 3);
-        assertEquals(3, decorator.getSemestre());
-        
-        decorator.getState().setSemestre(decorator, 5);
-        assertEquals(5, decorator.getSemestre());
-    }
-    /*
+    
     @Test
     void testAprobadaSetSemestre() {
         Subject subject = new Subject(101, "Matemáticas", 4);
         SubjectDecorator decorator = new SubjectDecorator(subject);
-        decorator.inscribir();
+        AcademicPeriod academicPeriod = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
+        Group grupo = new Group(30, academicPeriod);
+        decorator.inscribir(grupo);
         decorator.aprobar();
         assertTrue(decorator.getState() instanceof AprobadaState);
 
         assertThrows(IllegalStateException.class, () -> {
-            decorator.getState().setSemestre(decorator, 4);
+            decorator.setSemester(4);
         });
-        Group grupo = new Group(30, new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4)));
+        Group grupo1 = new Group(30, new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4)));
         assertThrows(IllegalStateException.class, () -> {
-            decorator.setGroup(grupo);
+            decorator.setGroup(grupo1);
         });
         decorator.aprobar();
     }
@@ -1075,23 +1127,33 @@ class SirhaBackEndApplicationTests {
     void testReprobadaSetSemestre() {
         Subject subject = new Subject(101, "Matemáticas", 4);
         SubjectDecorator decorator = new SubjectDecorator(subject);
-        decorator.inscribir();
+        AcademicPeriod academicPeriod = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
+        Group grupo = new Group(30, academicPeriod);
+        decorator.inscribir(grupo);
         decorator.reprobar();
         assertTrue(decorator.getState() instanceof ReprobadaState);
 
         assertThrows(IllegalStateException.class, () -> {
-            decorator.getState().setSemestre(decorator, 4);
+            decorator.setSemester(4);
         });
-        Group grupo = new Group(30, new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4)));
+        Group grupo1 = new Group(30, new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4)));
         assertThrows(IllegalStateException.class, () -> {
-            decorator.setGroup(grupo);
+            decorator.setGroup(grupo1);
         });
         assertThrows(IllegalStateException.class, () -> {
-            decorator.reprobar();
+            decorator.setGrade(00);
         });
+        assertEquals(SemaforoColores.ROJO, decorator.getLastStateProcess().getState());
+        decorator.inscribir(grupo1);
+        decorator.setGrade(50);
+        decorator.setSemester(4);
         decorator.aprobar();
+        assertTrue(decorator.getState() instanceof AprobadaState);
+        assertEquals(4, decorator.getSemester());
+        assertEquals(50, decorator.getGrade());
+        assertEquals(SemaforoColores.VERDE, decorator.getLastStateProcess().getState());
     }
-    */
+    
 
     @Test
     void testNoCursadaStateSetGroupValid() {
@@ -1103,9 +1165,9 @@ class SirhaBackEndApplicationTests {
         
         assertTrue(decorator.getState() instanceof NoCursadaState);
         assertNull(decorator.getGroup());
-        
-        decorator.setGroup(grupo);;
-        assertNotNull(decorator.getGroup());
+
+        assertThrows(IllegalStateException.class, () -> decorator.setGroup(grupo));
+        assertNull(decorator.getGroup());
     }
 
     @Test
@@ -1114,21 +1176,23 @@ class SirhaBackEndApplicationTests {
         SubjectDecorator decorator = new SubjectDecorator(subject);
         
         assertTrue(decorator.getState() instanceof NoCursadaState);
-        
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+
+        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> {
             decorator.getState().setGroup(decorator, null);
         });
         
-        assertEquals("El grupo no puede ser nulo", exception.getMessage());
+        assertEquals("No se puede asignar grupo a materia no cursada", exception.getMessage());
     }
 
-    /*
+    
     @Test
     void testEnCursoStateCanMethods() {
         Subject subject = new Subject(101, "Matemáticas", 4);
         SubjectDecorator decorator = new SubjectDecorator(subject);
-        
-        decorator.inscribir();
+        AcademicPeriod academicPeriod = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
+        Group grupo = new Group(30, academicPeriod);
+        decorator.inscribir(grupo);
+
         assertTrue(decorator.getState() instanceof EnCursoState);
         
         assertFalse(decorator.getState().puedeInscribirse());
@@ -1144,14 +1208,18 @@ class SirhaBackEndApplicationTests {
         Subject subject = new Subject(101, "Matemáticas", 4);
         SubjectDecorator decorator = new SubjectDecorator(subject);
         
-        decorator.inscribir();
+        AcademicPeriod academicPeriod = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
+        Group grupo = new Group(30, academicPeriod);
+
+        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> {
+            decorator.setSemester(4);
+        });
+        decorator.inscribir(grupo);
         assertTrue(decorator.getState() instanceof EnCursoState);
         
-        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> {
-            decorator.getState().setSemestre(decorator, 4);
-        });
+        decorator.setSemester(4);
         
-        assertEquals("No se puede cambiar semestre mientras está en curso", exception.getMessage());
+        assertEquals("No se puede cambiar semestre de materia no cursada", exception.getMessage());
     }
 
     @Test
@@ -1160,15 +1228,14 @@ class SirhaBackEndApplicationTests {
         SubjectDecorator decorator = new SubjectDecorator(subject);
         AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
         Group grupo = new Group(30, period);
-
-        decorator.inscribir();
-        assertTrue(decorator.getState() instanceof EnCursoState);
-        
         IllegalStateException exception = assertThrows(IllegalStateException.class, () -> {
-            decorator.setGroup(grupo);;
+            decorator.setGroup(grupo);
         });
-        
-        assertEquals("La materia ya tiene un grupo asignado", exception.getMessage());
+        decorator.inscribir(grupo);
+        decorator.setGroup(grupo);
+        assertTrue(decorator.getState() instanceof EnCursoState);
+        assertEquals(grupo, decorator.getGroup());
+        assertEquals("No se puede asignar grupo a materia no cursada", exception.getMessage());
     }
 
     @Test
@@ -1176,7 +1243,9 @@ class SirhaBackEndApplicationTests {
         Subject subject = new Subject(101, "Matemáticas", 4);
         SubjectDecorator decorator = new SubjectDecorator(subject);
         
-        decorator.inscribir();
+        AcademicPeriod academicPeriod = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
+        Group grupo = new Group(30, academicPeriod);
+        decorator.inscribir(grupo);
         decorator.aprobar();
         assertTrue(decorator.getState() instanceof AprobadaState);
         
@@ -1193,7 +1262,9 @@ class SirhaBackEndApplicationTests {
         Subject subject = new Subject(101, "Matemáticas", 4);
         SubjectDecorator decorator = new SubjectDecorator(subject);
         
-        decorator.inscribir();
+        AcademicPeriod academicPeriod = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
+        Group grupo = new Group(30, academicPeriod);
+        decorator.inscribir(grupo);
         decorator.reprobar();
         assertTrue(decorator.getState() instanceof ReprobadaState);
         
@@ -1213,12 +1284,11 @@ class SirhaBackEndApplicationTests {
         Group grupo = new Group(30, period);
 
         assertTrue(decorator.getState().puedeInscribirse());
-        decorator.getState().setSemestre(decorator, 2);
-        decorator.setGroup(grupo);;
-        assertEquals(2, decorator.getSemestre());
-        assertNotNull(decorator.getGroup());
-        
-        decorator.inscribir();
+                
+        AcademicPeriod academicPeriod = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
+        Group grupo1 = new Group(30, academicPeriod);
+        decorator.inscribir(grupo1);
+        decorator.setGroup(grupo);
         assertFalse(decorator.getState().puedeInscribirse());
         assertTrue(decorator.getState().puedeAprobar());
         assertTrue(decorator.getState().puedeReprobar());
@@ -1237,17 +1307,23 @@ class SirhaBackEndApplicationTests {
         SubjectDecorator decorator = new SubjectDecorator(subject);
         
         assertEquals("No Cursada", decorator.getState().getEstadoNombre());
-        
-        decorator.inscribir();
+
+        AcademicPeriod academicPeriod = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
+        Group grupo = new Group(30, academicPeriod);
+        decorator.inscribir(grupo);
         assertEquals("En Curso", decorator.getState().getEstadoNombre());
         
         SubjectDecorator decorator2 = new SubjectDecorator(new Subject(102, "Física", 3));
-        decorator2.inscribir();
+        AcademicPeriod academicPeriod2 = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
+        Group grupo2 = new Group(30, academicPeriod2);
+        decorator2.inscribir(grupo2);
         decorator2.aprobar();
         assertEquals("Aprobada", decorator2.getState().getEstadoNombre());
         
         SubjectDecorator decorator3 = new SubjectDecorator(new Subject(103, "Química", 4));
-        decorator3.inscribir();
+        AcademicPeriod academicPeriod3 = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
+        Group grupo3 = new Group(30, academicPeriod3);
+        decorator3.inscribir(grupo3);
         decorator3.reprobar();
         assertEquals("Reprobada", decorator3.getState().getEstadoNombre());
     }
@@ -1261,10 +1337,11 @@ class SirhaBackEndApplicationTests {
 
         assertFalse(decorator.getState().tieneGrupoAsignado());
         
-        decorator.setGroup(grupo);;
+        
         assertFalse(decorator.getState().tieneGrupoAsignado());
         
-        decorator.inscribir();
+        decorator.inscribir(grupo);
+        decorator.setGroup(grupo);
         assertTrue(decorator.getState().tieneGrupoAsignado());
         
         decorator.aprobar();
@@ -1272,11 +1349,12 @@ class SirhaBackEndApplicationTests {
         
         SubjectDecorator decorator2 = new SubjectDecorator(new Subject(102, "Física", 3));
         Group grupo2 = new Group(30, period);
-        decorator2.getState().setGroup(decorator2, grupo2);
+        
         assertFalse(decorator2.getState().tieneGrupoAsignado());
-        decorator2.inscribir();
+        decorator2.inscribir(grupo2);
+        decorator2.setGroup(grupo2);
         decorator2.reprobar();
-        assertTrue(decorator2.getState().tieneGrupoAsignado());  //aunque reprobo aun tiene grupo asignado
+        assertTrue(decorator2.getState().tieneGrupoAsignado()); 
     }
 
     @Test
@@ -1285,13 +1363,42 @@ class SirhaBackEndApplicationTests {
         SubjectDecorator programacionDecorator = new SubjectDecorator(programacion);
         
         assertEquals("Programación I", programacionDecorator.getName());
-        assertEquals(5, programacionDecorator.getCreditos());
+        assertEquals(5, programacionDecorator.getCredits());
         assertNotNull(programacionDecorator.getGroups());
-        
-        programacionDecorator.inscribir();
-        programacionDecorator.setSemestreMateria(1);
+
+        AcademicPeriod academicPeriod = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
+        Group grupo = new Group(30, academicPeriod);
+        programacionDecorator.inscribir(grupo, 1);
+        programacionDecorator.setSemester(2);
         
         assertEquals(SemaforoColores.AMARILLO, programacionDecorator.getEstadoColor());
-        assertEquals(1, programacionDecorator.getSemestre());
-    }*/
+        assertEquals(2, programacionDecorator.getSemester());
+    }
+    @Test
+    void testAcademicPeriodMethods() {
+        LocalDate startDate = LocalDate.of(2024, 1, 1);
+        LocalDate endDate = LocalDate.of(2024, 6, 30);
+        AcademicPeriod period = new AcademicPeriod("2024-1", startDate, endDate);
+        period.setId(1);
+
+        period.setStartDatesInscripciones(startDate.minusMonths(1), startDate.minusDays(10));
+
+        assertEquals("2024-1", period.getPeriodo());
+        assertEquals(startDate, period.getStartDate());
+        assertEquals(endDate, period.getEndDate());
+
+        assertFalse(period.isActive());
+        assertFalse(period.isPeriodInscripcionesAbiertas());
+        assertEquals(startDate, period.getStartDate());
+        assertEquals(endDate, period.getEndDate());
+        assertEquals(startDate.minusMonths(1), period.getStartDateInscripciones());
+        assertEquals(startDate.minusDays(10), period.getEndDateInscripciones());
+
+        period.toString();
+
+        assertTrue(period.equals(period));
+        assertFalse(period.equals(null));
+        assertFalse(period.equals(new AcademicPeriod("2024-2", startDate, endDate)));
+        assertTrue(period.equals(new AcademicPeriod("2024-1", startDate, endDate)));
+    }
 }
