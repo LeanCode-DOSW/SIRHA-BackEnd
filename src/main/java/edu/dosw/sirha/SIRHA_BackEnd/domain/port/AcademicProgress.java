@@ -3,6 +3,7 @@ package edu.dosw.sirha.SIRHA_BackEnd.domain.port;
 import java.util.List;
 import java.util.Collection;
 
+import edu.dosw.sirha.SIRHA_BackEnd.domain.model.StudyPlan;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.Subject;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.SemaforoColores;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateGroup.Group;
@@ -81,7 +82,7 @@ public interface AcademicProgress {
     int getMateriasReprobadasCount();
     int getMateriasNoCursadasCount();
 
-
+    StudyPlan getStudyPlan();
     void enrollSubjectInGroup(Subject subject, Group group);
     //void unenrollSubjectFromGroup(Subject subject, Group group);
 }

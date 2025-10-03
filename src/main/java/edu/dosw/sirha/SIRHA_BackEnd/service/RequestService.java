@@ -3,7 +3,7 @@ package edu.dosw.sirha.SIRHA_BackEnd.service;
 import java.util.List;
 import java.util.Optional;
 
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.BaseRequest;
+import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateRequest.BaseRequest;
 
 public interface RequestService {
     List<BaseRequest> findAll();

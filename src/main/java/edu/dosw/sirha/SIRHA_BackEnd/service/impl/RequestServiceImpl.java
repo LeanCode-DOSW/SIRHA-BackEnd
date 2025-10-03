@@ -1,6 +1,6 @@
 package edu.dosw.sirha.SIRHA_BackEnd.service.impl;
 
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.BaseRequest;
+import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateRequest.BaseRequest;
 import edu.dosw.sirha.SIRHA_BackEnd.repository.mongo.RequestMongoRepository;
 import edu.dosw.sirha.SIRHA_BackEnd.service.RequestService;
 import org.springframework.stereotype.Service;

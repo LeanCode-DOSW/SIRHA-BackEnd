@@ -8,7 +8,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document(collection = "academic_periods")
 public class AcademicPeriod {
     @Id
-    private String id;
+    private int id;
     private String periodo; // "2024-1"
     private LocalDate startDate;
     private LocalDate endDate;
@@ -37,27 +37,23 @@ public class AcademicPeriod {
                !hoy.isBefore(startDateInscripciones) && 
                !hoy.isAfter(endDateInscripciones);
     }
-    public String getId() { return id; }
-    public void setId(String id) { this.id = id; }
+    public int getId() { return id; }
+    public void setId(int id) { this.id = id; }
 
     public String getPeriodo() { return periodo; }
-    public void setPeriodo(String periodo) { this.periodo = periodo; }
 
     public LocalDate getStartDate() { return startDate; }
-    public void setStartDate(LocalDate startDate) { this.startDate = startDate; }
 
     public LocalDate getEndDate() { return endDate; }
-    public void setEndDate(LocalDate endDate) { this.endDate = endDate; }
 
     public LocalDate getStartDateInscripciones() { return startDateInscripciones; }
-    public void setStartDateInscripciones(LocalDate startDateInscripciones) { 
+    public LocalDate getEndDateInscripciones() { return endDateInscripciones; }
+    public void setStartDatesInscripciones(LocalDate startDateInscripciones, LocalDate endDateInscripciones) { 
         this.startDateInscripciones = startDateInscripciones; 
+        this.endDateInscripciones = endDateInscripciones;
     }
 
-    public LocalDate getEndDateInscripciones() { return endDateInscripciones; }
-    public void setEndDateInscripciones(LocalDate endDateInscripciones) { 
-        this.endDateInscripciones = endDateInscripciones; 
-    }
+    
     
     public boolean isActivo() { 
         return !startDate.isAfter(LocalDate.now()) && !endDate.isBefore(LocalDate.now());
@@ -68,7 +64,9 @@ public class AcademicPeriod {
         if (this == obj) return true;
         if (obj == null || getClass() != obj.getClass()) return false;
         AcademicPeriod that = (AcademicPeriod) obj;
-        return Objects.equals(id, that.id);
+        return Objects.equals(periodo, that.periodo) &&
+               Objects.equals(startDate, that.startDate) &&
+               Objects.equals(endDate, that.endDate);
     }
 
     @Override

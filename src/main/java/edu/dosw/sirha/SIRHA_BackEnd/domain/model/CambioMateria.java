@@ -1,5 +1,7 @@
 package edu.dosw.sirha.SIRHA_BackEnd.domain.model;
 
+import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateRequest.BaseRequest;
+
 public class CambioMateria extends BaseRequest {
 
     private Subject oldSubject;

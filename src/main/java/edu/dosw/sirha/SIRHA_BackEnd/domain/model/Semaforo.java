@@ -44,6 +44,11 @@ public class Semaforo implements AcademicProgress {
     public StudyPlan getStudyPlan() {
         return studyPlan;
     }
+
+    public int getStudyPlanSubjectsCount() {
+        return studyPlan.getSubjects().size();
+    }
+    
     public List<SubjectDecorator> getMateriasAprobadas() {
         return subjects.values().stream()
             .filter(s -> s.getEstadoColor() == SemaforoColores.VERDE)
@@ -88,14 +93,14 @@ public class Semaforo implements AcademicProgress {
     public int getCreditosPorColor(SemaforoColores color) {
         return subjects.values().stream()
             .filter(s -> s.getEstadoColor() == color)
-            .mapToInt(SubjectDecorator::getCreditos)
+            .mapToInt(SubjectDecorator::getCredits)
             .sum();
     }
 
     public List<SubjectDecorator> getMateriasPorSemestre(int semestre) {
         List<SubjectDecorator> materiasSemestre = new ArrayList<>();
         for (SubjectDecorator sd : subjects.values()) {
-            if (sd.getSemestre() == semestre) {
+            if (sd.getSemester() == semestre) {
                 materiasSemestre.add(sd);
             }
         }
@@ -168,13 +173,16 @@ public class Semaforo implements AcademicProgress {
     @Override
     public void enrollSubjectInGroup(Subject subject, Group group) {
         if (subject == null || group == null) {
+            System.out.println("Error: La materia y el grupo no pueden ser nulos");
             throw new IllegalArgumentException("La materia y el grupo no pueden ser nulos");
         }
         SubjectDecorator decorator = subjects.get(subject.getName());
         if (decorator == null) {
+            System.out.println("Error: La materia no está en el semáforo");
             throw new IllegalArgumentException("La materia no está en el semáforo");
         }
         if (!subject.isHasGroup(group)) {
+            System.out.println("Error: El grupo no pertenece a la materia especificada");
             throw new IllegalArgumentException("El grupo no pertenece a la materia especificada");
         }
         decorator.inscribir(group);

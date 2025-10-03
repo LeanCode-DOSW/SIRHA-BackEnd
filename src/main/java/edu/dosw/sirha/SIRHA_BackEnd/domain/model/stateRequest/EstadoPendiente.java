@@ -1,6 +1,5 @@
 package edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateRequest;
 
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.BaseRequest;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.RequestStateEnum;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.port.RequestState;
 
@@ -16,7 +15,7 @@ public class EstadoPendiente implements RequestState {
     public void pendingRequest(BaseRequest solicitud) {throw new IllegalStateException("La solicitud ya está en estado pendiente.");}
 
     @Override
-    public void reviewRequest(BaseRequest solicitud) {}
+    public void reviewRequest(BaseRequest solicitud) { }
 
     @Override
     public RequestStateEnum getState() {

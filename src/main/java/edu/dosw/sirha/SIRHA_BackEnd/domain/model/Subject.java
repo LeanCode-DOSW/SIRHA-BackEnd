@@ -21,20 +21,20 @@ public class Subject {
     @Id
     private int id;
     private String name;
-    private int creditos;
+    private int credits;
     private List<Group> groups;
     private List<PrerequisiteRule> prerequisites;
 
-    public Subject(int id, String name, int creditos) {
+    public Subject(int id, String name, int credits) {
         if (name == null || name.isBlank()) {
             throw new IllegalArgumentException("El nombre de la materia no puede estar vacío");
         }
-        if (creditos <= 0) {
+        if (credits <= 0) {
             throw new IllegalArgumentException("La materia debe tener al menos 1 crédito");
         }
         this.id = id;
         this.name = name;
-        this.creditos = creditos;
+        this.credits = credits;
         this.groups = new ArrayList<>();
         this.prerequisites = new ArrayList<>();
     }
@@ -52,47 +52,40 @@ public class Subject {
     /**
      * Elimina un grupo de la materia.
      */
-    public boolean removeGroup(Group g) {
-        return groups.remove(g);
-    }
+    public boolean removeGroup(Group g) {return groups.remove(g);}
+    public boolean isHasGroup(Group group){return groups.contains(group);}
 
-    // ---------- Getters y Setters ----------
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
+    
+    public void setId(int id) {this.id = id;}
     public void setName(String name) {
-        if (name == null || name.isBlank()) {
-            throw new IllegalArgumentException("El nombre no puede estar vacío");
-        }
+        if (name == null || name.isBlank()) {throw new IllegalArgumentException("El nombre no puede estar vacío");}
         this.name = name;
     }
-
-    public int getCreditos() {
-        return creditos;
+    public void setCredits(int credits) {
+        if (credits <= 0) {throw new IllegalArgumentException("La materia debe tener al menos 1 crédito");}
+        this.credits = credits;
     }
+    public void setPrerequisites(List<PrerequisiteRule> prerequisites) {this.prerequisites = prerequisites;}
 
-    public void setCreditos(int creditos) {
-        if (creditos <= 0) {
-            throw new IllegalArgumentException("La materia debe tener al menos 1 crédito");
+    
+
+    public int getId() {return id;}
+    public String getName() {return name;}
+    public String getNombre(){return name;}
+    public List<Group> getGrupos(){return groups;}
+    public List<PrerequisiteRule> getPrerequisites() {return prerequisites;}
+    public List<Group> getGroups() {return groups;}
+    public int getCredits() {return credits;}
+
+    public boolean canEnroll(AcademicProgress progress) {
+        if (prerequisites.isEmpty()) {
+            return true;
         }
-        this.creditos = creditos;
+        return prerequisites.stream().allMatch(rule -> rule.canEnroll(this, progress));
     }
+    public boolean hasPrerequisites() {return !prerequisites.isEmpty();}
+    public void addPrerequisite(PrerequisiteRule prerequisite) {this.prerequisites.add(prerequisite);}
 
-    public List<Group> getGroups() {
-        return groups;
-    }
-
-    // ---------- equals, hashCode y toString ----------
 
     @Override
     public boolean equals(Object o) {
@@ -101,51 +94,13 @@ public class Subject {
         Subject subject = (Subject) o;
         return Objects.equals(id, subject.id);
     }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id);
-    }
-
     @Override
     public String toString() {
         return "Subject{" +
                 "id='" + id + '\'' +
                 ", name='" + name + '\'' +
-                ", creditos=" + creditos +
+                ", credits=" + credits +
                 ", grupos=" + groups.size() +
                 '}';
     }
-    public String getNombre(){
-        return name;
-    }
-
-    public List<Group> getGrupos(){
-        return groups;
-    }
-    public boolean isHasGroup(Group group){
-        return groups.contains(group);
-    }
-
-
-    public List<PrerequisiteRule> getPrerequisites() {
-        return prerequisites;
-    }
-
-    public void setPrerequisites(List<PrerequisiteRule> prerequisites) {
-        this.prerequisites = prerequisites;
-    }
-    public boolean canEnroll(AcademicProgress progress) {
-        if (prerequisites.isEmpty()) {
-            return true;
-        }
-        return prerequisites.stream().allMatch(rule -> rule.canEnroll(this, progress));
-    }
-    public boolean hasPrerequisites() {
-        return !prerequisites.isEmpty();
-    }
-    public void addPrerequisite(PrerequisiteRule prerequisite) {
-        this.prerequisites.add(prerequisite);
-    }
-    
 }

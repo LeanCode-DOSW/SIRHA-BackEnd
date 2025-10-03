@@ -9,5 +9,6 @@ public interface RequestProcess {
     RequestStateEnum getEstado();
     LocalDateTime getCreadoEn();
     void setEstado(RequestStateEnum estado, String comentario);
-
+    void setEstado(RequestStateEnum estado);
+    String getComentario();
 }

@@ -1,6 +1,5 @@
 package edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateRequest;
 
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.BaseRequest;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.RequestStateEnum;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.port.RequestState;
 

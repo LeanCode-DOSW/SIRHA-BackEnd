@@ -89,16 +89,16 @@ class RequestTest {
     void testPrerequisiteValidation() {
         AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
 
-        StudyPlan studyPlan = new StudyPlan("Ingeniería de Sistemas");
-        Subject prerequisite = new Subject(100, "Álgebra", 3);
+        StudyPlan studyPlan = new StudyPlan("Ingenieria de Sistemas");
+        Subject prerequisite = new Subject(100, "Algebra", 3);
         MustHaveApprovedSubject rule = new MustHaveApprovedSubject(prerequisite);
-        Subject mainSubject = new Subject(101, "Cálculo", 4);
+        Subject mainSubject = new Subject(101, "Calculo", 4);
         
 
-        Group group = new Group(30, period);
+        Group group1 = new Group(30, period);
         Group group2 = new Group(25, period);
 
-        prerequisite.addGroup(group);
+        prerequisite.addGroup(group1);
         mainSubject.addGroup(group2);
 
         studyPlan.addSubject(prerequisite);
@@ -109,6 +109,15 @@ class RequestTest {
         Student student = new Student(1, "juan.perez", "juan@example.com", "hashedPassword", "20231001");
         Semaforo semaforo = new Semaforo(studyPlan);
         student.setAcademicProgress(semaforo);
+        student.setCurrentPeriod(period);
+
+
+        assertNotNull(student.getAcademicProgress());
+        assertEquals(2, student.getAcademicProgress().getSubjects().size());
+        assertEquals(2, student.getAcademicProgress().getMateriasNoCursadas().size());
+        assertTrue(student.getAcademicProgress().hasSubject(mainSubject));
+        assertTrue(student.getAcademicProgress().hasSubject(prerequisite));
+
 
         assertThrows(IllegalStateException.class, () -> {
             student.enrollSubject(mainSubject, group2);
@@ -117,8 +126,12 @@ class RequestTest {
         assertTrue(mainSubject.hasPrerequisites());
         assertTrue(mainSubject.getPrerequisites().contains(rule));
 
-        student.enrollSubject(prerequisite, group);
-        student.enrollSubject(mainSubject, group2); //deberia funcionar porque ya tiene el prerequisito
+        student.enrollSubject(prerequisite, group1);   
+        
+        student.getAcademicProgress().getMateriasCursando().get(0).aprobar();   // AQUI USAR METODO APROVAR MATERIA DESDE STUDENT
+        
+
+        student.enrollSubject(mainSubject, group2);
 
         assertTrue(student.hasSubject(prerequisite));
         assertTrue(student.hasSubject(mainSubject));
@@ -155,49 +168,7 @@ class RequestTest {
         assertTrue(studyPlan.hasSubject(subject2));
         assertTrue(studyPlan.hasSubject(subject3));
     }
-    /* 
-    @Test
-    void testCompleteEnrollmentFlow() {
-        Student student = new Student(1, "juan.perez", "juan@example.com", "hashedPassword", "20231001");
-        AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
-        Subject subject = new Subject(101, "Matemáticas", 4);
-        
-        StudyPlan studyPlan = new StudyPlan("Ingeniería de Sistemas");
-        studyPlan.addSubject(subject);
 
-        Semaforo semaforo = new Semaforo(studyPlan);
-        student.setAcademicProgress(semaforo);
-        
-        Group group = new Group(30, period);
-        
-        SubjectDecorator decorator = new SubjectDecorator(subject);
-        
-        assertTrue(decorator.getState() instanceof NoCursadaState);
-        assertTrue(decorator.getState().puedeInscribirse());
-        assertTrue(group.isOpen());
-        assertTrue(studyPlan.hasSubject(subject));
-        
-        decorator.inscribir();
-
-        assertTrue(decorator.getState() instanceof EnCursoState);
-        assertTrue(student.hasSubject(decorator));
-    }
-
-    @Test
-    void testSubjectDecoratorStateValidation() {
-        Subject subject = new Subject(101, "Matemáticas", 4);
-        SubjectDecorator decorator = new SubjectDecorator(subject);
-        
-        assertTrue(decorator.getState() instanceof NoCursadaState);
-        assertTrue(decorator.getState().puedeInscribirse());
-        assertFalse(decorator.getState().puedeAprobar());
-        
-        decorator.inscribir();
-        assertTrue(decorator.getState() instanceof EnCursoState);
-        assertFalse(decorator.getState().puedeInscribirse());
-        assertTrue(decorator.getState().puedeAprobar());
-    }
-    */
     @Test
     void testBaseRequestFlow() {
         Student student = new Student(1, "juan.perez", "juan@example.com", "hashedPassword", "20231001");
@@ -219,4 +190,5 @@ class RequestTest {
         assertEquals("RECHAZADA", RequestStateEnum.RECHAZADA.toString());
         assertEquals("EN_REVISION", RequestStateEnum.EN_REVISION.toString());
     }
+    
 }

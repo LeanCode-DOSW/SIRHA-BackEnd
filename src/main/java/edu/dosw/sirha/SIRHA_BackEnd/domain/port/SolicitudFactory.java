@@ -1,8 +1,8 @@
 package edu.dosw.sirha.SIRHA_BackEnd.domain.port;
 
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.BaseRequest;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.Subject;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateGroup.Group;
+import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateRequest.BaseRequest;
 
 public interface SolicitudFactory {
     //Request createSolicitudCambioGrupo(Subject subject, Group newGroup);
