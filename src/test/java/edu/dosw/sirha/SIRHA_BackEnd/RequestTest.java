@@ -219,4 +219,5 @@ class RequestTest {
         assertEquals("RECHAZADA", RequestStateEnum.RECHAZADA.toString());
         assertEquals("EN_REVISION", RequestStateEnum.EN_REVISION.toString());
     }
+    
 }

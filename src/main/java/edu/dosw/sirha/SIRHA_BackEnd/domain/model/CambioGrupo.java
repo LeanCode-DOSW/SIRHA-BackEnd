@@ -1,6 +1,7 @@
 package edu.dosw.sirha.SIRHA_BackEnd.domain.model;
 
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateGroup.Group;
+import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateRequest.BaseRequest;
 
 public class CambioGrupo extends BaseRequest {
     private Subject subject;
@@ -10,6 +11,7 @@ public class CambioGrupo extends BaseRequest {
         super(student, currentPeriod);
         this.subject = subject;
         this.group = group;
+        
     }
 
     @Override

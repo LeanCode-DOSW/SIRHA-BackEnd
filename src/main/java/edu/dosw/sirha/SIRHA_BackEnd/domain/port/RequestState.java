@@ -1,7 +1,7 @@
 package edu.dosw.sirha.SIRHA_BackEnd.domain.port;
 
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.BaseRequest;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.RequestStateEnum;
+import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateRequest.BaseRequest;
 
 public interface RequestState {
     void approveRequest(BaseRequest solicitud);

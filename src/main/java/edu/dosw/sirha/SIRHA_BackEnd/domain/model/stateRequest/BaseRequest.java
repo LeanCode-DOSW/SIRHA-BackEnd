@@ -1,9 +1,12 @@
-package edu.dosw.sirha.SIRHA_BackEnd.domain.model;
+package edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateRequest;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import edu.dosw.sirha.SIRHA_BackEnd.domain.model.AcademicPeriod;
+import edu.dosw.sirha.SIRHA_BackEnd.domain.model.ResponseProcess;
+import edu.dosw.sirha.SIRHA_BackEnd.domain.model.Student;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.*;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.port.*;
 
@@ -40,6 +43,8 @@ public abstract class BaseRequest implements Request {
         this.student = student;
         setCurrentPeriod(currentPeriod);
         this.procesos = new ArrayList<>();
+        state = new EstadoPendiente();
+        changeState(new ResponseProcess(RequestStateEnum.PENDIENTE, "Solicitud creada y en estado pendiente."));
     }
 
     public void agregarProceso(ResponseProcess proceso) {
@@ -50,9 +55,6 @@ public abstract class BaseRequest implements Request {
         return procesos;
     }
 
-    public void setEstado(RequestState estado) {
-        state = estado;
-    }
     public RequestState getEstado() {
         return state;
     }
@@ -66,18 +68,22 @@ public abstract class BaseRequest implements Request {
 
     public void approveRequest(String comentario){
         state.approveRequest(this);
+        state = new EstadoAprobada();
         changeState(new ResponseProcess(RequestStateEnum.APROBADA, comentario));
     }
     public void rejectRequest(String comentario){
         state.rejectRequest(this);
+        state = new EstadoRechazada();
         changeState(new ResponseProcess(RequestStateEnum.RECHAZADA, comentario));
     }
     public void pendingRequest(String comentario){
         state.pendingRequest(this);
+        state = new EstadoPendiente();
         changeState(new ResponseProcess(RequestStateEnum.PENDIENTE, comentario));
     }
     public void reviewRequest(String comentario){
         state.reviewRequest(this);
+        state = new EstadoEnRevision();
         changeState(new ResponseProcess(RequestStateEnum.EN_REVISION, comentario));
     }
 
@@ -86,15 +92,12 @@ public abstract class BaseRequest implements Request {
         setActualState(proceso.getEstado());
     }
 
-
-
-
     
     public String getId() {return id;}
 
     public ResponseProcess getActualProcess(){return procesos.get(procesos.size() - 1);}
     public RequestStateEnum getActualState(){return getActualProcess().getEstado();}
-    public void setActualState(RequestStateEnum estado){getActualProcess().setEstado(estado);}
+    private void setActualState(RequestStateEnum estado){getActualProcess().setEstado(estado);}
 
     /**
      * Obtiene la fecha y hora de creación de la solicitud.
