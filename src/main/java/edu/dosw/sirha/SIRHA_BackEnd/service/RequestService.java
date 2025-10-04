@@ -13,4 +13,6 @@ public interface RequestService {
     void rechazarSolicitud(String id);
 
     void rejectRequest(String id);
+
+    void approveRequest(String id);
 }

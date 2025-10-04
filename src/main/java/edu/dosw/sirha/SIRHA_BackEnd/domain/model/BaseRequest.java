@@ -31,8 +31,6 @@ import edu.dosw.sirha.SIRHA_BackEnd.domain.port.*;
  *
  * @see RequestState
  * @see Request
- * @see GroupChangeRequest
- * @see CourseChangeRequest
  */
 public abstract class BaseRequest implements Request {
     private String id;
