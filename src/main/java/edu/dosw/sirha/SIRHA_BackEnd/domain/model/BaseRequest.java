@@ -1,150 +1,162 @@
 package edu.dosw.sirha.SIRHA_BackEnd.domain.model;
 
 import java.time.LocalDateTime;
-
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.*;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.port.*;
 
 /**
- * Clase abstracta base para todas las solicitudes académicas en el sistema SIRHA.
- * 
- * Esta clase define la estructura común y comportamiento básico para todos los tipos
- * de solicitudes que pueden realizar los estudiantes, como cambios de grupo,
- * cambios de materia, solicitudes de reinscripción, etc.
- * 
- * Implementa el patrón Template Method, donde define la estructura común de las
- * solicitudes y delega la implementación específica de aprobar() y rechazar()
- * a las clases concretas.
- * 
- * Características principales:
- * - Sistema de prioridades para ordenamiento de solicitudes
- * - Estados bien definidos (PENDIENTE, APROBADA, RECHAZADA)
- * - Timestamp automático de creación
- * - Interface común para todas las solicitudes
- * 
- * Estados de solicitud:
- * - PENDIENTE: Solicitud creada, esperando revisión
- * - APROBADA: Solicitud aceptada y procesada
- * - RECHAZADA: Solicitud denegada con razón específica
- * 
+ * Abstract base class for all academic requests in the SIRHA system.
+ *
+ * This class defines the common structure and base behavior for all types
+ * of requests that students may submit, such as:
+ * - Group change requests
+ * - Course change requests
+ * - Re-enrollment requests
+ *
+ * It follows the Template Method pattern, providing the general workflow
+ * for requests and delegating the specific implementations of {@link #approve()}
+ * and {@link #reject()} to concrete subclasses.
+ *
+ * Key features:
+ * - Priority system for request ordering
+ * - Well-defined states (PENDING, APPROVED, REJECTED, UNDER_REVIEW)
+ * - Automatic creation timestamp
+ * - Shared contract for all request types
+ *
+ * Possible request states:
+ * - {@link RequestState#PENDING}: Newly created request, waiting for review
+ * - {@link RequestState#APPROVED}: Request accepted and processed
+ * - {@link RequestState#REJECTED}: Request denied with a reason
+ * - {@link RequestState#UNDER_REVIEW}: Request currently being evaluated
+ *
  * @see RequestState
  * @see Request
- * @see CambioGrupo
- * @see CambioMateria
+ * @see GroupChangeRequest
+ * @see CourseChangeRequest
  */
 public abstract class BaseRequest implements Request {
     private String id;
-    private int prioridad;
-    private RequestState estado;
-    private LocalDateTime creadoEn;
+    private int priority;
+    private RequestState state;
+    private LocalDateTime createdAt;
 
     /**
-     * Constructor base para todas las solicitudes.
-     * 
-     * Inicializa una solicitud con una prioridad específica y establece
-     * automáticamente el estado como PENDIENTE y el timestamp de creación.
-     * 
-     * @param prioridad nivel de prioridad de la solicitud.
+     * Base constructor for all requests.
+     *
+     * Initializes a request with the specified priority,
+     * default state {@link RequestState#PENDING}, and sets
+     * the creation timestamp automatically.
+     *
+     * @param priority the priority level of the request (1-5).
      */
-    public BaseRequest(int prioridad) {
-        this.prioridad = prioridad;
-        this.estado = RequestState.PENDIENTE;
-        this.creadoEn = LocalDateTime.now();
+    public BaseRequest(int priority) {
+        this.priority = priority;
+        this.state = RequestState.PENDING;
+        this.createdAt = LocalDateTime.now();
     }
 
+    /**
+     * Approves the request.
+     * The specific approval logic must be implemented by subclasses.
+     */
+    public abstract void approve();
 
-    public abstract void aprobar();
-    public abstract void rechazar();
+    /**
+     * Rejects the request.
+     * The specific rejection logic must be implemented by subclasses.
+     */
+    public abstract void reject();
+
+    // ---------- Getters & Setters ----------
 
     public String getId() {
         return id;
     }
+
     public void setId(String id) {
         this.id = id;
     }
 
     /**
-     * Obtiene el nivel de prioridad de la solicitud.
-     * @return prioridad en escala 1-5
+     * Gets the priority level of the request.
+     *
+     * @return the priority level (1-5).
      */
-    public int getPrioridad() {
-        return prioridad;
+    public int getPriority() {
+        return priority;
     }
 
     /**
-     * Establece el nivel de prioridad de la solicitud.
-     * Solo se permite cambiar si la solicitud está pendiente.
-     * 
-     * @param prioridad nueva prioridad (1-5)
-     * @throws IllegalArgumentException si la prioridad está fuera del rango
-     * @throws IllegalStateException si la solicitud no está pendiente
+     * Sets the priority level of the request.
+     * Only allowed while the request is pending.
+     *
+     * @param priority new priority (1-5).
+     * @throws IllegalArgumentException if the priority is out of range.
      */
-    
-    public void setPrioridad(int prioridad) {
-        if (prioridad < 1 || prioridad > 5) {
-            throw new IllegalArgumentException("La prioridad debe estar entre 1 y 5");
+    public void setPriority(int priority) {
+        if (priority < 1 || priority > 5) {
+            throw new IllegalArgumentException("Priority must be between 1 and 5");
         }
-        /*
-        if (!puedeSerProcesada()) {
-            throw new IllegalStateException("No se puede cambiar la prioridad de una solicitud finalizada");
-        }
-            */
-        this.prioridad = prioridad;
+        this.priority = priority;
     }
 
     /**
-     * Obtiene el estado actual de la solicitud.
-     * @return estado de la solicitud
+     * Gets the current state of the request.
+     *
+     * @return the request state.
      */
-    public RequestState getEstado() {
-        return estado;
+    public RequestState getState() {
+        return state;
     }
 
     /**
-     * Establece el estado de la solicitud.
-     * Usado internamente por los métodos aprobar() y rechazar().
-     * 
-     * @param estado nuevo estado de la solicitud
-     * @throws IllegalArgumentException si el estado es null
+     * Sets the current state of the request.
+     * Intended to be used internally by {@link #approve()} and {@link #reject()}.
+     *
+     * @param state new request state.
+     * @throws IllegalArgumentException if the state is null.
      */
-    protected void setEstado(RequestState estado) {
-        if (estado == null) {
-            throw new IllegalArgumentException("El estado no puede ser null");
+    protected void setState(RequestState state) {
+        if (state == null) {
+            throw new IllegalArgumentException("State cannot be null");
         }
-        this.estado = estado;
+        this.state = state;
     }
 
     /**
-     * Obtiene la fecha y hora de creación de la solicitud.
-     * @return timestamp de creación
+     * Gets the timestamp of when the request was created.
+     *
+     * @return creation timestamp.
      */
-    public LocalDateTime getCreadoEn() {
-        return creadoEn;
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
     }
 
     /**
-     * Establece la fecha de creación de la solicitud.
-     * Usado para pruebas o migración de datos.
-     * 
-     * @param creadoEn nueva fecha de creación
-     * @throws IllegalArgumentException si la fecha es null o futura
+     * Sets the creation timestamp.
+     * Typically used for testing or data migration.
+     *
+     * @param createdAt new creation date and time.
+     * @throws IllegalArgumentException if the timestamp is null or in the future.
      */
-    public void setCreadoEn(LocalDateTime creadoEn) {
-        if (creadoEn == null) {
-            throw new IllegalArgumentException("La fecha de creación no puede ser null");
+    public void setCreatedAt(LocalDateTime createdAt) {
+        if (createdAt == null) {
+            throw new IllegalArgumentException("Creation date cannot be null");
         }
-        if (creadoEn.isAfter(LocalDateTime.now())) {
-            throw new IllegalArgumentException("La fecha de creación no puede ser futura");
+        if (createdAt.isAfter(LocalDateTime.now())) {
+            throw new IllegalArgumentException("Creation date cannot be in the future");
         }
-        this.creadoEn = creadoEn;
+        this.createdAt = createdAt;
     }
 
     /**
-     * Representación en string de la solicitud con información básica.
+     * Provides a string representation of the request with its basic information.
+     *
+     * @return formatted string including id, priority, state, and creation timestamp.
      */
     @Override
     public String toString() {
-        return String.format("%s{id='%s', prioridad=%d, estado=%s, creadoEn=%s}", 
-                            getClass().getSimpleName(), id, prioridad, estado, creadoEn);
+        return String.format("%s{id='%s', priority=%d, state=%s, createdAt=%s}",
+                getClass().getSimpleName(), id, priority, state, createdAt);
     }
 }
