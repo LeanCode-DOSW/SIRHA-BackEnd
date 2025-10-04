@@ -12,4 +12,6 @@ public interface GroupService {
     Optional<Group> findById(String id);
     Group save(Group group);
     void inscribirEstudiante(String groupId, Student student);
+
+    void enrollStudent(String groupId, Student student);
 }

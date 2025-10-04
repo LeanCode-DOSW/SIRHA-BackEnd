@@ -11,4 +11,6 @@ public interface RequestService {
     BaseRequest save(BaseRequest request);
     void aprobarSolicitud(String id);
     void rechazarSolicitud(String id);
+
+    void rejectRequest(String id);
 }
