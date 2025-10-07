@@ -5,11 +5,13 @@ import java.util.Optional;
 
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.Schedule;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.Student;
+import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.SemaforoColores;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.AcademicPeriod;
 import java.util.Map;
 import edu.dosw.sirha.SIRHA_BackEnd.dto.AuthResponse;
 import edu.dosw.sirha.SIRHA_BackEnd.dto.LoginRequest;
 import edu.dosw.sirha.SIRHA_BackEnd.dto.RegisterRequest;
+import edu.dosw.sirha.SIRHA_BackEnd.dto.SubjectDecoratorDTO;
 
 public interface StudentService {
     Optional<Student> login(String username, String password);
@@ -32,5 +34,7 @@ public interface StudentService {
     List<Schedule> getCurrentSchedule(String username);
     List<Schedule> getScheduleForPeriod(String username, String period);
     Map<AcademicPeriod,List<Schedule>> getAllSchedules(String username);
+
+    Map<SemaforoColores,List<SubjectDecoratorDTO>> getAcademicPensum(String username);
     
 }

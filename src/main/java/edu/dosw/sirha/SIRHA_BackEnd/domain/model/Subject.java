@@ -73,7 +73,6 @@ public class Subject {
 
     public String getId() {return id;}
     public String getName() {return name;}
-    public String getNombre(){return name;}
     public List<Group> getGrupos(){return groups;}
     public List<PrerequisiteRule> getPrerequisites() {return prerequisites;}
     public List<Group> getGroups() {return groups;}

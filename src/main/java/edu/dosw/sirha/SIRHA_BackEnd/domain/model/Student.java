@@ -18,6 +18,7 @@ import edu.dosw.sirha.SIRHA_BackEnd.domain.port.RequestTo;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.port.RequestProcess;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.port.ScheduleManager;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.port.SolicitudFactory;
+import edu.dosw.sirha.SIRHA_BackEnd.dto.SubjectDecoratorDTO;
 
 /**
  * Entidad del dominio que representa a un estudiante en el sistema SIRHA.
@@ -156,10 +157,6 @@ public class Student extends User implements SolicitudFactory, ScheduleManager, 
         return Objects.equals(codigo, student.codigo);
     }
     
-    public int hashCode() {
-        return Objects.hash(super.hashCode(), codigo);
-    }
-    
     public List<SubjectDecorator> getMateriasCursando() {
         if (this.academicProgress == null) {
             return new ArrayList<>();
@@ -167,18 +164,30 @@ public class Student extends User implements SolicitudFactory, ScheduleManager, 
         return academicProgress.getMateriasCursando();
     }
     public int getMateriasCursandoCount() {
+        if (academicProgress == null) {
+            throw new IllegalStateException("El progreso académico no está inicializado");
+        }
         return academicProgress.getMateriasCursandoCount();
     }
     
     public int getMateriasAprobadasCount() {
+        if (academicProgress == null) {
+            throw new IllegalStateException("El progreso académico no está inicializado");
+        }
         return academicProgress.getMateriasAprobadasCount();
     }
    
     public int getMateriasReprobadasCount() {
+        if (academicProgress == null) {
+            throw new IllegalStateException("El progreso académico no está inicializado");
+        }
         return academicProgress.getMateriasReprobadasCount();
     }
     
     public int getMateriasNoCursadasCount() {
+        if (academicProgress == null) {
+            throw new IllegalStateException("El progreso académico no está inicializado");
+        }
         return academicProgress.getMateriasNoCursadasCount();
     }
     
@@ -236,23 +245,6 @@ public class Student extends User implements SolicitudFactory, ScheduleManager, 
             .anyMatch(materia -> materia.getGroup().conflictoConHorario(nuevoGrupo));
     }
     
-    /**
-     * Obtiene todos los semestres únicos de las materias del estudiante.
-     * 
-     * @return conjunto de semestres ordenados
-     */
-    public List<Integer> getSemestresHistoricos() {
-        if (academicProgress == null) {
-            return new ArrayList<>();
-        }
-        
-        return academicProgress.getSubjects().stream()
-            .map(SubjectDecorator::getSemester)
-            .filter(s -> s > 0)
-            .distinct()
-            .sorted()
-            .toList();
-    }
     
     /**
      * Obtiene los horarios de las materias en curso (materias amarillas).
@@ -324,9 +316,6 @@ public class Student extends User implements SolicitudFactory, ScheduleManager, 
         }
         return hasSubject(subject.getSubject());
     }
-
-
-   
 
     public boolean canEnroll(Subject subject) {
         // 1. Verificar que la materia esté en el plan de estudios
@@ -454,6 +443,19 @@ public class Student extends User implements SolicitudFactory, ScheduleManager, 
     public String toString() {
         return String.format("Student{id='%s', username='%s', codigo='%s'}",
                             getId(), getUsername(), codigo);
+    }
+
+    @Override
+    public Map<SemaforoColores, List<SubjectDecoratorDTO>> getAcademicPensum() {
+        if (academicProgress == null) {
+            return Map.of(
+                SemaforoColores.VERDE, new ArrayList<>(),
+                SemaforoColores.AMARILLO, new ArrayList<>(),
+                SemaforoColores.ROJO, new ArrayList<>(),
+                SemaforoColores.GRIS, new ArrayList<>()
+            );
+        }
+        return academicProgress.getAcademicPensum();
     }
 
     
