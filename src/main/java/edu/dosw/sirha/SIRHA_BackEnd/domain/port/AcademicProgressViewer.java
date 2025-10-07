@@ -1,9 +1,11 @@
 package edu.dosw.sirha.SIRHA_BackEnd.domain.port;
 
 import java.util.List;
+import java.util.Map;
 
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.SemaforoColores;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateSubjectDec.SubjectDecorator;
+import edu.dosw.sirha.SIRHA_BackEnd.dto.SubjectDecoratorDTO;
 
 public interface AcademicProgressViewer {
     // Conteos por estado
@@ -17,7 +19,6 @@ public interface AcademicProgressViewer {
     
     // Consultas por semestre
     List<SubjectDecorator> getMateriasPorSemestre(int semestre);
-    List<Integer> getSemestresHistoricos();
     int getSemestreActual();
     
     // Créditos
@@ -26,5 +27,6 @@ public interface AcademicProgressViewer {
     
     // Resúmenes
     String getResumenAcademico();
+    Map<SemaforoColores, List<SubjectDecoratorDTO>> getAcademicPensum();
     
 }

@@ -2,13 +2,18 @@ package edu.dosw.sirha.SIRHA_BackEnd.controller;
 
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.Schedule;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.Student;
+import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.SemaforoColores;
 import edu.dosw.sirha.SIRHA_BackEnd.dto.StudentDTO;
+import edu.dosw.sirha.SIRHA_BackEnd.dto.SubjectDecoratorDTO;
 import edu.dosw.sirha.SIRHA_BackEnd.service.StudentService;
 import edu.dosw.sirha.SIRHA_BackEnd.util.MapperUtils;
+import io.micrometer.core.ipc.http.HttpSender.Response;
+import edu.dosw.sirha.SIRHA_BackEnd.domain.model.AcademicPeriod;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -123,8 +128,46 @@ public class StudentController {
 
     @GetMapping("/schedule/{username}")
     public ResponseEntity<List<Schedule>> getCurrentSchedule(@PathVariable String username){
-        return ResponseEntity.ok(studentService.getCurrentSchedule(username));
+        try {
+            List<Schedule> schedules = studentService.getCurrentSchedule(username);
+            return ResponseEntity.ok(schedules);
+        } catch (IllegalArgumentException e) {
+            // Retornar 404 cuando el estudiante no existe
+            return ResponseEntity.notFound().build();
+        }
     }
+    @GetMapping("/schedule/{username}/period")
+    public ResponseEntity<List<Schedule>> getScheduleForPeriod(@PathVariable String username, @RequestParam String period){
+        try {
+            List<Schedule> schedules = studentService.getScheduleForPeriod(username, period);
+            return ResponseEntity.ok(schedules);
+        } catch (IllegalArgumentException e) {
+            // Retornar 404 cuando el estudiante no existe
+            return ResponseEntity.notFound().build();
+        }
+    }
+    @GetMapping("/schedules/{username}")
+    public ResponseEntity<Map<AcademicPeriod,List<Schedule>>> getAllSchedules(@PathVariable String username){
+        try {
+            Map<AcademicPeriod,List<Schedule>> schedules = studentService.getAllSchedules(username);
+            return ResponseEntity.ok(schedules);
+        } catch (IllegalArgumentException e) {
+            // Retornar 404 cuando el estudiante no existe
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @GetMapping("/academicPensum/{username}")
+    public ResponseEntity<Map<SemaforoColores,List<SubjectDecoratorDTO>>> getAcademicPensum(@PathVariable String username){
+        try {
+            Map<SemaforoColores,List<SubjectDecoratorDTO>> pensum = studentService.getAcademicPensum(username);
+            return ResponseEntity.ok(pensum);
+        } catch (IllegalArgumentException e) {
+            // Retornar 404 cuando el estudiante no existe
+            return ResponseEntity.notFound().build();
+        }
+    }
+
 
     /**
      * Endpoint para crear un nuevo estudiante en el sistema.
@@ -139,27 +182,6 @@ public class StudentController {
      * - El username debe ser único en el sistema
      * - Los campos obligatorios no deben estar vacíos
      * 
-     * @param dto objeto StudentDTO con los datos del nuevo estudiante.
-     *           Debe contener al menos username y codigo válidos.
-     *           No debe ser null.
-     * @return StudentDTO del estudiante creado, incluyendo el ID asignado
-     * 
-     * @example
-     * POST /api/students
-     * Content-Type: application/json
-     * 
-     * {
-     *   "username": "carlos.ruiz",
-     *   "codigo": "202112347"
-     * }
-     * 
-     * Respuesta (200):
-     * {
-     *   "id": "generated-id-67890",
-     *   "username": "carlos.ruiz",
-     *   "codigo": "202112347",
-     *   "solicitudesIds": []
-     * }
      */
     @PostMapping
     public StudentDTO create(@RequestBody StudentDTO dto) {

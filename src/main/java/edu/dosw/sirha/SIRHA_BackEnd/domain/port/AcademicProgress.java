@@ -11,6 +11,7 @@ import edu.dosw.sirha.SIRHA_BackEnd.domain.model.Subject;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.SemaforoColores;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateGroup.Group;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateSubjectDec.SubjectDecorator;
+import edu.dosw.sirha.SIRHA_BackEnd.dto.SubjectDecoratorDTO;
 
 /**
  * Interface que define el contrato para el progreso académico de un estudiante.
@@ -89,6 +90,8 @@ public interface AcademicProgress {
     Map<AcademicPeriod, List<Schedule>> getAllSchedules();
     AcademicPeriod getCurrentAcademicPeriod();
     void setCurrentAcademicPeriod(AcademicPeriod period);
+
+    Map<SemaforoColores, List<SubjectDecoratorDTO>> getAcademicPensum();
     
     boolean verifyChangeGroup(Subject subject, Group newGroup);
     void enrollSubjectInGroup(Subject subject, Group group);

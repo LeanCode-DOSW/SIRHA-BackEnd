@@ -7,6 +7,7 @@ import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.SemaforoColores;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateGroup.Group;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateSubjectDec.SubjectDecorator;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.port.AcademicProgress;
+import edu.dosw.sirha.SIRHA_BackEnd.dto.SubjectDecoratorDTO;
 
 /**
  * Implementación del progreso académico que mantiene el estado de las materias
@@ -208,6 +209,29 @@ public class Semaforo implements AcademicProgress {
         subjects.values().forEach(sd -> { schedules.putIfAbsent(sd.getAcademicPeriod(), sd.getSchedules());
         });
         return schedules;
+    }
+
+    @Override
+    public Map<SemaforoColores, List<SubjectDecoratorDTO>> getAcademicPensum() {
+        Map<SemaforoColores, List<SubjectDecoratorDTO>> pensum = new HashMap<>();
+        
+        subjects.values().forEach(sd -> {
+            SemaforoColores color = sd.getEstadoColor();
+            pensum.putIfAbsent(color, new ArrayList<>());
+            
+            SubjectDecoratorDTO dto = new SubjectDecoratorDTO(
+                sd.getId(),
+                sd.getName(),
+                sd.getCredits(),
+                sd.getSemester(),
+                color,
+                sd.getGrade()
+            );
+            
+            pensum.get(color).add(dto);
+        });
+        
+        return pensum;
     }
 
 }

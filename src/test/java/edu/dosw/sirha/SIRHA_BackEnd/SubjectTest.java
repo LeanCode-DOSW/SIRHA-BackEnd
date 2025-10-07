@@ -127,10 +127,10 @@ public class SubjectTest {
         // ==================== MÉTODOS ADICIONALES (ALIAS) ====================
 
         @Test
-        public void getNombreTest() {
+        public void getNameTest() {
             Subject s = new Subject("101", "Matemáticas", 4);
-            assertEquals("Matemáticas", s.getNombre());
-            assertEquals(s.getName(), s.getNombre());
+            assertEquals("Matemáticas", s.getName());
+            assertEquals(s.getName(), s.getName());
         }
 
         @Test

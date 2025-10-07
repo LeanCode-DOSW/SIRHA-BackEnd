@@ -63,7 +63,7 @@ public class SubjectDecorator {
     public SubjectStateProcess getLastStateProcess() {return history.get(history.size() - 1);}
 
     public String getName() {return subject.getName();}
-    public int getCredits() {return subject.getCredits();}
+    public int getCredits() {return subject.getCredits();}    
     public List<Group> getGroups() {return subject.getGroups();}
     public String getId() { return subject.getId(); }
     public SemaforoColores getEstadoColor() {return estadoColor;}
