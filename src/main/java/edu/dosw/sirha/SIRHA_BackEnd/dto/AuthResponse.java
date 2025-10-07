@@ -4,14 +4,14 @@ package edu.dosw.sirha.SIRHA_BackEnd.dto;
  * DTO para respuestas de autenticación exitosa.
  */
 public class AuthResponse {
-    private int id;
+    private String id;
     private String username;
     private String email;
     private String codigo;
     private String message;
     private long timestamp;
 
-    public AuthResponse(int id, String username, String email, String codigo, String message) {
+    public AuthResponse(String id, String username, String email, String codigo, String message) {
         this.id = id;
         this.username = username;
         this.email = email;
@@ -19,9 +19,9 @@ public class AuthResponse {
         this.message = message;
         this.timestamp = System.currentTimeMillis();
     }
-    
-    public int getId() { return id; }
-    public void setId(int id) { this.id = id; }
+
+    public String getId() { return id; }
+    public void setId(String id) { this.id = id; }
 
     public String getUsername() { return username; }
     public void setUsername(String username) { this.username = username; }

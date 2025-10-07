@@ -10,7 +10,7 @@ import edu.dosw.sirha.SIRHA_BackEnd.domain.port.RequestProcess;
 public class ResponseProcess implements RequestProcess {
     @Id
     //@GeneratedValue
-    private int id;
+    private String id;
     
     private RequestStateEnum estado;
     private LocalDateTime creadoEn;
@@ -26,7 +26,7 @@ public class ResponseProcess implements RequestProcess {
 
     public String getComentario() {return comentario;}
     public void setComentario(String comentario) {this.comentario = comentario;}
-    public int getId() {return id;}
+    public String getId() {return id;}
     public RequestStateEnum getEstado() {return estado;}
     public LocalDateTime getCreadoEn() {return creadoEn;}
     public void setEstado(RequestStateEnum estado) {this.estado = estado;}

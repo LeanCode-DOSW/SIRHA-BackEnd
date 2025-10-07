@@ -163,7 +163,7 @@ public class GroupTests {
     void setCursoTest() {
         AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
         Group g = new Group(5, period);
-        Subject curso = new Subject(101, "Cálculo I", 4);
+        Subject curso = new Subject("101", "Cálculo I", 4);
         
         g.setCurso(curso);
 

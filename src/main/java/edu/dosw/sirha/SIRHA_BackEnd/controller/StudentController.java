@@ -1,9 +1,12 @@
 package edu.dosw.sirha.SIRHA_BackEnd.controller;
 
+import edu.dosw.sirha.SIRHA_BackEnd.domain.model.Schedule;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.Student;
 import edu.dosw.sirha.SIRHA_BackEnd.dto.StudentDTO;
 import edu.dosw.sirha.SIRHA_BackEnd.service.StudentService;
 import edu.dosw.sirha.SIRHA_BackEnd.util.MapperUtils;
+
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -118,6 +121,11 @@ public class StudentController {
                 .orElseThrow(() -> new RuntimeException("Estudiante no encontrado"));
     }
 
+    @GetMapping("/schedule/{username}")
+    public ResponseEntity<List<Schedule>> getCurrentSchedule(@PathVariable String username){
+        return ResponseEntity.ok(studentService.getCurrentSchedule(username));
+    }
+
     /**
      * Endpoint para crear un nuevo estudiante en el sistema.
      * 
@@ -155,7 +163,6 @@ public class StudentController {
      */
     @PostMapping
     public StudentDTO create(@RequestBody StudentDTO dto) {
-        // Crear nueva instancia de Student con datos del DTO
         Student newStudent = new Student(
             dto.getUsername(), 
             dto.getEmail(),  
@@ -163,7 +170,6 @@ public class StudentController {
             dto.getCodigo()
         );
         
-        // Guardar el estudiante y convertir a DTO para la respuesta
         Student savedStudent = studentService.save(newStudent);
         return MapperUtils.toDTO(savedStudent);
     }

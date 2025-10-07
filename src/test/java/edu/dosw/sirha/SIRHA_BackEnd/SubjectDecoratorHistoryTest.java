@@ -11,12 +11,13 @@ import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateSubjectDec.SubjectDecorato
 import edu.dosw.sirha.SIRHA_BackEnd.domain.port.SubjectStateProcess;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
 
 import java.time.LocalDate;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
-
+@SpringBootTest
 class SubjectDecoratorHistoryTest {
 
     private Subject subject;
@@ -26,7 +27,7 @@ class SubjectDecoratorHistoryTest {
 
     @BeforeEach
     void setUp() {
-        subject = new Subject(101, "Matemáticas", 4);
+        subject = new Subject("101", "Matemáticas", 4);
         decorator = new SubjectDecorator(subject);
         period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
         group = new Group(30, period);

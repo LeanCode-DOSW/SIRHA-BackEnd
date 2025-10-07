@@ -1,9 +1,13 @@
 package edu.dosw.sirha.SIRHA_BackEnd.service.impl;
 
+import edu.dosw.sirha.SIRHA_BackEnd.domain.model.Schedule;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.Student;
+import edu.dosw.sirha.SIRHA_BackEnd.domain.model.AcademicPeriod;
+import java.util.Map;
 import edu.dosw.sirha.SIRHA_BackEnd.dto.AuthResponse;
 import edu.dosw.sirha.SIRHA_BackEnd.dto.LoginRequest;
 import edu.dosw.sirha.SIRHA_BackEnd.dto.RegisterRequest;
+import edu.dosw.sirha.SIRHA_BackEnd.repository.mongo.AcademicPeriodMongoRepository;
 import edu.dosw.sirha.SIRHA_BackEnd.repository.mongo.StudentMongoRepository;
 import edu.dosw.sirha.SIRHA_BackEnd.service.StudentService;
 import edu.dosw.sirha.SIRHA_BackEnd.util.ValidationUtil;
@@ -16,9 +20,11 @@ import java.util.Optional;
 @Service
 public class StudentServiceImpl implements StudentService {
     private final StudentMongoRepository studentRepository;
+    private final AcademicPeriodMongoRepository academicPeriodRepository;
 
-    public StudentServiceImpl(StudentMongoRepository studentRepository) {
+    public StudentServiceImpl(StudentMongoRepository studentRepository, AcademicPeriodMongoRepository academicPeriodRepository) {
         this.studentRepository = studentRepository;
+        this.academicPeriodRepository = academicPeriodRepository;
     }
 
     @Override
@@ -128,5 +134,27 @@ public class StudentServiceImpl implements StudentService {
             student.getCodigo(),
             "Login exitoso"
         );
+    }
+
+    @Override
+    public List<Schedule> getCurrentSchedule(String username) {
+        return studentRepository.findByUsername(username)
+            .orElseThrow(() -> new IllegalArgumentException("Estudiante no encontrado"))
+            .getCurrentSchedule();
+    }
+
+    @Override
+    public List<Schedule> getScheduleForPeriod(String username, String period) {
+        
+        return studentRepository.findByUsername(username)
+            .orElseThrow(() -> new IllegalArgumentException("Estudiante no encontrado"))
+            .getScheduleForPeriod(academicPeriodRepository.findByPeriod(period)
+                .orElseThrow(() -> new IllegalArgumentException("Periodo académico no encontrado")));
+    }
+
+    @Override
+    public Map<AcademicPeriod, List<Schedule>> getAllSchedules(String username) {
+        return studentRepository.findByUsername(username)
+            .orElseThrow(() -> new IllegalArgumentException("Estudiante no encontrado")).getAllSchedules();
     }
 }

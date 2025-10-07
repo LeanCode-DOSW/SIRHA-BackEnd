@@ -1,8 +1,11 @@
 package edu.dosw.sirha.SIRHA_BackEnd.domain.port;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Collection;
 
+import edu.dosw.sirha.SIRHA_BackEnd.domain.model.AcademicPeriod;
+import edu.dosw.sirha.SIRHA_BackEnd.domain.model.Schedule;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.StudyPlan;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.Subject;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.SemaforoColores;
@@ -83,6 +86,10 @@ public interface AcademicProgress {
     int getMateriasNoCursadasCount();
 
     StudyPlan getStudyPlan();
+    Map<AcademicPeriod, List<Schedule>> getAllSchedules();
+    AcademicPeriod getCurrentAcademicPeriod();
+    void setCurrentAcademicPeriod(AcademicPeriod period);
+    
     boolean verifyChangeGroup(Subject subject, Group newGroup);
     void enrollSubjectInGroup(Subject subject, Group group);
     //void unenrollSubjectFromGroup(Subject subject, Group group);

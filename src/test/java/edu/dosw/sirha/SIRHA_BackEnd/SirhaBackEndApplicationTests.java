@@ -10,7 +10,6 @@ import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateSubjectDec.*;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.port.RequestTo;
 import edu.dosw.sirha.SIRHA_BackEnd.dto.StudentDTO;
 import edu.dosw.sirha.SIRHA_BackEnd.util.*;
-import io.micrometer.core.ipc.http.HttpSender.Request;
 
 import java.util.*;
 import java.time.LocalDate;
@@ -105,9 +104,10 @@ class SirhaBackEndApplicationTests {
     @Test
     void testFromStudentDTO() {
         StudentDTO dto = new StudentDTO();
-        dto.setId(67890);
+        dto.setId("67890");
         dto.setUsername("maria.garcia");
         dto.setCodigo("EST002");
+        dto.setEmail("maria.garcia@example.com");
         
         Student student = MapperUtils.fromDTOnewStudent(dto);
         
@@ -139,11 +139,11 @@ class SirhaBackEndApplicationTests {
     @Test
     void testStudentDefaultConstructor() {
         Student student = new Student(  "juan.perez", "juan.perez@example.com", "hashedPass", "EST001");
-        student.setId(12345);
+        student.setId("12345");
         assertNotNull(student);
         assertEquals("juan.perez", student.getUsername());
         assertEquals("EST001", student.getCodigo());
-		assertEquals(12345, student.getId());
+		assertEquals("12345", student.getId());
 		assertTrue(PasswordUtils.verifyPassword("hashedPass", student.getPasswordHash()));
 		assertEquals("juan.perez@example.com", student.getEmail());
     }
@@ -171,16 +171,16 @@ class SirhaBackEndApplicationTests {
     @Test
     void testStudentSetId() {
         Student student = new Student( "juan.perez", "juan.perez@example.com", "hashedPass", "EST001");
-        student.setId(456);
+        student.setId("456");
         
-        assertEquals(456, student.getId());
+        assertEquals("456", student.getId());
         assertEquals("juan.perez", student.getUsername());
     }
     
     @Test
     void testStudentToString() {
         Student student = new Student( "juan.perez", "juan.perez@example.com", "hashedPass", "EST001");
-        student.setId(12345);
+        student.setId("12345");
         String result = student.toString();
         assertNotNull(result);
         assertFalse(result.isEmpty());
@@ -257,10 +257,10 @@ class SirhaBackEndApplicationTests {
     
     @Test
     void testCreateStudentWithSemaforo() {
-        Student student = new Student(1, "juan.perez", "juan@example.com", "hashedPassword", "20231001");
+        Student student = new Student("1", "juan.perez", "juan@example.com", "hashedPassword", "20231001");
         
         StudyPlan studyPlan = new StudyPlan("Ingeniería de Sistemas");
-        Subject matematicas = new Subject(101, "Matemáticas I", 4);
+        Subject matematicas = new Subject("101", "Matemáticas I", 4);
         studyPlan.addSubject(matematicas);
         
         Semaforo semaforo = new Semaforo(studyPlan);
@@ -304,11 +304,11 @@ class SirhaBackEndApplicationTests {
     void testProfessorBasics() {
         Professor profesor1 = new Professor();
         assertNotNull(profesor1);
-        
-        Professor profesor2 = new Professor("dr.smith", "hashedPass", "PROFESOR", "L-V 8-12");
-        profesor2.setId(1);
+
+        Professor profesor2 = new Professor("dr.smith", "dr.smith@example.com", "hashedPass", "L-V 8-12");
+        profesor2.setId("1");
         assertNotNull(profesor2);
-        assertEquals(1, profesor2.getId());
+        assertEquals("1", profesor2.getId());
         assertEquals("dr.smith", profesor2.getUsername());
     }
     
@@ -319,7 +319,7 @@ class SirhaBackEndApplicationTests {
         assertEquals("Ingeniería de Software", plan.getName());
         assertNotNull(plan.getSubjects());
 
-        Subject subject = new Subject(001, "Matemáticas", 4);
+        Subject subject = new Subject("001", "Matemáticas", 4);
         plan.addSubject(subject);
         assertTrue(plan.getSubjects().containsKey(subject.getName()));
 
@@ -329,12 +329,12 @@ class SirhaBackEndApplicationTests {
     
     @Test
     void testSubjectDecoratorBasics() {
-        Subject subject = new Subject(001, "Programación", 3);
+        Subject subject = new Subject("001", "Programación", 3);
         
         SubjectDecorator decorator = new SubjectDecorator(subject);
         assertNotNull(decorator);
         assertEquals("Programación", decorator.getName());
-        assertEquals(001, decorator.getId());
+        assertEquals("001", decorator.getId());
         assertEquals(3, decorator.getCredits());
         assertNotNull(decorator.getGroups());
     }
@@ -377,8 +377,8 @@ class SirhaBackEndApplicationTests {
         period.setStartDatesInscripciones(LocalDate.now(), LocalDate.now().plusMonths(1));
 
         assertTrue(period.isActive());
-        
-        Subject subject = new Subject(101, "Matemáticas", 4);
+
+        Subject subject = new Subject("101", "Matemáticas", 4);
         Group group = new Group(30, period);
         subject.addGroup(group);
         assertEquals(period.getId(), group.getCurrentPeriod().getId());
@@ -388,7 +388,7 @@ class SirhaBackEndApplicationTests {
 
     @Test
     void testNoCursadaStateTransitions() {
-        Subject subject = new Subject(101, "Matemáticas", 4);
+        Subject subject = new Subject("101", "Matemáticas", 4);
         SubjectDecorator decorator = new SubjectDecorator(subject);
         
         assertTrue(decorator.getState() instanceof NoCursadaState);
@@ -402,7 +402,7 @@ class SirhaBackEndApplicationTests {
     }
     @Test
     void testEnCursoStateTransitions() {
-        Subject subject = new Subject(101, "Matemáticas", 4);
+        Subject subject = new Subject("101", "Matemáticas", 4);
         SubjectDecorator decorator = new SubjectDecorator(subject);
 
         AcademicPeriod academicPeriod = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
@@ -416,7 +416,7 @@ class SirhaBackEndApplicationTests {
     }
     @Test
     void testEnCursoStateToReprobada2() {
-        Subject subject = new Subject(101, "Matemáticas", 4);
+        Subject subject = new Subject("101", "Matemáticas", 4);
         SubjectDecorator decorator = new SubjectDecorator(subject);
         
         AcademicPeriod academicPeriod = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
@@ -429,7 +429,7 @@ class SirhaBackEndApplicationTests {
     }
     @Test
     void testEnCursoStateRetirar2() {
-        Subject subject = new Subject(101, "Matemáticas", 4);
+        Subject subject = new Subject("101", "Matemáticas", 4);
         SubjectDecorator decorator = new SubjectDecorator(subject);
 
         AcademicPeriod academicPeriod = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
@@ -444,7 +444,7 @@ class SirhaBackEndApplicationTests {
 
     @Test
     void testAprobadaStateImmutable() {
-        Subject subject = new Subject(101, "Matemáticas", 4);
+        Subject subject = new Subject("101", "Matemáticas", 4);
         SubjectDecorator decorator = new SubjectDecorator(subject);
 
         AcademicPeriod academicPeriod = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
@@ -459,7 +459,7 @@ class SirhaBackEndApplicationTests {
 
     @Test
     void testSubjectDecoratorStateValidations() {
-        Subject subject = new Subject(101, "Matemáticas", 4);
+        Subject subject = new Subject("101", "Matemáticas", 4);
         SubjectDecorator decorator = new SubjectDecorator(subject);
         
         assertTrue(decorator.puedeInscribirse()); 
@@ -478,7 +478,7 @@ class SirhaBackEndApplicationTests {
 
     @Test
     void testSubjectDecoratorInitialState() {
-        Subject subject = new Subject(101, "Matemáticas", 4);
+        Subject subject = new Subject("101", "Matemáticas", 4);
         SubjectDecorator decorator = new SubjectDecorator(subject);
         
         assertNotNull(decorator);
@@ -492,7 +492,7 @@ class SirhaBackEndApplicationTests {
 
     @Test
     void testNoCursadaStateInitialState() {
-        Subject subject = new Subject(101, "Matemáticas", 4);
+        Subject subject = new Subject("101", "Matemáticas", 4);
         SubjectDecorator decorator = new SubjectDecorator(subject);
         NoCursadaState state = new NoCursadaState();
         
@@ -506,7 +506,7 @@ class SirhaBackEndApplicationTests {
 
     @Test
     void testNoCursadaStateInscribir() {
-        Subject subject = new Subject(101, "Matemáticas", 4);
+        Subject subject = new Subject("101", "Matemáticas", 4);
         SubjectDecorator decorator = new SubjectDecorator(subject);
 
         AcademicPeriod academicPeriod = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
@@ -521,7 +521,7 @@ class SirhaBackEndApplicationTests {
 
     @Test
     void testNoCursadaStateInvalidTransitions() {
-        Subject subject = new Subject(101, "Matemáticas", 4);
+        Subject subject = new Subject("101", "Matemáticas", 4);
         SubjectDecorator decorator = new SubjectDecorator(subject);
         
         assertThrows(IllegalStateException.class, () -> decorator.aprobar());
@@ -531,7 +531,7 @@ class SirhaBackEndApplicationTests {
 
     @Test
     void testEnCursoStateProperties() {
-        Subject subject = new Subject(101, "Matemáticas", 4);
+        Subject subject = new Subject("101", "Matemáticas", 4);
         SubjectDecorator decorator = new SubjectDecorator(subject);
         AcademicPeriod academicPeriod = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
         Group grupo = new Group(30, academicPeriod);
@@ -547,7 +547,7 @@ class SirhaBackEndApplicationTests {
 
     @Test
     void testEnCursoStateToAprobada() {
-        Subject subject = new Subject(101, "Matemáticas", 4);
+        Subject subject = new Subject("101", "Matemáticas", 4);
         SubjectDecorator decorator = new SubjectDecorator(subject);
         AcademicPeriod academicPeriod = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
         Group grupo = new Group(30, academicPeriod);
@@ -564,7 +564,7 @@ class SirhaBackEndApplicationTests {
 
     @Test
     void testEnCursoStateToReprobada() {
-        Subject subject = new Subject(101, "Matemáticas", 4);
+        Subject subject = new Subject("101", "Matemáticas", 4);
         SubjectDecorator decorator = new SubjectDecorator(subject);
         AcademicPeriod academicPeriod = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
         Group grupo = new Group(30, academicPeriod);
@@ -581,7 +581,7 @@ class SirhaBackEndApplicationTests {
 
     @Test
     void testEnCursoStateRetirar() {
-        Subject subject = new Subject(101, "Matemáticas", 4);
+        Subject subject = new Subject("101", "Matemáticas", 4);
         SubjectDecorator decorator = new SubjectDecorator(subject);
         AcademicPeriod academicPeriod = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
         Group grupo = new Group(30, academicPeriod);
@@ -597,7 +597,7 @@ class SirhaBackEndApplicationTests {
 
     @Test
     void testEnCursoStateInvalidInscribir() {
-        Subject subject = new Subject(101, "Matemáticas", 4);
+        Subject subject = new Subject("101", "Matemáticas", 4);
         SubjectDecorator decorator = new SubjectDecorator(subject);
         AcademicPeriod academicPeriod = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
         Group grupo = new Group(30, academicPeriod);
@@ -608,7 +608,7 @@ class SirhaBackEndApplicationTests {
 
     @Test
     void testAprobadaStateProperties() {
-        Subject subject = new Subject(101, "Matemáticas", 4);
+        Subject subject = new Subject("101", "Matemáticas", 4);
         SubjectDecorator decorator = new SubjectDecorator(subject);
         AcademicPeriod academicPeriod = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
         Group grupo = new Group(30, academicPeriod);
@@ -625,7 +625,7 @@ class SirhaBackEndApplicationTests {
 
     @Test
     void testAprobadaStateImmutableTransitions() {
-        Subject subject = new Subject(101, "Matemáticas", 4);
+        Subject subject = new Subject("101", "Matemáticas", 4);
         SubjectDecorator decorator = new SubjectDecorator(subject);
         AcademicPeriod academicPeriod = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
         Group grupo = new Group(30, academicPeriod);
@@ -639,7 +639,7 @@ class SirhaBackEndApplicationTests {
 
     @Test
     void testReprobadaStateProperties() {
-        Subject subject = new Subject(101, "Matemáticas", 4);
+        Subject subject = new Subject("101", "Matemáticas", 4);
         SubjectDecorator decorator = new SubjectDecorator(subject);
         AcademicPeriod academicPeriod = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
         Group grupo = new Group(30, academicPeriod);
@@ -656,7 +656,7 @@ class SirhaBackEndApplicationTests {
 
     @Test
     void testReprobadaStateReInscribir() {
-        Subject subject = new Subject(101, "Matemáticas", 4);
+        Subject subject = new Subject("101", "Matemáticas", 4);
         SubjectDecorator decorator = new SubjectDecorator(subject);
         AcademicPeriod academicPeriod = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
         Group grupo = new Group(30, academicPeriod);
@@ -672,7 +672,7 @@ class SirhaBackEndApplicationTests {
 
     @Test
     void testReprobadaStateInvalidTransitions() {
-        Subject subject = new Subject(101, "Matemáticas", 4);
+        Subject subject = new Subject("101", "Matemáticas", 4);
         SubjectDecorator decorator = new SubjectDecorator(subject);
         AcademicPeriod academicPeriod = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
         Group grupo = new Group(30, academicPeriod);
@@ -685,7 +685,7 @@ class SirhaBackEndApplicationTests {
 
     @Test
     void testCompleteSubjectLifecycle() {
-        Subject subject = new Subject(101, "Matemáticas", 4);
+        Subject subject = new Subject("101", "Matemáticas", 4);
         SubjectDecorator decorator = new SubjectDecorator(subject);
         
         assertTrue(decorator.getState() instanceof NoCursadaState);
@@ -711,7 +711,7 @@ class SirhaBackEndApplicationTests {
 
     @Test
     void testFailureAndRetryLifecycle() {
-        Subject subject = new Subject(101, "Matemáticas", 4);
+        Subject subject = new Subject("101", "Matemáticas", 4);
         SubjectDecorator decorator = new SubjectDecorator(subject);
         AcademicPeriod academicPeriod = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
         Group grupo = new Group(30, academicPeriod);
@@ -730,7 +730,7 @@ class SirhaBackEndApplicationTests {
 
     @Test
     void testStateTransitionHistory() {
-        Subject subject = new Subject(101, "Matemáticas", 4);
+        Subject subject = new Subject("101", "Matemáticas", 4);
         SubjectDecorator decorator = new SubjectDecorator(subject);
         
         List<Class<?>> stateHistory = new ArrayList<>();
@@ -756,7 +756,7 @@ class SirhaBackEndApplicationTests {
 
     @Test
     void testStateColorConsistency() {
-        Subject subject = new Subject(101, "Matemáticas", 4);
+        Subject subject = new Subject("101", "Matemáticas", 4);
         SubjectDecorator decorator = new SubjectDecorator(subject);
         
         assertEquals(SemaforoColores.GRIS, decorator.getEstadoColor());
@@ -776,7 +776,7 @@ class SirhaBackEndApplicationTests {
 
     @Test
     void testStateColorConsistencyAfterFailure() {
-        Subject subject = new Subject(101, "Matemáticas", 4);
+        Subject subject = new Subject("101", "Matemáticas", 4);
         SubjectDecorator decorator = new SubjectDecorator(subject);
         AcademicPeriod academicPeriod = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
         Group grupo = new Group(30, academicPeriod);
@@ -791,10 +791,10 @@ class SirhaBackEndApplicationTests {
 
     @Test
     void testMultipleSubjectsIndependentStates() {
-        Subject math = new Subject(101, "Matemáticas", 4);
-        Subject physics = new Subject(102, "Física", 3);
-        Subject chemistry = new Subject(103, "Química", 4);
-        
+        Subject math = new Subject("101", "Matemáticas", 4);
+        Subject physics = new Subject("102", "Física", 3);
+        Subject chemistry = new Subject("103", "Química", 4);
+
         SubjectDecorator mathDecorator = new SubjectDecorator(math);
         SubjectDecorator physicsDecorator = new SubjectDecorator(physics);
         SubjectDecorator chemistryDecorator = new SubjectDecorator(chemistry);
@@ -818,7 +818,7 @@ class SirhaBackEndApplicationTests {
 
     @Test
     void testStateMethodDelegation() {
-        Subject subject = new Subject(101, "Matemáticas", 4);
+        Subject subject = new Subject("101", "Matemáticas", 4);
         SubjectDecorator decorator = new SubjectDecorator(subject);
         
         NoCursadaState initialState = (NoCursadaState) decorator.getState();
@@ -838,9 +838,9 @@ class SirhaBackEndApplicationTests {
 
     @Test
     void testStateInstanceUniqueness() {
-        Subject subject1 = new Subject(101, "Matemáticas", 4);
-        Subject subject2 = new Subject(102, "Física", 3);
-        
+        Subject subject1 = new Subject("101", "Matemáticas", 4);
+        Subject subject2 = new Subject("102", "Física", 3);
+
         SubjectDecorator decorator1 = new SubjectDecorator(subject1);
         SubjectDecorator decorator2 = new SubjectDecorator(subject2);
         
@@ -855,11 +855,10 @@ class SirhaBackEndApplicationTests {
         
         assertEquals(decorator1.getState().getClass(), decorator2.getState().getClass());
     }
-    // ============== COMPREHENSIVE STATE TRANSITION TESTS ==============
 
     @Test
     void testNoCursadaStateAllTransitions() {
-        Subject subject = new Subject(101, "Matemáticas", 4);
+        Subject subject = new Subject("101", "Matemáticas", 4);
         SubjectDecorator decorator = new SubjectDecorator(subject);
         
         assertTrue(decorator.getState() instanceof NoCursadaState);
@@ -880,7 +879,7 @@ class SirhaBackEndApplicationTests {
 
     @Test
     void testEnCursoStateAllTransitions() {
-        Subject subject = new Subject(101, "Matemáticas", 4);
+        Subject subject = new Subject("101", "Matemáticas", 4);
         SubjectDecorator decorator = new SubjectDecorator(subject);
         AcademicPeriod academicPeriod = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
         Group grupo = new Group(30, academicPeriod);
@@ -890,12 +889,12 @@ class SirhaBackEndApplicationTests {
         assertThrows(IllegalStateException.class, () -> decorator.inscribir(grupo));
         assertTrue(decorator.getState() instanceof EnCursoState);
         
-        SubjectDecorator decorator2 = new SubjectDecorator(new Subject(102, "Física", 3));
+        SubjectDecorator decorator2 = new SubjectDecorator(new Subject("102", "Física", 3));
         decorator2.inscribir(grupo);
         decorator2.aprobar();
         assertTrue(decorator2.getState() instanceof AprobadaState);
         
-        SubjectDecorator decorator3 = new SubjectDecorator(new Subject(103, "Química", 4));
+        SubjectDecorator decorator3 = new SubjectDecorator(new Subject("103", "Química", 4));
         decorator3.inscribir(grupo);
         decorator3.reprobar();
         assertTrue(decorator3.getState() instanceof ReprobadaState);
@@ -906,7 +905,7 @@ class SirhaBackEndApplicationTests {
 
     @Test
     void testAprobadaStateAllTransitions() {
-        Subject subject = new Subject(101, "Matemáticas", 4);
+        Subject subject = new Subject("101", "Matemáticas", 4);
         SubjectDecorator decorator = new SubjectDecorator(subject);
         AcademicPeriod academicPeriod = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
         Group grupo = new Group(30, academicPeriod);
@@ -924,7 +923,7 @@ class SirhaBackEndApplicationTests {
 
     @Test
     void testReprobadaStateAllTransitions() {
-        Subject subject = new Subject(101, "Matemáticas", 4);
+        Subject subject = new Subject("101", "Matemáticas", 4);
         SubjectDecorator decorator = new SubjectDecorator(subject);
         
         AcademicPeriod academicPeriod = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
@@ -948,7 +947,7 @@ class SirhaBackEndApplicationTests {
 
     @Test
     void testStateTransitionConsistency() {
-        Subject subject = new Subject(101, "Matemáticas", 4);
+        Subject subject = new Subject("101", "Matemáticas", 4);
         SubjectDecorator decorator = new SubjectDecorator(subject);
         
         assertTrue(decorator.getState() instanceof NoCursadaState);
@@ -984,7 +983,7 @@ class SirhaBackEndApplicationTests {
 
     @Test
     void testStateColorTransitions() {
-        Subject subject = new Subject(101, "Matemáticas", 4);
+        Subject subject = new Subject("101", "Matemáticas", 4);
         SubjectDecorator decorator = new SubjectDecorator(subject);
         
         assertEquals(SemaforoColores.GRIS, decorator.getEstadoColor());
@@ -1006,7 +1005,7 @@ class SirhaBackEndApplicationTests {
 
     @Test
     void testInvalidTransitionsPreserveState() {
-        Subject subject = new Subject(101, "Matemáticas", 4);
+        Subject subject = new Subject("101", "Matemáticas", 4);
         SubjectDecorator decorator = new SubjectDecorator(subject);
         
         SemaforoColores originalColor = decorator.getEstadoColor();
@@ -1023,7 +1022,7 @@ class SirhaBackEndApplicationTests {
 
     @Test
     void testReprobadaStateSpecificBehavior() {
-        Subject subject = new Subject(101, "Matemáticas", 4);
+        Subject subject = new Subject("101", "Matemáticas", 4);
         SubjectDecorator decorator = new SubjectDecorator(subject);
 
         AcademicPeriod academicPeriod = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
@@ -1043,7 +1042,7 @@ class SirhaBackEndApplicationTests {
 
     @Test
     void testEnCursoStateMultipleExitPaths() {
-        Subject subject1 = new Subject(101, "Math", 4);
+        Subject subject1 = new Subject("101", "Math", 4);
         SubjectDecorator decorator1 = new SubjectDecorator(subject1);
         AcademicPeriod academicPeriod = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
 
@@ -1051,15 +1050,15 @@ class SirhaBackEndApplicationTests {
         decorator1.inscribir(grupo);
         decorator1.aprobar();
         assertTrue(decorator1.getState() instanceof AprobadaState);
-        
-        Subject subject2 = new Subject(102, "Physics", 3);
+
+        Subject subject2 = new Subject("102", "Physics", 3);
         SubjectDecorator decorator2 = new SubjectDecorator(subject2);
         Group grupo2 = new Group(30, academicPeriod);
         decorator2.inscribir(grupo2);
         decorator2.reprobar();
         assertTrue(decorator2.getState() instanceof ReprobadaState);
-        
-        Subject subject3 = new Subject(103, "Chemistry", 4);
+
+        Subject subject3 = new Subject("103", "Chemistry", 4);
         SubjectDecorator decorator3 = new SubjectDecorator(subject3);
         Group grupo3 = new Group(30, academicPeriod);
         decorator3.inscribir(grupo3);
@@ -1069,7 +1068,7 @@ class SirhaBackEndApplicationTests {
 
     @Test
     void testStateTransitionExceptionMessages() {
-        Subject subject = new Subject(101, "Matemáticas", 4);
+        Subject subject = new Subject("101", "Matemáticas", 4);
         SubjectDecorator decorator = new SubjectDecorator(subject);
         
         try {
@@ -1095,7 +1094,7 @@ class SirhaBackEndApplicationTests {
 
     @Test
     void testNoCursadaStateCanMethods() {
-        Subject subject = new Subject(101, "Matemáticas", 4);
+        Subject subject = new Subject("101", "Matemáticas", 4);
         SubjectDecorator decorator = new SubjectDecorator(subject);
         
         assertTrue(decorator.getState() instanceof NoCursadaState);
@@ -1110,7 +1109,7 @@ class SirhaBackEndApplicationTests {
     
     @Test
     void testAprobadaSetSemestre() {
-        Subject subject = new Subject(101, "Matemáticas", 4);
+        Subject subject = new Subject("101", "Matemáticas", 4);
         SubjectDecorator decorator = new SubjectDecorator(subject);
         AcademicPeriod academicPeriod = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
         Group grupo = new Group(30, academicPeriod);
@@ -1130,7 +1129,7 @@ class SirhaBackEndApplicationTests {
 
     @Test
     void testReprobadaSetSemestre() {
-        Subject subject = new Subject(101, "Matemáticas", 4);
+        Subject subject = new Subject("101", "Matemáticas", 4);
         SubjectDecorator decorator = new SubjectDecorator(subject);
         AcademicPeriod academicPeriod = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
         Group grupo = new Group(30, academicPeriod);
@@ -1162,7 +1161,7 @@ class SirhaBackEndApplicationTests {
 
     @Test
     void testNoCursadaStateSetGroupValid() {
-        Subject subject = new Subject(101, "Matemáticas", 4);
+        Subject subject = new Subject("101", "Matemáticas", 4);
         SubjectDecorator decorator = new SubjectDecorator(subject);
         AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
 
@@ -1177,7 +1176,7 @@ class SirhaBackEndApplicationTests {
 
     @Test
     void testNoCursadaStateSetGroupNull() {
-        Subject subject = new Subject(101, "Matemáticas", 4);
+        Subject subject = new Subject("101", "Matemáticas", 4);
         SubjectDecorator decorator = new SubjectDecorator(subject);
         
         assertTrue(decorator.getState() instanceof NoCursadaState);
@@ -1192,7 +1191,7 @@ class SirhaBackEndApplicationTests {
     
     @Test
     void testEnCursoStateCanMethods() {
-        Subject subject = new Subject(101, "Matemáticas", 4);
+        Subject subject = new Subject("101", "Matemáticas", 4);
         SubjectDecorator decorator = new SubjectDecorator(subject);
         AcademicPeriod academicPeriod = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
         Group grupo = new Group(30, academicPeriod);
@@ -1210,7 +1209,7 @@ class SirhaBackEndApplicationTests {
     
     @Test
     void testEnCursoStateSetSemestreThrowsException() {
-        Subject subject = new Subject(101, "Matemáticas", 4);
+        Subject subject = new Subject("101", "Matemáticas", 4);
         SubjectDecorator decorator = new SubjectDecorator(subject);
         
         AcademicPeriod academicPeriod = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
@@ -1229,7 +1228,7 @@ class SirhaBackEndApplicationTests {
 
     @Test
     void testEnCursoStateSetGroupThrowsException() {
-        Subject subject = new Subject(101, "Matemáticas", 4);
+        Subject subject = new Subject("101", "Matemáticas", 4);
         SubjectDecorator decorator = new SubjectDecorator(subject);
         AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
         Group grupo = new Group(30, period);
@@ -1245,7 +1244,7 @@ class SirhaBackEndApplicationTests {
 
     @Test
     void testAprobadaStateCanMethods() {
-        Subject subject = new Subject(101, "Matemáticas", 4);
+        Subject subject = new Subject("101", "Matemáticas", 4);
         SubjectDecorator decorator = new SubjectDecorator(subject);
         
         AcademicPeriod academicPeriod = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
@@ -1264,7 +1263,7 @@ class SirhaBackEndApplicationTests {
 
     @Test
     void testReprobadaStateCanMethods() {
-        Subject subject = new Subject(101, "Matemáticas", 4);
+        Subject subject = new Subject("101", "Matemáticas", 4);
         SubjectDecorator decorator = new SubjectDecorator(subject);
         
         AcademicPeriod academicPeriod = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
@@ -1283,7 +1282,7 @@ class SirhaBackEndApplicationTests {
 
     @Test
     void testStateCanMethodsConsistency() {
-        Subject subject = new Subject(101, "Matemáticas", 4);
+        Subject subject = new Subject("101", "Matemáticas", 4);
         SubjectDecorator decorator = new SubjectDecorator(subject);
         AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
         Group grupo = new Group(30, period);
@@ -1308,7 +1307,7 @@ class SirhaBackEndApplicationTests {
 
     @Test
     void testAllStatesGetEstadoNombre() {
-        Subject subject = new Subject(101, "Matemáticas", 4);
+        Subject subject = new Subject("101", "Matemáticas", 4);
         SubjectDecorator decorator = new SubjectDecorator(subject);
         
         assertEquals("No Cursada", decorator.getState().getEstadoNombre());
@@ -1317,15 +1316,15 @@ class SirhaBackEndApplicationTests {
         Group grupo = new Group(30, academicPeriod);
         decorator.inscribir(grupo);
         assertEquals("En Curso", decorator.getState().getEstadoNombre());
-        
-        SubjectDecorator decorator2 = new SubjectDecorator(new Subject(102, "Física", 3));
+
+        SubjectDecorator decorator2 = new SubjectDecorator(new Subject("102", "Física", 3));
         AcademicPeriod academicPeriod2 = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
         Group grupo2 = new Group(30, academicPeriod2);
         decorator2.inscribir(grupo2);
         decorator2.aprobar();
         assertEquals("Aprobada", decorator2.getState().getEstadoNombre());
-        
-        SubjectDecorator decorator3 = new SubjectDecorator(new Subject(103, "Química", 4));
+
+        SubjectDecorator decorator3 = new SubjectDecorator(new Subject("103", "Química", 4));
         AcademicPeriod academicPeriod3 = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
         Group grupo3 = new Group(30, academicPeriod3);
         decorator3.inscribir(grupo3);
@@ -1335,7 +1334,7 @@ class SirhaBackEndApplicationTests {
 
     @Test
     void testTieneGrupoAsignadoConsistency() {
-        Subject subject = new Subject(101, "Matemáticas", 4);
+        Subject subject = new Subject("101", "Matemáticas", 4);
         SubjectDecorator decorator = new SubjectDecorator(subject);
         AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
         Group grupo = new Group(30, period);
@@ -1352,7 +1351,7 @@ class SirhaBackEndApplicationTests {
         decorator.aprobar();
         assertTrue(decorator.getState().tieneGrupoAsignado());
         
-        SubjectDecorator decorator2 = new SubjectDecorator(new Subject(102, "Física", 3));
+        SubjectDecorator decorator2 = new SubjectDecorator(new Subject("102", "Física", 3));
         Group grupo2 = new Group(30, period);
         
         assertFalse(decorator2.getState().tieneGrupoAsignado());
@@ -1364,7 +1363,7 @@ class SirhaBackEndApplicationTests {
 
     @Test
     void testSubjectDecorator() {
-        Subject programacion = new Subject(001, "Programación I", 5);
+        Subject programacion = new Subject("001", "Programación I", 5);
         SubjectDecorator programacionDecorator = new SubjectDecorator(programacion);
         
         assertEquals("Programación I", programacionDecorator.getName());
@@ -1384,11 +1383,11 @@ class SirhaBackEndApplicationTests {
         LocalDate startDate = LocalDate.of(2024, 1, 1);
         LocalDate endDate = LocalDate.of(2024, 6, 30);
         AcademicPeriod period = new AcademicPeriod("2024-1", startDate, endDate);
-        period.setId(1);
+        period.setId("1");
 
         period.setStartDatesInscripciones(startDate.minusMonths(1), startDate.minusDays(10));
 
-        assertEquals("2024-1", period.getPeriodo());
+        assertEquals("2024-1", period.getPeriod());
         assertEquals(startDate, period.getStartDate());
         assertEquals(endDate, period.getEndDate());
 
@@ -1413,9 +1412,10 @@ class SirhaBackEndApplicationTests {
         
         Student student = new Student("testuser", "test@email.com", "hashedpass", "20241001");
         AcademicPeriod activePeriod = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now());
-        student.setCurrentPeriod(activePeriod);
         
-        Subject subject = new Subject(101, "Matemáticas", 4);
+        
+        
+        Subject subject = new Subject("101", "Matemáticas", 4);
 
         Group currentGroup = new Group(30, activePeriod);
         Schedule currentSchedule = new Schedule(DiasSemana.LUNES, LocalTime.of(8, 0), LocalTime.of(10, 0));
@@ -1432,7 +1432,7 @@ class SirhaBackEndApplicationTests {
         studyPlan.addSubject(subject);
         Semaforo semaforo = new Semaforo(studyPlan);
         student.setAcademicProgress(semaforo);
-       
+        student.setCurrentPeriod(activePeriod);
         student.enrollSubject(subject, currentGroup);
 
         assertFalse(newGroup.equals(currentGroup));

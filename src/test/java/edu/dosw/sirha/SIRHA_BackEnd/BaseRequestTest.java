@@ -30,12 +30,12 @@ class BaseRequestTest {
 
     @BeforeEach
     void setUp() {
-        student = new Student(1, "juan.perez", "juan@example.com", "hashedPassword", "20231001");
+        student = new Student("1", "juan.perez", "juan@example.com", "hashedPassword", "20231001");
         academicPeriod = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
-        
-        subject1 = new Subject(101, "Matemáticas", 4);
-        subject2 = new Subject(102, "Física", 3);
-        
+
+        subject1 = new Subject("101", "Matemáticas", 4);
+        subject2 = new Subject("102", "Física", 3);
+
         group1 = new Group(30, academicPeriod);
         group2 = new Group(25, academicPeriod);
         
@@ -61,6 +61,7 @@ class BaseRequestTest {
     @Test
     void testCambioMateriaCreation() {
         CambioMateria cambioMateria = new CambioMateria(student, subject1, subject2, academicPeriod);
+        cambioMateria.setId("12345");
         
         assertNotNull(cambioMateria);
         assertEquals(student, cambioMateria.getStudent());

@@ -32,12 +32,12 @@ class CambioMateriaTest {
 
     @BeforeEach
     void setUp() {
-        student = new Student(1, "juan.perez", "juan@example.com", "hashedPassword", "20231001");
+        student = new Student("1", "juan.perez", "juan@example.com", "hashedPassword", "20231001");
         academicPeriod = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
-        
-        materiaAntigua = new Subject(101, "Álgebra", 3);
-        materiaNueva = new Subject(102, "Cálculo", 4);
-        prerequisito = new Subject(100, "Matemáticas Básicas", 3);
+
+        materiaAntigua = new Subject("101", "Álgebra", 3);
+        materiaNueva = new Subject("102", "Cálculo", 4);
+        prerequisito = new Subject("100", "Matemáticas Básicas", 3);
         
         grupoAntiguo = new Group(30, academicPeriod);
         grupoNuevo = new Group(25, academicPeriod);
@@ -114,7 +114,7 @@ class CambioMateriaTest {
     void testCambioMateriaCapacityValidation() {
         // Llenar el grupo de la materia nueva
         for (int i = 0; i < 25; i++) {
-            Student otroStudent = new Student(i + 100, "student" + i, "student" + i + "@test.com", "pass", "202400" + i);
+            Student otroStudent = new Student(String.valueOf(i + 100), "student" + i, "student" + i + "@test.com", "pass", "202400" + i);
             grupoNuevo.enrollStudent(otroStudent);
         }
         
@@ -228,7 +228,7 @@ class CambioMateriaTest {
     @Test
     void testCambioMateriaSubjectNotInStudyPlan() {
         // Crear una materia que no está en el plan
-        Subject materiaFueraPlan = new Subject(999, "Materia Externa", 2);
+        Subject materiaFueraPlan = new Subject("999", "Materia Externa", 2);
         Group grupoExterno = new Group(15, academicPeriod);
         materiaFueraPlan.addGroup(grupoExterno);
         
@@ -278,7 +278,7 @@ class CambioMateriaTest {
     @Test
     void testCambioMateriaComplexPrerequisiteScenario() {
         // Crear cadena de prerequisitos: Básicas -> Álgebra -> Cálculo
-        Subject matematicasBasicas = new Subject(90, "Matemáticas Básicas", 2);
+        Subject matematicasBasicas = new Subject("90", "Matemáticas Básicas", 2);
         Group grupoBasicas = new Group(40, academicPeriod);
         matematicasBasicas.addGroup(grupoBasicas);
         studyPlan.addSubject(matematicasBasicas);

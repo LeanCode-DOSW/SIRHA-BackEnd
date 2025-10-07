@@ -6,7 +6,7 @@ import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.SemaforoColores;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateGroup.Group;
 
 public interface SubjectStateProcess {
-    int getId();
+    String getId();
     SemaforoColores getState();
     LocalDateTime getCreadoEn();
     void setState(SemaforoColores state);

@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Objects;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateGroup.Group;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.port.AcademicProgress;
@@ -17,15 +18,16 @@ import edu.dosw.sirha.SIRHA_BackEnd.domain.port.PrerequisiteRule;
  * - Una materia puede tener múltiples grupos.
  * - Cada materia debe tener un nombre único y un identificador.
  */
+@Document(collection = "subjects")
 public class Subject {
     @Id
-    private int id;
+    private String id;
     private String name;
     private int credits;
     private List<Group> groups;
     private List<PrerequisiteRule> prerequisites;
 
-    public Subject(int id, String name, int credits) {
+    public Subject(String id, String name, int credits) {
         if (name == null || name.isBlank()) {
             throw new IllegalArgumentException("El nombre de la materia no puede estar vacío");
         }
@@ -55,8 +57,8 @@ public class Subject {
     public boolean removeGroup(Group g) {return groups.remove(g);}
     public boolean hasGroup(Group group){return groups.contains(group);}
 
-    
-    public void setId(int id) {this.id = id;}
+
+    public void setId(String id) {this.id = id;}
     public void setName(String name) {
         if (name == null || name.isBlank()) {throw new IllegalArgumentException("El nombre no puede estar vacío");}
         this.name = name;
@@ -69,7 +71,7 @@ public class Subject {
 
     
 
-    public int getId() {return id;}
+    public String getId() {return id;}
     public String getName() {return name;}
     public String getNombre(){return name;}
     public List<Group> getGrupos(){return groups;}

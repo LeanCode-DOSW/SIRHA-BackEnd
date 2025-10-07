@@ -26,11 +26,11 @@ class RequestTest {
 
     @Test
     void testInscriptionRequestValidation() {
-        Student student = new Student(1, "juan.perez", "juan@example.com", "hashedPassword", "20231001");
+        Student student = new Student("1", "juan.perez", "juan@example.com", "hashedPassword", "20231001");
         
         AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
-        Subject subject = new Subject(101, "Matemáticas", 4);
-        
+        Subject subject = new Subject("101", "Matemáticas", 4);
+
         Group group = new Group(30, period);
         
         StudyPlan studyPlan = new StudyPlan("Ingeniería de Sistemas");
@@ -90,10 +90,9 @@ class RequestTest {
         AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
 
         StudyPlan studyPlan = new StudyPlan("Ingenieria de Sistemas");
-        Subject prerequisite = new Subject(100, "Algebra", 3);
+        Subject prerequisite = new Subject("100", "Algebra", 3);
         MustHaveApprovedSubject rule = new MustHaveApprovedSubject(prerequisite);
-        Subject mainSubject = new Subject(101, "Calculo", 4);
-        
+        Subject mainSubject = new Subject("101", "Calculo", 4);
 
         Group group1 = new Group(30, period);
         Group group2 = new Group(25, period);
@@ -106,7 +105,7 @@ class RequestTest {
 
         mainSubject.addPrerequisite(rule);
 
-        Student student = new Student(1, "juan.perez", "juan@example.com", "hashedPassword", "20231001");
+        Student student = new Student("1", "juan.perez", "juan@example.com", "hashedPassword", "20231001");
         Semaforo semaforo = new Semaforo(studyPlan);
         student.setAcademicProgress(semaforo);
         student.setCurrentPeriod(period);
@@ -144,7 +143,7 @@ class RequestTest {
         
         AcademicPeriod period = new AcademicPeriod("2024-1", startDate, endDate);
         
-        assertEquals("2024-1", period.getPeriodo());
+        assertEquals("2024-1", period.getPeriod());
         assertEquals(startDate, period.getStartDate());
         assertEquals(endDate, period.getEndDate());
         assertTrue(period.isActive());
@@ -153,10 +152,10 @@ class RequestTest {
     @Test
     void testStudyPlanConfiguration() {
         StudyPlan studyPlan = new StudyPlan("Ingeniería de Sistemas"); // Constructor con nombre
-        Subject subject1 = new Subject(101, "Matemáticas", 4);
-        Subject subject2 = new Subject(102, "Física", 3);
-        Subject subject3 = new Subject(103, "Química", 4);
-        
+        Subject subject1 = new Subject("101", "Matemáticas", 4);
+        Subject subject2 = new Subject("102", "Física", 3);
+        Subject subject3 = new Subject("103", "Química", 4);
+
         // Agregar materias al plan
         studyPlan.addSubject(subject1);
         studyPlan.addSubject(subject2);
@@ -171,7 +170,7 @@ class RequestTest {
 
     @Test
     void testBaseRequestFlow() {
-        Student student = new Student(1, "juan.perez", "juan@example.com", "hashedPassword", "20231001");
+        Student student = new Student("1", "juan.perez", "juan@example.com", "hashedPassword", "20231001");
         AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
         
         assertNotNull(student);

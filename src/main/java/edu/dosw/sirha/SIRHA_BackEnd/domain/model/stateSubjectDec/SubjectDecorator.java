@@ -3,7 +3,9 @@ package edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateSubjectDec;
 import java.util.ArrayList;
 import java.util.List;
 
+import edu.dosw.sirha.SIRHA_BackEnd.domain.model.AcademicPeriod;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.ResponseProcess;
+import edu.dosw.sirha.SIRHA_BackEnd.domain.model.Schedule;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.Subject;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.SubjectProgress;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.SemaforoColores;
@@ -49,6 +51,8 @@ public class SubjectDecorator {
     private void recordChangeState(SubjectStateProcess stateProcess){
         addState(stateProcess);
     }
+    public List<Schedule> getSchedules() {return group.getSchedules();}
+    public AcademicPeriod getAcademicPeriod() {return group.getCurrentPeriod();}
 
     public boolean puedeInscribirse() {return state.puedeInscribirse();}
     public boolean estaCursando() {return estadoColor == SemaforoColores.AMARILLO;}
@@ -61,7 +65,7 @@ public class SubjectDecorator {
     public String getName() {return subject.getName();}
     public int getCredits() {return subject.getCredits();}
     public List<Group> getGroups() {return subject.getGroups();}
-    public int getId() { return subject.getId(); }
+    public String getId() { return subject.getId(); }
     public SemaforoColores getEstadoColor() {return estadoColor;}
     public int getSemester() {return semestre;}
     public Subject getSubject() {return subject;}

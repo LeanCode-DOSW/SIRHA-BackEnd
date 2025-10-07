@@ -1,6 +1,7 @@
 package edu.dosw.sirha.SIRHA_BackEnd.domain.model;
  
 import java.util.List;
+import java.util.Map;
 import java.util.ArrayList;
 import java.util.Objects;
  
@@ -35,13 +36,13 @@ public class Student extends User implements SolicitudFactory, ScheduleManager, 
     private String codigo;
     private AcademicProgress academicProgress;
     private List<RequestTo> solicitudes;
-    private AcademicPeriod currentPeriod;
+    
  
     public Student() {
         super();
     }
- 
-    public Student(int id, String username, String email, String passwordHash, String codigo) {
+
+    public Student(String id, String username, String email, String passwordHash, String codigo) {
         super(id, username, email, passwordHash);
     }
 
@@ -258,11 +259,7 @@ public class Student extends User implements SolicitudFactory, ScheduleManager, 
      * 
      * @return lista de horarios de Schedule
      */
-    public List<Schedule> getHorariosActuales() {
-        if (academicProgress == null) {
-            return new ArrayList<>();
-        }
-        
+    public List<Schedule> getCurrentSchedule() {
         return getMateriasCursando().stream()
             .filter(materia -> materia.getGroup() != null)
             .flatMap(materia -> materia.getGroup().getSchedules().stream())
@@ -309,10 +306,16 @@ public class Student extends User implements SolicitudFactory, ScheduleManager, 
 
 
     public AcademicPeriod getCurrentPeriod() {
-        return currentPeriod;
+        return academicProgress.getCurrentAcademicPeriod();
     }
     public void setCurrentPeriod(AcademicPeriod currentPeriod) {
-        this.currentPeriod = currentPeriod;
+        if (academicProgress == null) {
+            throw new IllegalStateException("El progreso académico no está inicializado");
+        }
+        if (!academicProgress.getMateriasCursando().isEmpty()) {
+            throw new IllegalStateException("No se puede cambiar el período académico mientras hay materias en curso");
+        }
+        academicProgress.setCurrentAcademicPeriod(currentPeriod);
     }
 
     public boolean hasSubject(SubjectDecorator subject) {
@@ -355,6 +358,7 @@ public class Student extends User implements SolicitudFactory, ScheduleManager, 
         }
         
         // 6. Verificar período académico activo
+        AcademicPeriod currentPeriod = getCurrentPeriod();
         if (currentPeriod == null || !currentPeriod.isActive() || !group.sameAcademicPeriod(currentPeriod)) {
             throw new IllegalStateException("El período académico no es válido");
         }
@@ -418,6 +422,7 @@ public class Student extends User implements SolicitudFactory, ScheduleManager, 
         if (tieneConflictoConHorario(newGroup)) {
             throw new IllegalStateException("Conflicto de horarios con el nuevo grupo");
         }
+        AcademicPeriod currentPeriod = getCurrentPeriod();
         if (currentPeriod == null || !currentPeriod.isActive() || !newGroup.sameAcademicPeriod(currentPeriod)) {
             throw new IllegalStateException("El período académico no es válido para el nuevo grupo");
         }
@@ -427,9 +432,19 @@ public class Student extends User implements SolicitudFactory, ScheduleManager, 
 
     public CambioGrupo createSolicitudCambioGrupo(Subject subject, Group newGroup) {
         validateChangeGroup(subject, newGroup);
+        AcademicPeriod currentPeriod = getCurrentPeriod();
         CambioGrupo solicitud = new CambioGrupo(this, subject, newGroup, currentPeriod);
         addRequest(solicitud);
         return solicitud;
+    }
+
+    public Map<AcademicPeriod, List<Schedule>> getAllSchedules() {
+        return academicProgress.getAllSchedules();
+    }
+
+    @Override
+    public List<Schedule> getScheduleForPeriod(AcademicPeriod period) {
+        return getAllSchedules().getOrDefault(period, new ArrayList<>());
     }
 
     /**
@@ -440,5 +455,7 @@ public class Student extends User implements SolicitudFactory, ScheduleManager, 
         return String.format("Student{id='%s', username='%s', codigo='%s'}",
                             getId(), getUsername(), codigo);
     }
+
+    
 }
  

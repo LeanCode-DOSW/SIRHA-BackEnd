@@ -15,6 +15,7 @@ import edu.dosw.sirha.SIRHA_BackEnd.domain.port.AcademicProgress;
 public class Semaforo implements AcademicProgress {
     private Map<String, SubjectDecorator> subjects;
     private final StudyPlan studyPlan;
+    private AcademicPeriod currentPeriod;
 
     public Semaforo(StudyPlan studyPlan) {
         this.subjects = new HashMap<>();
@@ -32,7 +33,12 @@ public class Semaforo implements AcademicProgress {
     public Collection<SubjectDecorator> getSubjects() {
         return subjects.values();
     }
-
+    public AcademicPeriod getCurrentAcademicPeriod() {
+        return currentPeriod;
+    }
+    public void setCurrentAcademicPeriod(AcademicPeriod period) {
+        this.currentPeriod = period;
+    }   
 
     public StudyPlan getStudyPlan() {
         return studyPlan;
@@ -193,6 +199,15 @@ public class Semaforo implements AcademicProgress {
         }
         decorator.inscribir(group);
         //faltaria set semestre
+    }
+
+    @Override
+    public Map<AcademicPeriod, List<Schedule>> getAllSchedules() {
+        Map<AcademicPeriod, List<Schedule>> schedules = new HashMap<>();
+
+        subjects.values().forEach(sd -> { schedules.putIfAbsent(sd.getAcademicPeriod(), sd.getSchedules());
+        });
+        return schedules;
     }
 
 }

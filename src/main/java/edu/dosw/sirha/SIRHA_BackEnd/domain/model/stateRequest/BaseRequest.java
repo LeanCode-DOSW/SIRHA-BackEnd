@@ -4,6 +4,9 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.AcademicPeriod;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.ResponseProcess;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.Student;
@@ -30,8 +33,10 @@ import edu.dosw.sirha.SIRHA_BackEnd.domain.port.*;
  * - RECHAZADA: Solicitud denegada con razón específica
  * - EN_REVISION: Solicitud en proceso de evaluación
  */
+@Document(collection = "requests")  
 public abstract class BaseRequest implements RequestTo {
-    private int id;
+    @Id
+    private String id;
     private LocalDateTime creadoEn;
     protected Student student;
     private AcademicPeriod currentPeriod;
@@ -84,7 +89,8 @@ public abstract class BaseRequest implements RequestTo {
         setActualState(proceso.getEstado());
     }
 
-    public int getId() {return id;}
+    public String getId() {return id;}
+    public void setId(String id) {this.id = id;}
 
     public RequestProcess getActualProcess(){return procesos.get(procesos.size() - 1);}
     public RequestStateEnum getActualState(){return getActualProcess().getEstado();}

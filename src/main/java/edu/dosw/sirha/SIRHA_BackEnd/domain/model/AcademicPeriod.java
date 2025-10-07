@@ -8,8 +8,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document(collection = "academic_periods")
 public class AcademicPeriod {
     @Id
-    private int id;
-    private String periodo; // "2024-1"
+    private String id;
+    private String period; // "2024-1"
     private LocalDate startDate;
     private LocalDate endDate;
     private LocalDate startDateInscripciones;
@@ -17,9 +17,9 @@ public class AcademicPeriod {
 
     public AcademicPeriod() {
     }
-    public AcademicPeriod(String periodo, LocalDate startDate, LocalDate endDate) {
+    public AcademicPeriod(String period, LocalDate startDate, LocalDate endDate) {
         this();
-        this.periodo = periodo;
+        this.period = period;
         this.startDate = startDate;
         this.endDate = endDate;
     }
@@ -37,10 +37,10 @@ public class AcademicPeriod {
                !hoy.isBefore(startDateInscripciones) && 
                !hoy.isAfter(endDateInscripciones);
     }
-    public int getId() { return id; }
-    public void setId(int id) { this.id = id; }
+    public String getId() { return id; }
+    public void setId(String id) { this.id = id; }
 
-    public String getPeriodo() { return periodo; }
+    public String getPeriod() { return period; }
 
     public LocalDate getStartDate() { return startDate; }
 
@@ -64,14 +64,14 @@ public class AcademicPeriod {
         if (this == obj) return true;
         if (obj == null || getClass() != obj.getClass()) return false;
         AcademicPeriod that = (AcademicPeriod) obj;
-        return Objects.equals(periodo, that.periodo) &&
+        return Objects.equals(period, that.period) &&
                Objects.equals(startDate, that.startDate) &&
                Objects.equals(endDate, that.endDate);
     }
 
     @Override
     public String toString() {
-        return String.format("AcademicPeriod{id='%s', periodo='%s', activo=%s, fechas=%s a %s}", 
-                           id, periodo, isActivo(), startDate, endDate);
+        return String.format("AcademicPeriod{id='%s', period='%s', activo=%s, fechas=%s a %s}", 
+                           id, period, isActivo(), startDate, endDate);
     }
 }

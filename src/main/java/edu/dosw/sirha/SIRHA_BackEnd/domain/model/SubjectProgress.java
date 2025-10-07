@@ -8,7 +8,7 @@ import edu.dosw.sirha.SIRHA_BackEnd.domain.port.SubjectStateProcess;
 
 public class SubjectProgress implements SubjectStateProcess {
     @Id
-    private int id;
+    private String id;
     private SemaforoColores state;
     private LocalDateTime creadoEn;
     private int semestre;
@@ -27,7 +27,7 @@ public class SubjectProgress implements SubjectStateProcess {
         this.grade = grade;
     }
 
-    public int getId() {return id;}
+    public String getId() {return id;}
     public SemaforoColores getState() {return state;}
     public LocalDateTime getCreadoEn() {return creadoEn;}
     public int getSemester() {return semestre;}

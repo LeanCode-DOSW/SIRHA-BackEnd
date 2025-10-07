@@ -15,7 +15,8 @@ public interface RequestTo {
     void rejectRequest(String comentario);
     void reviewRequest(String comentario);
 
-    int getId();
+    String getId();
+    void setId(String id);
 
     boolean validateRequest();  //preguntamos : se puede resolver la solicitud?
     RequestStateEnum getActualState();

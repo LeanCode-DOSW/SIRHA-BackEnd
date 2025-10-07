@@ -30,11 +30,10 @@ class CambioGrupoTest {
 
     @BeforeEach
     void setUp() {
-        student = new Student(1, "juan.perez", "juan@example.com", "hashedPassword", "20231001");
+        student = new Student("1", "juan.perez", "juan@example.com", "hashedPassword", "20231001");
         academicPeriod = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
-        
-        subject = new Subject(101, "Matemáticas", 4);
-        subject.setId(01);
+        subject = new Subject("101", "Matemáticas", 4);
+        subject.setId("01");
         
         grupoActual = new Group(30, academicPeriod);
         grupoActual.setId(1);
@@ -69,7 +68,7 @@ class CambioGrupoTest {
     @Test
     void testCambioGrupoCapacityValidation() {
         for (int i = 0; i < 25; i++) {
-            Student otroStudent = new Student(i + 100, "student" + i, "student" + i + "@test.com", "pass", "202400" + i);
+            Student otroStudent = new Student(String.valueOf(i + 100), "student" + i, "student" + i + "@test.com", "pass", "202400" + i);
             grupoNuevo.enrollStudent(otroStudent);
         }
         
