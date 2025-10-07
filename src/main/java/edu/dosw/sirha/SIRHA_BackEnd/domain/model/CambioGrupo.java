@@ -5,21 +5,20 @@ import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateRequest.BaseRequest;
 
 public class CambioGrupo extends BaseRequest {
     private Subject subject;
-    private Group group;
+    private Group newGroup;
 
-    public CambioGrupo(Student student, Subject subject, Group group, AcademicPeriod currentPeriod) {
+    public CambioGrupo(Student student, Subject subject, Group newGroup, AcademicPeriod currentPeriod) {
         super(student, currentPeriod);
         this.subject = subject;
-        this.group = group;
+        this.newGroup = newGroup;
         
     }
-
+    public Subject getSubject() {return subject;}
+    public Group getNewGroup() {return newGroup;}
+    
     @Override
-    public boolean validateRequest() {// para validar si se puede hacer el cambio de grupo necesitamos, primero ver el grupo que antes tenia, ver si el nuevo no tiene problemas con el horario
-        return false;
+    public boolean validateRequest() {
+        return student.validateChangeGroup(subject, newGroup);
     }
-
-    
-    
 
 }

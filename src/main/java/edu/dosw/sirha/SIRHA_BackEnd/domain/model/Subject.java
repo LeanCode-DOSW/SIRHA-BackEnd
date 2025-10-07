@@ -53,7 +53,7 @@ public class Subject {
      * Elimina un grupo de la materia.
      */
     public boolean removeGroup(Group g) {return groups.remove(g);}
-    public boolean isHasGroup(Group group){return groups.contains(group);}
+    public boolean hasGroup(Group group){return groups.contains(group);}
 
     
     public void setId(int id) {this.id = id;}

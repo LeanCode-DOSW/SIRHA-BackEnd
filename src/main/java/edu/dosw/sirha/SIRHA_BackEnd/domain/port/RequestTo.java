@@ -8,12 +8,14 @@ import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.*;
  * - Verificar la solicitud(validateRequest)
  * - Aprobar o rechazar la solicitud(approveRequest)
  */
-public interface Request {
+public interface RequestTo {
     
     void pendingRequest(String comentario);
     void approveRequest(String comentario);
     void rejectRequest(String comentario);
     void reviewRequest(String comentario);
+
+    int getId();
 
     boolean validateRequest();  //preguntamos : se puede resolver la solicitud?
     RequestStateEnum getActualState();

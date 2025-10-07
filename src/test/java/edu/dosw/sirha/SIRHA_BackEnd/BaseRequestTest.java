@@ -56,16 +56,7 @@ class BaseRequestTest {
         assertEquals(1, cambioGrupo.getProcesos().size());
     }
 
-    @Test
-    void testCambioGrupoCreation() {
-        CambioGrupo cambioGrupo = new CambioGrupo(student, subject1, group1, academicPeriod);
-        
-        assertNotNull(cambioGrupo);
-        assertEquals(student, cambioGrupo.getStudent());
-        assertEquals(academicPeriod, cambioGrupo.getCurrentPeriod());
-        
-        assertFalse(cambioGrupo.validateRequest());
-    }
+
 
     @Test
     void testCambioMateriaCreation() {
@@ -74,6 +65,8 @@ class BaseRequestTest {
         assertNotNull(cambioMateria);
         assertEquals(student, cambioMateria.getStudent());
         assertEquals(academicPeriod, cambioMateria.getCurrentPeriod());
+        assertNotNull(cambioMateria.getCreadoEn());
+        assertNotNull(cambioMateria.getId());
         
         assertFalse(cambioMateria.validateRequest());
     }

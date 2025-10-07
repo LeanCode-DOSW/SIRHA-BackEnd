@@ -278,7 +278,11 @@ public class Group {
         if (obj == null || getClass() != obj.getClass()) return false;
 
         Group group = (Group) obj;
-        return Objects.equals(id, group.id);
+        return Objects.equals(id, group.id) && Objects.equals(currentPeriod, group.currentPeriod)
+                && Objects.equals(curso, group.curso)
+                && Objects.equals(profesor, group.profesor)
+                && Objects.equals(aula, group.aula)
+                && Objects.equals(schedules, group.schedules);
     }
 
     @Override

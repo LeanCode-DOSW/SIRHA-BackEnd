@@ -29,17 +29,10 @@ public class Semaforo implements AcademicProgress {
         });
     }
 
-    public SubjectDecorator getSubject(String nombre) {
-        return subjects.get(nombre);
-    }
-
     public Collection<SubjectDecorator> getSubjects() {
         return subjects.values();
     }
 
-    public void setSubjects(Map<String, SubjectDecorator> subjects) {
-        this.subjects = subjects != null ? new HashMap<>(subjects) : new HashMap<>();
-    }
 
     public StudyPlan getStudyPlan() {
         return studyPlan;
@@ -109,9 +102,6 @@ public class Semaforo implements AcademicProgress {
 
     @Override
     public boolean hasSubject(Subject subject) {
-        if (subject == null) {
-            return false;
-        }
         return subjects.containsKey(subject.getName());
     }
 
@@ -134,14 +124,13 @@ public class Semaforo implements AcademicProgress {
             return false;
         }
         SubjectDecorator decorator = subjects.get(subject.getName());
-        return decorator != null && decorator.getEstadoColor() == SemaforoColores.VERDE;
+        return decorator.getEstadoColor() == SemaforoColores.VERDE;
     }
     @Override
     public boolean isSubjectCursando(Subject subject) {
-        if (subject == null) {
-            return false;
-        }
+
         if (!subjects.containsKey(subject.getName())) {
+            System.out.println("Error: La materia no está en el semáforo");
             return false;
         }
         SubjectDecorator decorator = subjects.get(subject.getName());
@@ -149,9 +138,7 @@ public class Semaforo implements AcademicProgress {
     }
     @Override
     public boolean isSubjectReprobada(Subject subject) {
-        if (subject == null) {
-            return false;
-        }
+
         if (!subjects.containsKey(subject.getName())) {
             return false;
         }
@@ -160,9 +147,7 @@ public class Semaforo implements AcademicProgress {
     }
     @Override
     public boolean isSubjectNoCursada(Subject subject) {
-        if (subject == null) {
-            return false;
-        }
+
         if (!subjects.containsKey(subject.getName())) {
             return false;
         }
@@ -170,18 +155,39 @@ public class Semaforo implements AcademicProgress {
         return decorator != null && decorator.getEstadoColor() == SemaforoColores.GRIS;
     }
 
-    @Override
-    public void enrollSubjectInGroup(Subject subject, Group group) {
-        if (subject == null || group == null) {
-            System.out.println("Error: La materia y el grupo no pueden ser nulos");
-            throw new IllegalArgumentException("La materia y el grupo no pueden ser nulos");
-        }
+
+    public boolean verifyChangeGroup(Subject subject, Group newGroup) {
+
         SubjectDecorator decorator = subjects.get(subject.getName());
         if (decorator == null) {
             System.out.println("Error: La materia no está en el semáforo");
             throw new IllegalArgumentException("La materia no está en el semáforo");
         }
-        if (!subject.isHasGroup(group)) {
+        if (!isSubjectCursando(subject)) {
+            System.out.println("Error: La materia no está en curso");
+            throw new IllegalStateException("La materia no está en curso");
+        }
+
+        if (decorator.getGroup().equals(newGroup)) {
+            System.out.println("Error: El nuevo grupo es el mismo que el actual");
+            throw new IllegalStateException("El nuevo grupo es el mismo que el actual");
+        }
+        if (!subject.hasGroup(newGroup)) {
+            System.out.println("Error: El grupo no pertenece a la materia especificada");
+            throw new IllegalArgumentException("El grupo no pertenece a la materia especificada");
+        }
+        return true;
+    }
+
+    @Override
+    public void enrollSubjectInGroup(Subject subject, Group group) {
+
+        SubjectDecorator decorator = subjects.get(subject.getName());
+        if (decorator == null) {
+            System.out.println("Error: La materia no está en el semáforo");
+            throw new IllegalArgumentException("La materia no está en el semáforo");
+        }
+        if (!subject.hasGroup(group)) {
             System.out.println("Error: El grupo no pertenece a la materia especificada");
             throw new IllegalArgumentException("El grupo no pertenece a la materia especificada");
         }

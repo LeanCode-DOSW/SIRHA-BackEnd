@@ -13,7 +13,7 @@ import edu.dosw.sirha.SIRHA_BackEnd.domain.port.AcademicOperations;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.port.AcademicProgress;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.port.AcademicProgressViewer;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.port.PrerequisiteRule;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.port.Request;
+import edu.dosw.sirha.SIRHA_BackEnd.domain.port.RequestTo;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.port.RequestProcess;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.port.ScheduleManager;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.port.SolicitudFactory;
@@ -34,7 +34,7 @@ import edu.dosw.sirha.SIRHA_BackEnd.domain.port.SolicitudFactory;
 public class Student extends User implements SolicitudFactory, ScheduleManager, AcademicProgressViewer, AcademicOperations {
     private String codigo;
     private AcademicProgress academicProgress;
-    private List<RequestProcess> solicitudes;
+    private List<RequestTo> solicitudes;
     private AcademicPeriod currentPeriod;
  
     public Student() {
@@ -67,7 +67,7 @@ public class Student extends User implements SolicitudFactory, ScheduleManager, 
      * a la lista de solicitudes del estudiante. La solicitud debe estar
      * completamente inicializada antes de agregarla.
      */
-    public void agregarSolicitud(RequestProcess solicitud) {
+    public void addRequest(RequestTo solicitud) {
         if (solicitud == null) {
             throw new IllegalStateException("La solicitud no puede ser null");
         }
@@ -122,18 +122,18 @@ public class Student extends User implements SolicitudFactory, ScheduleManager, 
      * Obtiene la lista de solicitudes del estudiante.
      * @return lista de solicitudes, nunca null (inicializada como lista vacía)
      */
-    public List<RequestProcess> getSolicitudes() {
+    public List<RequestTo> getSolicitudes() {
         if (solicitudes == null) {
             solicitudes = new ArrayList<>();
         }
-        return solicitudes;
+        return new ArrayList<>(solicitudes);
     }
 
     /**
      * Establece la lista completa de solicitudes del estudiante.
      * @param solicitudes nueva lista de solicitudes. Si es null, se inicializa como lista vacía.
      */
-    public void setSolicitudes(List<RequestProcess> solicitudes) {
+    public void setSolicitudes(List<RequestTo> solicitudes) {
         this.solicitudes = solicitudes != null ? solicitudes : new ArrayList<>();
     }
 
@@ -146,7 +146,6 @@ public class Student extends User implements SolicitudFactory, ScheduleManager, 
      * @param obj objeto a comparar
      * @return true si los objetos son iguales, false en caso contrario
      */
-    @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
         if (obj == null || getClass() != obj.getClass()) return false;
@@ -156,7 +155,6 @@ public class Student extends User implements SolicitudFactory, ScheduleManager, 
         return Objects.equals(codigo, student.codigo);
     }
     
-    @Override
     public int hashCode() {
         return Objects.hash(super.hashCode(), codigo);
     }
@@ -168,30 +166,18 @@ public class Student extends User implements SolicitudFactory, ScheduleManager, 
         return academicProgress.getMateriasCursando();
     }
     public int getMateriasCursandoCount() {
-        if (this.academicProgress == null) {
-            return 0;
-        }
         return academicProgress.getMateriasCursandoCount();
     }
     
     public int getMateriasAprobadasCount() {
-        if (this.academicProgress == null) {
-            return 0;
-        }
         return academicProgress.getMateriasAprobadasCount();
     }
    
     public int getMateriasReprobadasCount() {
-        if (this.academicProgress == null) {
-            return 0;
-        }
         return academicProgress.getMateriasReprobadasCount();
     }
     
     public int getMateriasNoCursadasCount() {
-        if (this.academicProgress == null) {
-            return 0;
-        }
         return academicProgress.getMateriasNoCursadasCount();
     }
     
@@ -215,9 +201,6 @@ public class Student extends User implements SolicitudFactory, ScheduleManager, 
      * @return total de créditos
      */
     public int getCreditosPorColor(SemaforoColores color) {
-        if (this.academicProgress == null) {
-            return 0;
-        }
         return academicProgress.getCreditosPorColor(color);
     }
  
@@ -342,7 +325,6 @@ public class Student extends User implements SolicitudFactory, ScheduleManager, 
 
    
 
-    @Override
     public boolean canEnroll(Subject subject) {
         // 1. Verificar que la materia esté en el plan de estudios
         if (academicProgress.getStudyPlan() == null || !academicProgress.getStudyPlan().hasSubject(subject)) {
@@ -361,7 +343,6 @@ public class Student extends User implements SolicitudFactory, ScheduleManager, 
         
         return true;
     }
-    @Override
     public boolean canEnrollInGroup(Subject subject, Group group) {
         // Primero verificar las validaciones básicas de la materia
         if (!canEnroll(subject)) {
@@ -388,7 +369,6 @@ public class Student extends User implements SolicitudFactory, ScheduleManager, 
         return true;
     }
 
-    @Override
     public void enrollSubject(Subject subject, Group group) {
         if (!canEnrollInGroup(subject, group)) {
             throw new IllegalStateException("No se puede inscribir en la materia o grupo especificado");
@@ -406,7 +386,6 @@ public class Student extends User implements SolicitudFactory, ScheduleManager, 
         }*/
     }
 
-    @Override
     public void unenrollSubject(Subject subject, Group group) {
         throw new UnsupportedOperationException("Método no implementado aún"); //:C
     }
@@ -414,15 +393,49 @@ public class Student extends User implements SolicitudFactory, ScheduleManager, 
     /*
      * Verifica si el estudiante tiene una materia específica en su progreso académico.
      */
-    @Override
     public boolean hasSubject(Subject subject) {
         return academicProgress != null && academicProgress.hasSubject(subject);
     }
-     /**
+
+    public boolean validateChangeGroup(Subject subject, Group newGroup){
+
+        if (!hasSubject(subject)) {
+            throw new IllegalStateException("El estudiante no tiene la materia especificada");
+        }
+        if (!academicProgress.isSubjectCursando(subject)) {
+            throw new IllegalStateException("La materia no está en curso");
+        }
+
+        if (!academicProgress.verifyChangeGroup(subject, newGroup)) {
+            throw new IllegalStateException("El nuevo grupo es el mismo que el actual");
+        }
+        if (!subject.hasGroup(newGroup)) {
+            throw new IllegalStateException("El nuevo grupo no pertenece a la materia especificada");
+        }
+        if (!newGroup.isOpen()) {
+            throw new IllegalStateException("El nuevo grupo está cerrado");
+        }
+        if (tieneConflictoConHorario(newGroup)) {
+            throw new IllegalStateException("Conflicto de horarios con el nuevo grupo");
+        }
+        if (currentPeriod == null || !currentPeriod.isActive() || !newGroup.sameAcademicPeriod(currentPeriod)) {
+            throw new IllegalStateException("El período académico no es válido para el nuevo grupo");
+        }
+        return true;
+    }
+
+
+    public CambioGrupo createSolicitudCambioGrupo(Subject subject, Group newGroup) {
+        validateChangeGroup(subject, newGroup);
+        CambioGrupo solicitud = new CambioGrupo(this, subject, newGroup, currentPeriod);
+        addRequest(solicitud);
+        return solicitud;
+    }
+
+    /**
      * Representación en string del estudiante.
      * @return string con información básica del estudiante
      */
-    @Override
     public String toString() {
         return String.format("Student{id='%s', username='%s', codigo='%s'}",
                             getId(), getUsername(), codigo);

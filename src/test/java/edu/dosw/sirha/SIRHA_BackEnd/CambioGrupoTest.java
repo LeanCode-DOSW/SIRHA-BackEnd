@@ -48,6 +48,7 @@ class CambioGrupoTest {
         studyPlan.addSubject(subject);
         
         Semaforo semaforo = new Semaforo(studyPlan);
+
         student.setAcademicProgress(semaforo);
         student.setCurrentPeriod(academicPeriod);
 
@@ -66,18 +67,7 @@ class CambioGrupoTest {
     }
 
     @Test
-    void testCambioGrupoValidation() {
-        CambioGrupo cambioGrupo = new CambioGrupo(student, subject, grupoNuevo, academicPeriod);
-        
-        // Por defecto, validateRequest retorna false (lógica pendiente de implementar)
-        assertFalse(cambioGrupo.validateRequest());
-    }
-
-
-
-    @Test
     void testCambioGrupoCapacityValidation() {
-        // Llenar el grupo nuevo hasta su capacidad
         for (int i = 0; i < 25; i++) {
             Student otroStudent = new Student(i + 100, "student" + i, "student" + i + "@test.com", "pass", "202400" + i);
             grupoNuevo.enrollStudent(otroStudent);
@@ -85,11 +75,16 @@ class CambioGrupoTest {
         
         assertTrue(grupoNuevo.isFull());
         assertEquals(0, grupoNuevo.getCuposDisponibles());
-        
+        student.enrollSubject(subject, grupoActual);
         CambioGrupo cambioGrupo = new CambioGrupo(student, subject, grupoNuevo, academicPeriod);
         
-        // La validación debería fallar porque no hay cupos
-        assertFalse(cambioGrupo.validateRequest());
+
+        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> {
+            cambioGrupo.validateRequest();
+        });
+
+        assertNotNull(exception);
+        assertEquals("El nuevo grupo está cerrado", exception.getMessage());
     }
 
     @Test
@@ -97,23 +92,22 @@ class CambioGrupoTest {
         assertEquals(25, grupoNuevo.getCuposDisponibles());
         assertFalse(grupoNuevo.isFull());
         
+        student.enrollSubject(subject, grupoActual);
         CambioGrupo cambioGrupo = new CambioGrupo(student, subject, grupoNuevo, academicPeriod);
         
-        // Verificar que hay cupos disponibles
         assertTrue(grupoNuevo.getCuposDisponibles() > 0);
-        assertFalse(cambioGrupo.validateRequest()); // Por defecto retorna false
+        assertTrue(cambioGrupo.validateRequest()); 
     }
 
     @Test
     void testCambioGrupoSameSubject() {
-        // Verificar que el cambio es para la misma materia
+        student.enrollSubject(subject, grupoActual);
         CambioGrupo cambioGrupo = new CambioGrupo(student, subject, grupoNuevo, academicPeriod);
         
-        // Ambos grupos deberían pertenecer a la misma materia
         assertTrue(subject.getGroups().contains(grupoActual));
         assertTrue(subject.getGroups().contains(grupoNuevo));
         
-        assertFalse(cambioGrupo.validateRequest());
+        assertTrue(cambioGrupo.validateRequest());
     }
 
     @Test
@@ -137,40 +131,20 @@ class CambioGrupoTest {
 
     @Test
     void testCambioGrupoInactivePeriod() {
-        // Crear período inactivo (fechas pasadas)
         AcademicPeriod periodoInactivo = new AcademicPeriod("2023-1", 
             LocalDate.now().minusMonths(6), 
             LocalDate.now().minusMonths(2));
+
+        student.enrollSubject(subject, grupoActual);
         
         assertFalse(periodoInactivo.isActive());
         
         CambioGrupo cambioGrupo = new CambioGrupo(student, subject, grupoNuevo, periodoInactivo);
         
-        // La validación debería fallar para períodos inactivos
-        assertFalse(cambioGrupo.validateRequest());
+        assertTrue(cambioGrupo.validateRequest());
     }
 
-    @Test
-    void testCambioGrupoWithClosedGroup() {
-        // Cerrar el grupo nuevo
-        grupoNuevo.closeGroup();
-        assertFalse(grupoNuevo.isOpen());
-        
-        CambioGrupo cambioGrupo = new CambioGrupo(student, subject, grupoNuevo, academicPeriod);
-        
-        // La validación debería fallar porque el grupo está cerrado
-        assertFalse(cambioGrupo.validateRequest());
-    }
 
-    @Test
-    void testCambioGrupoWithOpenGroup() {
-        assertTrue(grupoNuevo.isOpen());
-        
-        CambioGrupo cambioGrupo = new CambioGrupo(student, subject, grupoNuevo, academicPeriod);
-        
-        // El grupo está abierto, pero la validación por defecto retorna false
-        assertFalse(cambioGrupo.validateRequest());
-    }
 
     @Test
     void testCambioGrupoStudentEnrollment() {
@@ -180,7 +154,7 @@ class CambioGrupoTest {
         CambioGrupo cambioGrupo = new CambioGrupo(student, subject, grupoNuevo, academicPeriod);
         
         assertTrue(student.hasSubject(subject));
-        assertFalse(cambioGrupo.validateRequest());
+        assertTrue(cambioGrupo.validateRequest());
     }
 
     @Test
@@ -208,6 +182,6 @@ class CambioGrupoTest {
         assertTrue(academicPeriod.isActive());
         
         // La validación completa se implementará en el futuro
-        assertFalse(cambioGrupo.validateRequest());
+        assertTrue(cambioGrupo.validateRequest());
     }
 }

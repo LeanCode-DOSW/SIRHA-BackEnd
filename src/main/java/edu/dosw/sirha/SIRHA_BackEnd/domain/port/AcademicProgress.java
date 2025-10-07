@@ -83,6 +83,7 @@ public interface AcademicProgress {
     int getMateriasNoCursadasCount();
 
     StudyPlan getStudyPlan();
+    boolean verifyChangeGroup(Subject subject, Group newGroup);
     void enrollSubjectInGroup(Subject subject, Group group);
     //void unenrollSubjectFromGroup(Subject subject, Group group);
 }

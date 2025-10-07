@@ -7,16 +7,21 @@ import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateGroup.Group;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateGroup.StatusClosed;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateGroup.StatusOpen;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateSubjectDec.*;
-
+import edu.dosw.sirha.SIRHA_BackEnd.domain.port.RequestTo;
 import edu.dosw.sirha.SIRHA_BackEnd.dto.StudentDTO;
 import edu.dosw.sirha.SIRHA_BackEnd.util.*;
+import io.micrometer.core.ipc.http.HttpSender.Request;
+
 import java.util.*;
 import java.time.LocalDate;
+import java.time.LocalTime;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cglib.core.Local;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.verify;
 
 @SpringBootTest
 class SirhaBackEndApplicationTests {
@@ -1400,5 +1405,51 @@ class SirhaBackEndApplicationTests {
         assertFalse(period.equals(null));
         assertFalse(period.equals(new AcademicPeriod("2024-2", startDate, endDate)));
         assertTrue(period.equals(new AcademicPeriod("2024-1", startDate, endDate)));
+    }
+
+
+    @Test
+    void testCreateSolicitudCambioGroup(){
+        
+        Student student = new Student("testuser", "test@email.com", "hashedpass", "20241001");
+        AcademicPeriod activePeriod = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now());
+        student.setCurrentPeriod(activePeriod);
+        
+        Subject subject = new Subject(101, "Matemáticas", 4);
+
+        Group currentGroup = new Group(30, activePeriod);
+        Schedule currentSchedule = new Schedule(DiasSemana.LUNES, LocalTime.of(8, 0), LocalTime.of(10, 0));
+        currentGroup.addSchedule(currentSchedule);
+        
+        Group newGroup = new Group(25, activePeriod);
+        Schedule newSchedule = new Schedule(DiasSemana.MARTES, LocalTime.of(10, 0), LocalTime.of(12, 0));
+        newGroup.addSchedule(newSchedule);
+
+        subject.addGroup(currentGroup);
+        subject.addGroup(newGroup);
+
+        StudyPlan studyPlan = new StudyPlan("Ingeniería de Sistemas");
+        studyPlan.addSubject(subject);
+        Semaforo semaforo = new Semaforo(studyPlan);
+        student.setAcademicProgress(semaforo);
+       
+        student.enrollSubject(subject, currentGroup);
+
+        assertFalse(newGroup.equals(currentGroup));
+
+        CambioGrupo solicitud = student.createSolicitudCambioGrupo(subject, newGroup);
+        
+        assertNotNull(solicitud);
+        assertTrue(solicitud instanceof CambioGrupo);
+
+        assertEquals(student, solicitud.getStudent());
+        assertEquals(subject, solicitud.getSubject());
+        assertEquals(newGroup, solicitud.getNewGroup());
+        assertEquals(activePeriod, solicitud.getCurrentPeriod());
+
+        List<RequestTo> solicitudes = student.getSolicitudes();
+        assertEquals(1, solicitudes.size());
+        assertEquals(solicitud, solicitudes.get(0));
+
     }
 }

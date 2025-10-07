@@ -30,10 +30,10 @@ import edu.dosw.sirha.SIRHA_BackEnd.domain.port.*;
  * - RECHAZADA: Solicitud denegada con razón específica
  * - EN_REVISION: Solicitud en proceso de evaluación
  */
-public abstract class BaseRequest implements Request {
-    private String id;
+public abstract class BaseRequest implements RequestTo {
+    private int id;
     private LocalDateTime creadoEn;
-    private Student student;
+    protected Student student;
     private AcademicPeriod currentPeriod;
     private ArrayList<RequestProcess> procesos;
     private RequestState state;
@@ -51,19 +51,11 @@ public abstract class BaseRequest implements Request {
         this.procesos.add(proceso);
     }
 
-    public List<RequestProcess> getProcesos() {
-        return procesos;
-    }
+    public List<RequestProcess> getProcesos() {return procesos;}
 
-    public RequestState getEstado() {
-        return state;
-    }
-    public AcademicPeriod getCurrentPeriod() {
-        return currentPeriod;
-    }
-    public void setCurrentPeriod(AcademicPeriod currentPeriod) {
-        this.currentPeriod = currentPeriod;
-    }
+    public RequestState getEstado() {return state;}
+    public AcademicPeriod getCurrentPeriod() {return currentPeriod;}
+    public void setCurrentPeriod(AcademicPeriod currentPeriod) {this.currentPeriod = currentPeriod;}
 
 
     public void approveRequest(String comentario){
@@ -92,8 +84,7 @@ public abstract class BaseRequest implements Request {
         setActualState(proceso.getEstado());
     }
 
-    
-    public String getId() {return id;}
+    public int getId() {return id;}
 
     public RequestProcess getActualProcess(){return procesos.get(procesos.size() - 1);}
     public RequestStateEnum getActualState(){return getActualProcess().getEstado();}

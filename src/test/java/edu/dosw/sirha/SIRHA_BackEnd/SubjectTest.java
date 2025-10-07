@@ -152,7 +152,7 @@ public class SubjectTest {
 
             s.addGroup(g);
 
-            assertTrue(s.isHasGroup(g));
+            assertTrue(s.hasGroup(g));
             assertEquals(1, s.getGroups().size());
             assertTrue(s.getGroups().contains(g));
         }
@@ -174,9 +174,9 @@ public class SubjectTest {
             s.addGroup(g3);
 
             assertEquals(3, s.getGroups().size());
-            assertTrue(s.isHasGroup(g1));
-            assertTrue(s.isHasGroup(g2));
-            assertTrue(s.isHasGroup(g3));
+            assertTrue(s.hasGroup(g1));
+            assertTrue(s.hasGroup(g2));
+            assertTrue(s.hasGroup(g3));
         }
 
         @Test
@@ -204,8 +204,8 @@ public class SubjectTest {
             boolean removed = s.removeGroup(g2);
 
             assertTrue(removed);
-            assertFalse(s.isHasGroup(g2));
-            assertTrue(s.isHasGroup(g1));
+            assertFalse(s.hasGroup(g2));
+            assertTrue(s.hasGroup(g1));
             assertEquals(1, s.getGroups().size());
         }
 
@@ -224,7 +224,7 @@ public class SubjectTest {
             boolean removed = s.removeGroup(g2);
 
             assertFalse(removed);
-            assertTrue(s.isHasGroup(g1));
+            assertTrue(s.hasGroup(g1));
             assertEquals(1, s.getGroups().size());
         }
 
@@ -238,7 +238,7 @@ public class SubjectTest {
         }
 
         @Test
-        public void isHasGroupTrueTest() {
+        public void hasGroupTrueTest() {
             Subject s = new Subject(101, "Matemáticas", 4);
             AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
             Group g = new Group(30, period);
@@ -246,11 +246,11 @@ public class SubjectTest {
 
             s.addGroup(g);
 
-            assertTrue(s.isHasGroup(g));
+            assertTrue(s.hasGroup(g));
         }
 
         @Test
-        public void isHasGroupFalseTest() {
+        public void hasGroupFalseTest() {
             Subject s = new Subject(101, "Matemáticas", 4);
             AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
             Group g1 = new Group(30, period);
@@ -261,14 +261,14 @@ public class SubjectTest {
 
             s.addGroup(g1);
 
-            assertFalse(s.isHasGroup(g2));
+            assertFalse(s.hasGroup(g2));
         }
 
         @Test
-        public void isHasGroupNullTest() {
+        public void hasGroupNullTest() {
             Subject s = new Subject(101, "Matemáticas", 4);
 
-            assertFalse(s.isHasGroup(null));
+            assertFalse(s.hasGroup(null));
         }
 
         // ==================== EQUALS, HASHCODE Y TOSTRING ====================
@@ -365,7 +365,7 @@ public class SubjectTest {
             s.addGroup(g); // Añadir el mismo grupo otra vez
 
             assertEquals(2, s.getGroups().size()); // ArrayList permite duplicados
-            assertTrue(s.isHasGroup(g));
+            assertTrue(s.hasGroup(g));
         }
 
         @Test
@@ -402,14 +402,14 @@ public class SubjectTest {
             // Remover uno del medio
             s.removeGroup(g2);
             assertEquals(2, s.getGroups().size());
-            assertFalse(s.isHasGroup(g2));
+            assertFalse(s.hasGroup(g2));
 
             // Añadir uno nuevo
             Group g4 = new Group(15, period);
             g4.setId(4);
             s.addGroup(g4);
             assertEquals(3, s.getGroups().size());
-            assertTrue(s.isHasGroup(g4));
+            assertTrue(s.hasGroup(g4));
 
             // Remover todos
             s.removeGroup(g1);
