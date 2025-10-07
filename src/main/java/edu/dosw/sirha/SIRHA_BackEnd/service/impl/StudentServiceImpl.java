@@ -2,11 +2,13 @@ package edu.dosw.sirha.SIRHA_BackEnd.service.impl;
 
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.Schedule;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.Student;
+import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.SemaforoColores;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.AcademicPeriod;
 import java.util.Map;
 import edu.dosw.sirha.SIRHA_BackEnd.dto.AuthResponse;
 import edu.dosw.sirha.SIRHA_BackEnd.dto.LoginRequest;
 import edu.dosw.sirha.SIRHA_BackEnd.dto.RegisterRequest;
+import edu.dosw.sirha.SIRHA_BackEnd.dto.SubjectDecoratorDTO;
 import edu.dosw.sirha.SIRHA_BackEnd.repository.mongo.AcademicPeriodMongoRepository;
 import edu.dosw.sirha.SIRHA_BackEnd.repository.mongo.StudentMongoRepository;
 import edu.dosw.sirha.SIRHA_BackEnd.service.StudentService;
@@ -16,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class StudentServiceImpl implements StudentService {
@@ -157,4 +160,11 @@ public class StudentServiceImpl implements StudentService {
         return studentRepository.findByUsername(username)
             .orElseThrow(() -> new IllegalArgumentException("Estudiante no encontrado")).getAllSchedules();
     }
+    @Override
+    public Map<SemaforoColores,List<SubjectDecoratorDTO>> getAcademicPensum(String username) {
+        return studentRepository.findByUsername(username)
+            .orElseThrow(() -> new IllegalArgumentException("Estudiante no encontrado"))
+            .getAcademicPensum();
+    }
+
 }
