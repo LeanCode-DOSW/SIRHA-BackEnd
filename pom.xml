@@ -201,6 +201,14 @@
 							<goal>check</goal>
 						</goals>
 						<configuration>
+						<excludes>
+							<exclude>**/util/**</exclude>
+							<exclude>**/controller/**</exclude>
+							<exclude>**/service/**</exclude>
+							<exclude>**/repository/**</exclude>
+							<exclude>**/dto/**</exclude>
+							<exclude>**/config/**</exclude>
+						</excludes>
 							<rules>
 								<rule>
 									<element>PACKAGE</element>

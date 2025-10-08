@@ -1,7 +1,7 @@
 package edu.dosw.sirha.SIRHA_BackEnd.service.impl;
 
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateRequest.BaseRequest;
-import edu.dosw.sirha.SIRHA_BackEnd.repository.mongo.RequestMongoRepository;
+import edu.dosw.sirha.SIRHA_BackEnd.repository.mongo.BaseRequestMongoRepository;
 import edu.dosw.sirha.SIRHA_BackEnd.service.RequestService;
 import org.springframework.stereotype.Service;
 
@@ -10,9 +10,9 @@ import java.util.Optional;
 
 @Service
 public class RequestServiceImpl implements RequestService {
-    private final RequestMongoRepository repository;
+    private final BaseRequestMongoRepository repository;
 
-    public RequestServiceImpl(RequestMongoRepository repository) {
+    public RequestServiceImpl(BaseRequestMongoRepository repository) {
         this.repository = repository;
     }
 

@@ -5,7 +5,6 @@ import java.util.*;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
-@Document(collection = "study_plans")
 public class StudyPlan {
     @Field("nombre")
     private String name;
