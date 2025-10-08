@@ -130,15 +130,6 @@ public class Student extends User implements SolicitudFactory, ScheduleManager, 
         }
         return new ArrayList<>(solicitudes);
     }
-
-    /**
-     * Establece la lista completa de solicitudes del estudiante.
-     * @param solicitudes nueva lista de solicitudes. Si es null, se inicializa como lista vacía.
-     */
-    public void setSolicitudes(List<RequestTo> solicitudes) {
-        this.solicitudes = solicitudes != null ? solicitudes : new ArrayList<>();
-    }
-
     
  
     /**
@@ -165,28 +156,28 @@ public class Student extends User implements SolicitudFactory, ScheduleManager, 
     }
     public int getMateriasCursandoCount() {
         if (academicProgress == null) {
-            throw new IllegalStateException("El progreso académico no está inicializado");
+            return 0;
         }
         return academicProgress.getMateriasCursandoCount();
     }
     
     public int getMateriasAprobadasCount() {
         if (academicProgress == null) {
-            throw new IllegalStateException("El progreso académico no está inicializado");
+            return 0;
         }
         return academicProgress.getMateriasAprobadasCount();
     }
    
     public int getMateriasReprobadasCount() {
         if (academicProgress == null) {
-            throw new IllegalStateException("El progreso académico no está inicializado");
+            return 0;
         }
         return academicProgress.getMateriasReprobadasCount();
     }
     
     public int getMateriasNoCursadasCount() {
         if (academicProgress == null) {
-            throw new IllegalStateException("El progreso académico no está inicializado");
+            return 0;
         }
         return academicProgress.getMateriasNoCursadasCount();
     }
@@ -211,6 +202,9 @@ public class Student extends User implements SolicitudFactory, ScheduleManager, 
      * @return total de créditos
      */
     public int getCreditosPorColor(SemaforoColores color) {
+        if (academicProgress == null) {
+            return 0;
+        }
         return academicProgress.getCreditosPorColor(color);
     }
  
@@ -252,6 +246,9 @@ public class Student extends User implements SolicitudFactory, ScheduleManager, 
      * @return lista de horarios de Schedule
      */
     public List<Schedule> getCurrentSchedule() {
+        if (academicProgress == null) {
+            return new ArrayList<>();
+        }
         return getMateriasCursando().stream()
             .filter(materia -> materia.getGroup() != null)
             .flatMap(materia -> materia.getGroup().getSchedules().stream())
@@ -273,6 +270,9 @@ public class Student extends User implements SolicitudFactory, ScheduleManager, 
      * @return total de créditos en curso
      */
     public int getCreditosEnCurso() {
+        if (academicProgress == null) {
+            return 0;
+        }
         return getCreditosPorColor(SemaforoColores.AMARILLO);
     }
     
@@ -298,6 +298,9 @@ public class Student extends User implements SolicitudFactory, ScheduleManager, 
 
 
     public AcademicPeriod getCurrentPeriod() {
+        if (academicProgress == null) {
+            return null;
+        }
         return academicProgress.getCurrentAcademicPeriod();
     }
     public void setCurrentPeriod(AcademicPeriod currentPeriod) {
@@ -418,16 +421,60 @@ public class Student extends User implements SolicitudFactory, ScheduleManager, 
         return true;
     }
 
+    public boolean validateChangeSubject(Subject oldSubject, Subject newSubject, Group newGroup) {
+        if (!hasSubject(oldSubject)) {
+            throw new IllegalStateException("El estudiante no tiene la materia antigua especificada");
+        }
+        if (!academicProgress.isSubjectCursando(oldSubject)) {
+            throw new IllegalStateException("La materia antigua no está en curso");
+        }
+        if (oldSubject.equals(newSubject)) {
+            throw new IllegalStateException("La materia nueva es la misma que la antigua");
+        }
+        if (academicProgress.hasSubject(newSubject) && !academicProgress.isSubjectNoCursada(newSubject)) {
+            throw new IllegalStateException("El estudiante ya tiene la materia nueva inscrita o aprobada");
+        }
+        if (!academicProgress.getStudyPlan().hasSubject(newSubject)) {
+            throw new IllegalStateException("La materia nueva no está en el plan de estudios del estudiante");
+        }
+        if (newSubject.hasPrerequisites() && !newSubject.canEnroll(academicProgress)) {
+            throw new IllegalStateException("No se cumplen los prerrequisitos para inscribir la materia nueva");
+        }
+        if (!newSubject.hasGroup(newGroup)) {
+            throw new IllegalStateException("El nuevo grupo no pertenece a la materia nueva especificada");
+        }
+        if (!newGroup.isOpen()) {
+            throw new IllegalStateException("El nuevo grupo está cerrado");
+        }
+        if (tieneConflictoConHorario(newGroup)) {
+            throw new IllegalStateException("Conflicto de horarios con el nuevo grupo");
+        }
+        AcademicPeriod currentPeriod = getCurrentPeriod();
+        if (currentPeriod == null || !currentPeriod.isActive() || !newGroup.sameAcademicPeriod(currentPeriod)) {
+            throw new IllegalStateException("El período académico no es válido para el nuevo grupo");
+        }
+        return true;
+    }
 
     public CambioGrupo createSolicitudCambioGrupo(Subject subject, Group newGroup) {
         validateChangeGroup(subject, newGroup);
-        AcademicPeriod currentPeriod = getCurrentPeriod();
-        CambioGrupo solicitud = new CambioGrupo(this, subject, newGroup, currentPeriod);
+        CambioGrupo solicitud = new CambioGrupo(this, subject, newGroup, getCurrentPeriod());
         addRequest(solicitud);
         return solicitud;
     }
+    public CambioMateria createSolicitudCambioMateria(Subject oldSubject, Subject newSubject, Group newGroup) {
+        validateChangeSubject(oldSubject, newSubject, newGroup);
+        CambioMateria solicitud = new CambioMateria(this, oldSubject, newSubject, newGroup, getCurrentPeriod());
+        addRequest(solicitud);
+        return solicitud;
+        
+    }
 
     public Map<AcademicPeriod, List<Schedule>> getAllSchedules() {
+        if (academicProgress == null) {
+            return Map.of();
+            
+        }
         return academicProgress.getAllSchedules();
     }
 
@@ -457,7 +504,6 @@ public class Student extends User implements SolicitudFactory, ScheduleManager, 
         }
         return academicProgress.getAcademicPensum();
     }
-
     
 }
  

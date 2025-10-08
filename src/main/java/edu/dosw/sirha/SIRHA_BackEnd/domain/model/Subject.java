@@ -50,11 +50,15 @@ public class Subject {
         }
         groups.add(g);
     }
+    public int getGroupCount() {return groups.size();}
 
     /**
      * Elimina un grupo de la materia.
      */
-    public boolean removeGroup(Group g) {return groups.remove(g);}
+    public boolean removeGroup(Group g) {
+        g.removeGroup();
+        return groups.remove(g);
+    }
     public boolean hasGroup(Group group){return groups.contains(group);}
 
 

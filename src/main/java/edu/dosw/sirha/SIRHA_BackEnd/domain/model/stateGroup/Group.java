@@ -34,6 +34,7 @@ import edu.dosw.sirha.SIRHA_BackEnd.domain.port.GroupState;
  */
 public class Group {
     private int id;
+    private String codigo;
     private int capacidad;
     private int inscritos;
     private GroupState estadoGrupo; // State Pattern
@@ -51,23 +52,28 @@ public class Group {
      * Inicializa el grupo con una capacidad específica y lo establece
      * en estado ABIERTO por defecto. La lista de estudiantes se inicializa vacía.
      */
-    public Group(int capacidad, AcademicPeriod currentPeriod) {
+    public Group(Subject subject,int capacidad, AcademicPeriod currentPeriod) {
         if (capacidad <= 0) {
             throw new IllegalArgumentException("La capacidad del grupo debe ser mayor a cero");
         }
-
+        curso = subject;
         setCapacidad(capacidad);
+        setCodigo();
         setCurrentPeriod(currentPeriod);
         this.inscritos = 0;
         this.estadoGrupo = new StatusOpen(); // Estado inicial: abierto
         this.estudiantes = new ArrayList<>();
         schedules = new ArrayList<>();
+        addToSubject();
     }
     public void setEstadoGrupo(GroupState estado) {
         if (estado == null) {
             throw new IllegalArgumentException("El estado del grupo no puede ser null");
         }
         this.estadoGrupo = estado;
+    }
+    private void addToSubject() {
+        curso.addGroup(this);   
     }
 
     /**
@@ -98,6 +104,9 @@ public class Group {
         }
 
         estadoGrupo.addStudent(this, estudiante);
+    }
+    private void setCodigo(){
+        this.codigo = curso.getName().substring(0,3).toUpperCase() + "-" + (curso.getGroupCount() + 1);
     }
 
     /**
@@ -158,6 +167,9 @@ public class Group {
     }
     public boolean unenrollStudent(Student student) {
         return estadoGrupo.removeStudent(this, student);
+    }
+    public String getCodigo() {
+        return codigo;
     }
 
     /**
@@ -278,7 +290,8 @@ public class Group {
         if (obj == null || getClass() != obj.getClass()) return false;
 
         Group group = (Group) obj;
-        return Objects.equals(id, group.id) && Objects.equals(currentPeriod, group.currentPeriod)
+        return Objects.equals(currentPeriod, group.currentPeriod)
+                && Objects.equals(codigo, group.codigo)
                 && Objects.equals(curso, group.curso)
                 && Objects.equals(profesor, group.profesor)
                 && Objects.equals(aula, group.aula)
@@ -291,7 +304,9 @@ public class Group {
                 id, capacidad, inscritos, aula,
                 estadoGrupo != null ? estadoGrupo.getClass().getSimpleName() : "null");
     }
-
+    public void removeGroup(){
+        curso = null;
+    }
 
     public void addSchedule(Schedule horario) {
         for (Schedule existente : schedules) {

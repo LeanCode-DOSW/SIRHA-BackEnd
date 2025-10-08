@@ -6,7 +6,6 @@ import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.RequestStateEnum;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateGroup.Group;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateGroup.StatusClosed;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateGroup.StatusOpen;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateSubjectDec.EnCursoState;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateSubjectDec.NoCursadaState;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateSubjectDec.SubjectDecorator;
 import org.junit.jupiter.api.Test;
@@ -31,7 +30,7 @@ class RequestTest {
         AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
         Subject subject = new Subject("101", "Matemáticas", 4);
 
-        Group group = new Group(30, period);
+        Group group = new Group(subject, 30, period);
         
         StudyPlan studyPlan = new StudyPlan("Ingeniería de Sistemas");
         studyPlan.addSubject(subject);
@@ -53,7 +52,8 @@ class RequestTest {
     @Test
     void testGroupStateValidation() {
         AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
-        Group group = new Group(30, period);
+        Subject subject = new Subject("101", "Matemáticas", 4);
+        Group group = new Group(subject, 30, period);
         
         assertTrue(group.getGroupState() instanceof StatusOpen);
         assertTrue(group.isOpen());
@@ -66,22 +66,19 @@ class RequestTest {
     @Test
     void testScheduleConflictDetection() {
         AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
-        
-        // Crear primer horario
+        Subject subject = new Subject("101", "Matemáticas", 4);
+
         Schedule schedule1 = new Schedule(DiasSemana.LUNES, LocalTime.of(8, 0), LocalTime.of(10, 0));
-        Group group1 = new Group(30, period);
+        Group group1 = new Group(subject, 30, period);
         group1.addSchedule(schedule1);
         
-        // Crear segundo horario con conflicto
         Schedule schedule2 = new Schedule(DiasSemana.LUNES, LocalTime.of(9, 0), LocalTime.of(11, 0));
-        Group group2 = new Group(25, period);
+        Group group2 = new Group(subject, 25, period);
         group2.addSchedule(schedule2);
         
-        // Verificar que los horarios están configurados
         assertEquals(1, group1.getSchedules().size());
         assertEquals(1, group2.getSchedules().size());
         
-        // Verificar conflicto
         assertTrue(schedule1.seSolapaCon(schedule2));
     }
 
@@ -94,11 +91,9 @@ class RequestTest {
         MustHaveApprovedSubject rule = new MustHaveApprovedSubject(prerequisite);
         Subject mainSubject = new Subject("101", "Calculo", 4);
 
-        Group group1 = new Group(30, period);
-        Group group2 = new Group(25, period);
+        Group group1 = new Group(prerequisite, 30, period);
+        Group group2 = new Group(mainSubject, 25, period);
 
-        prerequisite.addGroup(group1);
-        mainSubject.addGroup(group2);
 
         studyPlan.addSubject(prerequisite);
         studyPlan.addSubject(mainSubject);

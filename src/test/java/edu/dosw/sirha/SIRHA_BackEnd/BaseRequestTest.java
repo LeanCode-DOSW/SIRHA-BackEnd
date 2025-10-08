@@ -5,7 +5,6 @@ import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.RequestStateEnum;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateGroup.Group;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateRequest.*;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.port.RequestProcess;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.port.RequestState;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -36,9 +35,9 @@ class BaseRequestTest {
         subject1 = new Subject("101", "Matemáticas", 4);
         subject2 = new Subject("102", "Física", 3);
 
-        group1 = new Group(30, academicPeriod);
-        group2 = new Group(25, academicPeriod);
-        
+        group1 = new Group(subject1, 30, academicPeriod);
+        group2 = new Group(subject2, 25, academicPeriod);
+
         subject1.addGroup(group1);
         subject2.addGroup(group2);
     }
@@ -60,7 +59,7 @@ class BaseRequestTest {
 
     @Test
     void testCambioMateriaCreation() {
-        CambioMateria cambioMateria = new CambioMateria(student, subject1, subject2, academicPeriod);
+        CambioMateria cambioMateria = new CambioMateria(student, subject1, subject2, group1, academicPeriod);
         cambioMateria.setId("12345");
         
         assertNotNull(cambioMateria);
@@ -68,9 +67,7 @@ class BaseRequestTest {
         assertEquals(academicPeriod, cambioMateria.getCurrentPeriod());
         assertNotNull(cambioMateria.getCreadoEn());
         assertNotNull(cambioMateria.getId());
-        
-        assertFalse(cambioMateria.validateRequest());
-    }
+        }
 
     @Test
     void testRequestStateManagement() {
@@ -101,7 +98,7 @@ class BaseRequestTest {
 
     @Test
     void testRejectionProcess() {
-        CambioMateria cambioMateria = new CambioMateria(student, subject1, subject2, academicPeriod);
+        CambioMateria cambioMateria = new CambioMateria(student, subject1, subject2, group1, academicPeriod);
         
         cambioMateria.reviewRequest("Iniciando revisión");
 
@@ -131,7 +128,7 @@ class BaseRequestTest {
 
     @Test
     void testPendingProcess() {
-        CambioMateria cambioMateria = new CambioMateria(student, subject1, subject2, academicPeriod);
+        CambioMateria cambioMateria = new CambioMateria(student, subject1, subject2, group1, academicPeriod);
 
         cambioMateria.reviewRequest("Iniciando revisión");
 

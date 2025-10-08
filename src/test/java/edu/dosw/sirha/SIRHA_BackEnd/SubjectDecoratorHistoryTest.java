@@ -30,7 +30,7 @@ class SubjectDecoratorHistoryTest {
         subject = new Subject("101", "Matemáticas", 4);
         decorator = new SubjectDecorator(subject);
         period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
-        group = new Group(30, period);
+        group = new Group(subject, 30, period);
     }
 
     @Test
@@ -152,7 +152,7 @@ class SubjectDecoratorHistoryTest {
         assertEquals(1, decorator.getHistory().size());
         
         // Re-inscribir (si es posible según los estados)
-        Group newGroup = new Group(25, period);
+        Group newGroup = new Group(subject, 25, period);
         try {
             decorator.inscribir(newGroup);
             decorator.setGrade(90);

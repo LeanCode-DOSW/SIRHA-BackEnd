@@ -16,7 +16,7 @@ public class AprobadaState implements SubjectState {
     public void setGrade(SubjectDecorator materia, int grade) {throw new IllegalStateException("No se puede cambiar la nota de una materia aprobada");}
     public void setInscripcion(SubjectDecorator materia, Group grupo) {throw new IllegalStateException("No se puede inscribir una materia ya aprobada");}
     public void inscribir(SubjectDecorator materia, Group grupo) {throw new IllegalStateException("No se puede inscribir una materia ya aprobada");}
-    public void aprobar(SubjectDecorator materia) {System.out.println("Ya está aprobada.");}
+    public void aprobar(SubjectDecorator materia) {throw new IllegalStateException("No se puede aprobar una materia ya aprobada");}
     public void reprobar(SubjectDecorator materia) {throw new IllegalStateException("No se puede reprobar una materia aprobada");}
     public void retirar(SubjectDecorator materia) {throw new IllegalStateException("No se puede retirar una materia aprobada");}
 
