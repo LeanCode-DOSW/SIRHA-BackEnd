@@ -7,6 +7,7 @@ import java.util.List;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import edu.dosw.sirha.SIRHA_BackEnd.domain.exception.SirhaException;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.AcademicPeriod;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.ResponseProcess;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.Student;
@@ -63,22 +64,22 @@ public abstract class BaseRequest implements RequestTo {
     public void setCurrentPeriod(AcademicPeriod currentPeriod) {this.currentPeriod = currentPeriod;}
 
 
-    public void approveRequest(String comentario){
+    public void approveRequest(String comentario) throws SirhaException{
         state.approveRequest(this);
         state = new EstadoAprobada();
         changeState(new ResponseProcess(RequestStateEnum.APROBADA, comentario));
     }
-    public void rejectRequest(String comentario){
+    public void rejectRequest(String comentario) throws SirhaException{
         state.rejectRequest(this);
         state = new EstadoRechazada();
         changeState(new ResponseProcess(RequestStateEnum.RECHAZADA, comentario));
     }
-    public void pendingRequest(String comentario){
+    public void pendingRequest(String comentario) throws SirhaException{
         state.pendingRequest(this);
         state = new EstadoPendiente();
         changeState(new ResponseProcess(RequestStateEnum.PENDIENTE, comentario));
     }
-    public void reviewRequest(String comentario){
+    public void reviewRequest(String comentario) throws SirhaException{
         state.reviewRequest(this);
         state = new EstadoEnRevision();
         changeState(new ResponseProcess(RequestStateEnum.EN_REVISION, comentario));
