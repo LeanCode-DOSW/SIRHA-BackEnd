@@ -2,18 +2,24 @@ package edu.dosw.sirha.SIRHA_BackEnd.service.impl;
 
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.Schedule;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.Student;
+import edu.dosw.sirha.SIRHA_BackEnd.domain.model.Subject;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.SemaforoColores;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.AcademicPeriod;
+import edu.dosw.sirha.SIRHA_BackEnd.domain.model.CambioGrupo;
+import edu.dosw.sirha.SIRHA_BackEnd.domain.model.CambioMateria;
+
 import java.util.Map;
 import edu.dosw.sirha.SIRHA_BackEnd.dto.AuthResponse;
 import edu.dosw.sirha.SIRHA_BackEnd.dto.LoginRequest;
 import edu.dosw.sirha.SIRHA_BackEnd.dto.RegisterRequest;
 import edu.dosw.sirha.SIRHA_BackEnd.dto.SubjectDecoratorDTO;
 import edu.dosw.sirha.SIRHA_BackEnd.repository.mongo.AcademicPeriodMongoRepository;
+import edu.dosw.sirha.SIRHA_BackEnd.repository.mongo.GroupMongoRepository;
 import edu.dosw.sirha.SIRHA_BackEnd.repository.mongo.StudentMongoRepository;
+import edu.dosw.sirha.SIRHA_BackEnd.repository.mongo.SubjectMongoRepository;
 import edu.dosw.sirha.SIRHA_BackEnd.service.StudentService;
 import edu.dosw.sirha.SIRHA_BackEnd.util.ValidationUtil;
-
+import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateGroup.Group;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -24,10 +30,14 @@ import java.util.stream.Collectors;
 public class StudentServiceImpl implements StudentService {
     private final StudentMongoRepository studentRepository;
     private final AcademicPeriodMongoRepository academicPeriodRepository;
+    private final SubjectMongoRepository subjectRepository;
+    private final GroupMongoRepository  groupRepository;
 
-    public StudentServiceImpl(StudentMongoRepository studentRepository, AcademicPeriodMongoRepository academicPeriodRepository) {
+    public StudentServiceImpl(StudentMongoRepository studentRepository, AcademicPeriodMongoRepository academicPeriodRepository, SubjectMongoRepository subjectRepository, GroupMongoRepository groupRepository) {
         this.studentRepository = studentRepository;
         this.academicPeriodRepository = academicPeriodRepository;
+        this.subjectRepository = subjectRepository;
+        this.groupRepository = groupRepository;
     }
 
     @Override
@@ -166,5 +176,42 @@ public class StudentServiceImpl implements StudentService {
             .orElseThrow(() -> new IllegalArgumentException("Estudiante no encontrado"))
             .getAcademicPensum();
     }
+
+    @Override
+    public CambioGrupo createRequestCambioGrupo(String studentName, String subjectName, String codeNewGroup) {
+
+        Student student = studentRepository.findByUsername(studentName)
+            .orElseThrow(() -> new IllegalArgumentException("Estudiante no encontrado"));
+        
+        Subject subject = subjectRepository.findByName(subjectName)
+            .orElseThrow(() -> new IllegalArgumentException("Materia no encontrada"));
+
+        Group group = groupRepository.findByCode(codeNewGroup)
+            .orElseThrow(() -> new IllegalArgumentException("Grupo no encontrado"));
+            
+
+        return student.createSolicitudCambioGrupo(subject, group);
+
+        
+    }
+
+    @Override
+    public CambioMateria createRequestCambioMateria(String studentName, String subjectName, String newSubjectName, String codeNewGroup) {
+        
+        Student student = studentRepository.findByUsername(studentName)
+            .orElseThrow(() -> new IllegalArgumentException("Estudiante no encontrado"));
+
+        Subject subjectOld = subjectRepository.findByName(subjectName)
+            .orElseThrow(() -> new IllegalArgumentException("Materia antigua no encontrada"));
+
+        Subject subjectNew = subjectRepository.findByName(newSubjectName)
+            .orElseThrow(() -> new IllegalArgumentException("Materia nueva no encontrada"));
+
+        Group group = groupRepository.findByCode(codeNewGroup)
+            .orElseThrow(() -> new IllegalArgumentException("Grupo no encontrado"));
+
+        return student.createSolicitudCambioMateria(subjectOld, subjectNew, group);
+    }
+
 
 }

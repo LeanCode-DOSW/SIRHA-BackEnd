@@ -31,7 +31,7 @@ public class StatusOpen implements GroupState {
             }
             return true;
         } else {
-            throw new RuntimeException("No hay estudiantes inscritos para desinscribir.");
+            throw new IllegalStateException("No hay estudiantes inscritos para desinscribir.");
         }
     }
 }

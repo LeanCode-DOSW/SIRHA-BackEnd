@@ -38,15 +38,11 @@ class CambioMateriaTest {
         materiaAntigua = new Subject("101", "Álgebra", 3);
         materiaNueva = new Subject("102", "Cálculo", 4);
         prerequisito = new Subject("100", "Matemáticas Básicas", 3);
-        
-        grupoAntiguo = new Group(30, academicPeriod);
-        grupoNuevo = new Group(25, academicPeriod);
-        grupoPrerequisito = new Group(35, academicPeriod);
-        
-        materiaAntigua.addGroup(grupoAntiguo);
-        materiaNueva.addGroup(grupoNuevo);
-        prerequisito.addGroup(grupoPrerequisito);
-        
+
+        grupoAntiguo = new Group(materiaAntigua, 30, academicPeriod);
+        grupoNuevo = new Group(materiaNueva, 25, academicPeriod);
+        grupoPrerequisito = new Group(prerequisito, 35, academicPeriod);
+
         studyPlan = new StudyPlan("Ingeniería de Sistemas");
         studyPlan.addSubject(materiaAntigua);
         studyPlan.addSubject(materiaNueva);
@@ -63,20 +59,13 @@ class CambioMateriaTest {
 
     @Test
     void testCambioMateriaCreation() {
-        CambioMateria cambioMateria = new CambioMateria(student, materiaAntigua, materiaNueva, academicPeriod);
+        CambioMateria cambioMateria = new CambioMateria(student, materiaAntigua, materiaNueva, grupoNuevo, academicPeriod);
         
         assertNotNull(cambioMateria);
         assertEquals(student, cambioMateria.getStudent());
         assertEquals(academicPeriod, cambioMateria.getCurrentPeriod());
         assertNotNull(cambioMateria.getCreadoEn());
-    }
-
-    @Test
-    void testCambioMateriaValidation() {
-        CambioMateria cambioMateria = new CambioMateria(student, materiaAntigua, materiaNueva, academicPeriod);
-        
-        // Por defecto, validateRequest retorna false (lógica pendiente de implementar)
-        assertFalse(cambioMateria.validateRequest());
+        student.getAcademicProgress().getContadoresPorEstado();
     }
 
     @Test
@@ -87,10 +76,6 @@ class CambioMateriaTest {
         
         assertTrue(materiaNueva.hasPrerequisites());
         
-        CambioMateria cambioMateria = new CambioMateria(student, materiaAntigua, materiaNueva, academicPeriod);
-        
-        // Sin haber aprobado el prerequisito, la validación debería fallar
-        assertFalse(cambioMateria.validateRequest());
     }
 
     @Test
@@ -101,12 +86,8 @@ class CambioMateriaTest {
         
         // Inscribir y aprobar el prerequisito
         student.enrollSubject(prerequisito, grupoPrerequisito);
-        assertTrue(student.hasSubject(prerequisito));
-        
-        CambioMateria cambioMateria = new CambioMateria(student, materiaAntigua, materiaNueva, academicPeriod);
-        
-        // Con prerequisito cumplido, pero la validación por defecto sigue siendo false
-        assertFalse(cambioMateria.validateRequest());
+        assertTrue(student.hasSubject(prerequisito));        
+
     }
 
 
@@ -121,10 +102,6 @@ class CambioMateriaTest {
         assertTrue(grupoNuevo.isFull());
         assertEquals(0, grupoNuevo.getCuposDisponibles());
         
-        CambioMateria cambioMateria = new CambioMateria(student, materiaAntigua, materiaNueva, academicPeriod);
-        
-        // La validación debería fallar porque no hay cupos
-        assertFalse(cambioMateria.validateRequest());
     }
 
     @Test
@@ -132,37 +109,23 @@ class CambioMateriaTest {
         assertEquals(25, grupoNuevo.getCuposDisponibles());
         assertFalse(grupoNuevo.isFull());
         
-        CambioMateria cambioMateria = new CambioMateria(student, materiaAntigua, materiaNueva, academicPeriod);
         
         // Verificar que hay cupos disponibles
         assertTrue(grupoNuevo.getCuposDisponibles() > 0);
-        assertFalse(cambioMateria.validateRequest()); // Por defecto retorna false
     }
 
     @Test
-    void testCambioMateriaDifferentSubjects() {
-        CambioMateria cambioMateria = new CambioMateria(student, materiaAntigua, materiaNueva, academicPeriod);
-        
-        // Verificar que son materias diferentes
+    void testCambioMateriaDifferentSubjects() {        
         assertNotEquals(materiaAntigua.getId(), materiaNueva.getId());
         assertNotEquals(materiaAntigua.getName(), materiaNueva.getName());
         assertNotEquals(materiaAntigua.getCredits(), materiaNueva.getCredits());
     }
 
     @Test
-    void testCambioMateriaSameSubjectShouldFail() {
-        // Intentar cambio de la misma materia
-        CambioMateria cambioMateria = new CambioMateria(student, materiaAntigua, materiaAntigua, academicPeriod);
-        
-        // Esto debería ser inválido (cambiar de una materia a sí misma)
-        assertFalse(cambioMateria.validateRequest());
-    }
-
-    @Test
     void testCambioMateriaValidPeriod() {
         assertTrue(academicPeriod.isActive());
         
-        CambioMateria cambioMateria = new CambioMateria(student, materiaAntigua, materiaNueva, academicPeriod);
+        CambioMateria cambioMateria = new CambioMateria(student, materiaAntigua, materiaNueva, grupoNuevo, academicPeriod);
         
         assertEquals(academicPeriod, cambioMateria.getCurrentPeriod());
         assertTrue(cambioMateria.getCurrentPeriod().isActive());
@@ -177,37 +140,24 @@ class CambioMateriaTest {
         
         assertFalse(periodoInactivo.isActive());
         
-        CambioMateria cambioMateria = new CambioMateria(student, materiaAntigua, materiaNueva, periodoInactivo);
         
-        // La validación debería fallar para períodos inactivos
-        assertFalse(cambioMateria.validateRequest());
     }
 
     @Test
     void testCambioMateriaWithClosedGroup() {
         // Cerrar el grupo de la materia nueva
         grupoNuevo.closeGroup();
-        assertFalse(grupoNuevo.isOpen());
-        
-        CambioMateria cambioMateria = new CambioMateria(student, materiaAntigua, materiaNueva, academicPeriod);
-        
-        // La validación debería fallar porque el grupo está cerrado
-        assertFalse(cambioMateria.validateRequest());
+        assertFalse(grupoNuevo.isOpen());    
     }
 
 
     @Test
     void testCambioMateriaCreditsComparison() {
-        CambioMateria cambioMateria = new CambioMateria(student, materiaAntigua, materiaNueva, academicPeriod);
         
-        // Comparar créditos entre materias
         assertEquals(3, materiaAntigua.getCredits());
         assertEquals(4, materiaNueva.getCredits());
         
-        // La materia nueva tiene más créditos
         assertTrue(materiaNueva.getCredits() > materiaAntigua.getCredits());
-        
-        assertFalse(cambioMateria.validateRequest());
     }
 
     @Test
@@ -215,72 +165,73 @@ class CambioMateriaTest {
         // Verificar que ambas materias están en el plan de estudios
         assertTrue(studyPlan.hasSubject(materiaAntigua));
         assertTrue(studyPlan.hasSubject(materiaNueva));
-        
-        CambioMateria cambioMateria = new CambioMateria(student, materiaAntigua, materiaNueva, academicPeriod);
-        
-        // Ambas materias deben estar en el plan de estudios del estudiante
         assertTrue(studyPlan.getSubjects().containsValue(materiaAntigua));
         assertTrue(studyPlan.getSubjects().containsValue(materiaNueva));
-        
-        assertFalse(cambioMateria.validateRequest());
     }
 
     @Test
     void testCambioMateriaSubjectNotInStudyPlan() {
-        // Crear una materia que no está en el plan
         Subject materiaFueraPlan = new Subject("999", "Materia Externa", 2);
-        Group grupoExterno = new Group(15, academicPeriod);
-        materiaFueraPlan.addGroup(grupoExterno);
+        Group grupoExterno = new Group(materiaFueraPlan, 15, academicPeriod);
         
-        // Verificar que no está en el plan
         assertFalse(studyPlan.hasSubject(materiaFueraPlan));
         
-        CambioMateria cambioMateria = new CambioMateria(student, materiaAntigua, materiaFueraPlan, academicPeriod);
-        
-        // La validación debería fallar porque la materia nueva no está en el plan
-        assertFalse(cambioMateria.validateRequest());
     }
 
     @Test
-    void testCambioMateriaIntegrationScenario() {
-        // Escenario completo de cambio de materia
-        
-        // 1. Inscribir estudiante en materia antigua
+    void testCambioMateriaScenario() {
+        grupoAntiguo.addSchedule(scheduleConflict);
+        grupoNuevo.addSchedule(scheduleNoConflict);
+
         student.enrollSubject(materiaAntigua, grupoAntiguo);
         assertTrue(student.hasSubject(materiaAntigua));
         
-        // 2. Verificar que la materia nueva tiene cupos
         assertTrue(grupoNuevo.getCuposDisponibles() > 0);
         assertTrue(grupoNuevo.isOpen());
         
-        // 3. Verificar que no hay conflictos de horario
-        grupoAntiguo.addSchedule(scheduleConflict);
-        grupoNuevo.addSchedule(scheduleNoConflict);
+        
         assertFalse(scheduleConflict.seSolapaCon(scheduleNoConflict));
         
-        // 4. Verificar que ambas materias están en el plan
         assertTrue(studyPlan.hasSubject(materiaAntigua));
         assertTrue(studyPlan.hasSubject(materiaNueva));
-        
-        // 5. Crear solicitud de cambio
-        CambioMateria cambioMateria = new CambioMateria(student, materiaAntigua, materiaNueva, academicPeriod);
-        
-        // 6. Validar todos los aspectos
-        assertNotNull(cambioMateria);
-        assertEquals(student, cambioMateria.getStudent());
-        assertEquals(academicPeriod, cambioMateria.getCurrentPeriod());
-        assertTrue(academicPeriod.isActive());
-        
-        // La validación completa se implementará en el futuro
-        assertFalse(cambioMateria.validateRequest());
+
+        CambioMateria solicitud = student.createSolicitudCambioMateria(materiaAntigua, materiaNueva, grupoNuevo);
+        assertNotNull(solicitud);
+        assertEquals(student, solicitud.getStudent());
+        assertEquals(materiaAntigua, solicitud.getOldSubject());
+        assertEquals(materiaNueva, solicitud.getNewSubject());
+        assertEquals(grupoNuevo, solicitud.getNewGroup());
+        solicitud.validateRequest();
     }
+
+    @Test
+    void testValidateChangeSubjectSuccessfulCase() {
+        student.enrollSubject(materiaAntigua, grupoAntiguo);
+        
+        grupoAntiguo.addSchedule(scheduleConflict);
+        grupoNuevo.addSchedule(scheduleNoConflict);
+        
+        assertTrue(student.hasSubject(materiaAntigua));
+        assertTrue(student.getAcademicProgress().isSubjectCursando(materiaAntigua));
+        assertNotEquals(materiaAntigua, materiaNueva);
+        assertTrue(student.getAcademicProgress().isSubjectNoCursada(materiaNueva));
+        assertTrue(student.getAcademicProgress().getStudyPlan().hasSubject(materiaNueva));
+        assertTrue(materiaNueva.hasGroup(grupoNuevo));
+        assertTrue(grupoNuevo.isOpen());
+        assertFalse(student.tieneConflictoConHorario(grupoNuevo));
+        assertTrue(academicPeriod.isActive());
+        assertTrue(grupoNuevo.sameAcademicPeriod(academicPeriod));
+        
+        assertTrue(student.validateChangeSubject(materiaAntigua, materiaNueva, grupoNuevo));
+    }
+
+
 
     @Test
     void testCambioMateriaComplexPrerequisiteScenario() {
         // Crear cadena de prerequisitos: Básicas -> Álgebra -> Cálculo
         Subject matematicasBasicas = new Subject("90", "Matemáticas Básicas", 2);
-        Group grupoBasicas = new Group(40, academicPeriod);
-        matematicasBasicas.addGroup(grupoBasicas);
+        Group grupoBasicas = new Group(matematicasBasicas, 40, academicPeriod);
         studyPlan.addSubject(matematicasBasicas);
         
         // Álgebra requiere Matemáticas Básicas
@@ -297,11 +248,164 @@ class CambioMateriaTest {
         
         assertTrue(student.hasSubject(matematicasBasicas));
         assertTrue(student.hasSubject(materiaAntigua));
-        
-        CambioMateria cambioMateria = new CambioMateria(student, materiaAntigua, materiaNueva, academicPeriod);
-        
-        // Con todos los prerequisitos cumplidos
+
         assertTrue(materiaNueva.hasPrerequisites());
-        assertFalse(cambioMateria.validateRequest()); // Validación por defecto
+    }
+
+
+    @Test
+    void testError1_EstudianteNoTieneMateriaAntigua() {
+        Subject materiaNoInscrita = new Subject("999", "Materia No Inscrita", 3);
+        Group grupoNoInscrita = new Group(materiaNoInscrita, 20, academicPeriod);
+        studyPlan.addSubject(materiaNoInscrita);
+        
+        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> {
+            student.validateChangeSubject(materiaNoInscrita, materiaNueva, grupoNuevo);
+        });
+        assertEquals("El estudiante no tiene la materia antigua especificada", exception.getMessage());
+    }
+
+    @Test
+    void testError2_MateriaAntiguaNoEstaEnCurso() {    
+        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> {
+            student.validateChangeSubject(materiaAntigua, materiaNueva, grupoNuevo);
+        });
+        assertEquals("La materia antigua no está en curso", exception.getMessage());
+    }
+
+    @Test
+    void testError3_MateriaNuevaEsLaMismaQueAntigua() {
+        student.enrollSubject(materiaAntigua, grupoAntiguo);
+        
+        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> {
+            student.validateChangeSubject(materiaAntigua, materiaAntigua, grupoAntiguo);
+        });
+        assertEquals("La materia nueva es la misma que la antigua", exception.getMessage());
+    }
+
+    @Test
+    void testError4_EstudianteYaTieneMateriaNueva() {
+        student.enrollSubject(materiaAntigua, grupoAntiguo);
+        student.enrollSubject(materiaNueva, grupoNuevo);
+        
+        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> {
+            student.validateChangeSubject(materiaAntigua, materiaNueva, grupoNuevo);
+        });
+        assertEquals("El estudiante ya tiene la materia nueva inscrita o aprobada", exception.getMessage());
+    }
+
+    @Test
+    void testError5_MateriaNuevaNoEstaEnPlanEstudios() {
+        student.enrollSubject(materiaAntigua, grupoAntiguo);
+        
+        Subject materiaFueraPlan = new Subject("888", "Materia Externa", 2);
+        Group grupoExterno = new Group(materiaFueraPlan, 15, academicPeriod);
+        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> {
+            student.validateChangeSubject(materiaAntigua, materiaFueraPlan, grupoExterno);
+        });
+        assertEquals("La materia nueva no está en el plan de estudios del estudiante", exception.getMessage());
+    }
+
+    @Test
+    void testError6_NoSeCumplenPrerequisitos() {
+        student.enrollSubject(materiaAntigua, grupoAntiguo);
+        
+        MustHaveApprovedSubject prerequisiteRule = new MustHaveApprovedSubject(prerequisito);
+        materiaNueva.addPrerequisite(prerequisiteRule);
+        
+        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> {
+            student.validateChangeSubject(materiaAntigua, materiaNueva, grupoNuevo);
+        });
+        assertEquals("No se cumplen los prerrequisitos para inscribir la materia nueva", exception.getMessage());
+    }
+
+    @Test
+    void testError7_GrupoNoPerteneceMaterianNueva() {
+        // Error: El nuevo grupo no pertenece a la materia nueva especificada
+        assertFalse(student.tieneMateriasEnCurso());
+        student.enrollSubject(materiaAntigua, grupoAntiguo);
+        assertTrue(student.tieneMateriasEnCurso());
+        Group grupoIncorrecto = new Group(materiaAntigua, 20, academicPeriod);
+        grupoIncorrecto.addSchedule(new Schedule(DiasSemana.DOMINGO, LocalTime.of(14, 0), LocalTime.of(16, 0)));
+        
+        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> {
+            student.createSolicitudCambioMateria(materiaAntigua, materiaNueva, grupoIncorrecto);
+        });
+        assertEquals("El nuevo grupo no pertenece a la materia nueva especificada", exception.getMessage());
+    }
+
+    @Test
+    void testError8_GrupoNuevoEstaCerrado() {
+        student.enrollSubject(materiaAntigua, grupoAntiguo);
+        grupoNuevo.closeGroup();
+        
+        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> {
+            student.validateChangeSubject(materiaAntigua, materiaNueva, grupoNuevo);
+        });
+        assertEquals("El nuevo grupo está cerrado", exception.getMessage());
+    }
+
+    @Test
+    void testError9_ConflictoDeHorarios() {
+        student.enrollSubject(materiaAntigua, grupoAntiguo);
+        
+        Schedule horarioConflicto = new Schedule(DiasSemana.LUNES, LocalTime.of(8, 0), LocalTime.of(10, 0));
+        grupoAntiguo.addSchedule(horarioConflicto);
+        grupoNuevo.addSchedule(horarioConflicto); // Mismo horario = conflicto
+        
+        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> {
+            student.validateChangeSubject(materiaAntigua, materiaNueva, grupoNuevo);
+        });
+        assertEquals("Conflicto de horarios con el nuevo grupo", exception.getMessage());
+    }
+
+    @Test
+    void testError10_PeriodoAcademicoInvalido() {
+        student.enrollSubject(materiaAntigua, grupoAntiguo);
+        
+        AcademicPeriod periodoInactivo = new AcademicPeriod("2023-1", 
+            LocalDate.now().minusMonths(6), 
+            LocalDate.now().minusMonths(2));
+        Group grupoPerodoInvalido = new Group(materiaNueva, 20, periodoInactivo);
+        
+        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> {
+            student.validateChangeSubject(materiaAntigua, materiaNueva, grupoPerodoInvalido);
+        });
+        assertEquals("El período académico no es válido para el nuevo grupo", exception.getMessage());
+    }
+
+    @Test
+    void testError13_GrupoNoDifferentePeriodo() {
+        student.enrollSubject(materiaAntigua, grupoAntiguo);
+        
+        AcademicPeriod otroPeriodo = new AcademicPeriod("2024-2", 
+            LocalDate.now().plusMonths(6), 
+            LocalDate.now().plusMonths(10));
+        Group grupoOtroPeriodo = new Group(materiaNueva, 20, otroPeriodo);        
+        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> {
+            student.validateChangeSubject(materiaAntigua, materiaNueva, grupoOtroPeriodo);
+        });
+        assertEquals("El período académico no es válido para el nuevo grupo", exception.getMessage());
+    }
+
+    @Test
+    void testValidateChangeSubject_CasoExitoso() {
+        student.enrollSubject(materiaAntigua, grupoAntiguo);
+        
+        grupoAntiguo.addSchedule(scheduleConflict);
+        grupoNuevo.addSchedule(scheduleNoConflict);
+        
+        assertTrue(student.hasSubject(materiaAntigua));
+        assertTrue(student.getAcademicProgress().isSubjectCursando(materiaAntigua));
+        assertNotEquals(materiaAntigua, materiaNueva);
+        assertTrue(student.getAcademicProgress().isSubjectNoCursada(materiaNueva));
+        assertTrue(student.getAcademicProgress().getStudyPlan().hasSubject(materiaNueva));
+        assertTrue(materiaNueva.hasGroup(grupoNuevo));
+        assertTrue(grupoNuevo.isOpen());
+        assertFalse(student.tieneConflictoConHorario(grupoNuevo));
+        assertTrue(academicPeriod.isActive());
+        assertTrue(grupoNuevo.sameAcademicPeriod(academicPeriod));
+        
+        assertTrue(student.validateChangeSubject(materiaAntigua, materiaNueva, grupoNuevo));
     }
 }

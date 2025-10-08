@@ -50,13 +50,25 @@ public class Subject {
         }
         groups.add(g);
     }
+    public int getGroupCount() {return groups.size();}
 
     /**
      * Elimina un grupo de la materia.
      */
-    public boolean removeGroup(Group g) {return groups.remove(g);}
+    public boolean removeGroup(Group g) {
+        g.removeGroup();
+        return groups.remove(g);
+    }
     public boolean hasGroup(Group group){return groups.contains(group);}
 
+    public Group getGroupByCode(String code) {
+        for (Group g : groups) {
+            if (g.getCode().equals(code)) {
+                return g;
+            }
+        }
+        return null;
+    }
 
     public void setId(String id) {this.id = id;}
     public void setName(String name) {

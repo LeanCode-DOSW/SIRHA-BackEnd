@@ -43,9 +43,9 @@ class RequestIntegrationTest {
         physics = new Subject("102", "Física", 3);
         chemistry = new Subject("103", "Química", 4);
 
-        mathGroup1 = new Group(30, academicPeriod);
-        mathGroup2 = new Group(25, academicPeriod);
-        physicsGroup = new Group(20, academicPeriod);
+        mathGroup1 = new Group(mathematics, 30, academicPeriod);
+        mathGroup2 = new Group(mathematics, 25, academicPeriod);
+        physicsGroup = new Group(physics, 20, academicPeriod);
         
         mathGroup1.setId(1001);
         mathGroup2.setId(1002);
@@ -58,10 +58,6 @@ class RequestIntegrationTest {
         mathGroup1.addSchedule(mathSchedule1);
         mathGroup2.addSchedule(mathSchedule2);
         physicsGroup.addSchedule(physicsSchedule);
-        
-        mathematics.addGroup(mathGroup1);
-        mathematics.addGroup(mathGroup2);
-        physics.addGroup(physicsGroup);
         
         studyPlan = new StudyPlan("Ingeniería de Sistemas");
         studyPlan.addSubject(mathematics);
@@ -109,9 +105,9 @@ class RequestIntegrationTest {
     void testCompleteSubjectChangeWorkflow() {
         student.enrollSubject(mathematics, mathGroup1);
         assertTrue(student.hasSubject(mathematics));
-        
-        CambioMateria solicitudCambio = new CambioMateria(student, mathematics, physics, academicPeriod);
-        
+
+        CambioMateria solicitudCambio = new CambioMateria(student, mathematics, physics, mathGroup2, academicPeriod);
+
         assertNotNull(solicitudCambio);
         assertEquals(student, solicitudCambio.getStudent());
         assertEquals(academicPeriod, solicitudCambio.getCurrentPeriod());
@@ -162,8 +158,7 @@ class RequestIntegrationTest {
     @Test
     void testSubjectWithPrerequisitesWorkflow() {
         Subject calculus = new Subject("201", "Cálculo", 4);
-        Group calculusGroup = new Group(20, academicPeriod);
-        calculus.addGroup(calculusGroup);
+        Group calculusGroup = new Group(calculus, 20, academicPeriod);
         studyPlan.addSubject(calculus);
         
         MustHaveApprovedSubject prerequisiteRule = new MustHaveApprovedSubject(mathematics);
@@ -171,7 +166,7 @@ class RequestIntegrationTest {
         
         assertTrue(calculus.hasPrerequisites());
         
-        CambioMateria solicitudSinPrerequisito = new CambioMateria(student, physics, calculus, academicPeriod);
+        CambioMateria solicitudSinPrerequisito = new CambioMateria(student, physics, calculus, mathGroup2, academicPeriod);
         
         solicitudSinPrerequisito.reviewRequest("Revisando prerequisitos");
         
@@ -180,7 +175,7 @@ class RequestIntegrationTest {
         
         student.enrollSubject(mathematics, mathGroup1);
         
-        CambioMateria solicitudConPrerequisito = new CambioMateria(student, physics, calculus, academicPeriod);
+        CambioMateria solicitudConPrerequisito = new CambioMateria(student, physics, calculus, mathGroup2, academicPeriod);
 
         solicitudConPrerequisito.reviewRequest("Revisando con prerequisitos cumplidos");
         solicitudConPrerequisito.approveRequest("Prerequisitos cumplidos - cambio aprobado");
@@ -191,19 +186,19 @@ class RequestIntegrationTest {
     @Test
     void testScheduleConflictDetection() {
         Schedule conflictingSchedule = new Schedule(DiasSemana.LUNES, LocalTime.of(9, 0), LocalTime.of(11, 0));
-        Group conflictingGroup = new Group(15, academicPeriod);
-        conflictingGroup.addSchedule(conflictingSchedule);
+        
         
         Subject conflictingSubject = new Subject("999", "Materia Conflictiva", 2);
-        conflictingSubject.addGroup(conflictingGroup);
+        Group conflictingGroup = new Group(conflictingSubject, 15, academicPeriod);
+        conflictingGroup.addSchedule(conflictingSchedule);
         studyPlan.addSubject(conflictingSubject);
         
         student.enrollSubject(mathematics, mathGroup1); // Lunes 8-10
         
         assertTrue(mathSchedule1.seSolapaCon(conflictingSchedule));
-        
-        CambioMateria solicitudConflicto = new CambioMateria(student, physics, conflictingSubject, academicPeriod);
-        
+
+        CambioMateria solicitudConflicto = new CambioMateria(student, physics, conflictingSubject, conflictingGroup, academicPeriod);
+
         solicitudConflicto.reviewRequest("Revisando conflictos de horario");
         
         solicitudConflicto.rejectRequest("Conflicto de horario detectado");
@@ -215,7 +210,7 @@ class RequestIntegrationTest {
         CambioGrupo solicitud1 = new CambioGrupo(student, mathematics, mathGroup2, academicPeriod);
         solicitud1.reviewRequest("Revisando primera solicitud");
         solicitud1.approveRequest("Primera solicitud aprobada");
-        CambioMateria solicitud2 = new CambioMateria(student, mathematics, physics, academicPeriod);    
+        CambioMateria solicitud2 = new CambioMateria(student, mathematics, physics, mathGroup2, academicPeriod);
         solicitud2.reviewRequest("Revisando segunda solicitud");
         solicitud2.approveRequest("Segunda solicitud aprobada");
         

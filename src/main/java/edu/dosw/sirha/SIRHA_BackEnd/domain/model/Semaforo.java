@@ -168,7 +168,7 @@ public class Semaforo implements AcademicProgress {
         SubjectDecorator decorator = subjects.get(subject.getName());
         if (decorator == null) {
             System.out.println("Error: La materia no está en el semáforo");
-            throw new IllegalArgumentException("La materia no está en el semáforo");
+            throw new IllegalStateException("La materia no está en el semáforo");
         }
         if (!isSubjectCursando(subject)) {
             System.out.println("Error: La materia no está en curso");
@@ -181,7 +181,7 @@ public class Semaforo implements AcademicProgress {
         }
         if (!subject.hasGroup(newGroup)) {
             System.out.println("Error: El grupo no pertenece a la materia especificada");
-            throw new IllegalArgumentException("El grupo no pertenece a la materia especificada");
+            throw new IllegalStateException("El grupo no pertenece a la materia especificada");
         }
         return true;
     }
