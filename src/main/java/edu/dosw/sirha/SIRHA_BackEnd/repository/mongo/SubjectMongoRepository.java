@@ -13,10 +13,6 @@ import java.util.Optional;
 @Repository
 public interface SubjectMongoRepository extends MongoRepository<Subject, String> {
 
-    /**
-     * Busca una materia por su nombre.
-     * @param name nombre de la materia
-     * @return Optional de Subject si existe
-     */
     Optional<Subject> findByName(String name);
+    
 }

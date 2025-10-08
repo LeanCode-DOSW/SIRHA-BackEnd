@@ -9,6 +9,8 @@ import edu.dosw.sirha.SIRHA_BackEnd.service.StudentService;
 import edu.dosw.sirha.SIRHA_BackEnd.util.MapperUtils;
 import io.micrometer.core.ipc.http.HttpSender.Response;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.AcademicPeriod;
+import edu.dosw.sirha.SIRHA_BackEnd.domain.model.CambioGrupo;
+import edu.dosw.sirha.SIRHA_BackEnd.domain.model.CambioMateria;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -162,6 +164,35 @@ public class StudentController {
         try {
             Map<SemaforoColores,List<SubjectDecoratorDTO>> pensum = studentService.getAcademicPensum(username);
             return ResponseEntity.ok(pensum);
+        } catch (IllegalArgumentException e) {
+            // Retornar 404 cuando el estudiante no existe
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @PostMapping("/{studentName}/solicitudes/cambio-grupo")
+    public ResponseEntity<CambioGrupo> createRequestCambioGrupo(
+            @PathVariable String studentName, 
+            @RequestParam String subjectName, 
+            @RequestParam String codeNewGroup) {
+        try {
+            CambioGrupo cambioGrupo = studentService.createRequestCambioGrupo(studentName, subjectName, codeNewGroup);
+            return ResponseEntity.ok(cambioGrupo);
+        } catch (IllegalArgumentException e) {
+            // Retornar 404 cuando el estudiante no existe
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @PostMapping("/{studentName}/solicitudes/cambio-materia")
+    public ResponseEntity<CambioMateria> createRequestCambioMateria(
+            @PathVariable String studentName, 
+            @RequestParam String subjectName, 
+            @RequestParam String newSubjectName, 
+            @RequestParam String codeNewGroup) {
+        try {
+            CambioMateria cambioMateria = studentService.createRequestCambioMateria(studentName, subjectName, newSubjectName, codeNewGroup);
+            return ResponseEntity.ok(cambioMateria);
         } catch (IllegalArgumentException e) {
             // Retornar 404 cuando el estudiante no existe
             return ResponseEntity.notFound().build();

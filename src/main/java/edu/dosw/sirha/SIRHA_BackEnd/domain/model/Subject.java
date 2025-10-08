@@ -61,6 +61,14 @@ public class Subject {
     }
     public boolean hasGroup(Group group){return groups.contains(group);}
 
+    public Group getGroupByCode(String code) {
+        for (Group g : groups) {
+            if (g.getCode().equals(code)) {
+                return g;
+            }
+        }
+        return null;
+    }
 
     public void setId(String id) {this.id = id;}
     public void setName(String name) {

@@ -314,6 +314,7 @@ class CambioGrupoTest {
             student.validateChangeGroup(subject, grupoLleno);
         });
         assertEquals("El nuevo grupo está cerrado", exception.getMessage());
+        assertThrows(IllegalArgumentException.class, () -> { student.setEmail("fallo"); });
     }
 
 }

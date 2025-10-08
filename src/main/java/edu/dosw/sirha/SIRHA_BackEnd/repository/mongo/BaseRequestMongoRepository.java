@@ -4,5 +4,5 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateRequest.BaseRequest;
 
-public interface RequestMongoRepository extends MongoRepository<BaseRequest, String> {
+public interface BaseRequestMongoRepository extends MongoRepository<BaseRequest, String> {
 }

@@ -370,6 +370,7 @@ class SubjectTest {
     void nombreConEspaciosTest() {
         Subject s = new Subject("101", " Matemáticas Avanzadas ", 4);
         assertEquals(" Matemáticas Avanzadas ", s.getName());
+        s.getGroupByCode("1");
     }
 
 }

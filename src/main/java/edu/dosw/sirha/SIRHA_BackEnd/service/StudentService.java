@@ -7,6 +7,9 @@ import edu.dosw.sirha.SIRHA_BackEnd.domain.model.Schedule;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.Student;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.SemaforoColores;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.AcademicPeriod;
+import edu.dosw.sirha.SIRHA_BackEnd.domain.model.CambioGrupo;
+import edu.dosw.sirha.SIRHA_BackEnd.domain.model.CambioMateria;
+
 import java.util.Map;
 import edu.dosw.sirha.SIRHA_BackEnd.dto.AuthResponse;
 import edu.dosw.sirha.SIRHA_BackEnd.dto.LoginRequest;
@@ -36,5 +39,8 @@ public interface StudentService {
     Map<AcademicPeriod,List<Schedule>> getAllSchedules(String username);
 
     Map<SemaforoColores,List<SubjectDecoratorDTO>> getAcademicPensum(String username);
-    
+
+    CambioGrupo createRequestCambioGrupo(String studentName, String subjectName, String codeNewGroup);
+    CambioMateria createRequestCambioMateria(String studentName, String subjectName, String newSubjectName, String codeNewGroup);
+
 }

@@ -2,6 +2,8 @@ package edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateGroup;
 
 import java.util.*;
 
+import org.springframework.data.mongodb.core.mapping.Document;
+
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.AcademicPeriod;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.Professor;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.Schedule;
@@ -32,9 +34,10 @@ import edu.dosw.sirha.SIRHA_BackEnd.domain.port.GroupState;
  * @see Subject
  * @see Student
  */
+@Document(collection = "groups")
 public class Group {
     private int id;
-    private String codigo;
+    private String code;
     private int capacidad;
     private int inscritos;
     private GroupState estadoGrupo; // State Pattern
@@ -58,7 +61,7 @@ public class Group {
         }
         curso = subject;
         setCapacidad(capacidad);
-        setCodigo();
+        setCode();
         setCurrentPeriod(currentPeriod);
         this.inscritos = 0;
         this.estadoGrupo = new StatusOpen(); // Estado inicial: abierto
@@ -105,8 +108,8 @@ public class Group {
 
         estadoGrupo.addStudent(this, estudiante);
     }
-    private void setCodigo(){
-        this.codigo = curso.getName().substring(0,3).toUpperCase() + "-" + (curso.getGroupCount() + 1);
+    private void setCode(){
+        this.code = curso.getName().substring(0,3).toUpperCase() + "-" + (curso.getGroupCount() + 1);
     }
 
     /**
@@ -168,8 +171,8 @@ public class Group {
     public boolean unenrollStudent(Student student) {
         return estadoGrupo.removeStudent(this, student);
     }
-    public String getCodigo() {
-        return codigo;
+    public String getCode() {
+        return code;
     }
 
     /**
@@ -291,7 +294,7 @@ public class Group {
 
         Group group = (Group) obj;
         return Objects.equals(currentPeriod, group.currentPeriod)
-                && Objects.equals(codigo, group.codigo)
+                && Objects.equals(code, group.code)
                 && Objects.equals(curso, group.curso)
                 && Objects.equals(profesor, group.profesor)
                 && Objects.equals(aula, group.aula)

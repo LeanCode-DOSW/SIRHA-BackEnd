@@ -201,6 +201,7 @@ class CambioMateriaTest {
         assertEquals(materiaAntigua, solicitud.getOldSubject());
         assertEquals(materiaNueva, solicitud.getNewSubject());
         assertEquals(grupoNuevo, solicitud.getNewGroup());
+        solicitud.validateRequest();
     }
 
     @Test
