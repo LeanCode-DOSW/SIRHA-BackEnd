@@ -24,10 +24,10 @@ public class NoCursadaState implements SubjectState {
     public void reprobar(SubjectDecorator materia) {throw new IllegalStateException("No se puede reprobar una materia no cursada");}
     public void retirar(SubjectDecorator materia) {throw new IllegalStateException("No se puede retirar una materia no cursada");}
 
-    public boolean puedeInscribirse() { return true; }
-    public boolean puedeAprobar() { return false; }
-    public boolean puedeReprobar() { return false; }
-    public boolean puedeRetirar() { return false; }
-    public boolean tieneGrupoAsignado() { return false; }
-    public String getEstadoNombre() { return "No Cursada"; }
+    public boolean canEnroll() { return true; }
+    public boolean canApprove() { return false; }
+    public boolean canFail() { return false; }
+    public boolean canDropSubject() { return false; }
+    public boolean hasAssignedGroup() { return false; }
+    public String getStatusName() { return "No Cursada"; }
 }

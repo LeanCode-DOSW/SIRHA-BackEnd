@@ -8,7 +8,7 @@ import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateGroup.Group;
 public interface SubjectStateProcess {
     String getId();
     SemaforoColores getState();
-    LocalDateTime getCreadoEn();
+    LocalDateTime getCreatedAt();
     void setState(SemaforoColores state);
     int getSemester();
     int getGrade();

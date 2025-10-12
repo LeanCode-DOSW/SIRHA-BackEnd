@@ -1,4 +1,4 @@
-package edu.dosw.sirha.SIRHA_BackEnd.domain.exception;
+package edu.dosw.sirha.SIRHA_BackEnd.exception;
 
 public class ConflictException extends DomainException {
     public ConflictException(String message) {

@@ -3,11 +3,16 @@ package edu.dosw.sirha.SIRHA_BackEnd.domain.model;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.Careers;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.SemaforoColores;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateGroup.Group;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateSubjectDec.SubjectDecorator;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.port.AcademicProgress;
+import edu.dosw.sirha.SIRHA_BackEnd.dto.AcademicIndicatorsDTO;
+import edu.dosw.sirha.SIRHA_BackEnd.dto.RequestApprovalRateDTO;
 import edu.dosw.sirha.SIRHA_BackEnd.dto.SubjectDecoratorDTO;
+import edu.dosw.sirha.SIRHA_BackEnd.exception.ErrorCodeSirha;
+import edu.dosw.sirha.SIRHA_BackEnd.exception.SirhaException;
 
 /**
  * Implementación del progreso académico que mantiene el estado de las materias
@@ -49,25 +54,25 @@ public class Semaforo implements AcademicProgress {
         return studyPlan.getSubjects().size();
     }
     
-    public List<SubjectDecorator> getMateriasAprobadas() {
+    public List<SubjectDecorator> getPassedSubjects() {
         return subjects.values().stream()
             .filter(s -> s.getEstadoColor() == SemaforoColores.VERDE)
             .collect(Collectors.toList());
     }
 
-    public List<SubjectDecorator> getMateriasCursando() {
+    public List<SubjectDecorator> getSubjectsInProgress() {
         return subjects.values().stream()
             .filter(s -> s.getEstadoColor() == SemaforoColores.AMARILLO)
             .collect(Collectors.toList());
     }
 
-    public List<SubjectDecorator> getMateriasReprobadas() {
+    public List<SubjectDecorator> getFailedSubjects() {
         return subjects.values().stream()
             .filter(s -> s.getEstadoColor() == SemaforoColores.ROJO)
             .collect(Collectors.toList());
     }
 
-    public List<SubjectDecorator> getMateriasNoCursadas() {
+    public List<SubjectDecorator> getSubjectsNotTaken() {
         return subjects.values().stream()
             .filter(s -> s.getEstadoColor() == SemaforoColores.GRIS)
             .collect(Collectors.toList());
@@ -77,34 +82,37 @@ public class Semaforo implements AcademicProgress {
         return subjects.size();
     }
 
-    public int getMateriasAprobadasCount() {
-        return getMateriasAprobadas().size();
+    public int getPassedSubjectsCount() {
+        return getPassedSubjects().size();
     }
-    public int getMateriasCursandoCount() {
-        return getMateriasCursando().size();
+    public int getSubjectsInProgressCount() {
+        return getSubjectsInProgress().size();
     }
-    public int getMateriasReprobadasCount() {
-        return getMateriasReprobadas().size();
+    public int getFailedSubjectsCount() {
+        return getFailedSubjects().size();
     }
-    public int getMateriasNoCursadasCount() {
-        return getMateriasNoCursadas().size();
+    public int getSubjectsNotTakenCount() {
+        return getSubjectsNotTaken().size();
     }
-
-    public int getCreditosPorColor(SemaforoColores color) {
+    public int getTotalSubjectsCount() {
+        return subjects.size();
+    }
+    public int getCreditsByColor(SemaforoColores color) {
         return subjects.values().stream()
             .filter(s -> s.getEstadoColor() == color)
             .mapToInt(SubjectDecorator::getCredits)
             .sum();
     }
-
-    public List<SubjectDecorator> getMateriasPorSemestre(int semestre) {
-        List<SubjectDecorator> materiasSemestre = new ArrayList<>();
+    
+    @Override
+    public List<SubjectDecorator> getSubjectsBySemester(int semester) {
+        List<SubjectDecorator> subjectsSemester = new ArrayList<>();
         for (SubjectDecorator sd : subjects.values()) {
-            if (sd.getSemester() == semestre) {
-                materiasSemestre.add(sd);
+            if (sd.getSemester() == semester) {
+                subjectsSemester.add(sd);
             }
         }
-        return materiasSemestre;
+        return subjectsSemester;
     }
 
     @Override
@@ -113,12 +121,18 @@ public class Semaforo implements AcademicProgress {
     }
 
     @Override
+    public Careers getCareer() {
+        return studyPlan.getCareer();
+    }
+    
+
+    @Override
     public int[] getContadoresPorEstado() {
         return new int[]{
-            getMateriasAprobadasCount(),
-            getMateriasCursandoCount(), 
-            getMateriasReprobadasCount(),
-            getMateriasNoCursadasCount()
+            getPassedSubjectsCount(),
+            getSubjectsInProgressCount(), 
+            getFailedSubjectsCount(),
+            getSubjectsNotTakenCount()
         };
     }
 
@@ -232,6 +246,152 @@ public class Semaforo implements AcademicProgress {
         });
         
         return pensum;
+    }
+
+    @Override
+    public Map<SemaforoColores, Double> getPercentageByColor() {
+        Map<SemaforoColores, Double> porcentajes = new EnumMap<>(SemaforoColores.class);
+
+        int totalSubjects = getTotalSubjectsCount();
+
+        if (totalSubjects == 0) {return porcentajes;}
+
+        porcentajes.put(SemaforoColores.VERDE, (getSubjectsByColorCount(SemaforoColores.VERDE) / (double) totalSubjects) * 100);
+        porcentajes.put(SemaforoColores.AMARILLO, (getSubjectsByColorCount(SemaforoColores.AMARILLO) / (double) totalSubjects) * 100);
+        porcentajes.put(SemaforoColores.ROJO, (getSubjectsByColorCount(SemaforoColores.ROJO) / (double) totalSubjects) * 100);
+        porcentajes.put(SemaforoColores.GRIS, (getSubjectsByColorCount(SemaforoColores.GRIS) / (double) totalSubjects) * 100);
+
+
+        return porcentajes;
+    }
+
+    /**
+     * Calcula el porcentaje de avance general en el plan de estudios
+     * @return Porcentaje de avance (0.0 a 100.0)
+     */
+    @Override
+    public double getOverallProgressPercentage() {
+        int totalSubjects = getTotalSubjectsCount();
+        if (totalSubjects == 0) {
+            return 0.0;
+        }
+        int approvedSubjects = getPassedSubjectsCount();
+        return (approvedSubjects / (double) totalSubjects) * 100;
+    }
+    /**
+     * Calcula la tasa de éxito académico (materias aprobadas vs total cursadas)
+     * @return Porcentaje de éxito académico (0.0 a 100.0)
+     */
+    @Override
+    public double getAcademicSuccessRate() {
+        int totalSubjects = getPassedSubjectsCount() + getFailedSubjectsCount();
+        if (totalSubjects == 0) {
+            return 0.0;
+        }
+        int approvedSubjects = getPassedSubjectsCount();
+        return (approvedSubjects / (double) totalSubjects) * 100;
+    }
+    /**
+     * Obtiene el porcentaje de créditos completados
+     * @return Porcentaje de créditos obtenidos del total requerido
+     */
+    @Override
+    public double getCompletedCreditsPercentage() {
+        int totalCredits = getCreditsStudyPlan();
+        if (totalCredits == 0) {
+            return 0.0;
+        }
+        int approvedCredits = getCreditsByColor(SemaforoColores.VERDE);
+        return (approvedCredits / (double) totalCredits) * 100;
+    }
+
+    @Override
+    public AcademicIndicatorsDTO getAcademicIndicators() {
+        double overallProgress = getOverallProgressPercentage();
+        SemaforoColores globalIndicator;
+        if (overallProgress >= 75.0) {
+            globalIndicator = SemaforoColores.VERDE;
+        } else if (overallProgress >= 50.0) {
+            globalIndicator = SemaforoColores.AMARILLO;
+        } else if (overallProgress >= 25.0) {
+            globalIndicator = SemaforoColores.ROJO;
+        } else {
+            globalIndicator = SemaforoColores.GRIS;
+        }
+
+        double academicSuccessRate = getAcademicSuccessRate();
+        double creditsCompletionPercentage = getCompletedCreditsPercentage();
+        boolean academicRisk = globalIndicator == SemaforoColores.ROJO || globalIndicator == SemaforoColores.GRIS;
+
+        String academicStatus;
+        if (overallProgress >= 90.0) {
+            academicStatus = "Excelente";
+        } else if (overallProgress >= 70.0) {
+            academicStatus = "Bueno";
+        } else if (overallProgress >= 50.0) {
+            academicStatus = "Regular";
+        } else {
+            academicStatus = "Necesita Mejorar";
+        }
+
+        Map<SemaforoColores, Double> trafficLightSummary = getPercentageByColor();
+
+        return new AcademicIndicatorsDTO(
+            overallProgress,
+            globalIndicator,
+            academicSuccessRate,
+            creditsCompletionPercentage,
+            academicRisk,
+            academicStatus,
+            trafficLightSummary
+        );
+    }
+    
+    @Override
+    public int getCreditsStudyPlan() {
+        return studyPlan.calculateTotalCredits();
+    }
+
+    @Override
+    public void approveSubject(String subject) throws SirhaException {
+        SubjectDecorator decorator = subjects.get(subject);
+        if (decorator == null) {
+            throw SirhaException.of(ErrorCodeSirha.SUBJECT_NOT_FOUND, "La materia no está en el semáforo");
+        }
+        decorator.aprobar();
+    }
+
+    @Override
+    public void failSubject(String subject) throws SirhaException {
+        SubjectDecorator decorator = subjects.get(subject);
+        if (decorator == null) {
+            throw SirhaException.of(ErrorCodeSirha.SUBJECT_NOT_FOUND, "La materia no está en el semáforo");
+        }
+        decorator.reprobar();
+    }
+    @Override
+    public void unenrollSubjectFromGroup(String subject, Group group) throws SirhaException {
+        SubjectDecorator decorator = subjects.get(subject);
+        if (decorator == null) {
+            throw SirhaException.of(ErrorCodeSirha.SUBJECT_NOT_FOUND, "La materia no está en el semáforo");
+        }
+        decorator.retirar();
+    }
+
+    @Override
+    public int getSubjectsByColorCount(SemaforoColores color) {
+        return (int) subjects.values().stream()
+            .filter(s -> s.getEstadoColor() == color)
+            .count();
+    }
+
+    @Override
+    public void setSubjectSemester(String name, int semester) throws SirhaException {
+        SubjectDecorator decorator = subjects.get(name);
+        if (decorator == null) {
+            throw SirhaException.of(ErrorCodeSirha.SUBJECT_NOT_FOUND, "La materia no está en el semáforo");
+        }
+        decorator.setSemester(semester);
     }
 
 }

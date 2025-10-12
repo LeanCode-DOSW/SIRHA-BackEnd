@@ -7,7 +7,11 @@ import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateGroup.StatusOpen;
 import edu.dosw.sirha.SIRHA_BackEnd.repository.mongo.GroupMongoRepository;
 import edu.dosw.sirha.SIRHA_BackEnd.repository.mongo.SubjectMongoRepository;
 import edu.dosw.sirha.SIRHA_BackEnd.service.GroupService;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -17,98 +21,45 @@ import java.util.List;
 @Service
 public class GroupServiceImpl implements GroupService {
 
+    private static final Logger log = LoggerFactory.getLogger(GroupServiceImpl.class);
+
     private final GroupMongoRepository groupRepository;
     private final SubjectMongoRepository subjectRepository;
 
     public GroupServiceImpl(GroupMongoRepository groupRepository, SubjectMongoRepository subjectRepository) {
         this.groupRepository = groupRepository;
         this.subjectRepository = subjectRepository;
+        log.info("GroupServiceImpl inicializado correctamente");
     }
 
-    // ---------- Materias ----------
-
-    /** Registra una nueva materia. */
-    public Subject registrarMateria(Subject subject) {
-        return subjectRepository.save(subject);
-    }
-
-    /** Lista todas las materias. */
-    public List<Subject> listarMaterias() {
-        return subjectRepository.findAll();
-    }
-
-    // ---------- Grupos ----------
 
     /**
-     * Registra un grupo en una materia verificando conflictos de horarios.
+     * Registra un grupo en una materia
      */
-    public Group registrarGrupo(String subjectId, Group grupo) {
-        Subject subject = subjectRepository.findById(subjectId)
-                .orElseThrow(() -> new RuntimeException("Materia con id " + subjectId + " no encontrada"));
+    @Transactional
+    @Override
+    public Group registerGroup(String subjectName, Group group) {
+        Subject subject = subjectRepository.findByName(subjectName)
+                .orElseThrow(() -> new RuntimeException("Materia con nombre " + subjectName + " no encontrada"));
 
-        // Validar conflictos de horarios con grupos existentes
-        for (Group gExistente : subject.getGroups()) {
-            for (Schedule hNuevo : grupo.getSchedules()) {
-                for (Schedule hExistente : gExistente.getSchedules()) {
-                    if (hNuevo.seSolapaCon(hExistente)) {
-                        throw new RuntimeException("Conflicto de horario con grupo existente: " + gExistente.getId());
-                    }
-                }
-            }
-        }
-
-        subject.addGroup(grupo);
+        subject.addGroup(group);
         subjectRepository.save(subject);
-        return groupRepository.save(grupo);
-    }
-
-    /** Lista todos los grupos de una materia. */
-    public List<Group> listarGruposPorMateria(String subjectId) {
-        Subject subject = subjectRepository.findById(subjectId)
-                .orElseThrow(() -> new RuntimeException("Materia con id " + subjectId + " no encontrada"));
-        return subject.getGroups();
-    }
-
-    /** Actualiza la información de un grupo. */
-    public Group actualizarGrupo(Group grupo) {
-        if (!groupRepository.existsById(grupo.getId())) {
-            throw new RuntimeException("Grupo con id " + grupo.getId() + " no existe");
-        }
-        return groupRepository.save(grupo);
-    }
-
-    /** Elimina un grupo por su ID. */
-    public void eliminarGrupo(Integer id) {
-        if (!groupRepository.existsById(id)) {
-            throw new RuntimeException("Grupo con id " + id + " no existe");
-        }
-        groupRepository.deleteById(id);
-    }
-
-    // ---------- Implementación de métodos de GroupService ----------
-
-    @Override
-    public List<Group> findAll() {
-        return groupRepository.findAll();
-    }
-
-    @Override
-    public Group findById(Integer id) {
-        return groupRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Grupo con id " + id + " no encontrado"));
-    }
-
-    @Override
-    public Group save(Group group) {
         return groupRepository.save(group);
     }
 
+    @Transactional
     @Override
-    public void delete(Integer id) {
-        eliminarGrupo(id);
+    public Group deleteGroup(Integer id) {               //REVISAR
+        if (!groupRepository.existsById(id)) {
+            throw new RuntimeException("Grupo con id " + id + " no existe");
+        } 
+        Group group = groupRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Grupo con id " + id + " no encontrado"));
+        Subject subject = group.getCurso();
+        subject.removeGroup(group);
+        groupRepository.deleteById(id);
+        return group;
     }
-
-    // ---------- Métodos de gestión de profesores ----------
 
     @Override
     public Group asignarProfesor(Integer groupId, Professor professor) {
@@ -118,25 +69,41 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    public Professor getProfesor(Integer groupId) {
-        return findById(groupId).getProfesor();
-    }
-
-    // ---------- Métodos de gestión de horarios ----------
-
-    @Override
     public Group agregarHorario(Integer groupId, Schedule schedule) {
         Group group = findById(groupId);
         group.getSchedules().add(schedule);
         return groupRepository.save(group);
     }
+/*  
+    @Override
+    public Group cerrarGrupo(Integer groupId) {
+        log.info("Cerrando grupo con ID: {}", groupId);
+        Group group = findById(groupId);
+        group.closeGroup();
+        return groupRepository.save(group);
+    }
+
+    @Override
+    public Group abrirGrupo(Integer groupId) {
+        log.info("Abriendo grupo con ID: {}", groupId);
+        Group group = findById(groupId).orElseThrow(() -> new RuntimeException("Grupo con id " + groupId + " no encontrado"));
+        log.info("Estado actual del grupo (antes de abrir): {}", group.getGroupState().getClass().getSimpleName());
+        group.openGroup();
+        log.info("Estado actual del grupo (después de abrir): {}", group.getGroupState().getClass().getSimpleName());
+        return groupRepository.save(group);
+    }
+
+*/
+
+
+
+    // ===========================GETS ============================
 
     @Override
     public List<Schedule> getHorarios(Integer groupId) {
         return findById(groupId).getSchedules();
     }
 
-    // ---------- Métodos de capacidad ----------
 
     @Override
     public boolean estaLleno(Integer groupId) {
@@ -148,20 +115,18 @@ public class GroupServiceImpl implements GroupService {
     public int getCuposDisponibles(Integer groupId) {
         return findById(groupId).getCuposDisponibles();
     }
-
-    // ---------- Estado del grupo ----------
-
     @Override
-    public Group cerrarGrupo(Integer groupId) {
-        Group group = findById(groupId);
-        group.setEstadoGrupo(new StatusClosed()); // cambia el estado al cerrado
-        return groupRepository.save(group);
+    public Group findById(Integer id) {
+        return groupRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Grupo con id " + id + " no encontrado"));
+    }
+    @Override
+    public Professor getProfesor(Integer groupId) {
+        return findById(groupId).getProfesor();
     }
 
     @Override
-    public Group abrirGrupo(Integer groupId) {
-        Group group = findById(groupId);
-        group.setEstadoGrupo(new StatusOpen()); // cambia el estado al abierto
-        return groupRepository.save(group);
+    public List<Group> findAll() {
+        return groupRepository.findAll();
     }
 }

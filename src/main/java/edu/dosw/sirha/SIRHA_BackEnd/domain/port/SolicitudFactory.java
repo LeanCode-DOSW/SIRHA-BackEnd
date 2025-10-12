@@ -7,8 +7,8 @@ import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateGroup.Group;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateRequest.BaseRequest;
 
 public interface SolicitudFactory {
-    CambioGrupo createSolicitudCambioGrupo(Subject subject, Group newGroup);
-    CambioMateria createSolicitudCambioMateria(Subject oldSubject, Subject newSubject, Group newGroup);
+    CambioGrupo createGroupChangeRequest(Subject subject, Group newGroup);
+    CambioMateria createSubjectChangeRequest(Subject oldSubject, Subject newSubject, Group newGroup);
     
-    //Request createSolicitudInscripcionMateria(Subject subject);
+    //Request createSubjectEnrollmentRequest(Subject subject);
 }

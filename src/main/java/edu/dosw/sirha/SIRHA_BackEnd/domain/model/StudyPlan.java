@@ -1,24 +1,36 @@
 package edu.dosw.sirha.SIRHA_BackEnd.domain.model;
-
 import java.util.*;
-
 import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.mapping.Field;
 
+import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.Careers;
+
+@Document("planesDeEstudio")
 public class StudyPlan {
-    @Field("nombre")
     private String name;
-    @Field("materias")
+    private Careers career;
     private Map<String, Subject> subjects;
+    private int totalCredits;
 
 
-    public StudyPlan(String name) {
+    public StudyPlan(String name, Careers career) {
         this.name = name;
+        this.career = career;
         this.subjects = new HashMap<>();
+        calculateTotalCredits();
+    }
+
+    public int calculateTotalCredits() {
+        int total = 0;
+        for (Subject subject : subjects.values()) {
+            total += subject.getCredits();
+        }
+        this.totalCredits = total;
+        return total;
     }
 
     public void addSubject(Subject m) {
         subjects.put(m.getName(), m);
+        calculateTotalCredits();
     }
 
     public Map<String, Subject> getSubjects() {
@@ -35,5 +47,6 @@ public class StudyPlan {
         return subjects.get(name);
     }
     
+    public Careers getCareer() { return career; }
 }
 

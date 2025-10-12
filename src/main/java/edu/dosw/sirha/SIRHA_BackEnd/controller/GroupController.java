@@ -30,16 +30,6 @@ public class GroupController {
         return groupService.findById(groupId);
     }
 
-    @PostMapping
-    public Group create(@RequestBody Group group) {
-        return groupService.save(group);
-    }
-
-    @DeleteMapping("/{groupId}")
-    public void delete(@PathVariable Integer groupId) {
-        groupService.delete(groupId);
-    }
-
     // ==================== FUNCIONES DE NEGOCIO ====================
 
     // Consultar cupos disponibles

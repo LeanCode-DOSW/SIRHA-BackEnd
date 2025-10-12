@@ -21,13 +21,7 @@ public class AuthServiceImpl implements AuthService {
     public AuthServiceImpl(StudentService studentService) {
         this.studentService = studentService;
     }
-
-    @Override
-    public Optional<Student> login(String username, String password) {
-        return studentService.findByUsername(username)
-                .filter(student -> student.verificarContraseña(password));
-    }
-
+    
     @Override
     public Student register(Student student) {
         return studentService.save(student);

@@ -38,11 +38,15 @@ public class SubjectDecorator {
     void setGroupDirect(Group group) { this.group = group; }
     void setGradeDirect(int grade) { this.grade = grade; }
 
-    public void inscribir(Group grupo) { state.inscribir(this, grupo); }
+    public void inscribir(Group grupo) { 
+        state.inscribir(this, grupo); 
+        recordChangeState(new SubjectProgress(SemaforoColores.GRIS, semestre, grupo, 0));
+    }
 
     public void inscribir(Group grupo, int semester) {
-        state.inscribir(this, grupo);
+        inscribir(grupo);
         state.setSemester(this, semester);
+        
     }
     public void aprobar()   { state.aprobar(this); recordChangeState(new SubjectProgress(SemaforoColores.VERDE, this.semestre, this.group, this.grade));}
     public void reprobar()  { state.reprobar(this); recordChangeState(new SubjectProgress(SemaforoColores.ROJO, this.semestre, this.group, this.grade)); }
@@ -54,7 +58,7 @@ public class SubjectDecorator {
     public List<Schedule> getSchedules() {return group.getSchedules();}
     public AcademicPeriod getAcademicPeriod() {return group.getCurrentPeriod();}
 
-    public boolean puedeInscribirse() {return state.puedeInscribirse();}
+    public boolean canEnroll() {return state.canEnroll();}
     public boolean estaCursando() {return estadoColor == SemaforoColores.AMARILLO;}
     public boolean estaAprobada() {return estadoColor == SemaforoColores.VERDE;}
     public boolean estaReprobada() {return estadoColor == SemaforoColores.ROJO;}

@@ -220,7 +220,7 @@ public class StudentController {
             dto.getUsername(), 
             dto.getEmail(),  
             "defaultPass", // Contraseña temporal - debe ser actualizada
-            dto.getCodigo()
+            dto.getCode()
         );
         
         Student savedStudent = studentService.save(newStudent);

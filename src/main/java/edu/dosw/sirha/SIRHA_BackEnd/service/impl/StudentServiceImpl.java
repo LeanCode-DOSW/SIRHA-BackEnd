@@ -141,7 +141,95 @@ public class StudentServiceImpl implements StudentService {
     }
 
     @Override
-    public Optional<Student> login(String username, String password) {
+    public boolean existsByEmail(String email) {
+        log.debug("Verificando existencia de email: {}", email);
+        try {
+            boolean exists = studentRepository.findByEmail(email).isPresent();
+            log.debug("Email {} existe: {}", email, exists);
+            return exists;
+        } catch (Exception e) {
+            log.error("Error al verificar email {}: {}", email, e.getMessage(), e);
+            throw e;
+        }
+    }
+
+
+
+    
+    private Student registerStudent(Student student) {
+        log.info("Registrando estudiante: {}", student.getUsername());
+        try {
+            Student registeredStudent = studentRepository.save(student);
+            log.info("Estudiante registrado exitosamente: {} con ID: {}", 
+                    registeredStudent.getUsername(), registeredStudent.getId());
+            return registeredStudent;
+        } catch (Exception e) {
+            log.error("Error al registrar estudiante {}: {}", student.getUsername(), e.getMessage(), e);
+            throw e;
+        }
+    }
+
+
+
+    @Override
+    public AuthResponse registerStudent(RegisterRequest request) {
+        log.info("Iniciando proceso de registro para usuario: {}", request.getUsername());
+        
+        try {
+            log.debug("Validando datos de registro para: {}", request.getUsername());
+            ValidationUtil.validateStudentRegistration(
+                request.getUsername(), 
+                request.getEmail(), 
+                request.getPassword(), 
+                request.getCodigo()
+            );
+            log.debug("Validación exitosa para: {}", request.getUsername());
+            
+            if (existsByCodigo(request.getCodigo())) {
+                log.warn("Intento de registro con código duplicado: {} para usuario: {}", 
+                        request.getCodigo(), request.getUsername());
+                throw new IllegalArgumentException("El código estudiantil ya está registrado");
+            }
+            
+            if (existsByEmail(request.getEmail())) {
+                log.warn("Intento de registro con email duplicado: {} para usuario: {}", 
+                        request.getEmail(), request.getUsername());
+                throw new IllegalArgumentException("El email ya está registrado");
+            }
+            
+            log.debug("Creando nuevo estudiante: {}", request.getUsername());
+            Student student = new Student(
+                request.getUsername(),
+                request.getEmail(),
+                request.getPassword(),
+                request.getCodigo()
+            );
+            
+            Student savedStudent = registerStudent(student);
+            
+            log.info("Registro completado exitosamente para usuario: {} con código: {}", 
+                    savedStudent.getUsername(), savedStudent.getCodigo());
+            
+            return new AuthResponse(
+                savedStudent.getId(),
+                savedStudent.getUsername(),
+                savedStudent.getEmail(),
+                savedStudent.getCodigo(),
+                "Registro exitoso"
+            );
+            
+        } catch (IllegalArgumentException e) {
+            log.warn("Error de validación en registro para {}: {}", request.getUsername(), e.getMessage());
+            throw e;
+        } catch (Exception e) {
+            log.error("Error inesperado durante registro para {}: {}", request.getUsername(), e.getMessage(), e);
+            throw new RuntimeException("Error interno durante el registro", e);
+        }
+    }
+
+
+
+    private Optional<Student> loginStudent(String username, String password) {
         log.info("Intento de login para usuario: {}", username);
         try {
             Optional<Student> student = studentRepository.findByUsername(username)
@@ -161,101 +249,11 @@ public class StudentServiceImpl implements StudentService {
     }
 
     @Override
-    public Student register(Student student) {
-        log.info("Registrando estudiante: {}", student.getUsername());
-        try {
-            Student registeredStudent = studentRepository.save(student);
-            log.info("Estudiante registrado exitosamente: {} con ID: {}", 
-                    registeredStudent.getUsername(), registeredStudent.getId());
-            return registeredStudent;
-        } catch (Exception e) {
-            log.error("Error al registrar estudiante {}: {}", student.getUsername(), e.getMessage(), e);
-            throw e;
-        }
-    }
-
-    @Override
-    public boolean existsByEmail(String email) {
-        log.debug("Verificando existencia de email: {}", email);
-        try {
-            boolean exists = studentRepository.findByEmail(email).isPresent();
-            log.debug("Email {} existe: {}", email, exists);
-            return exists;
-        } catch (Exception e) {
-            log.error("Error al verificar email {}: {}", email, e.getMessage(), e);
-            throw e;
-        }
-    }
-
-    @Override
-    public AuthResponse registerStudent(RegisterRequest request) {
-        log.info("Iniciando proceso de registro para usuario: {}", request.getUsername());
-        
-        try {
-            // Validación
-            log.debug("Validando datos de registro para: {}", request.getUsername());
-            ValidationUtil.validateStudentRegistration(
-                request.getUsername(), 
-                request.getEmail(), 
-                request.getPassword(), 
-                request.getCodigo()
-            );
-            log.debug("Validación exitosa para: {}", request.getUsername());
-            
-            // Verificar código duplicado
-            if (existsByCodigo(request.getCodigo())) {
-                log.warn("Intento de registro con código duplicado: {} para usuario: {}", 
-                        request.getCodigo(), request.getUsername());
-                throw new IllegalArgumentException("El código estudiantil ya está registrado");
-            }
-            
-            // Verificar email duplicado
-            if (existsByEmail(request.getEmail())) {
-                log.warn("Intento de registro con email duplicado: {} para usuario: {}", 
-                        request.getEmail(), request.getUsername());
-                throw new IllegalArgumentException("El email ya está registrado");
-            }
-            
-            // Crear estudiante
-            log.debug("Creando nuevo estudiante: {}", request.getUsername());
-            Student student = new Student(
-                request.getUsername(),
-                request.getEmail(),
-                request.getPassword(),
-                request.getCodigo()
-            );
-            
-            // Registrar
-            Student savedStudent = register(student);
-            
-            log.info("Registro completado exitosamente para usuario: {} con código: {}", 
-                    savedStudent.getUsername(), savedStudent.getCodigo());
-            
-            // Retornar respuesta
-            return new AuthResponse(
-                savedStudent.getId(),
-                savedStudent.getUsername(),
-                savedStudent.getEmail(),
-                savedStudent.getCodigo(),
-                "Registro exitoso"
-            );
-            
-        } catch (IllegalArgumentException e) {
-            log.warn("Error de validación en registro para {}: {}", request.getUsername(), e.getMessage());
-            throw e;
-        } catch (Exception e) {
-            log.error("Error inesperado durante registro para {}: {}", request.getUsername(), e.getMessage(), e);
-            throw new RuntimeException("Error interno durante el registro", e);
-        }
-    }
-
-    @Override
     public AuthResponse loginStudent(LoginRequest request) {
         log.info("Iniciando proceso de login para usuario: {}", request.getUsername());
         
         try {
-            // Buscar estudiante
-            Optional<Student> userOpt = login(request.getUsername(), request.getPassword());
+            Optional<Student> userOpt = loginStudent(request.getUsername(), request.getPassword());
             
             if (userOpt.isEmpty()) {
                 log.warn("Login fallido para usuario: {} - credenciales inválidas", request.getUsername());
@@ -263,12 +261,6 @@ public class StudentServiceImpl implements StudentService {
             }
             
             Student student = userOpt.get();
-            
-            // Verificación de tipo (aunque no es necesaria si solo tienes Student)
-            if (!(student instanceof Student)) {
-                log.error("Usuario {} no es un estudiante válido", request.getUsername());
-                throw new IllegalArgumentException("Usuario no es un estudiante");
-            }
             
             log.info("Login completado exitosamente para usuario: {}", student.getUsername());
             
@@ -403,32 +395,28 @@ public class StudentServiceImpl implements StudentService {
                 studentName, subjectName, codeNewGroup);
         
         try {
-            // Buscar estudiante
             Student student = studentRepository.findByUsername(studentName)
                 .orElseThrow(() -> {
                     log.warn("Estudiante no encontrado para cambio de grupo: {}", studentName);
                     return new IllegalArgumentException("Estudiante no encontrado");
                 });
             
-            // Buscar materia
             Subject subject = subjectRepository.findByName(subjectName)
                 .orElseThrow(() -> {
                     log.warn("Materia no encontrada: {}", subjectName);
                     return new IllegalArgumentException("Materia no encontrada");
                 });
 
-            // Buscar grupo
             Group group = groupRepository.findByCode(codeNewGroup)
                 .orElseThrow(() -> {
                     log.warn("Grupo no encontrado: {}", codeNewGroup);
                     return new IllegalArgumentException("Grupo no encontrado");
                 });
 
-            // Crear solicitud
             log.debug("Creando solicitud de cambio de grupo para {}: {} -> {}", 
                      studentName, subjectName, codeNewGroup);
                      
-            CambioGrupo cambio = student.createSolicitudCambioGrupo(subject, group);
+            CambioGrupo cambio = student.createGroupChangeRequest(subject, group);
             
             log.info("Solicitud de cambio de grupo creada exitosamente - ID: {} para usuario: {}", 
                     cambio.getId(), studentName);
@@ -452,39 +440,34 @@ public class StudentServiceImpl implements StudentService {
                 studentName, subjectName, newSubjectName, codeNewGroup);
         
         try {
-            // Buscar estudiante
             Student student = studentRepository.findByUsername(studentName)
                 .orElseThrow(() -> {
                     log.warn("Estudiante no encontrado para cambio de materia: {}", studentName);
                     return new IllegalArgumentException("Estudiante no encontrado");
                 });
 
-            // Buscar materia antigua
             Subject subjectOld = subjectRepository.findByName(subjectName)
                 .orElseThrow(() -> {
                     log.warn("Materia antigua no encontrada: {}", subjectName);
                     return new IllegalArgumentException("Materia antigua no encontrada");
                 });
 
-            // Buscar materia nueva
             Subject subjectNew = subjectRepository.findByName(newSubjectName)
                 .orElseThrow(() -> {
                     log.warn("Materia nueva no encontrada: {}", newSubjectName);
                     return new IllegalArgumentException("Materia nueva no encontrada");
                 });
 
-            // Buscar grupo
             Group group = groupRepository.findByCode(codeNewGroup)
                 .orElseThrow(() -> {
                     log.warn("Grupo no encontrado: {}", codeNewGroup);
                     return new IllegalArgumentException("Grupo no encontrado");
                 });
 
-            // Crear solicitud
             log.debug("Creando solicitud de cambio de materia para {}: {} -> {} en grupo {}", 
                      studentName, subjectName, newSubjectName, codeNewGroup);
                      
-            CambioMateria cambio = student.createSolicitudCambioMateria(subjectOld, subjectNew, group);
+            CambioMateria cambio = student.createSubjectChangeRequest(subjectOld, subjectNew, group);
             
             log.info("Solicitud de cambio de materia creada exitosamente - ID: {} para usuario: {}", 
                     cambio.getId(), studentName);

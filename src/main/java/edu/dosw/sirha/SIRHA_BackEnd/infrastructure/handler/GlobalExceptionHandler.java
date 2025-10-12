@@ -1,7 +1,8 @@
 package edu.dosw.sirha.SIRHA_BackEnd.infrastructure.handler;
 
-import edu.dosw.sirha.SIRHA_BackEnd.domain.exception.SirhaException;
 import edu.dosw.sirha.SIRHA_BackEnd.dto.ApiErrorResponse;
+import edu.dosw.sirha.SIRHA_BackEnd.exception.SirhaException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;

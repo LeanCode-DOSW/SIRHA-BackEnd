@@ -1,6 +1,7 @@
 package edu.dosw.sirha.SIRHA_BackEnd;
 
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.*;
+import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.Careers;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.DiasSemana;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.SemaforoColores;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateGroup.Group;
@@ -9,6 +10,7 @@ import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateGroup.StatusOpen;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateSubjectDec.*;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.port.RequestTo;
 import edu.dosw.sirha.SIRHA_BackEnd.dto.StudentDTO;
+import edu.dosw.sirha.SIRHA_BackEnd.exception.SirhaException;
 import edu.dosw.sirha.SIRHA_BackEnd.util.*;
 import java.util.*;
 import java.time.LocalDate;
@@ -17,7 +19,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import static org.junit.jupiter.api.Assertions.*;
-import org.junit.jupiter.api.DisplayName;
 
 @SpringBootTest
 class SirhaBackEndApplicationTests {
@@ -50,14 +51,12 @@ class SirhaBackEndApplicationTests {
 
     @BeforeEach
     void setUp() {
-        // ============== CONFIGURACIÓN DE PERÍODOS ACADÉMICOS ==============
         academicPeriod = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
         pastPeriod = new AcademicPeriod("2023-2", LocalDate.now().minusMonths(8), LocalDate.now().minusMonths(4));
         futurePeriod = new AcademicPeriod("2024-2", LocalDate.now().plusMonths(6), LocalDate.now().plusMonths(10));
         
         academicPeriod.setStartDatesInscripciones(LocalDate.now(), LocalDate.now().plusMonths(1));
         
-        // ============== CONFIGURACIÓN DE ESTUDIANTES ==============
         student = new Student("juan.perez", "juan.perez@example.com", "hashedPass", "EST001");
         student.setId("12345");
         student2 = new Student("maria.garcia", "maria.garcia@example.com", "hashedPass2", "EST002");
@@ -65,43 +64,44 @@ class SirhaBackEndApplicationTests {
         student3 = new Student("carlos.lopez", "carlos.lopez@example.com", "hashedPass3", "EST003");
         student3.setId("11111");
         
-        // ============== CONFIGURACIÓN DE PROFESOR ==============
-        professor = new Professor("dr.smith", "dr.smith@example.com", "hashedPass", "L-V 8-12");
+        professor = new Professor("dr.smith", "dr.smith@example.com", "hashedPass");
         professor.setId("1");
         
-        // ============== CONFIGURACIÓN DE MATERIAS ==============
         matematicas = new Subject("101", "Matemáticas I", 4);
         fisica = new Subject("102", "Física I", 3);
         quimica = new Subject("103", "Química I", 4);
         programacion = new Subject("CS101", "Programación I", 5);
         
-        // ============== CONFIGURACIÓN DE GRUPOS ==============
-        grupo1 = new Group(matematicas,30, academicPeriod);
-        grupo1.setId(1);
-        grupo1.setAula("A101");
-        grupo1.setProfesor(professor);
-        grupo1.setCurso(matematicas);
+        try {
+            grupo1 = new Group(matematicas,30, academicPeriod);
+            grupo1.setId(1);
+            grupo1.setAula("A101");
+            grupo1.setProfesor(professor);
+            grupo1.setCurso(matematicas);
+            
+            grupo2 = new Group(fisica, 25, academicPeriod);
+            grupo2.setId(2);
+            grupo2.setAula("B202");
+            grupo2.setProfesor(professor);
+            grupo2.setCurso(fisica);
+            
+            grupo3 = new Group(quimica, 35, academicPeriod);
+            grupo3.setId(3);
+            grupo3.setAula("C303");
+        } catch (Exception e) {
+            fail("No se esperaba una excepción al crear los grupos: " + e.getMessage());
+        }
         
-        grupo2 = new Group(fisica, 25, academicPeriod);
-        grupo2.setId(2);
-        grupo2.setAula("B202");
-        grupo2.setProfesor(professor);
-        grupo2.setCurso(fisica);
-        
-        grupo3 = new Group(quimica, 35, academicPeriod);
-        grupo3.setId(3);
-        grupo3.setAula("C303");
-        
-        // ============== CONFIGURACIÓN DE HORARIOS ==============
         schedule1 = new Schedule(DiasSemana.LUNES, LocalTime.of(8, 0), LocalTime.of(10, 0));
         schedule2 = new Schedule(DiasSemana.MARTES, LocalTime.of(10, 0), LocalTime.of(12, 0));
         scheduleConflict = new Schedule(DiasSemana.LUNES, LocalTime.of(9, 0), LocalTime.of(11, 0));
-        
-        grupo1.addSchedule(schedule1);
-        grupo2.addSchedule(schedule2);
-        
-        // ============== CONFIGURACIÓN DE PLAN DE ESTUDIOS ==============
-        studyPlan = new StudyPlan("Ingeniería de Sistemas");
+        try {
+            grupo1.addSchedule(schedule1);
+            grupo2.addSchedule(schedule2);
+        } catch (Exception e) {
+            fail("No se esperaba una excepción al agregar horarios: " + e.getMessage());
+        }        
+        studyPlan = new StudyPlan("Ingeniería de Sistemas", Careers.INGENIERIA_DE_SISTEMAS);
         studyPlan.addSubject(matematicas);
         studyPlan.addSubject(fisica);
         studyPlan.addSubject(quimica);
@@ -111,7 +111,6 @@ class SirhaBackEndApplicationTests {
         fisica.addGroup(grupo2);
         quimica.addGroup(grupo3);
         
-        // ============== CONFIGURACIÓN DE SEMÁFORO Y DECORADORES ==============
         semaforo = new Semaforo(studyPlan);
         matemDecorator = new SubjectDecorator(matematicas);
         fisicaDecorator = new SubjectDecorator(fisica);
@@ -120,12 +119,13 @@ class SirhaBackEndApplicationTests {
         student.setAcademicProgress(semaforo);
         student.setCurrentPeriod(academicPeriod);
         
-        // ============== CONFIGURACIÓN DE DTO ==============
-        studentDTO = new StudentDTO();
-        studentDTO.setId("67890");
-        studentDTO.setUsername("maria.garcia");
-        studentDTO.setCodigo("EST002");
-        studentDTO.setEmail("maria.garcia@example.com");
+        studentDTO = new StudentDTO(
+            "67890",
+            "maria.garcia",
+            "maria.garcia@example.com",
+            "EST002",
+            Careers.INGENIERIA_DE_SISTEMAS
+        );
     }
 
     @Test
@@ -133,7 +133,6 @@ class SirhaBackEndApplicationTests {
         // Test básico para verificar que el contexto de Spring Boot se carga correctamente
     }
 
-    // ============== PRUEBAS PARA PasswordUtils ==============
     
     @Test
     void testHashPassword() {
@@ -194,7 +193,7 @@ class SirhaBackEndApplicationTests {
         assertNotNull(dto);
         assertEquals(student.getId(), dto.getId());
         assertEquals(student.getUsername(), dto.getUsername());
-        assertEquals(student.getCodigo(), dto.getCodigo());
+        assertEquals(student.getCodigo(), dto.getCode());
     }
     
     @Test
@@ -209,7 +208,7 @@ class SirhaBackEndApplicationTests {
         
         assertNotNull(convertedStudent);
         assertEquals(studentDTO.getUsername(), convertedStudent.getUsername());
-        assertEquals(studentDTO.getCodigo(), convertedStudent.getCodigo());
+        assertEquals(studentDTO.getCode(), convertedStudent.getCodigo());
     }
     
     @Test
@@ -224,7 +223,7 @@ class SirhaBackEndApplicationTests {
         
         assertNotNull(dto);
         assertEquals("juan.perez", dto.getUsername());
-        assertEquals("EST001", dto.getCodigo());
+        assertEquals("EST001", dto.getCode());
     }
 
     // ============== PRUEBAS PARA Student ==============
@@ -297,7 +296,7 @@ class SirhaBackEndApplicationTests {
         StudentDTO dto = MapperUtils.toDTO(student);
         assertNotNull(dto);
         assertEquals(student.getUsername(), dto.getUsername());
-        assertEquals(student.getCodigo(), dto.getCodigo());
+        assertEquals(student.getCodigo(), dto.getCode());
     }
     
     @Test
@@ -306,7 +305,7 @@ class SirhaBackEndApplicationTests {
         assertNotNull(dto);
         assertEquals(student.getId(), dto.getId());
         assertEquals(student.getUsername(), dto.getUsername());
-        assertEquals(student.getCodigo(), dto.getCodigo());
+        assertEquals(student.getCodigo(), dto.getCode());
 
         Student convertedStudent = MapperUtils.fromDTOnewStudent(dto);
         assertNotNull(convertedStudent);
@@ -323,7 +322,7 @@ class SirhaBackEndApplicationTests {
 
         assertNotNull(dto);
         assertEquals(student.getUsername(), dto.getUsername());
-        assertEquals(student.getCodigo(), dto.getCodigo());
+        assertEquals(student.getCodigo(), dto.getCode());
         
         String dtoString = dto.toString();
         if (dtoString != null) {
@@ -487,15 +486,15 @@ class SirhaBackEndApplicationTests {
 
     @Test
     void testSubjectDecoratorStateValidations() {
-        assertTrue(matemDecorator.puedeInscribirse());
+        assertTrue(matemDecorator.canEnroll());
 
         matemDecorator.inscribir(grupo1);
-        assertFalse(matemDecorator.puedeInscribirse());
+        assertFalse(matemDecorator.canEnroll());
         assertTrue(matemDecorator.estaCursando());
         
         matemDecorator.aprobar();
         assertFalse(matemDecorator.estaCursando());
-        assertFalse(matemDecorator.puedeInscribirse());
+        assertFalse(matemDecorator.canEnroll());
     }
 
     @Test
@@ -504,24 +503,28 @@ class SirhaBackEndApplicationTests {
         SubjectDecorator decorator = new SubjectDecorator(subject);
         
         assertTrue(decorator.getState() instanceof NoCursadaState);
-        assertTrue(decorator.puedeInscribirse());
+        assertTrue(decorator.canEnroll());
 
         AcademicPeriod academicPeriod = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
-        Group grupo = new Group(matematicas,30, academicPeriod);
-        decorator.inscribir(grupo);
-        assertTrue(decorator.getState() instanceof EnCursoState);
-        assertTrue(decorator.estaCursando());
-        
-        decorator.retirar();
-        assertTrue(decorator.getState() instanceof NoCursadaState);
+        try {
+            Group grupo = new Group(matematicas,30, academicPeriod);
+            decorator.inscribir(grupo);
+            assertTrue(decorator.getState() instanceof EnCursoState);
+            assertTrue(decorator.estaCursando());
+            
+            decorator.retirar();
+            assertTrue(decorator.getState() instanceof NoCursadaState);
 
-        Group grupo1 = new Group(matematicas,30, academicPeriod);
-        decorator.inscribir(grupo1);
-        assertTrue(decorator.getState() instanceof EnCursoState);
-        
-        decorator.aprobar();
-        assertTrue(decorator.getState() instanceof AprobadaState);
-        assertTrue(decorator.estaAprobada());
+            Group grupo1 = new Group(matematicas,30, academicPeriod);
+            decorator.inscribir(grupo1);
+            assertTrue(decorator.getState() instanceof EnCursoState);
+            
+            decorator.aprobar();
+            assertTrue(decorator.getState() instanceof AprobadaState);
+            assertTrue(decorator.estaAprobada());
+        } catch (Exception e) {
+            fail("No se esperaba una excepción al crear el grupo o inscribir la materia: " + e.getMessage());
+        }
     }
 
     @Test
@@ -529,18 +532,22 @@ class SirhaBackEndApplicationTests {
         Subject subject = new Subject("101", "Matemáticas", 4);
         SubjectDecorator decorator = new SubjectDecorator(subject);
         AcademicPeriod academicPeriod = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
-        Group grupo = new Group(matematicas,30, academicPeriod);
-        decorator.inscribir(grupo);
-        decorator.reprobar();
-        assertTrue(decorator.getState() instanceof ReprobadaState);
-        assertTrue(decorator.estaReprobada());
+        try {
+            Group grupo = new Group(matematicas,30, academicPeriod);
+            decorator.inscribir(grupo);
+            decorator.reprobar();
+            assertTrue(decorator.getState() instanceof ReprobadaState);
+            assertTrue(decorator.estaReprobada());
 
-        decorator.inscribir(grupo);
-        assertTrue(decorator.getState() instanceof EnCursoState);
-        
-        decorator.aprobar();
-        assertTrue(decorator.getState() instanceof AprobadaState);
-        assertTrue(decorator.estaAprobada());
+            decorator.inscribir(grupo);
+            assertTrue(decorator.getState() instanceof EnCursoState);
+            
+            decorator.aprobar();
+            assertTrue(decorator.getState() instanceof AprobadaState);
+            assertTrue(decorator.estaAprobada());
+        } catch (Exception e) {
+            fail("No se esperaba una excepción al crear el grupo o inscribir la materia: " + e.getMessage());
+        }
     }
 
     @Test
@@ -552,21 +559,25 @@ class SirhaBackEndApplicationTests {
         
         stateHistory.add(decorator.getState().getClass());
         AcademicPeriod academicPeriod = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
-        Group grupo = new Group(matematicas,30, academicPeriod);
-        decorator.inscribir(grupo);
-        stateHistory.add(decorator.getState().getClass());
-        decorator.retirar();
-        stateHistory.add(decorator.getState().getClass());
-        decorator.inscribir(grupo);
-        stateHistory.add(decorator.getState().getClass());
-        decorator.reprobar();
-        stateHistory.add(decorator.getState().getClass());
-        
-        assertEquals(NoCursadaState.class, stateHistory.get(0));
-        assertEquals(EnCursoState.class, stateHistory.get(1));
-        assertEquals(NoCursadaState.class, stateHistory.get(2));
-        assertEquals(EnCursoState.class, stateHistory.get(3));
-        assertEquals(ReprobadaState.class, stateHistory.get(4));
+        try {
+            Group grupo = new Group(matematicas,30, academicPeriod);
+            decorator.inscribir(grupo);
+            stateHistory.add(decorator.getState().getClass());
+            decorator.retirar();
+            stateHistory.add(decorator.getState().getClass());
+            decorator.inscribir(grupo);
+            stateHistory.add(decorator.getState().getClass());
+            decorator.reprobar();
+            stateHistory.add(decorator.getState().getClass());
+            
+            assertEquals(NoCursadaState.class, stateHistory.get(0));
+            assertEquals(EnCursoState.class, stateHistory.get(1));
+            assertEquals(NoCursadaState.class, stateHistory.get(2));
+            assertEquals(EnCursoState.class, stateHistory.get(3));
+            assertEquals(ReprobadaState.class, stateHistory.get(4));
+        } catch (Exception e) {
+            fail("No se esperaba una excepción al crear el grupo o inscribir la materia: " + e.getMessage());
+        }
     }
 
     @Test
@@ -577,16 +588,20 @@ class SirhaBackEndApplicationTests {
         assertEquals(SemaforoColores.GRIS, decorator.getEstadoColor());
 
         AcademicPeriod academicPeriod = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
-        Group grupo = new Group(matematicas,30, academicPeriod);
-        decorator.inscribir(grupo);
-        assertEquals(SemaforoColores.AMARILLO, decorator.getEstadoColor());
-        
-        decorator.retirar();
-        assertEquals(SemaforoColores.GRIS, decorator.getEstadoColor());
-        
-        decorator.inscribir(grupo);
-        decorator.aprobar();
-        assertEquals(SemaforoColores.VERDE, decorator.getEstadoColor());
+        try {
+            Group grupo = new Group(matematicas,30, academicPeriod);
+            decorator.inscribir(grupo);
+            assertEquals(SemaforoColores.AMARILLO, decorator.getEstadoColor());
+            
+            decorator.retirar();
+            assertEquals(SemaforoColores.GRIS, decorator.getEstadoColor());
+            
+            decorator.inscribir(grupo);
+            decorator.aprobar();
+            assertEquals(SemaforoColores.VERDE, decorator.getEstadoColor());
+        } catch (Exception e) {
+            fail("No se esperaba una excepción al crear el grupo o inscribir la materia: " + e.getMessage());
+        }
     }
 
     @Test
@@ -594,14 +609,18 @@ class SirhaBackEndApplicationTests {
         Subject subject = new Subject("101", "Matemáticas", 4);
         SubjectDecorator decorator = new SubjectDecorator(subject);
         AcademicPeriod academicPeriod = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
-        Group grupo = new Group(matematicas,30, academicPeriod);
-        decorator.inscribir(grupo);
-        decorator.reprobar();
-        assertEquals(SemaforoColores.ROJO, decorator.getEstadoColor());
-        assertEquals(ReprobadaState.class, decorator.getState().getClass());
-        
-        decorator.inscribir(grupo);
-        assertEquals(SemaforoColores.AMARILLO, decorator.getEstadoColor());
+        try {
+            Group grupo = new Group(matematicas,30, academicPeriod);
+            decorator.inscribir(grupo);
+            decorator.reprobar();
+            assertEquals(SemaforoColores.ROJO, decorator.getEstadoColor());
+            assertEquals(ReprobadaState.class, decorator.getState().getClass());
+            
+            decorator.inscribir(grupo);
+            assertEquals(SemaforoColores.AMARILLO, decorator.getEstadoColor());
+        } catch (Exception e) {
+            fail("No se esperaba una excepción al crear el grupo o inscribir la materia: " + e.getMessage());
+        }
     }
 
     @Test
@@ -614,21 +633,25 @@ class SirhaBackEndApplicationTests {
         SubjectDecorator physicsDecorator = new SubjectDecorator(physics);
         SubjectDecorator chemistryDecorator = new SubjectDecorator(chemistry);
         AcademicPeriod academicPeriod = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
-        Group grupo = new Group(matematicas,30, academicPeriod);
-        mathDecorator.inscribir(grupo);
-        mathDecorator.aprobar();
+        try {
+            Group grupo = new Group(matematicas,30, academicPeriod);
+            mathDecorator.inscribir(grupo);
+            mathDecorator.aprobar();
 
-        physicsDecorator.inscribir(grupo);
-        physicsDecorator.reprobar();
-        
-        
-        assertTrue(mathDecorator.estaAprobada());
-        assertTrue(physicsDecorator.estaReprobada());
-        assertTrue(chemistryDecorator.puedeInscribirse());
-        
-        assertEquals(SemaforoColores.VERDE, mathDecorator.getEstadoColor());
-        assertEquals(SemaforoColores.ROJO, physicsDecorator.getEstadoColor());
-        assertEquals(SemaforoColores.GRIS, chemistryDecorator.getEstadoColor());
+            physicsDecorator.inscribir(grupo);
+            physicsDecorator.reprobar();
+            
+            
+            assertTrue(mathDecorator.estaAprobada());
+            assertTrue(physicsDecorator.estaReprobada());
+            assertTrue(chemistryDecorator.canEnroll());
+            
+            assertEquals(SemaforoColores.VERDE, mathDecorator.getEstadoColor());
+            assertEquals(SemaforoColores.ROJO, physicsDecorator.getEstadoColor());
+            assertEquals(SemaforoColores.GRIS, chemistryDecorator.getEstadoColor());
+        } catch (Exception e) {
+            fail("No se esperaba una excepción al crear el grupo o inscribir la materia: " + e.getMessage());
+        }
     }
 
     @Test
@@ -639,16 +662,20 @@ class SirhaBackEndApplicationTests {
         NoCursadaState initialState = (NoCursadaState) decorator.getState();
         assertNotNull(initialState);
         AcademicPeriod academicPeriod = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
-        Group grupo = new Group(matematicas,30, academicPeriod);
-        decorator.inscribir(grupo);
-        EnCursoState enrolledState = (EnCursoState) decorator.getState();
-        assertNotNull(enrolledState);
-        assertNotSame(initialState, enrolledState);
-        
-        decorator.aprobar();
-        AprobadaState passedState = (AprobadaState) decorator.getState();
-        assertNotNull(passedState);
-        assertNotSame(enrolledState, passedState);
+        try {
+            Group grupo = new Group(matematicas,30, academicPeriod);
+            decorator.inscribir(grupo);
+            EnCursoState enrolledState = (EnCursoState) decorator.getState();
+            assertNotNull(enrolledState);
+            assertNotSame(initialState, enrolledState);
+            
+            decorator.aprobar();
+            AprobadaState passedState = (AprobadaState) decorator.getState();
+            assertNotNull(passedState);
+            assertNotSame(enrolledState, passedState);
+        } catch (Exception e) {
+            fail("No se esperaba una excepción al crear el grupo o inscribir la materia: " + e.getMessage());
+        }
     }
 
     @Test
@@ -662,13 +689,17 @@ class SirhaBackEndApplicationTests {
         assertNotSame(decorator1.getState(), decorator2.getState());
         
         AcademicPeriod academicPeriod = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
-        Group grupo = new Group(matematicas,30, academicPeriod);
-        decorator1.inscribir(grupo);
-        decorator2.inscribir(grupo);
+        try {
+            Group grupo = new Group(matematicas,30, academicPeriod);
+            decorator1.inscribir(grupo);
+            decorator2.inscribir(grupo);
 
-        assertNotSame(decorator1.getState(), decorator2.getState());
-        
-        assertEquals(decorator1.getState().getClass(), decorator2.getState().getClass());
+            assertNotSame(decorator1.getState(), decorator2.getState());
+            
+            assertEquals(decorator1.getState().getClass(), decorator2.getState().getClass());
+        } catch (Exception e) {
+            fail("No se esperaba una excepción al crear el grupo o inscribir la materia: " + e.getMessage());
+        }
     }
 
     @Test
@@ -678,18 +709,22 @@ class SirhaBackEndApplicationTests {
         
         assertTrue(decorator.getState() instanceof NoCursadaState);
         AcademicPeriod academicPeriod = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
-        Group grupo = new Group(matematicas,30, academicPeriod);
-        decorator.inscribir(grupo);
-        assertTrue(decorator.getState() instanceof EnCursoState);
-        
-        decorator.retirar();
-        assertTrue(decorator.getState() instanceof NoCursadaState);
-        
-        assertThrows(IllegalStateException.class, () -> decorator.aprobar());
-        assertThrows(IllegalStateException.class, () -> decorator.reprobar());
-        assertThrows(IllegalStateException.class, () -> decorator.retirar());
-        
-        assertTrue(decorator.getState() instanceof NoCursadaState);
+        try {
+            Group grupo = new Group(matematicas,30, academicPeriod);
+            decorator.inscribir(grupo);
+            assertTrue(decorator.getState() instanceof EnCursoState);
+            
+            decorator.retirar();
+            assertTrue(decorator.getState() instanceof NoCursadaState);
+            
+            assertThrows(IllegalStateException.class, () -> decorator.aprobar());
+            assertThrows(IllegalStateException.class, () -> decorator.reprobar());
+            assertThrows(IllegalStateException.class, () -> decorator.retirar());
+            
+            assertTrue(decorator.getState() instanceof NoCursadaState);
+        } catch (Exception e) {
+            fail("No se esperaba una excepción al crear el grupo o inscribir la materia: " + e.getMessage());
+        }
     }
 
     @Test
@@ -697,25 +732,29 @@ class SirhaBackEndApplicationTests {
         Subject subject = new Subject("101", "Matemáticas", 4);
         SubjectDecorator decorator = new SubjectDecorator(subject);
         AcademicPeriod academicPeriod = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
-        Group grupo = new Group(matematicas,30, academicPeriod);
-        decorator.inscribir(grupo);
-        assertTrue(decorator.getState() instanceof EnCursoState);
-        
-        assertThrows(IllegalStateException.class, () -> decorator.inscribir(grupo));
-        assertTrue(decorator.getState() instanceof EnCursoState);
-        
-        SubjectDecorator decorator2 = new SubjectDecorator(new Subject("102", "Física", 3));
-        decorator2.inscribir(grupo);
-        decorator2.aprobar();
-        assertTrue(decorator2.getState() instanceof AprobadaState);
-        
-        SubjectDecorator decorator3 = new SubjectDecorator(new Subject("103", "Química", 4));
-        decorator3.inscribir(grupo);
-        decorator3.reprobar();
-        assertTrue(decorator3.getState() instanceof ReprobadaState);
-        
-        decorator.retirar();
-        assertTrue(decorator.getState() instanceof NoCursadaState);
+        try {
+            Group grupo = new Group(matematicas,30, academicPeriod);
+            decorator.inscribir(grupo);
+            assertTrue(decorator.getState() instanceof EnCursoState);
+            
+            assertThrows(IllegalStateException.class, () -> decorator.inscribir(grupo));
+            assertTrue(decorator.getState() instanceof EnCursoState);
+            
+            SubjectDecorator decorator2 = new SubjectDecorator(new Subject("102", "Física", 3));
+            decorator2.inscribir(grupo);
+            decorator2.aprobar();
+            assertTrue(decorator2.getState() instanceof AprobadaState);
+            
+            SubjectDecorator decorator3 = new SubjectDecorator(new Subject("103", "Química", 4));
+            decorator3.inscribir(grupo);
+            decorator3.reprobar();
+            assertTrue(decorator3.getState() instanceof ReprobadaState);
+            
+            decorator.retirar();
+            assertTrue(decorator.getState() instanceof NoCursadaState);
+        } catch (Exception e) {
+            fail("No se esperaba una excepción al crear el grupo o inscribir la materia: " + e.getMessage());
+        }
     }
 
     @Test
@@ -723,15 +762,19 @@ class SirhaBackEndApplicationTests {
         Subject subject = new Subject("101", "Matemáticas", 4);
         SubjectDecorator decorator = new SubjectDecorator(subject);
         AcademicPeriod academicPeriod = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
-        Group grupo = new Group(matematicas,30, academicPeriod);
-        decorator.inscribir(grupo);
-        decorator.aprobar();
-        
-        assertTrue(decorator.getState() instanceof AprobadaState);
-        
-        assertThrows(IllegalStateException.class, () -> decorator.inscribir(grupo));
-        assertThrows(IllegalStateException.class, () -> decorator.reprobar());
-        assertThrows(IllegalStateException.class, () -> decorator.retirar());
+        try {
+            Group grupo = new Group(matematicas,30, academicPeriod);
+            decorator.inscribir(grupo);
+            decorator.aprobar();
+            
+            assertTrue(decorator.getState() instanceof AprobadaState);
+            
+            assertThrows(IllegalStateException.class, () -> decorator.inscribir(grupo));
+            assertThrows(IllegalStateException.class, () -> decorator.reprobar());
+            assertThrows(IllegalStateException.class, () -> decorator.retirar());
+        } catch (Exception e) {
+            fail("No se esperaba una excepción al crear el grupo o inscribir la materia: " + e.getMessage());
+        }
     }
 
     @Test
@@ -740,19 +783,23 @@ class SirhaBackEndApplicationTests {
         SubjectDecorator decorator = new SubjectDecorator(subject);
         
         AcademicPeriod academicPeriod = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
-        Group grupo = new Group(matematicas,30, academicPeriod);
-        decorator.inscribir(grupo);
-        decorator.reprobar();
-        assertTrue(decorator.getState() instanceof ReprobadaState);
+        try {
+            Group grupo = new Group(matematicas,30, academicPeriod);
+            decorator.inscribir(grupo);
+            decorator.reprobar();
+            assertTrue(decorator.getState() instanceof ReprobadaState);
 
-        decorator.inscribir(grupo);
-        assertTrue(decorator.getState() instanceof EnCursoState);
-        
-        decorator.reprobar();
-        assertTrue(decorator.getState() instanceof ReprobadaState);
-        
-        assertThrows(IllegalStateException.class, () -> decorator.reprobar());
-        assertThrows(IllegalStateException.class, () -> decorator.retirar());
+            decorator.inscribir(grupo);
+            assertTrue(decorator.getState() instanceof EnCursoState);
+            
+            decorator.reprobar();
+            assertTrue(decorator.getState() instanceof ReprobadaState);
+            
+            assertThrows(IllegalStateException.class, () -> decorator.reprobar());
+            assertThrows(IllegalStateException.class, () -> decorator.retirar());
+        } catch (Exception e) {
+            fail("No se esperaba una excepción al crear el grupo o inscribir la materia: " + e.getMessage());
+        }
     }
 
     @Test
@@ -761,34 +808,38 @@ class SirhaBackEndApplicationTests {
         SubjectDecorator decorator = new SubjectDecorator(subject);
         
         assertTrue(decorator.getState() instanceof NoCursadaState);
-        assertTrue(decorator.puedeInscribirse());
+        assertTrue(decorator.canEnroll());
         assertFalse(decorator.estaCursando());
         assertFalse(decorator.estaAprobada());
         assertFalse(decorator.estaReprobada());
 
         AcademicPeriod academicPeriod = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
-        Group grupo = new Group(matematicas,30, academicPeriod);
-        decorator.inscribir(grupo);
-        assertTrue(decorator.getState() instanceof EnCursoState);
-        assertFalse(decorator.puedeInscribirse());
-        assertTrue(decorator.estaCursando());
-        assertFalse(decorator.estaAprobada());
-        assertFalse(decorator.estaReprobada());
-        
-        decorator.reprobar();
-        assertTrue(decorator.getState() instanceof ReprobadaState);
-        assertTrue(decorator.puedeInscribirse()); // Can re-enroll after failing
-        assertFalse(decorator.estaCursando());
-        assertFalse(decorator.estaAprobada());
-        assertTrue(decorator.estaReprobada());
+        try {
+            Group grupo = new Group(matematicas,30, academicPeriod);
+            decorator.inscribir(grupo);
+            assertTrue(decorator.getState() instanceof EnCursoState);
+            assertFalse(decorator.canEnroll());
+            assertTrue(decorator.estaCursando());
+            assertFalse(decorator.estaAprobada());
+            assertFalse(decorator.estaReprobada());
+            
+            decorator.reprobar();
+            assertTrue(decorator.getState() instanceof ReprobadaState);
+            assertTrue(decorator.canEnroll()); // Can re-enroll after failing
+            assertFalse(decorator.estaCursando());
+            assertFalse(decorator.estaAprobada());
+            assertTrue(decorator.estaReprobada());
 
-        decorator.inscribir(grupo);
-        decorator.aprobar();
-        assertTrue(decorator.getState() instanceof AprobadaState);
-        assertFalse(decorator.puedeInscribirse());
-        assertFalse(decorator.estaCursando());
-        assertTrue(decorator.estaAprobada());
-        assertFalse(decorator.estaReprobada());
+            decorator.inscribir(grupo);
+            decorator.aprobar();
+            assertTrue(decorator.getState() instanceof AprobadaState);
+            assertFalse(decorator.canEnroll());
+            assertFalse(decorator.estaCursando());
+            assertTrue(decorator.estaAprobada());
+            assertFalse(decorator.estaReprobada());
+        } catch (Exception e) {
+            fail("No se esperaba una excepción al crear el grupo o inscribir la materia: " + e.getMessage());
+        }
     }
 
     @Test
@@ -799,18 +850,22 @@ class SirhaBackEndApplicationTests {
         assertEquals(SemaforoColores.GRIS, decorator.getEstadoColor());
 
         AcademicPeriod academicPeriod = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
-        Group grupo = new Group(matematicas,30, academicPeriod);
-        decorator.inscribir(grupo);
-        assertEquals(SemaforoColores.AMARILLO, decorator.getEstadoColor());
-        
-        decorator.reprobar();
-        assertEquals(SemaforoColores.ROJO, decorator.getEstadoColor());
+        try {
+            Group grupo = new Group(matematicas,30, academicPeriod);
+            decorator.inscribir(grupo);
+            assertEquals(SemaforoColores.AMARILLO, decorator.getEstadoColor());
+            
+            decorator.reprobar();
+            assertEquals(SemaforoColores.ROJO, decorator.getEstadoColor());
 
-        decorator.inscribir(grupo);
-        assertEquals(SemaforoColores.AMARILLO, decorator.getEstadoColor());
-        
-        decorator.aprobar();
-        assertEquals(SemaforoColores.VERDE, decorator.getEstadoColor());
+            decorator.inscribir(grupo);
+            assertEquals(SemaforoColores.AMARILLO, decorator.getEstadoColor());
+            
+            decorator.aprobar();
+            assertEquals(SemaforoColores.VERDE, decorator.getEstadoColor());
+        } catch (Exception e) {
+            fail("No se esperaba una excepción al crear el grupo o inscribir la materia: " + e.getMessage());
+        }
     }
 
     @Test
@@ -836,18 +891,22 @@ class SirhaBackEndApplicationTests {
         SubjectDecorator decorator = new SubjectDecorator(subject);
 
         AcademicPeriod academicPeriod = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
-        Group grupo = new Group(matematicas,30, academicPeriod);
-        decorator.inscribir(grupo);
-        decorator.reprobar();
-        
-        assertTrue(decorator.estaReprobada());
-        assertTrue(decorator.puedeInscribirse()); 
-        assertFalse(decorator.estaCursando());
-        assertFalse(decorator.estaAprobada());
-        assertEquals(SemaforoColores.ROJO, decorator.getEstadoColor());
+        try {
+            Group grupo = new Group(matematicas,30, academicPeriod);
+            decorator.inscribir(grupo);
+            decorator.reprobar();
+            
+            assertTrue(decorator.estaReprobada());
+            assertTrue(decorator.canEnroll()); 
+            assertFalse(decorator.estaCursando());
+            assertFalse(decorator.estaAprobada());
+            assertEquals(SemaforoColores.ROJO, decorator.getEstadoColor());
 
-        decorator.inscribir(grupo);
-        assertTrue(decorator.getState() instanceof EnCursoState);
+            decorator.inscribir(grupo);
+            assertTrue(decorator.getState() instanceof EnCursoState);
+        } catch (Exception e) {
+            fail("No se esperaba una excepción al crear el grupo o inscribir la materia: " + e.getMessage());
+        }
     }
 
     @Test
@@ -855,25 +914,28 @@ class SirhaBackEndApplicationTests {
         Subject subject1 = new Subject("101", "Math", 4);
         SubjectDecorator decorator1 = new SubjectDecorator(subject1);
         AcademicPeriod academicPeriod = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
+        try {
+            Group grupo = new Group(matematicas,30, academicPeriod);
+            decorator1.inscribir(grupo);
+            decorator1.aprobar();
+            assertTrue(decorator1.getState() instanceof AprobadaState);
 
-        Group grupo = new Group(matematicas,30, academicPeriod);
-        decorator1.inscribir(grupo);
-        decorator1.aprobar();
-        assertTrue(decorator1.getState() instanceof AprobadaState);
+            Subject subject2 = new Subject("102", "Physics", 3);
+            SubjectDecorator decorator2 = new SubjectDecorator(subject2);
+            Group grupo2 = new Group(matematicas,30, academicPeriod);
+            decorator2.inscribir(grupo2);
+            decorator2.reprobar();
+            assertTrue(decorator2.getState() instanceof ReprobadaState);
 
-        Subject subject2 = new Subject("102", "Physics", 3);
-        SubjectDecorator decorator2 = new SubjectDecorator(subject2);
-        Group grupo2 = new Group(matematicas,30, academicPeriod);
-        decorator2.inscribir(grupo2);
-        decorator2.reprobar();
-        assertTrue(decorator2.getState() instanceof ReprobadaState);
-
-        Subject subject3 = new Subject("103", "Chemistry", 4);
-        SubjectDecorator decorator3 = new SubjectDecorator(subject3);
-        Group grupo3 = new Group(matematicas,30, academicPeriod);
-        decorator3.inscribir(grupo3);
-        decorator3.retirar();
-        assertTrue(decorator3.getState() instanceof NoCursadaState);
+            Subject subject3 = new Subject("103", "Chemistry", 4);
+            SubjectDecorator decorator3 = new SubjectDecorator(subject3);
+            Group grupo3 = new Group(matematicas,30, academicPeriod);
+            decorator3.inscribir(grupo3);
+            decorator3.retirar();
+            assertTrue(decorator3.getState() instanceof NoCursadaState);
+        } catch (Exception e) { 
+            fail("No se esperaba una excepción al crear el grupo o inscribir la materia: " + e.getMessage());
+        }
     }
 
     @Test
@@ -889,15 +951,18 @@ class SirhaBackEndApplicationTests {
         }
 
         AcademicPeriod academicPeriod = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
-        Group grupo = new Group(matematicas,30, academicPeriod);
-        decorator.inscribir(grupo);
-        decorator.aprobar();
-        
         try {
+            Group grupo = new Group(matematicas,30, academicPeriod);
             decorator.inscribir(grupo);
-            fail("Should have thrown IllegalStateException");
-        } catch (IllegalStateException e) {
-            assertNotNull(e.getMessage());
+            decorator.aprobar();
+            try {
+                decorator.inscribir(grupo);
+                fail("Should have thrown IllegalStateException");
+            } catch (IllegalStateException e) {
+                assertNotNull(e.getMessage());
+            }
+        } catch (Exception e) {
+            fail("No se esperaba una excepción al crear el grupo o inscribir la materia: " + e.getMessage());
         }
     } 
 
@@ -909,12 +974,12 @@ class SirhaBackEndApplicationTests {
         
         assertTrue(decorator.getState() instanceof NoCursadaState);
         
-        assertTrue(decorator.getState().puedeInscribirse());
-        assertFalse(decorator.getState().puedeAprobar());
-        assertFalse(decorator.getState().puedeReprobar());
-        assertFalse(decorator.getState().puedeRetirar());
-        assertFalse(decorator.getState().tieneGrupoAsignado());
-        assertEquals("No Cursada", decorator.getState().getEstadoNombre());
+        assertTrue(decorator.getState().canEnroll());
+        assertFalse(decorator.getState().canApprove());
+        assertFalse(decorator.getState().canFail());
+        assertFalse(decorator.getState().canDropSubject());
+        assertFalse(decorator.getState().hasAssignedGroup());
+        assertEquals("No Cursada", decorator.getState().getStatusName());
     }
     
     @Test
@@ -922,21 +987,25 @@ class SirhaBackEndApplicationTests {
         Subject subject = new Subject("101", "Matemáticas", 4);
         SubjectDecorator decorator = new SubjectDecorator(subject);
         AcademicPeriod academicPeriod = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
-        Group grupo = new Group(matematicas,30, academicPeriod);
-        decorator.inscribir(grupo);
-        decorator.aprobar();
-        assertTrue(decorator.getState() instanceof AprobadaState);
-
-        assertThrows(IllegalStateException.class, () -> {
-            decorator.setSemester(4);
-        });
-        Group grupo1 = new Group(matematicas,30, new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4)));
-        assertThrows(IllegalStateException.class, () -> {
-            decorator.setGroup(grupo1);
-        });
-        assertThrows(IllegalStateException.class, () -> {
+        try {
+            Group grupo = new Group(matematicas,30, academicPeriod);
+            decorator.inscribir(grupo);
             decorator.aprobar();
-        });
+            assertTrue(decorator.getState() instanceof AprobadaState);
+
+            assertThrows(IllegalStateException.class, () -> {
+                decorator.setSemester(4);
+            });
+            Group grupo1 = new Group(matematicas,30, new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4)));
+            assertThrows(IllegalStateException.class, () -> {
+                decorator.setGroup(grupo1);
+            });
+            assertThrows(IllegalStateException.class, () -> {
+                decorator.aprobar();
+            });
+        } catch (Exception e) {
+            fail("No se esperaba una excepción al crear el grupo o inscribir la materia: " + e.getMessage());
+        }
     }
 
     @Test
@@ -944,30 +1013,34 @@ class SirhaBackEndApplicationTests {
         Subject subject = new Subject("101", "Matemáticas", 4);
         SubjectDecorator decorator = new SubjectDecorator(subject);
         AcademicPeriod academicPeriod = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
-        Group grupo = new Group(matematicas,30, academicPeriod);
-        decorator.inscribir(grupo);
-        decorator.reprobar();
-        assertTrue(decorator.getState() instanceof ReprobadaState);
+        try {
+            Group grupo = new Group(matematicas,30, academicPeriod);
+            decorator.inscribir(grupo);
+            decorator.reprobar();
+            assertTrue(decorator.getState() instanceof ReprobadaState);
 
-        assertThrows(IllegalStateException.class, () -> {
+            assertThrows(IllegalStateException.class, () -> {
+                decorator.setSemester(4);
+            });
+            Group grupo1 = new Group(matematicas, 30, new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4)));
+            assertThrows(IllegalStateException.class, () -> {
+                decorator.setGroup(grupo1);
+            });
+            assertThrows(IllegalStateException.class, () -> {
+                decorator.setGrade(00);
+            });
+            assertEquals(SemaforoColores.ROJO, decorator.getLastStateProcess().getState());
+            decorator.inscribir(grupo1);
+            decorator.setGrade(50);
             decorator.setSemester(4);
-        });
-        Group grupo1 = new Group(matematicas, 30, new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4)));
-        assertThrows(IllegalStateException.class, () -> {
-            decorator.setGroup(grupo1);
-        });
-        assertThrows(IllegalStateException.class, () -> {
-            decorator.setGrade(00);
-        });
-        assertEquals(SemaforoColores.ROJO, decorator.getLastStateProcess().getState());
-        decorator.inscribir(grupo1);
-        decorator.setGrade(50);
-        decorator.setSemester(4);
-        decorator.aprobar();
-        assertTrue(decorator.getState() instanceof AprobadaState);
-        assertEquals(4, decorator.getSemester());
-        assertEquals(50, decorator.getGrade());
-        assertEquals(SemaforoColores.VERDE, decorator.getLastStateProcess().getState());
+            decorator.aprobar();
+            assertTrue(decorator.getState() instanceof AprobadaState);
+            assertEquals(4, decorator.getSemester());
+            assertEquals(50, decorator.getGrade());
+            assertEquals(SemaforoColores.VERDE, decorator.getLastStateProcess().getState());
+        } catch (Exception e) {
+            fail("No se esperaba una excepción al crear el grupo o inscribir la materia: " + e.getMessage());
+        }
     }
     
 
@@ -977,13 +1050,17 @@ class SirhaBackEndApplicationTests {
         SubjectDecorator decorator = new SubjectDecorator(subject);
         AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
 
-        Group grupo = new Group(matematicas, 30, period);
-        
-        assertTrue(decorator.getState() instanceof NoCursadaState);
-        assertNull(decorator.getGroup());
+        try {
+            Group grupo = new Group(matematicas, 30, period);
+            assertTrue(decorator.getState() instanceof NoCursadaState);
+            assertNull(decorator.getGroup());
 
-        assertThrows(IllegalStateException.class, () -> decorator.setGroup(grupo));
-        assertNull(decorator.getGroup());
+            assertThrows(IllegalStateException.class, () -> decorator.setGroup(grupo));
+            assertNull(decorator.getGroup());
+        } catch (Exception e) {
+            fail("No se esperaba una excepción al crear el grupo: " + e.getMessage());
+        }
+        
     }
 
     @Test
@@ -1006,17 +1083,21 @@ class SirhaBackEndApplicationTests {
         Subject subject = new Subject("101", "Matemáticas", 4);
         SubjectDecorator decorator = new SubjectDecorator(subject);
         AcademicPeriod academicPeriod = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
-        Group grupo = new Group(matematicas,30, academicPeriod);
-        decorator.inscribir(grupo);
+        try {
+            Group grupo = new Group(matematicas,30, academicPeriod);
+            decorator.inscribir(grupo);
 
-        assertTrue(decorator.getState() instanceof EnCursoState);
-        
-        assertFalse(decorator.getState().puedeInscribirse());
-        assertTrue(decorator.getState().puedeAprobar());
-        assertTrue(decorator.getState().puedeReprobar());
-        assertTrue(decorator.getState().puedeRetirar());
-        assertTrue(decorator.getState().tieneGrupoAsignado());
-        assertEquals("En Curso", decorator.getState().getEstadoNombre());
+            assertTrue(decorator.getState() instanceof EnCursoState);
+            
+            assertFalse(decorator.getState().canEnroll());
+            assertTrue(decorator.getState().canApprove());
+            assertTrue(decorator.getState().canFail());
+            assertTrue(decorator.getState().canDropSubject());
+            assertTrue(decorator.getState().hasAssignedGroup());
+            assertEquals("En Curso", decorator.getState().getStatusName());
+        } catch (Exception e) {
+            fail("No se esperaba una excepción al crear el grupo o inscribir la materia: " + e.getMessage());
+        }
     }
     
     @Test
@@ -1025,17 +1106,21 @@ class SirhaBackEndApplicationTests {
         SubjectDecorator decorator = new SubjectDecorator(subject);
         
         AcademicPeriod academicPeriod = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
-        Group grupo = new Group(matematicas,30, academicPeriod);
+        try {
+            Group grupo = new Group(matematicas,30, academicPeriod);
 
-        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> {
+            IllegalStateException exception = assertThrows(IllegalStateException.class, () -> {
+                decorator.setSemester(4);
+            });
+            decorator.inscribir(grupo);
+            assertTrue(decorator.getState() instanceof EnCursoState);
+            
             decorator.setSemester(4);
-        });
-        decorator.inscribir(grupo);
-        assertTrue(decorator.getState() instanceof EnCursoState);
-        
-        decorator.setSemester(4);
-        
-        assertEquals("No se puede cambiar semestre de materia no cursada", exception.getMessage());
+            
+            assertEquals("No se puede cambiar semestre de materia no cursada", exception.getMessage());
+        } catch (Exception e) {
+            fail("No se esperaba una excepción al crear el grupo o inscribir la materia: " + e.getMessage());
+        }
     }
 
     @Test
@@ -1043,15 +1128,19 @@ class SirhaBackEndApplicationTests {
         Subject subject = new Subject("101", "Matemáticas", 4);
         SubjectDecorator decorator = new SubjectDecorator(subject);
         AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
-        Group grupo = new Group(matematicas, 30, period);
-        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> {
+        try {
+            Group grupo = new Group(matematicas, 30, period);
+            IllegalStateException exception = assertThrows(IllegalStateException.class, () -> {
+                decorator.setGroup(grupo);
+            });
+            decorator.inscribir(grupo);
             decorator.setGroup(grupo);
-        });
-        decorator.inscribir(grupo);
-        decorator.setGroup(grupo);
-        assertTrue(decorator.getState() instanceof EnCursoState);
-        assertEquals(grupo, decorator.getGroup());
-        assertEquals("No se puede asignar grupo a materia no cursada", exception.getMessage());
+            assertTrue(decorator.getState() instanceof EnCursoState);
+            assertEquals(grupo, decorator.getGroup());
+            assertEquals("No se puede asignar grupo a materia no cursada", exception.getMessage());
+        } catch (Exception e) {
+            fail("No se esperaba una excepción al crear el grupo o inscribir la materia: " + e.getMessage());
+        }
     }
 
     @Test
@@ -1060,17 +1149,21 @@ class SirhaBackEndApplicationTests {
         SubjectDecorator decorator = new SubjectDecorator(subject);
         
         AcademicPeriod academicPeriod = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
-        Group grupo = new Group(matematicas,30, academicPeriod);
-        decorator.inscribir(grupo);
-        decorator.aprobar();
-        assertTrue(decorator.getState() instanceof AprobadaState);
-        
-        assertFalse(decorator.getState().puedeInscribirse());
-        assertFalse(decorator.getState().puedeAprobar());
-        assertFalse(decorator.getState().puedeReprobar());
-        assertFalse(decorator.getState().puedeRetirar());
-        assertTrue(decorator.getState().tieneGrupoAsignado());
-        assertEquals("Aprobada", decorator.getState().getEstadoNombre());
+        try {
+            Group grupo = new Group(matematicas,30, academicPeriod);
+            decorator.inscribir(grupo);
+            decorator.aprobar();
+            assertTrue(decorator.getState() instanceof AprobadaState);
+            
+            assertFalse(decorator.getState().canEnroll());
+            assertFalse(decorator.getState().canApprove());
+            assertFalse(decorator.getState().canFail());
+            assertFalse(decorator.getState().canDropSubject());
+            assertTrue(decorator.getState().hasAssignedGroup());
+            assertEquals("Aprobada", decorator.getState().getStatusName());
+        } catch (Exception e) {
+            fail("No se esperaba una excepción al crear el grupo o inscribir la materia: " + e.getMessage());
+        }
     }
 
     @Test
@@ -1079,17 +1172,21 @@ class SirhaBackEndApplicationTests {
         SubjectDecorator decorator = new SubjectDecorator(subject);
         
         AcademicPeriod academicPeriod = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
-        Group grupo = new Group(matematicas,30, academicPeriod);
-        decorator.inscribir(grupo);
-        decorator.reprobar();
-        assertTrue(decorator.getState() instanceof ReprobadaState);
-        
-        assertTrue(decorator.getState().puedeInscribirse()); // Puede reinscribirse
-        assertTrue(decorator.getState().puedeAprobar());
-        assertFalse(decorator.getState().puedeReprobar());
-        assertFalse(decorator.getState().puedeRetirar());
-        assertTrue(decorator.getState().tieneGrupoAsignado());
-        assertEquals("Reprobada", decorator.getState().getEstadoNombre());
+        try {
+            Group grupo = new Group(matematicas,30, academicPeriod);
+            decorator.inscribir(grupo);
+            decorator.reprobar();
+            assertTrue(decorator.getState() instanceof ReprobadaState);
+            
+            assertTrue(decorator.getState().canEnroll()); // Puede reinscribirse
+            assertTrue(decorator.getState().canApprove());
+            assertFalse(decorator.getState().canFail());
+            assertFalse(decorator.getState().canDropSubject());
+            assertTrue(decorator.getState().hasAssignedGroup());
+            assertEquals("Reprobada", decorator.getState().getStatusName());
+        } catch (Exception e) {
+            fail("No se esperaba una excepción al crear el grupo o inscribir la materia: " + e.getMessage());
+        }
     }
 
     @Test
@@ -1097,80 +1194,92 @@ class SirhaBackEndApplicationTests {
         Subject subject = new Subject("101", "Matemáticas", 4);
         SubjectDecorator decorator = new SubjectDecorator(subject);
         AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
-        Group grupo = new Group(matematicas, 30, period);
+        try {
+            Group grupo = new Group(matematicas, 30, period);
 
-        assertTrue(decorator.getState().puedeInscribirse());
-                
-        AcademicPeriod academicPeriod = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
-        Group grupo1 = new Group(matematicas,30, academicPeriod);
-        decorator.inscribir(grupo1);
-        decorator.setGroup(grupo);
-        assertFalse(decorator.getState().puedeInscribirse());
-        assertTrue(decorator.getState().puedeAprobar());
-        assertTrue(decorator.getState().puedeReprobar());
-        assertTrue(decorator.getState().puedeRetirar());
-        
-        decorator.aprobar();
-        assertFalse(decorator.getState().puedeInscribirse());
-        assertFalse(decorator.getState().puedeAprobar());
-        assertFalse(decorator.getState().puedeReprobar());
-        assertFalse(decorator.getState().puedeRetirar());
+            assertTrue(decorator.getState().canEnroll());
+                    
+            AcademicPeriod academicPeriod = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
+            Group grupo1 = new Group(matematicas,30, academicPeriod);
+            decorator.inscribir(grupo1);
+            decorator.setGroup(grupo);
+            assertFalse(decorator.getState().canEnroll());
+            assertTrue(decorator.getState().canApprove());
+            assertTrue(decorator.getState().canFail());
+            assertTrue(decorator.getState().canDropSubject());
+            
+            decorator.aprobar();
+            assertFalse(decorator.getState().canEnroll());
+            assertFalse(decorator.getState().canApprove());
+            assertFalse(decorator.getState().canFail());
+            assertFalse(decorator.getState().canDropSubject());
+        } catch (Exception e) {
+            fail("No se esperaba una excepción al crear el grupo o inscribir la materia: " + e.getMessage());
+        }
     }
 
     @Test
-    void testAllStatesGetEstadoNombre() {
+    void testAllStatesgetStatusName() {
         Subject subject = new Subject("101", "Matemáticas", 4);
         SubjectDecorator decorator = new SubjectDecorator(subject);
         
-        assertEquals("No Cursada", decorator.getState().getEstadoNombre());
+        assertEquals("No Cursada", decorator.getState().getStatusName());
 
         AcademicPeriod academicPeriod = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
-        Group grupo = new Group(matematicas,30, academicPeriod);
-        decorator.inscribir(grupo);
-        assertEquals("En Curso", decorator.getState().getEstadoNombre());
+        try {
+            Group grupo = new Group(matematicas,30, academicPeriod);
+            decorator.inscribir(grupo);
+            assertEquals("En Curso", decorator.getState().getStatusName());
 
-        SubjectDecorator decorator2 = new SubjectDecorator(new Subject("102", "Física", 3));
-        AcademicPeriod academicPeriod2 = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
-        Group grupo2 = new Group(fisica, 30, academicPeriod2);
-        decorator2.inscribir(grupo2);
-        decorator2.aprobar();
-        assertEquals("Aprobada", decorator2.getState().getEstadoNombre());
+            SubjectDecorator decorator2 = new SubjectDecorator(new Subject("102", "Física", 3));
+            AcademicPeriod academicPeriod2 = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
+            Group grupo2 = new Group(fisica, 30, academicPeriod2);
+            decorator2.inscribir(grupo2);
+            decorator2.aprobar();
+            assertEquals("Aprobada", decorator2.getState().getStatusName());
 
-        SubjectDecorator decorator3 = new SubjectDecorator(new Subject("103", "Química", 4));
-        AcademicPeriod academicPeriod3 = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
-        Group grupo3 = new Group(quimica, 30, academicPeriod3);
-        decorator3.inscribir(grupo3);
-        decorator3.reprobar();
-        assertEquals("Reprobada", decorator3.getState().getEstadoNombre());
+            SubjectDecorator decorator3 = new SubjectDecorator(new Subject("103", "Química", 4));
+            AcademicPeriod academicPeriod3 = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
+            Group grupo3 = new Group(quimica, 30, academicPeriod3);
+            decorator3.inscribir(grupo3);
+            decorator3.reprobar();
+            assertEquals("Reprobada", decorator3.getState().getStatusName());
+        } catch (Exception e) {
+            fail("No se esperaba una excepción al crear el grupo o inscribir la materia: " + e.getMessage());
+        }
     }
 
     @Test
-    void testTieneGrupoAsignadoConsistency() {
+    void testhasAssignedGroupConsistency() {
         Subject subject = new Subject("101", "Matemáticas", 4);
         SubjectDecorator decorator = new SubjectDecorator(subject);
         AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
-        Group grupo = new Group(matematicas, 30, period);
+        try {
+            Group grupo = new Group(matematicas, 30, period);
 
-        assertFalse(decorator.getState().tieneGrupoAsignado());
-        
-        
-        assertFalse(decorator.getState().tieneGrupoAsignado());
-        
-        decorator.inscribir(grupo);
-        decorator.setGroup(grupo);
-        assertTrue(decorator.getState().tieneGrupoAsignado());
-        
-        decorator.aprobar();
-        assertTrue(decorator.getState().tieneGrupoAsignado());
-        
-        SubjectDecorator decorator2 = new SubjectDecorator(new Subject("102", "Física", 3));
-        Group grupo2 = new Group(matematicas, 30, period);
-        
-        assertFalse(decorator2.getState().tieneGrupoAsignado());
-        decorator2.inscribir(grupo2);
-        decorator2.setGroup(grupo2);
-        decorator2.reprobar();
-        assertTrue(decorator2.getState().tieneGrupoAsignado()); 
+            assertFalse(decorator.getState().hasAssignedGroup());
+            
+            
+            assertFalse(decorator.getState().hasAssignedGroup());
+            
+            decorator.inscribir(grupo);
+            decorator.setGroup(grupo);
+            assertTrue(decorator.getState().hasAssignedGroup());
+            
+            decorator.aprobar();
+            assertTrue(decorator.getState().hasAssignedGroup());
+            
+            SubjectDecorator decorator2 = new SubjectDecorator(new Subject("102", "Física", 3));
+            Group grupo2 = new Group(matematicas, 30, period);
+            
+            assertFalse(decorator2.getState().hasAssignedGroup());
+            decorator2.inscribir(grupo2);
+            decorator2.setGroup(grupo2);
+            decorator2.reprobar();
+            assertTrue(decorator2.getState().hasAssignedGroup()); 
+        } catch (Exception e) {
+            fail("No se esperaba una excepción al crear el grupo o inscribir la materia: " + e.getMessage());
+        }
     }
 
     @Test
@@ -1183,12 +1292,16 @@ class SirhaBackEndApplicationTests {
         assertNotNull(programacionDecorator.getGroups());
 
         AcademicPeriod academicPeriod = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
-        Group grupo = new Group(matematicas,30, academicPeriod);
-        programacionDecorator.inscribir(grupo, 1);
-        programacionDecorator.setSemester(2);
-        
-        assertEquals(SemaforoColores.AMARILLO, programacionDecorator.getEstadoColor());
-        assertEquals(2, programacionDecorator.getSemester());
+        try {
+            Group grupo = new Group(matematicas,30, academicPeriod);
+            programacionDecorator.inscribir(grupo, 1);
+            programacionDecorator.setSemester(2);
+            
+            assertEquals(SemaforoColores.AMARILLO, programacionDecorator.getEstadoColor());
+            assertEquals(2, programacionDecorator.getSemester());
+        } catch (Exception e) {
+            fail("No se esperaba una excepción al crear el grupo o inscribir la materia: " + e.getMessage());
+        }
     }
     @Test
     void testAcademicPeriodMethods() {
@@ -1221,268 +1334,284 @@ class SirhaBackEndApplicationTests {
 
     @Test
     void testCreateSolicitudCambioGroup(){
-        student.enrollSubject(matematicas, grupo1);
+        try {
+            student.enrollSubject(matematicas, grupo1);
 
-        Group newGroup = new Group(matematicas, 25, academicPeriod);
-        Schedule newSchedule = new Schedule(DiasSemana.MARTES, LocalTime.of(10, 0), LocalTime.of(12, 0));
-        newGroup.addSchedule(newSchedule);
-        matematicas.addGroup(newGroup);
+            Group newGroup = new Group(matematicas, 25, academicPeriod);
+            Schedule newSchedule = new Schedule(DiasSemana.MARTES, LocalTime.of(10, 0), LocalTime.of(12, 0));
+            newGroup.addSchedule(newSchedule);
+            matematicas.addGroup(newGroup);
 
-        assertFalse(newGroup.equals(grupo1));
+            assertFalse(newGroup.equals(grupo1));
 
-        CambioGrupo solicitud = student.createSolicitudCambioGrupo(matematicas, newGroup);
-        
-        assertNotNull(solicitud);
-        assertTrue(solicitud instanceof CambioGrupo);
-        assertEquals(student, solicitud.getStudent());
-        assertEquals(matematicas, solicitud.getSubject());
-        assertEquals(newGroup, solicitud.getNewGroup());
-        assertEquals(academicPeriod, solicitud.getCurrentPeriod());
+            CambioGrupo solicitud = student.createGroupChangeRequest(matematicas, newGroup);
+            
+            assertNotNull(solicitud);
+            assertTrue(solicitud instanceof CambioGrupo);
+            assertEquals(student, solicitud.getStudent());
+            assertEquals(matematicas, solicitud.getSubject());
+            assertEquals(newGroup, solicitud.getNewGroup());
+            assertEquals(academicPeriod, solicitud.getCurrentPeriod());
 
-        List<RequestTo> solicitudes = student.getSolicitudes();
-        assertEquals(1, solicitudes.size());
-        assertEquals(solicitud, solicitudes.get(0));
+            List<RequestTo> solicitudes = student.getSolicitudes();
+            assertEquals(1, solicitudes.size());
+            assertEquals(solicitud, solicitudes.get(0));
+        } catch (Exception e) {
+            fail("No se esperaba una excepción al crear la solicitud de cambio de grupo: " + e.getMessage());
+        }
     }
 
     @Test
     void testSubjectContainsDifferentGroupsWithSameProperties() {
-        Group grupoA = new Group(matematicas, 25, academicPeriod);
-        Group grupoB = new Group(matematicas, 25, academicPeriod);
-        Group grupoC = new Group(matematicas, 25, academicPeriod);
+        try {
+            Group grupoA = new Group(matematicas, 25, academicPeriod);
+            Group grupoB = new Group(matematicas, 25, academicPeriod);
+            Group grupoC = new Group(matematicas, 25, academicPeriod);
 
-        Schedule horario = new Schedule(DiasSemana.MIERCOLES, LocalTime.of(14, 0), LocalTime.of(16, 0));
-        grupoA.addSchedule(horario);
-        grupoB.addSchedule(new Schedule(DiasSemana.MIERCOLES, LocalTime.of(14, 0), LocalTime.of(16, 0)));
-        grupoC.addSchedule(new Schedule(DiasSemana.MIERCOLES, LocalTime.of(14, 0), LocalTime.of(16, 0)));
-        
-        programacion.addGroup(grupoA);
-        programacion.addGroup(grupoB);
-        programacion.addGroup(grupoC);
-        
-        assertEquals(3, programacion.getGroups().size(), "La materia debe tener 3 grupos diferentes");
-        assertNotSame(grupoA, grupoB, "grupoA y grupoB deben ser instancias diferentes");
-        assertNotSame(grupoB, grupoC, "grupoB y grupoC deben ser instancias diferentes");
-        assertNotSame(grupoA, grupoC, "grupoA y grupoC deben ser instancias diferentes");
+            Schedule horario = new Schedule(DiasSemana.MIERCOLES, LocalTime.of(14, 0), LocalTime.of(16, 0));
+            grupoA.addSchedule(horario);
+            grupoB.addSchedule(new Schedule(DiasSemana.MIERCOLES, LocalTime.of(14, 0), LocalTime.of(16, 0)));
+            grupoC.addSchedule(new Schedule(DiasSemana.MIERCOLES, LocalTime.of(14, 0), LocalTime.of(16, 0)));
+            
+            programacion.addGroup(grupoA);
+            programacion.addGroup(grupoB);
+            programacion.addGroup(grupoC);
+            
+            assertEquals(3, programacion.getGroups().size(), "La materia debe tener 3 grupos diferentes");
+            assertNotSame(grupoA, grupoB, "grupoA y grupoB deben ser instancias diferentes");
+            assertNotSame(grupoB, grupoC, "grupoB y grupoC deben ser instancias diferentes");
+            assertNotSame(grupoA, grupoC, "grupoA y grupoC deben ser instancias diferentes");
 
-        assertTrue(programacion.hasGroup(grupoA));
-        assertTrue(programacion.hasGroup(grupoB));
-        assertTrue(programacion.hasGroup(grupoC));
+            assertTrue(programacion.hasGroup(grupoA));
+            assertTrue(programacion.hasGroup(grupoB));
+            assertTrue(programacion.hasGroup(grupoC));
 
-        Set<Group> uniqueGroups = new HashSet<>(programacion.getGroups());
-        assertEquals(3, uniqueGroups.size(), "No debe haber grupos duplicados");
-        
-        assertNotEquals(grupoA, grupoB, "Grupos con propiedades idénticas deben ser instancias diferentes");
-        assertNotEquals(grupoB, grupoC, "Grupos con propiedades idénticas deben ser instancias diferentes");
-        assertNotEquals(grupoA, grupoC, "Grupos con propiedades idénticas deben ser instancias diferentes");
-        
-        assertFalse(grupoA.equals(grupoB), "equals() no debe considerar iguales a grupos diferentes");
+            Set<Group> uniqueGroups = new HashSet<>(programacion.getGroups());
+            assertEquals(3, uniqueGroups.size(), "No debe haber grupos duplicados");
+            
+            assertNotEquals(grupoA, grupoB, "Grupos con propiedades idénticas deben ser instancias diferentes");
+            assertNotEquals(grupoB, grupoC, "Grupos con propiedades idénticas deben ser instancias diferentes");
+            assertNotEquals(grupoA, grupoC, "Grupos con propiedades idénticas deben ser instancias diferentes");
+            
+            assertFalse(grupoA.equals(grupoB), "equals() no debe considerar iguales a grupos diferentes");
+        } catch (Exception e) {
+            fail("No se esperaba una excepción al crear los grupos o asignarlos a la materia: " + e.getMessage());
+        }
     }
-
-    // ... [Continuar añadiendo todas las pruebas restantes aquí, usando los objetos del setup]
-    
-    // El resto de las pruebas van aquí, pero ahora usando los objetos pre-configurados
-    // del @BeforeEach en lugar de crear nuevos objetos en cada test...
 
     @Test
     void testCreateSolicitudCambioGroup2(){
-        student.enrollSubject(matematicas, grupo1);
+        try {
+            student.enrollSubject(matematicas, grupo1);
 
-        Group newGroup = new Group(matematicas, 25, academicPeriod);
-        Schedule newSchedule = new Schedule(DiasSemana.MARTES, LocalTime.of(10, 0), LocalTime.of(12, 0));
-        newGroup.addSchedule(newSchedule);
-        matematicas.addGroup(newGroup);
+            Group newGroup = new Group(matematicas, 25, academicPeriod);
+            Schedule newSchedule = new Schedule(DiasSemana.MARTES, LocalTime.of(10, 0), LocalTime.of(12, 0));
+            newGroup.addSchedule(newSchedule);
+            matematicas.addGroup(newGroup);
 
-        assertFalse(newGroup.equals(grupo1));
+            assertFalse(newGroup.equals(grupo1));
 
-        CambioGrupo solicitud = student.createSolicitudCambioGrupo(matematicas, newGroup);
-        
-        assertNotNull(solicitud);
-        assertTrue(solicitud instanceof CambioGrupo);
-        assertEquals(student, solicitud.getStudent());
-        assertEquals(matematicas, solicitud.getSubject());
-        assertEquals(newGroup, solicitud.getNewGroup());
-        assertEquals(academicPeriod, solicitud.getCurrentPeriod());
+            CambioGrupo solicitud = student.createGroupChangeRequest(matematicas, newGroup);
+            
+            assertNotNull(solicitud);
+            assertTrue(solicitud instanceof CambioGrupo);
+            assertEquals(student, solicitud.getStudent());
+            assertEquals(matematicas, solicitud.getSubject());
+            assertEquals(newGroup, solicitud.getNewGroup());
+            assertEquals(academicPeriod, solicitud.getCurrentPeriod());
 
-        List<RequestTo> solicitudes = student.getSolicitudes();
-        assertEquals(1, solicitudes.size());
-        assertEquals(solicitud, solicitudes.get(0));
+            List<RequestTo> solicitudes = student.getSolicitudes();
+            assertEquals(1, solicitudes.size());
+            assertEquals(solicitud, solicitudes.get(0));
+        } catch (Exception e) {
+            fail("No se esperaba una excepción al crear la solicitud de cambio de grupo: " + e.getMessage());
+        }
     }
 
     @Test
     void testSubjectContainsDifferentGroupsWithSameProperties2() {
-        Group grupoA = new Group(matematicas, 25, academicPeriod);
-        Group grupoB = new Group(matematicas, 25, academicPeriod);
-        Group grupoC = new Group(matematicas, 25, academicPeriod);
+        try {
+            Group grupoA = new Group(matematicas, 25, academicPeriod);
+            Group grupoB = new Group(matematicas, 25, academicPeriod);
+            Group grupoC = new Group(matematicas, 25, academicPeriod);
 
-        Schedule horario = new Schedule(DiasSemana.MIERCOLES, LocalTime.of(14, 0), LocalTime.of(16, 0));
-        grupoA.addSchedule(horario);
-        grupoB.addSchedule(new Schedule(DiasSemana.MIERCOLES, LocalTime.of(14, 0), LocalTime.of(16, 0)));
-        grupoC.addSchedule(new Schedule(DiasSemana.MIERCOLES, LocalTime.of(14, 0), LocalTime.of(16, 0)));
-        
-        programacion.addGroup(grupoA);
-        programacion.addGroup(grupoB);
-        programacion.addGroup(grupoC);
-        
-        assertEquals(3, programacion.getGroups().size(), "La materia debe tener 3 grupos diferentes");
-        assertNotSame(grupoA, grupoB, "grupoA y grupoB deben ser instancias diferentes");
-        assertNotSame(grupoB, grupoC, "grupoB y grupoC deben ser instancias diferentes");
-        assertNotSame(grupoA, grupoC, "grupoA y grupoC deben ser instancias diferentes");
+            Schedule horario = new Schedule(DiasSemana.MIERCOLES, LocalTime.of(14, 0), LocalTime.of(16, 0));
+            grupoA.addSchedule(horario);
+            grupoB.addSchedule(new Schedule(DiasSemana.MIERCOLES, LocalTime.of(14, 0), LocalTime.of(16, 0)));
+            grupoC.addSchedule(new Schedule(DiasSemana.MIERCOLES, LocalTime.of(14, 0), LocalTime.of(16, 0)));
+            
+            programacion.addGroup(grupoA);
+            programacion.addGroup(grupoB);
+            programacion.addGroup(grupoC);
+            
+            assertEquals(3, programacion.getGroups().size(), "La materia debe tener 3 grupos diferentes");
+            assertNotSame(grupoA, grupoB, "grupoA y grupoB deben ser instancias diferentes");
+            assertNotSame(grupoB, grupoC, "grupoB y grupoC deben ser instancias diferentes");
+            assertNotSame(grupoA, grupoC, "grupoA y grupoC deben ser instancias diferentes");
 
-        assertTrue(programacion.hasGroup(grupoA));
-        assertTrue(programacion.hasGroup(grupoB));
-        assertTrue(programacion.hasGroup(grupoC));
+            assertTrue(programacion.hasGroup(grupoA));
+            assertTrue(programacion.hasGroup(grupoB));
+            assertTrue(programacion.hasGroup(grupoC));
 
-        Set<Group> uniqueGroups = new HashSet<>(programacion.getGroups());
-        assertEquals(3, uniqueGroups.size(), "No debe haber grupos duplicados");
-        
-        assertNotEquals(grupoA, grupoB, "Grupos con propiedades idénticas deben ser instancias diferentes");
-        assertNotEquals(grupoB, grupoC, "Grupos con propiedades idénticas deben ser instancias diferentes");
-        assertNotEquals(grupoA, grupoC, "Grupos con propiedades idénticas deben ser instancias diferentes");
-        
-        assertFalse(grupoA.equals(grupoB), "equals() no debe considerar iguales a grupos diferentes");
+            Set<Group> uniqueGroups = new HashSet<>(programacion.getGroups());
+            assertEquals(3, uniqueGroups.size(), "No debe haber grupos duplicados");
+            
+            assertNotEquals(grupoA, grupoB, "Grupos con propiedades idénticas deben ser instancias diferentes");
+            assertNotEquals(grupoB, grupoC, "Grupos con propiedades idénticas deben ser instancias diferentes");
+            assertNotEquals(grupoA, grupoC, "Grupos con propiedades idénticas deben ser instancias diferentes");
+            
+            assertFalse(grupoA.equals(grupoB), "equals() no debe considerar iguales a grupos diferentes");
+        } catch (Exception e) {
+            fail("No se esperaba una excepción al crear los grupos o asignarlos a la materia: " + e.getMessage());
+        }
     }
 
-    // ============== PRUEBAS QUE FALTARON - AÑADIR AL FINAL ==============
-
     @Test
-    @DisplayName("Estados específicos - NoCursadaState propiedades")
     void testNoCursadaStateSpecificProperties() {
         Subject subject = new Subject("101", "Matemáticas", 4);
         SubjectDecorator decorator = new SubjectDecorator(subject);
         NoCursadaState state = new NoCursadaState();
         
         assertTrue(decorator.getState() instanceof NoCursadaState);
-        assertTrue(state.puedeInscribirse());
-        assertFalse(state.puedeAprobar());
-        assertFalse(state.puedeReprobar());
-        assertFalse(state.puedeRetirar());
-        assertFalse(state.tieneGrupoAsignado());
-        assertEquals("No Cursada", state.getEstadoNombre());
+        assertTrue(state.canEnroll());
+        assertFalse(state.canApprove());
+        assertFalse(state.canFail());
+        assertFalse(state.canDropSubject());
+        assertFalse(state.hasAssignedGroup());
+        assertEquals("No Cursada", state.getStatusName());
     }
 
     @Test
-    @DisplayName("Estados específicos - EnCursoState propiedades")
     void testEnCursoStateSpecificProperties() {
         EnCursoState state = new EnCursoState();
         
-        assertFalse(state.puedeInscribirse());
-        assertTrue(state.puedeAprobar());
-        assertTrue(state.puedeReprobar());
-        assertTrue(state.puedeRetirar());
-        assertTrue(state.tieneGrupoAsignado());
-        assertEquals("En Curso", state.getEstadoNombre());
+        assertFalse(state.canEnroll());
+        assertTrue(state.canApprove());
+        assertTrue(state.canFail());
+        assertTrue(state.canDropSubject());
+        assertTrue(state.hasAssignedGroup());
+        assertEquals("En Curso", state.getStatusName());
     }
 
     @Test
-    @DisplayName("Estados específicos - AprobadaState propiedades")
     void testAprobadaStateSpecificProperties() {
         AprobadaState state = new AprobadaState();
         
-        assertFalse(state.puedeInscribirse());
-        assertFalse(state.puedeAprobar());
-        assertFalse(state.puedeReprobar());
-        assertFalse(state.puedeRetirar());
-        assertTrue(state.tieneGrupoAsignado());
-        assertEquals("Aprobada", state.getEstadoNombre());
+        assertFalse(state.canEnroll());
+        assertFalse(state.canApprove());
+        assertFalse(state.canFail());
+        assertFalse(state.canDropSubject());
+        assertTrue(state.hasAssignedGroup());
+        assertEquals("Aprobada", state.getStatusName());
     }
 
     @Test
-    @DisplayName("Estados específicos - ReprobadaState propiedades")
     void testReprobadaStateSpecificProperties() {
         ReprobadaState state = new ReprobadaState();
         
-        assertTrue(state.puedeInscribirse());
-        assertTrue(state.puedeAprobar());
-        assertFalse(state.puedeReprobar());
-        assertFalse(state.puedeRetirar());
-        assertTrue(state.tieneGrupoAsignado());
-        assertEquals("Reprobada", state.getEstadoNombre());
+        assertTrue(state.canEnroll());
+        assertTrue(state.canApprove());
+        assertFalse(state.canFail());
+        assertFalse(state.canDropSubject());
+        assertTrue(state.hasAssignedGroup());
+        assertEquals("Reprobada", state.getStatusName());
     }
 
     @Test
-    @DisplayName("Group - Inscripción de estudiantes múltiples")
     void testGroupMultipleStudentEnrollment() {
         AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
-        Group group = new Group(matematicas, 5, period);
-        
-        Student s1 = new Student("student1", "s1@test.com", "hash", "S001");
-        Student s2 = new Student("student2", "s2@test.com", "hash", "S002");
-        Student s3 = new Student("student3", "s3@test.com", "hash", "S003");
-        
-        group.enrollStudent(s1);
-        group.enrollStudent(s2);
-        group.enrollStudent(s3);
-        
-        assertEquals(3, group.getInscritos());
-        assertEquals(2, group.getCuposDisponibles());
-        assertFalse(group.isFull());
-        
-        assertTrue(group.contieneEstudiante(s1));
-        assertTrue(group.contieneEstudiante(s2));
-        assertTrue(group.contieneEstudiante(s3));
+        try {
+            Group group = new Group(matematicas, 5, period);
+            
+            Student s1 = new Student("student1", "s1@test.com", "hash", "S001");
+            Student s2 = new Student("student2", "s2@test.com", "hash", "S002");
+            Student s3 = new Student("student3", "s3@test.com", "hash", "S003");
+            
+            group.enrollStudent(s1);
+            group.enrollStudent(s2);
+            group.enrollStudent(s3);
+            
+            assertEquals(3, group.getInscritos());
+            assertEquals(2, group.getCuposDisponibles());
+            assertFalse(group.isFull());
+            
+            assertTrue(group.contieneEstudiante(s1));
+            assertTrue(group.contieneEstudiante(s2));
+            assertTrue(group.contieneEstudiante(s3));
+        } catch (Exception e) {
+            fail("No se esperaba una excepción al crear el grupo o inscribir estudiantes: " + e.getMessage());
+        }
     }
 
     @Test
-    @DisplayName("Group - Estado se cierra automáticamente al llenarse")
     void testGroupAutoCloseWhenFull() {
         AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
-        Group group = new Group(matematicas, 2, period);
-        
-        Student s1 = new Student("student1", "s1@test.com", "hash", "S001");
-        Student s2 = new Student("student2", "s2@test.com", "hash", "S002");
-        Student s3 = new Student("student3", "s3@test.com", "hash", "S003");
-        
-        assertTrue(group.getGroupState() instanceof StatusOpen);
-        
-        group.enrollStudent(s1);
-        assertTrue(group.getGroupState() instanceof StatusOpen);
-        
-        group.enrollStudent(s2);
-        assertTrue(group.getGroupState() instanceof StatusClosed);
-        assertTrue(group.isFull());
-        
-        assertThrows(RuntimeException.class, () -> group.enrollStudent(s3));
+        try {
+            Group group = new Group(matematicas, 2, period);
+            
+            Student s1 = new Student("student1", "s1@test.com", "hash", "S001");
+            Student s2 = new Student("student2", "s2@test.com", "hash", "S002");
+            Student s3 = new Student("student3", "s3@test.com", "hash", "S003");
+            
+            assertTrue(group.getGroupState() instanceof StatusOpen);
+            
+            group.enrollStudent(s1);
+            assertTrue(group.getGroupState() instanceof StatusOpen);
+            
+            group.enrollStudent(s2);
+            assertTrue(group.getGroupState() instanceof StatusClosed);
+            assertTrue(group.isFull());
+            
+            assertThrows(SirhaException.class, () -> group.enrollStudent(s3));
+        } catch (Exception e) {
+            fail("No se esperaba una excepción al crear el grupo o inscribir estudiantes: " + e.getMessage());
+        }
     }
 
     @Test
-    @DisplayName("Group - Conflictos de horarios")
     void testGroupScheduleConflictDetection() {
         AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
-        Group group1 = new Group(matematicas, 10, period);
-        Group group2 = new Group(matematicas, 10, period);
-        
-        Schedule schedule1 = new Schedule(DiasSemana.LUNES, LocalTime.of(8, 0), LocalTime.of(10, 0));
-        Schedule schedule2 = new Schedule(DiasSemana.LUNES, LocalTime.of(9, 0), LocalTime.of(11, 0)); // Conflicto
-        
-        group1.addSchedule(schedule1);
-        group2.addSchedule(schedule2);
-        
-        assertTrue(group1.conflictoConHorario(group2));
-        assertTrue(group2.conflictoConHorario(group1));
+        try{ 
+            Group group1 = new Group(matematicas, 10, period);
+            Group group2 = new Group(matematicas, 10, period);
+            
+            Schedule schedule1 = new Schedule(DiasSemana.LUNES, LocalTime.of(8, 0), LocalTime.of(10, 0));
+            Schedule schedule2 = new Schedule(DiasSemana.LUNES, LocalTime.of(9, 0), LocalTime.of(11, 0)); // Conflicto
+            
+            group1.addSchedule(schedule1);
+            group2.addSchedule(schedule2);
+            
+            assertTrue(group1.conflictoConHorario(group2));
+            assertTrue(group2.conflictoConHorario(group1));
+        } catch (Exception e) {
+            fail("No se esperaba una excepción al crear el grupo o asignar horarios: " + e.getMessage());
+        }
     }
 
     @Test
-    @DisplayName("Group - Sin conflictos de horarios")
     void testGroupNoScheduleConflict() {
         AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
-        Group group1 = new Group(matematicas, 10, period);
-        Group group2 = new Group(matematicas, 10, period);
-        
-        Schedule schedule1 = new Schedule(DiasSemana.LUNES, LocalTime.of(8, 0), LocalTime.of(10, 0));
-        Schedule schedule2 = new Schedule(DiasSemana.MARTES, LocalTime.of(8, 0), LocalTime.of(10, 0)); // Diferente día
-        
-        group1.addSchedule(schedule1);
-        group2.addSchedule(schedule2);
-        
-        assertFalse(group1.conflictoConHorario(group2));
-        assertFalse(group2.conflictoConHorario(group1));
+        try {
+            Group group1 = new Group(matematicas, 10, period);
+            Group group2 = new Group(matematicas, 10, period);
+            
+            Schedule schedule1 = new Schedule(DiasSemana.LUNES, LocalTime.of(8, 0), LocalTime.of(10, 0));
+            Schedule schedule2 = new Schedule(DiasSemana.MARTES, LocalTime.of(8, 0), LocalTime.of(10, 0)); // Diferente día
+            
+            group1.addSchedule(schedule1);
+            group2.addSchedule(schedule2);
+            
+            assertFalse(group1.conflictoConHorario(group2));
+            assertFalse(group2.conflictoConHorario(group1));
+        } catch (Exception e) {
+            fail("No se esperaba una excepción al crear el grupo o asignar horarios: " + e.getMessage());
+        }
     }
 
     @Test
-    @DisplayName("Student - Métodos de validación académica")
     void testStudentAcademicValidations() {
         Student student = new Student("test.user", "test@example.com", "password", "T001");
-        StudyPlan plan = new StudyPlan("Test Plan");
+        StudyPlan plan = new StudyPlan("Test Plan", Careers.INGENIERIA_DE_SISTEMAS);
         Subject subject = new Subject("101", "Test Subject", 3);
         plan.addSubject(subject);
         
@@ -1495,29 +1624,31 @@ class SirhaBackEndApplicationTests {
     }
 
     @Test
-    @DisplayName("Student - Inscripción en materia")
     void testStudentSubjectEnrollment() {
         Student student = new Student("test.user", "test@example.com", "password", "T001");
-        StudyPlan plan = new StudyPlan("Test Plan");
+        StudyPlan plan = new StudyPlan("Test Plan", Careers.INGENIERIA_DE_SISTEMAS);
         Subject subject = new Subject("101", "Test Subject", 3);
         plan.addSubject(subject);
         
         AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
-        Group group = new Group(matematicas, 30, period);
-        subject.addGroup(group);
-        
-        Semaforo semaforo = new Semaforo(plan);
-        student.setAcademicProgress(semaforo);
-        student.setCurrentPeriod(period);
-        
-        student.enrollSubject(subject, group);
-        
-        assertTrue(student.hasSubject(subject));
-        assertTrue(student.getAcademicProgress().isSubjectCursando(subject));
+        try {
+            Group group = new Group(matematicas, 30, period);
+            subject.addGroup(group);
+            
+            Semaforo semaforo = new Semaforo(plan);
+            student.setAcademicProgress(semaforo);
+            student.setCurrentPeriod(period);
+            
+            student.enrollSubject(subject, group);
+            
+            assertTrue(student.hasSubject(subject));
+            assertTrue(student.getAcademicProgress().isSubjectCursando(subject));
+        } catch (Exception e) {
+            fail("No se esperaba una excepción al crear el grupo o inscribir la materia: " + e.getMessage());
+        }
     }
 
     @Test
-    @DisplayName("Schedule - Validaciones de horario")
     void testScheduleValidations() {
         Schedule schedule = new Schedule(DiasSemana.LUNES, LocalTime.of(8, 0), LocalTime.of(10, 0));
         
@@ -1535,7 +1666,6 @@ class SirhaBackEndApplicationTests {
     }
 
     @Test
-    @DisplayName("Subject - Funcionalidades básicas")
     void testSubjectBasicFunctionalities() {
         Subject subject = new Subject("CS101", "Programming I", 4);
         
@@ -1546,16 +1676,19 @@ class SirhaBackEndApplicationTests {
         assertTrue(subject.getGroups().isEmpty());
         
         AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
-        Group group = new Group(matematicas, 30, period);
+        try {
+            Group group = new Group(matematicas, 30, period);
         
-        subject.addGroup(group);
-        assertEquals(1, subject.getGroups().size());
-        assertTrue(subject.hasGroup(group));
+            subject.addGroup(group);
+            assertEquals(1, subject.getGroups().size());
+            assertTrue(subject.hasGroup(group));
+        } catch (Exception e) {
+            fail("No se esperaba una excepción al crear el grupo: " + e.getMessage());
+        }
     }
 
 
     @Test
-    @DisplayName("AcademicPeriod - Validaciones de fechas")
     void testAcademicPeriodDateValidations() {
         LocalDate start = LocalDate.of(2024, 1, 15);
         LocalDate end = LocalDate.of(2024, 6, 15);
@@ -1579,12 +1712,11 @@ class SirhaBackEndApplicationTests {
     }
 
     @Test
-    @DisplayName("Professor - Funcionalidades básicas")
     void testProfessorBasicFunctionalities() {
         Professor prof1 = new Professor();
         assertNotNull(prof1);
-        
-        Professor prof2 = new Professor("dr.jones", "jones@univ.edu", "password", "MWF 10-12");
+
+        Professor prof2 = new Professor("dr.jones", "jones@univ.edu", "password");
         prof2.setId("PROF001");
         
         assertEquals("dr.jones", prof2.getUsername());
@@ -1593,9 +1725,8 @@ class SirhaBackEndApplicationTests {
     }
 
     @Test
-    @DisplayName("StudyPlan - Manejo de materias")
     void testStudyPlanSubjectManagement() {
-        StudyPlan plan = new StudyPlan("Computer Science");
+        StudyPlan plan = new StudyPlan("Computer Science", Careers.INGENIERIA_DE_SISTEMAS);
         
         Subject cs101 = new Subject("CS101", "Programming I", 4);
         Subject cs102 = new Subject("CS102", "Programming II", 4);
@@ -1613,7 +1744,6 @@ class SirhaBackEndApplicationTests {
     }
 
     @Test
-    @DisplayName("MapperUtils - Casos edge")
     void testMapperUtilsEdgeCases() {
         // Test con estudiante con datos mínimos
         Student minimalStudent = new Student("user", "user@test.com", "pass", "U001");
@@ -1621,7 +1751,7 @@ class SirhaBackEndApplicationTests {
         
         assertNotNull(dto);
         assertEquals("user", dto.getUsername());
-        assertEquals("U001", dto.getCodigo());
+        assertEquals("U001", dto.getCode());
         
         // Test conversión inversa
         Student converted = MapperUtils.fromDTOnewStudent(dto);
@@ -1631,26 +1761,28 @@ class SirhaBackEndApplicationTests {
     }
 
     @Test
-    @DisplayName("Group - Manejo de estados especiales")
     void testGroupSpecialStateHandling() {
         AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
-        Group group = new Group(matematicas, 1, period);
+        try{
+            Group group = new Group(matematicas, 1, period);
         
-        Student student = new Student("test", "test@test.com", "pass", "T001");
-        
-        assertTrue(group.getGroupState() instanceof StatusOpen);
-        
-        group.enrollStudent(student);
-        assertTrue(group.getGroupState() instanceof StatusClosed);
-        assertTrue(group.isFull());
-        
-        group.unenrollStudent(student);
-        assertTrue(group.getGroupState() instanceof StatusOpen);
-        assertFalse(group.isFull());
+            Student student = new Student("test", "test@test.com", "pass", "T001");
+            
+            assertTrue(group.getGroupState() instanceof StatusOpen);
+            
+            group.enrollStudent(student);
+            assertTrue(group.getGroupState() instanceof StatusClosed);
+            assertTrue(group.isFull());
+            
+            group.unenrollStudent(student);
+            assertTrue(group.getGroupState() instanceof StatusOpen);
+            assertFalse(group.isFull());
+        } catch (Exception e) {
+            fail("No se esperaba una excepción al crear el grupo o inscribir/desinscribir estudiantes: " + e.getMessage());
+        }
     }
 
     @Test
-    @DisplayName("SubjectDecorator - Configuraciones avanzadas")
     void testSubjectDecoratorAdvancedConfiguration() {
         Subject subject = new Subject("ADV101", "Advanced Topics", 5);
         SubjectDecorator decorator = new SubjectDecorator(subject);
@@ -1660,18 +1792,21 @@ class SirhaBackEndApplicationTests {
         assertNull(decorator.getGroup());
         
         AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
-        Group group = new Group(matematicas, 20, period);
+        try {
+            Group group = new Group(matematicas, 20, period);
         
-        decorator.inscribir(group, 3); // Inscribir en semestre 3
-        decorator.setGrade(85);
-        
-        assertEquals(3, decorator.getSemester());
-        assertEquals(85, decorator.getGrade());
-        assertEquals(group, decorator.getGroup());
+            decorator.inscribir(group, 3); // Inscribir en semestre 3
+            decorator.setGrade(85);
+            
+            assertEquals(3, decorator.getSemester());
+            assertEquals(85, decorator.getGrade());
+            assertEquals(group, decorator.getGroup());
+        } catch (Exception e) {
+            fail("No se esperaba una excepción al crear el grupo o inscribir la materia: " + e.getMessage());
+        }
     }
 
     @Test
-    @DisplayName("Estados - Validaciones de transiciones inválidas")
     void testStateInvalidTransitionValidations() {
         Subject subject = new Subject("101", "Test", 3);
         SubjectDecorator decorator = new SubjectDecorator(subject);
@@ -1686,43 +1821,46 @@ class SirhaBackEndApplicationTests {
         
         // Inscribir y aprobar
         AcademicPeriod academicPeriod = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
-        Group grupo = new Group(matematicas,30, academicPeriod);
-        decorator.inscribir(grupo);
-        decorator.aprobar();
-        
-        // Estado: Aprobada - todas las transiciones deben fallar
-        assertThrows(IllegalStateException.class, () -> decorator.inscribir(grupo));
-        assertThrows(IllegalStateException.class, () -> decorator.aprobar());
-        assertThrows(IllegalStateException.class, () -> decorator.reprobar());
-        assertThrows(IllegalStateException.class, () -> decorator.retirar());
+        try{ 
+            Group grupo = new Group(matematicas,30, academicPeriod);
+            decorator.inscribir(grupo);
+            decorator.aprobar();
+            
+            // Estado: Aprobada - todas las transiciones deben fallar
+            assertThrows(IllegalStateException.class, () -> decorator.inscribir(grupo));
+            assertThrows(IllegalStateException.class, () -> decorator.aprobar());
+            assertThrows(IllegalStateException.class, () -> decorator.reprobar());
+            assertThrows(IllegalStateException.class, () -> decorator.retirar());
+        } catch (Exception e) {
+            fail("No se esperaba una excepción al crear el grupo o inscribir la materia: " + e.getMessage());
+        }
     }
 
     @Test
     void testStudentGets(){
         Student student = new Student("test.user", "test.user@example.com", "password", "T001");
-        student.getResumenAcademico();
+        student.getAcademicSummary();
         student.getAcademicPensum();
-        assertEquals(0, student.getMateriasCursando().size());
-        assertEquals(0, student.getMateriasAprobadasCount());
-        assertEquals(0, student.getMateriasReprobadasCount());
-        assertEquals(0, student.getMateriasNoCursadasCount());
-        assertFalse(student.tieneMateriasEnCurso());
-        assertEquals(0, student.getMateriasPorSemestre(0).size());
-        assertFalse(student.tieneConflictoConHorario(grupo1));
+        assertEquals(0, student.getSubjectsInProgressCount());
+        assertEquals(0, student.getPassedSubjectsCount());
+        assertEquals(0, student.getFailedSubjectsCount());
+        assertEquals(0, student.getSubjectsNotTakenCount());
+        assertFalse(student.hasCoursesInProgress());
+        assertEquals(0, student.getSubjectsBySemester(0).size());
+        assertFalse(student.hasScheduleConflictWith(grupo1));
         assertEquals(0, student.getCurrentSchedule().size());
         assertEquals(0, student.getSolicitudes().size());
-        assertEquals(0, student.getCreditosEnCurso());
-        assertEquals(1, student.getSemestreActual());
+        assertEquals(0, student.getCreditsInProgress());
+        assertEquals(1, student.getCurrentSemester());
         assertNull(student.getCurrentPeriod());
         assertEquals(0, student.getAllSchedules().size());
     }
 
     @Test
-    @DisplayName("Integration - Flujo completo de estudiante")
     void testCompleteStudentIntegrationFlow() {
         // Setup completo
         Student student = new Student("integration.test", "int@test.com", "password", "INT001");
-        StudyPlan plan = new StudyPlan("Integration Test Plan");
+        StudyPlan plan = new StudyPlan("Integration Test Plan", Careers.INGENIERIA_DE_SISTEMAS);
         
         Subject math = new Subject("MATH101", "Mathematics", 4);
         Subject physics = new Subject("PHYS101", "Physics", 3);
@@ -1730,32 +1868,36 @@ class SirhaBackEndApplicationTests {
         plan.addSubject(physics);
         
         AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
-        Group mathGroup = new Group(matematicas, 30, period);
-        Group physicsGroup = new Group(physics, 25, period);
-        
-        math.addGroup(mathGroup);
-        physics.addGroup(physicsGroup);
-        
-        Semaforo semaforo = new Semaforo(plan);
-        student.setAcademicProgress(semaforo);
-        student.setCurrentPeriod(period);
-        
-        // Flujo de inscripción y aprobación
-        student.enrollSubject(math, mathGroup);
-        assertTrue(student.hasSubject(math));
-        assertTrue(student.getAcademicProgress().isSubjectCursando(math));
-        
-        // Aprobar matemáticas
-        //student.getAcademicProgress().getSubject(math.getName()).aprobar();
-        //assertTrue(student.getAcademicProgress().isSubjectAprobada(math));
-        
-        // Inscribir física
-        student.enrollSubject(physics, physicsGroup);
-        assertTrue(student.hasSubject(physics));
-        
-        // Verificar estado del semáforo
-        //Map<SemaforoColores, List<SubjectDecorator>> estadoSemaforo = student.getAcademicProgress().getMateriasPorColor();
-        //assertEquals(1, estadoSemaforo.get(SemaforoColores.VERDE).size()); // math aprobada
-        //assertEquals(1, estadoSemaforo.get(SemaforoColores.AMARILLO).size()); // physics en curso
+        try {
+            Group mathGroup = new Group(matematicas, 30, period);
+            Group physicsGroup = new Group(physics, 25, period);
+            
+            math.addGroup(mathGroup);
+            physics.addGroup(physicsGroup);
+            
+            Semaforo semaforo = new Semaforo(plan);
+            student.setAcademicProgress(semaforo);
+            student.setCurrentPeriod(period);
+            
+            // Flujo de inscripción y aprobación
+            student.enrollSubject(math, mathGroup);
+            assertTrue(student.hasSubject(math));
+            assertTrue(student.getAcademicProgress().isSubjectCursando(math));
+            
+            // Aprobar matemáticas
+            //student.getAcademicProgress().getSubject(math.getName()).aprobar();
+            //assertTrue(student.getAcademicProgress().isSubjectAprobada(math));
+            
+            // Inscribir física
+            student.enrollSubject(physics, physicsGroup);
+            assertTrue(student.hasSubject(physics));
+            
+            // Verificar estado del semáforo
+            //Map<SemaforoColores, List<SubjectDecorator>> estadoSemaforo = student.getAcademicProgress().getMateriasPorColor();
+            //assertEquals(1, estadoSemaforo.get(SemaforoColores.VERDE).size()); // math aprobada
+            //assertEquals(1, estadoSemaforo.get(SemaforoColores.AMARILLO).size()); // physics en curso
+        } catch (Exception e) {
+            fail("No se esperaba una excepción en el flujo de integración: " + e.getMessage());
+        }
     }
 }

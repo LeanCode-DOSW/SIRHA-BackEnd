@@ -1,6 +1,7 @@
 package edu.dosw.sirha.SIRHA_BackEnd.domain.port;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.exception.SirhaException;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.*;
+import edu.dosw.sirha.SIRHA_BackEnd.dto.ResponseRequest;
+import edu.dosw.sirha.SIRHA_BackEnd.exception.SirhaException;
 
 /**
  * Interfaz que define las operaciones para manejar solicitudes.
@@ -11,10 +12,9 @@ import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.*;
  */
 public interface RequestTo {
     
-    void pendingRequest(String comentario) throws SirhaException;
-    void approveRequest(String comentario) throws SirhaException;
-    void rejectRequest(String comentario) throws SirhaException;
-    void reviewRequest(String comentario) throws SirhaException;
+    void approveRequest(ResponseRequest response) throws SirhaException;
+    void rejectRequest(ResponseRequest response) throws SirhaException;
+    void reviewRequest(ResponseRequest response) throws SirhaException;
 
     String getId();
     void setId(String id);

@@ -8,25 +8,23 @@ import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateGroup.Group;
 
 public interface GroupService {
 
-    // ===== CRUD de grupos =====
+    Group registerGroup(String subjectName, Group group);
+    Group deleteGroup(Integer id);
+
     List<Group> findAll();
-    Group findById(Integer id);
-    Group save(Group group);
-    void delete(Integer id);
+    
 
-    // Gestión de profesores
     Group asignarProfesor(Integer groupId, Professor professor);
-    Professor getProfesor(Integer groupId);
-
-    // Gestión de horarios
+    
     Group agregarHorario(Integer groupId, Schedule schedule);
-    List<Schedule> getHorarios(Integer groupId);
 
-    // Capacidad
+    Group findById(Integer id);
+    Professor getProfesor(Integer groupId);
+    List<Schedule> getHorarios(Integer groupId);
     boolean estaLleno(Integer groupId);
     int getCuposDisponibles(Integer groupId);
 
     // Estado del grupo
-    Group cerrarGrupo(Integer groupId);
-    Group abrirGrupo(Integer groupId);
+    //Group cerrarGrupo(Integer groupId);
+    //Group abrirGrupo(Integer groupId);
 }

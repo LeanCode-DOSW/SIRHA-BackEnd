@@ -21,10 +21,10 @@ public class ReprobadaState implements SubjectState {
     public void reprobar(SubjectDecorator materia) {throw new IllegalStateException("No se puede reprobar una materia que ya está reprobada");}
     public void retirar(SubjectDecorator materia) {throw new IllegalStateException("No se puede retirar una materia reprobada");}
     
-    public boolean puedeInscribirse() { return true; }
-    public boolean puedeAprobar() { return true; }
-    public boolean puedeReprobar() { return false; }
-    public boolean puedeRetirar() { return false; }
-    public boolean tieneGrupoAsignado() { return true; }
-    public String getEstadoNombre() { return "Reprobada"; }
+    public boolean canEnroll() { return true; }
+    public boolean canApprove() { return true; }
+    public boolean canFail() { return false; }
+    public boolean canDropSubject() { return false; }
+    public boolean hasAssignedGroup() { return true; }
+    public String getStatusName() { return "Reprobada"; }
 }

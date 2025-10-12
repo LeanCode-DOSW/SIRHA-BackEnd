@@ -22,10 +22,10 @@ public class AprobadaState implements SubjectState {
 
 
     
-    public boolean puedeInscribirse() { return false; }
-    public boolean puedeAprobar() { return false; }
-    public boolean puedeReprobar() { return false; }
-    public boolean puedeRetirar() { return false; }
-    public boolean tieneGrupoAsignado() { return true; }
-    public String getEstadoNombre() { return "Aprobada"; }
+    public boolean canEnroll() { return false; }
+    public boolean canApprove() { return false; }
+    public boolean canFail() { return false; }
+    public boolean canDropSubject() { return false; }
+    public boolean hasAssignedGroup() { return true; }
+    public String getStatusName() { return "Aprobada"; }
 }

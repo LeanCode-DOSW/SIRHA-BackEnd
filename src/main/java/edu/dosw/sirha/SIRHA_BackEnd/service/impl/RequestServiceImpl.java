@@ -1,6 +1,8 @@
 package edu.dosw.sirha.SIRHA_BackEnd.service.impl;
 
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateRequest.BaseRequest;
+import edu.dosw.sirha.SIRHA_BackEnd.exception.ErrorCodeSirha;
+import edu.dosw.sirha.SIRHA_BackEnd.exception.SirhaException;
 import edu.dosw.sirha.SIRHA_BackEnd.repository.mongo.BaseRequestMongoRepository;
 import edu.dosw.sirha.SIRHA_BackEnd.service.RequestService;
 import org.springframework.stereotype.Service;
@@ -36,7 +38,7 @@ public class RequestServiceImpl implements RequestService {
                     log.debug("Solicitud encontrada - ID: {}, Tipo: {}, Estado: {}", 
                              request.getId(), 
                              request.getClass().getSimpleName(), 
-                             request.getEstado()));
+                             request.getEnumState()));
             }
             
             return requests;
@@ -75,13 +77,11 @@ public class RequestServiceImpl implements RequestService {
         try {
             BaseRequest savedRequest = repository.save(request);
             
-            log.info("Solicitud guardada exitosamente - ID: {}, Tipo: {}", 
+            log.info("Solicitud guardada exitosamente - ID: {}, Tipo: {}, Estado: {}", 
                     savedRequest.getId(), 
-                    savedRequest.getClass().getSimpleName());
-            
-            log.debug("Detalles de solicitud guardada - ID: {}, Estado: {}", 
-                     savedRequest.getId(), 
-                     savedRequest.getEstado());
+                    savedRequest.getClass().getSimpleName(),
+                    savedRequest.getEnumState());
+
             
             return savedRequest;
         } catch (Exception e) {
@@ -104,19 +104,16 @@ public class RequestServiceImpl implements RequestService {
                     });
             
             log.debug("Solicitud encontrada para aprobación - ID: {}, Tipo: {}, Estado actual: {}", 
-                     id, request.getClass().getSimpleName(), request.getEstado());
+                     id, request.getClass().getSimpleName(), request.getEnumState());
             
+                     log.debug("Estado de solicitud cambiado a APROBADO para ID: {}", id);
             // request.aprobar();
-            log.debug("Estado de solicitud cambiado a APROBADO para ID: {}", id);
-            
-            BaseRequest savedRequest = repository.save(request);
             
             log.info("Solicitud aprobada exitosamente - ID: {}, Tipo: {}", 
-                    savedRequest.getId(), 
-                    savedRequest.getClass().getSimpleName());
+                    request.getId(), 
+                    request.getClass().getSimpleName());
             
         } catch (RuntimeException e) {
-            // Re-lanzar excepciones de dominio
             log.warn("Error al aprobar solicitud {}: {}", id, e.getMessage());
             throw e;
         } catch (Exception e) {
@@ -137,19 +134,14 @@ public class RequestServiceImpl implements RequestService {
                     });
             
             log.debug("Solicitud encontrada para rechazo - ID: {}, Tipo: {}, Estado actual: {}", 
-                     id, request.getClass().getSimpleName(), request.getEstado());
-            
+                     id, request.getClass().getSimpleName(), request.getEnumState());
+            log.debug("Estado de solicitud cambiado a RECHAZADO para ID: {}", id);  
             // request.rechazar();
-            log.debug("Estado de solicitud cambiado a RECHAZADO para ID: {}", id);
-            
-            BaseRequest savedRequest = repository.save(request);
-            
             log.info("Solicitud rechazada exitosamente - ID: {}, Tipo: {}", 
-                    savedRequest.getId(), 
-                    savedRequest.getClass().getSimpleName());
+                    request.getId(), 
+                    request.getClass().getSimpleName());
             
         } catch (RuntimeException e) {
-            // Re-lanzar excepciones de dominio
             log.warn("Error al rechazar solicitud {}: {}", id, e.getMessage());
             throw e;
         } catch (Exception e) {
