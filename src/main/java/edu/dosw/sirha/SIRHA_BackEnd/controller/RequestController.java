@@ -26,14 +26,4 @@ public class RequestController {
     public BaseRequest create(@RequestBody BaseRequest request) {
         return requestService.save(request);
     }
-
-    @PutMapping("/{id}/approve")
-    public void approve(@PathVariable String id) {
-        requestService.aprobarSolicitud(id);
-    }
-
-    @PutMapping("/{id}/reject")
-    public void reject(@PathVariable String id) {
-        requestService.rechazarSolicitud(id);
-    }
 }

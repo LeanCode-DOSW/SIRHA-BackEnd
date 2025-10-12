@@ -6,20 +6,21 @@ import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Objects;
- 
+import java.util.stream.Collectors;
+
 import org.springframework.data.mongodb.core.mapping.Document;
+
+import com.fasterxml.jackson.databind.JsonSerializable.Base;
 
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.Careers;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.RequestStateEnum;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.SemaforoColores;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateGroup.Group;
+import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateRequest.BaseRequest;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateSubjectDec.SubjectDecorator;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.port.AcademicOperations;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.port.AcademicProgress;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.port.AcademicProgressViewer;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.port.PrerequisiteRule;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.port.RequestTo;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.port.RequestProcess;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.port.ScheduleManager;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.port.SolicitudFactory;
 import edu.dosw.sirha.SIRHA_BackEnd.dto.AcademicIndicatorsDTO;
@@ -46,7 +47,7 @@ import edu.dosw.sirha.SIRHA_BackEnd.exception.SirhaException;
 public class Student extends User implements SolicitudFactory, ScheduleManager, AcademicProgressViewer, AcademicOperations {
     private String codigo;
     private AcademicProgress academicProgress;
-    private List<RequestTo> solicitudes;
+    private List<BaseRequest> solicitudes;
     
  
     public Student() {
@@ -79,7 +80,7 @@ public class Student extends User implements SolicitudFactory, ScheduleManager, 
      * a la lista de solicitudes del estudiante. La solicitud debe estar
      * completamente inicializada antes de agregarla.
      */
-    public void addRequest(RequestTo solicitud) {
+    public void addRequest(BaseRequest solicitud) {
         if (solicitud == null) {
             throw new IllegalStateException("La solicitud no puede ser null");
         }
@@ -89,6 +90,18 @@ public class Student extends User implements SolicitudFactory, ScheduleManager, 
         }
         
         this.solicitudes.add(solicitud);
+    }
+
+    public void removeRequest(BaseRequest solicitud) {
+        if (solicitud == null) {
+            throw new IllegalStateException("La solicitud no puede ser null");
+        }
+        
+        if (this.solicitudes == null || !this.solicitudes.contains(solicitud)) {
+            throw new IllegalStateException("La solicitud no existe en la lista del estudiante");
+        }
+        
+        this.solicitudes.remove(solicitud);
     }
  
     /**
@@ -134,12 +147,13 @@ public class Student extends User implements SolicitudFactory, ScheduleManager, 
      * Obtiene la lista de solicitudes del estudiante.
      * @return lista de solicitudes, nunca null (inicializada como lista vacía)
      */
-    public List<RequestTo> getSolicitudes() {
+    public List<BaseRequest> getSolicitudes() {
         if (solicitudes == null) {
             solicitudes = new ArrayList<>();
         }
         return new ArrayList<>(solicitudes);
     }
+    
     @Override
     public Careers getCareer() {
         if (academicProgress == null) {
@@ -711,6 +725,27 @@ public class Student extends User implements SolicitudFactory, ScheduleManager, 
             return 0;
         }
         return academicProgress.getSubjectsByColorCount(color);
+    }
+    
+    public BaseRequest getRequestById(String requestId) {
+        if (solicitudes == null || solicitudes.isEmpty()) {
+            return null;
+        }
+        return solicitudes.stream()
+            .filter(s -> s.getId().equals(requestId))
+            .findFirst()
+            .orElse(null);
+    }
+    /*
+     * Devuelve el historial de solicitudes resueltas: aprobadas o rechazadas.
+     */
+    public List<BaseRequest> getRequestsHistory() {
+        if (solicitudes == null) {
+            return new ArrayList<>();
+        }
+        return solicitudes.stream()
+            .filter(s -> s.getActualState() == RequestStateEnum.APROBADA || s.getActualState() == RequestStateEnum.RECHAZADA)
+            .toList();
     }
 
 }

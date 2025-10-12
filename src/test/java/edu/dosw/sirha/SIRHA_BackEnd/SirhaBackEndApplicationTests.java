@@ -7,8 +7,8 @@ import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.SemaforoColores;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateGroup.Group;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateGroup.StatusClosed;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateGroup.StatusOpen;
+import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateRequest.BaseRequest;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateSubjectDec.*;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.port.RequestTo;
 import edu.dosw.sirha.SIRHA_BackEnd.dto.StudentDTO;
 import edu.dosw.sirha.SIRHA_BackEnd.exception.SirhaException;
 import edu.dosw.sirha.SIRHA_BackEnd.util.*;
@@ -1353,7 +1353,7 @@ class SirhaBackEndApplicationTests {
             assertEquals(newGroup, solicitud.getNewGroup());
             assertEquals(academicPeriod, solicitud.getCurrentPeriod());
 
-            List<RequestTo> solicitudes = student.getSolicitudes();
+            List<BaseRequest> solicitudes = student.getSolicitudes();
             assertEquals(1, solicitudes.size());
             assertEquals(solicitud, solicitudes.get(0));
         } catch (Exception e) {
@@ -1420,7 +1420,7 @@ class SirhaBackEndApplicationTests {
             assertEquals(newGroup, solicitud.getNewGroup());
             assertEquals(academicPeriod, solicitud.getCurrentPeriod());
 
-            List<RequestTo> solicitudes = student.getSolicitudes();
+            List<BaseRequest> solicitudes = student.getSolicitudes();
             assertEquals(1, solicitudes.size());
             assertEquals(solicitud, solicitudes.get(0));
         } catch (Exception e) {

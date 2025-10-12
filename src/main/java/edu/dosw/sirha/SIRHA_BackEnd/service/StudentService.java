@@ -27,15 +27,19 @@ public interface StudentService {
     Optional<Student> findByUsername(String username);
     Optional<Student> findByEmail(String email);
 
-    boolean existsByCodigo(String codigo);
+    boolean existsByCode(String code);
     boolean existsByEmail(String email);
 
-    Student save(Student student);
+    Student save(Student student); //deberia ser un studentDTO
+    Student deleteById(String id);
 
     List<Schedule> getCurrentSchedule(String username);
     List<Schedule> getScheduleForPeriod(String username, String period);
     Map<AcademicPeriod,List<Schedule>> getAllSchedules(String username);
-    //List<BaseRequest> getAllRequests(String username);
+    
+    List<BaseRequest> getAllRequests(String username);
+    BaseRequest getRequestById(String username, String requestId);
+    List<BaseRequest> getRequestsHistory(String username); // el historial son las solicitudes que ya fueron aprobadas o rechazadas
 
     Map<SemaforoColores,List<SubjectDecoratorDTO>> getAcademicPensum(String username);
 

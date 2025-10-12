@@ -1,5 +1,6 @@
 package edu.dosw.sirha.SIRHA_BackEnd.service.impl;
 
+import edu.dosw.sirha.SIRHA_BackEnd.domain.model.Student;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateRequest.BaseRequest;
 import edu.dosw.sirha.SIRHA_BackEnd.exception.ErrorCodeSirha;
 import edu.dosw.sirha.SIRHA_BackEnd.exception.SirhaException;
@@ -93,60 +94,23 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override
-    public void aprobarSolicitud(String id) {
-        log.info("Iniciando proceso de aprobación para solicitud: {}", id);
-        
+    public BaseRequest deleteById(String id) {
+        log.info("Eliminando solicitud por ID: {}", id);
         try {
-            BaseRequest request = repository.findById(id)
-                    .orElseThrow(() -> {
-                        log.warn("Intento de aprobar solicitud inexistente: {}", id);
-                        return new RuntimeException("Solicitud no encontrada con ID: " + id);
-                    });
+            Optional<BaseRequest> existingRequest = repository.findById(id);
+            if (existingRequest.isEmpty()) {
+                log.warn("No se encontró solicitud con ID: {} para eliminar", id);
+                throw SirhaException.of(ErrorCodeSirha.REQUEST_NOT_FOUND, "Solicitud no encontrada");
+            }
+            Student student = existingRequest.get().getStudent();
+            student.removeRequest(existingRequest.get());
+            repository.deleteById(id);
+            log.info("Solicitud eliminada exitosamente - ID: {}", id);
             
-            log.debug("Solicitud encontrada para aprobación - ID: {}, Tipo: {}, Estado actual: {}", 
-                     id, request.getClass().getSimpleName(), request.getEnumState());
-            
-                     log.debug("Estado de solicitud cambiado a APROBADO para ID: {}", id);
-            // request.aprobar();
-            
-            log.info("Solicitud aprobada exitosamente - ID: {}, Tipo: {}", 
-                    request.getId(), 
-                    request.getClass().getSimpleName());
-            
-        } catch (RuntimeException e) {
-            log.warn("Error al aprobar solicitud {}: {}", id, e.getMessage());
-            throw e;
+            return existingRequest.get();
         } catch (Exception e) {
-            log.error("Error inesperado al aprobar solicitud {}: {}", id, e.getMessage(), e);
-            throw new RuntimeException("Error interno al aprobar solicitud", e);
-        }
-    }
-
-    @Override
-    public void rechazarSolicitud(String id) {
-        log.info("Iniciando proceso de rechazo para solicitud: {}", id);
-        
-        try {
-            BaseRequest request = repository.findById(id)
-                    .orElseThrow(() -> {
-                        log.warn("Intento de rechazar solicitud inexistente: {}", id);
-                        return new RuntimeException("Solicitud no encontrada con ID: " + id);
-                    });
-            
-            log.debug("Solicitud encontrada para rechazo - ID: {}, Tipo: {}, Estado actual: {}", 
-                     id, request.getClass().getSimpleName(), request.getEnumState());
-            log.debug("Estado de solicitud cambiado a RECHAZADO para ID: {}", id);  
-            // request.rechazar();
-            log.info("Solicitud rechazada exitosamente - ID: {}, Tipo: {}", 
-                    request.getId(), 
-                    request.getClass().getSimpleName());
-            
-        } catch (RuntimeException e) {
-            log.warn("Error al rechazar solicitud {}: {}", id, e.getMessage());
-            throw e;
-        } catch (Exception e) {
-            log.error("Error inesperado al rechazar solicitud {}: {}", id, e.getMessage(), e);
-            throw new RuntimeException("Error interno al rechazar solicitud", e);
+            log.error("Error al eliminar solicitud por ID {}: {}", id, e.getMessage(), e);
+            throw new RuntimeException("Error interno al eliminar solicitud", e);
         }
     }
 }

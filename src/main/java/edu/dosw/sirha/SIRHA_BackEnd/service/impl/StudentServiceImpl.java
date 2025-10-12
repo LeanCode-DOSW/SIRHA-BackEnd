@@ -20,6 +20,8 @@ import edu.dosw.sirha.SIRHA_BackEnd.repository.mongo.SubjectMongoRepository;
 import edu.dosw.sirha.SIRHA_BackEnd.service.StudentService;
 import edu.dosw.sirha.SIRHA_BackEnd.util.ValidationUtil;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateGroup.Group;
+import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateRequest.BaseRequest;
+
 import org.springframework.stereotype.Service;
 
 import org.slf4j.Logger;
@@ -128,14 +130,14 @@ public class StudentServiceImpl implements StudentService {
     }
 
     @Override
-    public boolean existsByCodigo(String codigo) {
-        log.debug("Verificando existencia de código: {}", codigo);
+    public boolean existsByCode(String code) {
+        log.debug("Verificando existencia de código: {}", code);
         try {
-            boolean exists = studentRepository.existsByCodigo(codigo);
-            log.debug("Código {} existe: {}", codigo, exists);
+            boolean exists = studentRepository.existsByCodigo(code);
+            log.debug("Código {} existe: {}", code, exists);
             return exists;
         } catch (Exception e) {
-            log.error("Error al verificar código {}: {}", codigo, e.getMessage(), e);
+            log.error("Error al verificar código {}: {}", code, e.getMessage(), e);
             throw e;
         }
     }
@@ -185,7 +187,7 @@ public class StudentServiceImpl implements StudentService {
             );
             log.debug("Validación exitosa para: {}", request.getUsername());
             
-            if (existsByCodigo(request.getCodigo())) {
+            if (existsByCode(request.getCodigo())) {
                 log.warn("Intento de registro con código duplicado: {} para usuario: {}", 
                         request.getCodigo(), request.getUsername());
                 throw new IllegalArgumentException("El código estudiantil ya está registrado");
@@ -481,6 +483,97 @@ public class StudentServiceImpl implements StudentService {
             log.error("Error inesperado al crear solicitud de cambio de materia para {}: {}", 
                      studentName, e.getMessage(), e);
             throw new RuntimeException("Error interno al crear solicitud de cambio de materia", e);
+        }
+    }
+
+    @Override
+    public Student deleteById(String id) {
+        log.info("Eliminando estudiante por ID: {}", id);
+        try {
+            Optional<Student> existingStudent = studentRepository.findById(id);
+            if (existingStudent.isEmpty()) {
+                log.warn("No se encontró estudiante con ID: {} para eliminar", id);
+                throw new IllegalArgumentException("Estudiante no encontrado");
+            }
+            studentRepository.deleteById(id);
+            log.info("Estudiante eliminado exitosamente - ID: {}", id);
+            return existingStudent.get();
+        } catch (IllegalArgumentException e) {
+            log.warn("Error al eliminar estudiante por ID {}: {}", id, e.getMessage());
+            throw e;
+        } catch (Exception e) {
+            log.error("Error al eliminar estudiante por ID {}: {}", id, e.getMessage(), e);
+            throw new RuntimeException("Error interno al eliminar estudiante", e);
+        }
+    }
+
+    @Override
+    public List<BaseRequest> getAllRequests(String username) {
+        log.info("Consultando todas las solicitudes para usuario: {}", username);
+        try {
+            Student student = studentRepository.findByUsername(username)
+                .orElseThrow(() -> {
+                    log.warn("Estudiante no encontrado: {}", username);
+                    return new IllegalArgumentException("Estudiante no encontrado");
+                });
+                
+            List<BaseRequest> requests = student.getSolicitudes();
+            log.info("Se encontraron {} solicitudes para {}", requests.size(), username);
+            return requests;
+            
+        } catch (IllegalArgumentException e) {
+            log.warn("Error al consultar solicitudes para {}: {}", username, e.getMessage());
+            throw e;
+        } catch (Exception e) {
+            log.error("Error inesperado al consultar solicitudes para {}: {}", username, e.getMessage(), e);
+            throw new RuntimeException("Error interno al consultar solicitudes", e);
+        }
+    }
+
+    @Override
+    public BaseRequest getRequestById(String username, String requestId) {
+        log.info("Consultando solicitud por ID: {} para usuario: {}", requestId, username);
+        try {
+            Student student = studentRepository.findByUsername(username)
+                .orElseThrow(() -> {
+                    log.warn("Estudiante no encontrado: {}", username);
+                    return new IllegalArgumentException("Estudiante no encontrado");
+                });
+
+            BaseRequest request = student.getRequestById(requestId);
+
+            log.info("Solicitud encontrada - ID: {} para usuario: {}", requestId, username);
+            return request;
+
+        } catch (IllegalArgumentException e) {
+            log.warn("Error al consultar solicitud por ID {} para {}: {}", requestId, username, e.getMessage());
+            throw e;
+        } catch (Exception e) {
+            log.error("Error inesperado al consultar solicitud por ID {} para {}: {}", requestId, username, e.getMessage(), e);
+            throw new RuntimeException("Error interno al consultar solicitud", e);
+        }
+    }
+
+    @Override
+    public List<BaseRequest> getRequestsHistory(String username) {
+        log.info("Consultando historial de solicitudes para usuario: {}", username);
+        try {
+            Student student = studentRepository.findByUsername(username)
+                .orElseThrow(() -> {
+                    log.warn("Estudiante no encontrado: {}", username);
+                    return new IllegalArgumentException("Estudiante no encontrado");
+                });
+
+            List<BaseRequest> requests = student.getRequestsHistory();
+            log.info("Se encontraron {} solicitudes en el historial para {}", requests.size(), username);
+            return requests;
+
+        } catch (IllegalArgumentException e) {
+            log.warn("Error al consultar historial de solicitudes para {}: {}", username, e.getMessage());
+            throw e;
+        } catch (Exception e) {
+            log.error("Error inesperado al consultar historial de solicitudes para {}: {}", username, e.getMessage(), e);
+            throw new RuntimeException("Error interno al consultar historial de solicitudes", e);
         }
     }
 }

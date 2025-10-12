@@ -9,6 +9,5 @@ public interface RequestService {
     List<BaseRequest> findAll();
     Optional<BaseRequest> findById(String id);
     BaseRequest save(BaseRequest request);
-    void aprobarSolicitud(String id);
-    void rechazarSolicitud(String id);
+    BaseRequest deleteById(String id);
 }

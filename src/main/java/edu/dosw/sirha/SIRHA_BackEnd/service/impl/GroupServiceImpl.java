@@ -38,7 +38,7 @@ public class GroupServiceImpl implements GroupService {
      */
     @Transactional
     @Override
-    public Group registerGroup(String subjectName, Group group) {
+    public Group saveGroup(String subjectName, Group group) {
         Subject subject = subjectRepository.findByName(subjectName)
                 .orElseThrow(() -> new RuntimeException("Materia con nombre " + subjectName + " no encontrada"));
 
@@ -49,7 +49,7 @@ public class GroupServiceImpl implements GroupService {
 
     @Transactional
     @Override
-    public Group deleteGroup(Integer id) {               //REVISAR
+    public Group deleteGroupById(Integer id) {               //REVISAR
         if (!groupRepository.existsById(id)) {
             throw new RuntimeException("Grupo con id " + id + " no existe");
         } 
@@ -62,14 +62,14 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    public Group asignarProfesor(Integer groupId, Professor professor) {
+    public Group assignProfessor(Integer groupId, Professor professor) {
         Group group = findById(groupId);
         group.setProfesor(professor);
         return groupRepository.save(group);
     }
 
     @Override
-    public Group agregarHorario(Integer groupId, Schedule schedule) {
+    public Group addSchedule(Integer groupId, Schedule schedule) {
         Group group = findById(groupId);
         group.getSchedules().add(schedule);
         return groupRepository.save(group);
@@ -100,19 +100,19 @@ public class GroupServiceImpl implements GroupService {
     // ===========================GETS ============================
 
     @Override
-    public List<Schedule> getHorarios(Integer groupId) {
+    public List<Schedule> getSchedules(Integer groupId) {
         return findById(groupId).getSchedules();
     }
 
 
     @Override
-    public boolean estaLleno(Integer groupId) {
+    public boolean isFull(Integer groupId) {
         Group group = findById(groupId);
         return group.getCuposDisponibles() <= 0;
     }
 
     @Override
-    public int getCuposDisponibles(Integer groupId) {
+    public int getAvailableSeats(Integer groupId) {
         return findById(groupId).getCuposDisponibles();
     }
     @Override
@@ -121,12 +121,12 @@ public class GroupServiceImpl implements GroupService {
                 .orElseThrow(() -> new RuntimeException("Grupo con id " + id + " no encontrado"));
     }
     @Override
-    public Professor getProfesor(Integer groupId) {
+    public Professor getProfessor(Integer groupId) {
         return findById(groupId).getProfesor();
     }
 
     @Override
-    public List<Group> findAll() {
+    public List<Group> findAllGroups() {
         return groupRepository.findAll();
     }
 }
