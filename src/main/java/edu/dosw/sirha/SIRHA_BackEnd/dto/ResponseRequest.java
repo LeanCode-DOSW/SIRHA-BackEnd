@@ -1,7 +1,7 @@
-package edu.dosw.sirha.SIRHA_BackEnd.dto;
+package edu.dosw.sirha.sirha_backend.dto;
 import java.time.LocalDateTime;
 
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.RequestStateEnum;
+import edu.dosw.sirha.sirha_backend.domain.model.enums.RequestStateEnum;
 
 public class ResponseRequest {
     private LocalDateTime responseDate;

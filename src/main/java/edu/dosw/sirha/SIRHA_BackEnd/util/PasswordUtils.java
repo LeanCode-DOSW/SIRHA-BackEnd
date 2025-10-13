@@ -1,4 +1,4 @@
-package edu.dosw.sirha.SIRHA_BackEnd.util;
+package edu.dosw.sirha.sirha_backend.util;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
@@ -14,6 +14,11 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
  * - Resistencia a ataques de rainbow table
  */
 public class PasswordUtils {
+
+    private PasswordUtils() {
+        throw new UnsupportedOperationException("Utility class");
+    }
+
     private static final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
     /**

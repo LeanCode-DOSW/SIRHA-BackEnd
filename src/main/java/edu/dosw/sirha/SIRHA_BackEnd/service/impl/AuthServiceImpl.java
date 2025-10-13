@@ -1,12 +1,12 @@
-package edu.dosw.sirha.SIRHA_BackEnd.service.impl;
+package edu.dosw.sirha.sirha_backend.service.impl;
 
-import edu.dosw.sirha.SIRHA_BackEnd.dto.AuthResponse;
-import edu.dosw.sirha.SIRHA_BackEnd.dto.LoginRequest;
-import edu.dosw.sirha.SIRHA_BackEnd.dto.RegisterRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import edu.dosw.sirha.SIRHA_BackEnd.service.*;
+import edu.dosw.sirha.sirha_backend.dto.AuthResponse;
+import edu.dosw.sirha.sirha_backend.dto.LoginRequest;
+import edu.dosw.sirha.sirha_backend.dto.RegisterRequest;
+import edu.dosw.sirha.sirha_backend.service.*;
 
 
 /**

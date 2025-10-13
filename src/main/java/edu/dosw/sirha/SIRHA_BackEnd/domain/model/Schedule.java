@@ -1,8 +1,6 @@
-package edu.dosw.sirha.SIRHA_BackEnd.domain.model;
-
+package edu.dosw.sirha.sirha_backend.domain.model;
 import java.time.LocalTime;
-
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.DiasSemana;
+import edu.dosw.sirha.sirha_backend.domain.model.enums.DiasSemana;
 
 /**
  * Representa un horario de clase con un día y un rango de horas.

@@ -1,19 +1,18 @@
-package edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateRequest;
+package edu.dosw.sirha.sirha_backend.domain.model.staterequest;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.AcademicPeriod;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.ResponseProcess;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.Student;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.*;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.port.*;
-import edu.dosw.sirha.SIRHA_BackEnd.dto.ResponseRequest;
-import edu.dosw.sirha.SIRHA_BackEnd.exception.SirhaException;
+import edu.dosw.sirha.sirha_backend.domain.model.AcademicPeriod;
+import edu.dosw.sirha.sirha_backend.domain.model.ResponseProcess;
+import edu.dosw.sirha.sirha_backend.domain.model.Student;
+import edu.dosw.sirha.sirha_backend.domain.model.enums.*;
+import edu.dosw.sirha.sirha_backend.domain.port.*;
+import edu.dosw.sirha.sirha_backend.dto.ResponseRequest;
+import edu.dosw.sirha.sirha_backend.exception.SirhaException;
 
 /**
  * Clase abstracta base para todas las solicitudes académicas en el sistema SIRHA.
@@ -46,7 +45,7 @@ public abstract class BaseRequest implements RequestTo {
     private RequestState state;
     private int priority;
 
-    public BaseRequest(Student student, AcademicPeriod currentPeriod) {
+    protected BaseRequest(Student student, AcademicPeriod currentPeriod) {
         this.creadoEn = LocalDateTime.now();
         this.student = student;
         setCurrentPeriod(currentPeriod);

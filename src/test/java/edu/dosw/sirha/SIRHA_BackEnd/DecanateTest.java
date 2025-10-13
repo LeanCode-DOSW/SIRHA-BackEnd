@@ -1,20 +1,21 @@
 package edu.dosw.sirha.SIRHA_BackEnd;
 
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.Decanate;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.Semaforo;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.Student;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.StudyPlan;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.Subject;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateGroup.Group;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.AcademicPeriod;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.Careers;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.RequestStateEnum;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateRequest.BaseRequest;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.CambioGrupo;
-import edu.dosw.sirha.SIRHA_BackEnd.exception.SirhaException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+
+import edu.dosw.sirha.sirha_backend.domain.model.AcademicPeriod;
+import edu.dosw.sirha.sirha_backend.domain.model.CambioGrupo;
+import edu.dosw.sirha.sirha_backend.domain.model.Decanate;
+import edu.dosw.sirha.sirha_backend.domain.model.Semaforo;
+import edu.dosw.sirha.sirha_backend.domain.model.Student;
+import edu.dosw.sirha.sirha_backend.domain.model.StudyPlan;
+import edu.dosw.sirha.sirha_backend.domain.model.Subject;
+import edu.dosw.sirha.sirha_backend.domain.model.enums.Careers;
+import edu.dosw.sirha.sirha_backend.domain.model.enums.RequestStateEnum;
+import edu.dosw.sirha.sirha_backend.domain.model.stateGroup.Group;
+import edu.dosw.sirha.sirha_backend.domain.model.staterequest.BaseRequest;
+import edu.dosw.sirha.sirha_backend.exception.SirhaException;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -22,7 +23,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
-public class DecanateTest {
+class DecanateTest {
 
     private Decanate decanateSistemas;
     private Decanate decanateIndustrial;
@@ -39,11 +40,8 @@ public class DecanateTest {
     // Grupos
     private Group grupoMatematicasA;
     private Group grupoMatematicasB;
-    private Group grupoFisicaC;
     private Group grupoFisicaD;
-    private Group grupoProgramacion1;
     private Group grupoProgramacion2;
-    private Group grupoQuimicaX;
     private Group grupoQuimicaY;
     
     // Solicitudes
@@ -66,13 +64,10 @@ public class DecanateTest {
         grupoMatematicasA = new Group(matematicas, 30, currentPeriod);
         grupoMatematicasB = new Group(matematicas, 30, currentPeriod);
         
-        grupoFisicaC = new Group(fisica, 25, currentPeriod);
         grupoFisicaD = new Group(fisica, 25, currentPeriod);
         
-        grupoProgramacion1 = new Group(programacion, 20, currentPeriod);
         grupoProgramacion2 = new Group(programacion, 20, currentPeriod);
         
-        grupoQuimicaX = new Group(quimica, 30, currentPeriod);
         grupoQuimicaY = new Group(quimica, 30, currentPeriod);
 
         StudyPlan studyPlan1 = new StudyPlan("Ingeniería de Sistemas", Careers.INGENIERIA_DE_SISTEMAS);
@@ -330,8 +325,7 @@ public class DecanateTest {
         SirhaException exception1 = assertThrows(SirhaException.class, () -> {
             decanateSistemas.receiveRequest(null);
         });
-        assertTrue(exception1.getMessage().contains("La solicitud no puede ser nula") ||
-                  exception1.getMessage().contains("VALIDATION_ERROR"));
+        assertTrue(exception1.getMessage().contains("Error de validación de datos"));
 
         // Act & Assert - Aprobar solicitud nula
         SirhaException exception2 = assertThrows(SirhaException.class, () -> {

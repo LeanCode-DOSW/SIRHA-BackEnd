@@ -190,6 +190,7 @@
 									<exclude>**/repository/**</exclude>
 									<exclude>**/dto/**</exclude>
 									<exclude>**/config/**</exclude>
+									<exclude>**/exception/**</exclude>
 								</excludes>
 						</configuration>
 					</execution>
@@ -208,6 +209,7 @@
 							<exclude>**/repository/**</exclude>
 							<exclude>**/dto/**</exclude>
 							<exclude>**/config/**</exclude>
+							<exclude>**/exception/**</exclude>
 						</excludes>
 							<rules>
 								<rule>

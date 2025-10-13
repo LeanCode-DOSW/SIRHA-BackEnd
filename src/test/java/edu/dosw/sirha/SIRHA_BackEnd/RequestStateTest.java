@@ -1,14 +1,14 @@
 package edu.dosw.sirha.SIRHA_BackEnd;
 
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.CambioGrupo;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.RequestStateEnum;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateRequest.*;
-import edu.dosw.sirha.SIRHA_BackEnd.dto.ResponseRequest;
-import edu.dosw.sirha.SIRHA_BackEnd.exception.SirhaException;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+
+import edu.dosw.sirha.sirha_backend.domain.model.CambioGrupo;
+import edu.dosw.sirha.sirha_backend.domain.model.enums.RequestStateEnum;
+import edu.dosw.sirha.sirha_backend.domain.model.staterequest.*;
+import edu.dosw.sirha.sirha_backend.dto.ResponseRequest;
+import edu.dosw.sirha.sirha_backend.exception.SirhaException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -111,8 +111,6 @@ class RequestStateTest {
         EstadoPendiente pendiente = new EstadoPendiente();
         assertThrows(SirhaException.class, () -> pendiente.approveRequest(testRequest, new ResponseRequest("Intentando aprobar sin revisión", RequestStateEnum.APROBADA)));
         
-        EstadoEnRevision enRevision = new EstadoEnRevision();
-
         EstadoAprobada aprobada = new EstadoAprobada();
         assertThrows(SirhaException.class, () -> aprobada.rejectRequest(testRequest, new ResponseRequest("Intentando rechazar una solicitud aprobada", RequestStateEnum.RECHAZADA)));
 

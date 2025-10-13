@@ -1,8 +1,8 @@
-package edu.dosw.sirha.SIRHA_BackEnd.repository.mongo;
+package edu.dosw.sirha.sirha_backend.repository.mongo;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
 
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateRequest.BaseRequest;
+import edu.dosw.sirha.sirha_backend.domain.model.staterequest.BaseRequest;
 
 public interface BaseRequestMongoRepository extends MongoRepository<BaseRequest, String> {
 }

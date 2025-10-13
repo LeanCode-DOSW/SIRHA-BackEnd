@@ -1,35 +1,31 @@
-package edu.dosw.sirha.SIRHA_BackEnd.domain.model;
+package edu.dosw.sirha.sirha_backend.domain.model;
  
 import java.util.List;
 import java.util.Map;
 import java.util.ArrayList;
 import java.util.EnumMap;
-import java.util.HashMap;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import com.fasterxml.jackson.databind.JsonSerializable.Base;
-
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.Careers;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.RequestStateEnum;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.SemaforoColores;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateGroup.Group;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateRequest.BaseRequest;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateSubjectDec.SubjectDecorator;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.port.AcademicOperations;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.port.AcademicProgress;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.port.AcademicProgressViewer;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.port.ScheduleManager;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.port.SolicitudFactory;
-import edu.dosw.sirha.SIRHA_BackEnd.dto.AcademicIndicatorsDTO;
-import edu.dosw.sirha.SIRHA_BackEnd.dto.RequestApprovalRateDTO;
-import edu.dosw.sirha.SIRHA_BackEnd.dto.StudentDTO;
-import edu.dosw.sirha.SIRHA_BackEnd.dto.StudentReportDTO;
-import edu.dosw.sirha.SIRHA_BackEnd.dto.SubjectDecoratorDTO;
-import edu.dosw.sirha.SIRHA_BackEnd.exception.ErrorCodeSirha;
-import edu.dosw.sirha.SIRHA_BackEnd.exception.SirhaException;
+import edu.dosw.sirha.sirha_backend.domain.model.enums.Careers;
+import edu.dosw.sirha.sirha_backend.domain.model.enums.RequestStateEnum;
+import edu.dosw.sirha.sirha_backend.domain.model.enums.SemaforoColores;
+import edu.dosw.sirha.sirha_backend.domain.model.stateGroup.Group;
+import edu.dosw.sirha.sirha_backend.domain.model.staterequest.BaseRequest;
+import edu.dosw.sirha.sirha_backend.domain.model.statesubjectdec.SubjectDecorator;
+import edu.dosw.sirha.sirha_backend.domain.port.AcademicOperations;
+import edu.dosw.sirha.sirha_backend.domain.port.AcademicProgress;
+import edu.dosw.sirha.sirha_backend.domain.port.AcademicProgressViewer;
+import edu.dosw.sirha.sirha_backend.domain.port.ScheduleManager;
+import edu.dosw.sirha.sirha_backend.domain.port.SolicitudFactory;
+import edu.dosw.sirha.sirha_backend.dto.AcademicIndicatorsDTO;
+import edu.dosw.sirha.sirha_backend.dto.RequestApprovalRateDTO;
+import edu.dosw.sirha.sirha_backend.dto.StudentDTO;
+import edu.dosw.sirha.sirha_backend.dto.StudentReportDTO;
+import edu.dosw.sirha.sirha_backend.dto.SubjectDecoratorDTO;
+import edu.dosw.sirha.sirha_backend.exception.ErrorCodeSirha;
+import edu.dosw.sirha.sirha_backend.exception.SirhaException;
 
 /**
  * Entidad del dominio que representa a un estudiante en el sistema SIRHA.
@@ -347,7 +343,8 @@ public class Student extends User implements SolicitudFactory, ScheduleManager, 
         }
         
         // 2. Verificar que la materia no esté ya inscrita
-        if (academicProgress == null || !academicProgress.isSubjectNoCursada(subject)) {
+
+        if (!academicProgress.isSubjectNoCursada(subject)) {
             throw new IllegalStateException("La materia ya está inscrita");
         }
         
@@ -395,9 +392,9 @@ public class Student extends User implements SolicitudFactory, ScheduleManager, 
 
         //academicProgress.recordEnrollment(subject, group, currentPeriod); despues
     }
-    public void enrollSubject(Subject subject, Group group, int Semester) throws SirhaException {
+    public void enrollSubject(Subject subject, Group group, int semester) throws SirhaException {
         enrollSubject(subject, group);
-        academicProgress.setSubjectSemester(subject.getName(), Semester);
+        academicProgress.setSubjectSemester(subject.getName(), semester);
 
     }
 

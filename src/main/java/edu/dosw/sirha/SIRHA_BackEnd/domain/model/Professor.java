@@ -1,4 +1,4 @@
-package edu.dosw.sirha.SIRHA_BackEnd.domain.model;
+package edu.dosw.sirha.sirha_backend.domain.model;
 
 public class Professor extends User {
 

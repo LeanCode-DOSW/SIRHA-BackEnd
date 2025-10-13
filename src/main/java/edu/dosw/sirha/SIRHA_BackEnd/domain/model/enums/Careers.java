@@ -1,6 +1,4 @@
-package edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums;
-
-import jakarta.xml.bind.annotation.XmlElement.DEFAULT;
+package edu.dosw.sirha.sirha_backend.domain.model.enums;
 
 public enum Careers {
     DEFAULT("Default Career"),

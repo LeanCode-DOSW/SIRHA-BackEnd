@@ -1,8 +1,8 @@
-package edu.dosw.sirha.SIRHA_BackEnd.domain.port;
+package edu.dosw.sirha.sirha_backend.domain.port;
 
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.Subject;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateGroup.Group;
-import edu.dosw.sirha.SIRHA_BackEnd.exception.SirhaException;
+import edu.dosw.sirha.sirha_backend.domain.model.Subject;
+import edu.dosw.sirha.sirha_backend.domain.model.stateGroup.Group;
+import edu.dosw.sirha.sirha_backend.exception.SirhaException;
 
 public interface AcademicOperations {
     boolean canEnroll(Subject subject);

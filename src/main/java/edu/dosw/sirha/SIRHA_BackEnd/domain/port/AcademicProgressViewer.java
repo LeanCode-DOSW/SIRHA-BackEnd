@@ -1,16 +1,16 @@
-package edu.dosw.sirha.SIRHA_BackEnd.domain.port;
+package edu.dosw.sirha.sirha_backend.domain.port;
 
 import java.util.List;
 import java.util.Map;
 
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.Careers;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.SemaforoColores;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateSubjectDec.SubjectDecorator;
-import edu.dosw.sirha.SIRHA_BackEnd.dto.AcademicIndicatorsDTO;
-import edu.dosw.sirha.SIRHA_BackEnd.dto.RequestApprovalRateDTO;
-import edu.dosw.sirha.SIRHA_BackEnd.dto.StudentDTO;
-import edu.dosw.sirha.SIRHA_BackEnd.dto.StudentReportDTO;
-import edu.dosw.sirha.SIRHA_BackEnd.dto.SubjectDecoratorDTO;
+import edu.dosw.sirha.sirha_backend.domain.model.enums.Careers;
+import edu.dosw.sirha.sirha_backend.domain.model.enums.SemaforoColores;
+import edu.dosw.sirha.sirha_backend.domain.model.statesubjectdec.SubjectDecorator;
+import edu.dosw.sirha.sirha_backend.dto.AcademicIndicatorsDTO;
+import edu.dosw.sirha.sirha_backend.dto.RequestApprovalRateDTO;
+import edu.dosw.sirha.sirha_backend.dto.StudentDTO;
+import edu.dosw.sirha.sirha_backend.dto.StudentReportDTO;
+import edu.dosw.sirha.sirha_backend.dto.SubjectDecoratorDTO;
 
 public interface AcademicProgressViewer {
     // Conteos por estado (Counts by status)

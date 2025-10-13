@@ -1,9 +1,9 @@
-package edu.dosw.sirha.SIRHA_BackEnd.domain.port;
+package edu.dosw.sirha.sirha_backend.domain.port;
 
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateRequest.BaseRequest;
-import edu.dosw.sirha.SIRHA_BackEnd.dto.ResponseRequest;
-import edu.dosw.sirha.SIRHA_BackEnd.exception.SirhaException;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.RequestStateEnum;
+import edu.dosw.sirha.sirha_backend.domain.model.enums.RequestStateEnum;
+import edu.dosw.sirha.sirha_backend.domain.model.staterequest.BaseRequest;
+import edu.dosw.sirha.sirha_backend.dto.ResponseRequest;
+import edu.dosw.sirha.sirha_backend.exception.SirhaException;
 
 public interface RequestState {
     void approveRequest(BaseRequest request, ResponseRequest response) throws SirhaException;

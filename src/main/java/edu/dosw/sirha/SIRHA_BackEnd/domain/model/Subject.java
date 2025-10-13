@@ -1,15 +1,14 @@
-package edu.dosw.sirha.SIRHA_BackEnd.domain.model;
+package edu.dosw.sirha.sirha_backend.domain.model;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateGroup.Group;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.port.AcademicProgress;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.port.PrerequisiteRule;
+import edu.dosw.sirha.sirha_backend.domain.model.stateGroup.Group;
+import edu.dosw.sirha.sirha_backend.domain.port.AcademicProgress;
+import edu.dosw.sirha.sirha_backend.domain.port.PrerequisiteRule;
 
 /**
  * Representa una materia o asignatura dentro del sistema académico.

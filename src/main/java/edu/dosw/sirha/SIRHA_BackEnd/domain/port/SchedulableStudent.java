@@ -1,9 +1,8 @@
-package edu.dosw.sirha.SIRHA_BackEnd.domain.port;
+package edu.dosw.sirha.sirha_backend.domain.port;
 
 import java.util.*;
 
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.*;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateSubjectDec.SubjectDecorator;
+import edu.dosw.sirha.sirha_backend.domain.model.*;
 
 public interface SchedulableStudent {
     Optional<StudyPlan> obtenerPlanEstudioActual(String studentId);

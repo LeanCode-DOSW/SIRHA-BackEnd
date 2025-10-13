@@ -1,6 +1,6 @@
-package edu.dosw.sirha.SIRHA_BackEnd.service;
+package edu.dosw.sirha.sirha_backend.service;
 
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.AcademicPeriod;
+import edu.dosw.sirha.sirha_backend.domain.model.AcademicPeriod;
 
 public interface AcademicPeriodService {
     AcademicPeriod getCurrentAcademicPeriod();

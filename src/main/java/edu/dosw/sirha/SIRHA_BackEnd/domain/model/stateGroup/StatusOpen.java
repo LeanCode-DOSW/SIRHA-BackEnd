@@ -1,9 +1,9 @@
-package edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateGroup;
+package edu.dosw.sirha.sirha_backend.domain.model.stateGroup;
 
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.Student;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.port.GroupState;
-import edu.dosw.sirha.SIRHA_BackEnd.exception.ErrorCodeSirha;
-import edu.dosw.sirha.SIRHA_BackEnd.exception.SirhaException;
+import edu.dosw.sirha.sirha_backend.domain.model.Student;
+import edu.dosw.sirha.sirha_backend.domain.port.GroupState;
+import edu.dosw.sirha.sirha_backend.exception.ErrorCodeSirha;
+import edu.dosw.sirha.sirha_backend.exception.SirhaException;
 
 public class StatusOpen implements GroupState {
 
@@ -11,7 +11,6 @@ public class StatusOpen implements GroupState {
     public boolean addStudent(Group group, Student student) throws SirhaException {
         if (!group.isFull()) {
             group.addStudent(student);
-            System.out.println("Estudiante inscrito en el grupo.");
             if (group.getCuposDisponibles() == 0) {
                 group.setEstadoGrupo(new StatusClosed());
             }
@@ -27,7 +26,6 @@ public class StatusOpen implements GroupState {
     public boolean removeStudent(Group group, Student student) throws SirhaException {
         if (group.getInscritos() > 0) {
             group.removeStudent(student);
-            System.out.println("Estudiante desinscrito del grupo.");
             if (group.getCuposDisponibles() > 0) {
                 group.setEstadoGrupo(new StatusOpen());
             }

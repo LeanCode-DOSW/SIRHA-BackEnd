@@ -1,10 +1,10 @@
-package edu.dosw.sirha.SIRHA_BackEnd.dto;
+package edu.dosw.sirha.sirha_backend.dto;
 
 import java.util.List;
 import java.util.Map;
 
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.Careers;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.SemaforoColores;
+import edu.dosw.sirha.sirha_backend.domain.model.enums.Careers;
+import edu.dosw.sirha.sirha_backend.domain.model.enums.SemaforoColores;
 
 public class StudentReportDTO {
     private StudentDTO studentDTO;

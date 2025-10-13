@@ -1,6 +1,6 @@
-package edu.dosw.sirha.SIRHA_BackEnd.exception;
+package edu.dosw.sirha.sirha_backend.exception;
 
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.RequestStateEnum;
+import edu.dosw.sirha.sirha_backend.domain.model.enums.RequestStateEnum;
 
 public class SirhaException extends Exception {
     private final ErrorCodeSirha errorCode;

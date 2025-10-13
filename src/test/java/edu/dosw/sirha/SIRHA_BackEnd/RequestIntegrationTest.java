@@ -1,17 +1,17 @@
 package edu.dosw.sirha.SIRHA_BackEnd;
 
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.*;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.Careers;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.DiasSemana;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.RequestStateEnum;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateGroup.Group;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateRequest.*;
-import edu.dosw.sirha.SIRHA_BackEnd.dto.ResponseRequest;
-import edu.dosw.sirha.SIRHA_BackEnd.exception.SirhaException;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+
+import edu.dosw.sirha.sirha_backend.domain.model.*;
+import edu.dosw.sirha.sirha_backend.domain.model.enums.Careers;
+import edu.dosw.sirha.sirha_backend.domain.model.enums.DiasSemana;
+import edu.dosw.sirha.sirha_backend.domain.model.enums.RequestStateEnum;
+import edu.dosw.sirha.sirha_backend.domain.model.stateGroup.Group;
+import edu.dosw.sirha.sirha_backend.domain.model.staterequest.*;
+import edu.dosw.sirha.sirha_backend.dto.ResponseRequest;
+import edu.dosw.sirha.sirha_backend.exception.SirhaException;
 
 import java.time.LocalDate;
 import java.time.LocalTime;

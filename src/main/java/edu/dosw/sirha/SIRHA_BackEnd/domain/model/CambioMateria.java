@@ -1,7 +1,6 @@
-package edu.dosw.sirha.SIRHA_BackEnd.domain.model;
-
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateGroup.Group;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateRequest.BaseRequest;
+package edu.dosw.sirha.sirha_backend.domain.model;
+import edu.dosw.sirha.sirha_backend.domain.model.stateGroup.Group;
+import edu.dosw.sirha.sirha_backend.domain.model.staterequest.BaseRequest;
 
 public class CambioMateria extends BaseRequest {
 

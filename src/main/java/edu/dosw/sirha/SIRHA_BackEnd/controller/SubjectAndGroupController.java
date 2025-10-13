@@ -1,4 +1,4 @@
-package edu.dosw.sirha.SIRHA_BackEnd.controller;
+package edu.dosw.sirha.sirha_backend.controller;
 
 import java.util.List;
 
@@ -6,11 +6,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.Professor;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.Schedule;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.Subject;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateGroup.Group;
-import edu.dosw.sirha.SIRHA_BackEnd.service.SubjectService;
+import edu.dosw.sirha.sirha_backend.domain.model.Professor;
+import edu.dosw.sirha.sirha_backend.domain.model.Schedule;
+import edu.dosw.sirha.sirha_backend.domain.model.Subject;
+import edu.dosw.sirha.sirha_backend.domain.model.stateGroup.Group;
+import edu.dosw.sirha.sirha_backend.service.SubjectService;
 
 @RestController
 @RequestMapping("/api/subjects")

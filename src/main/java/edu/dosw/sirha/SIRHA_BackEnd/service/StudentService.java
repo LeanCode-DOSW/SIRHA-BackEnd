@@ -1,21 +1,21 @@
-package edu.dosw.sirha.SIRHA_BackEnd.service;
+package edu.dosw.sirha.sirha_backend.service;
 
 import java.util.List;
 import java.util.Optional;
 
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.Schedule;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.Student;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.SemaforoColores;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateRequest.BaseRequest;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.AcademicPeriod;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.CambioGrupo;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.CambioMateria;
+import edu.dosw.sirha.sirha_backend.domain.model.AcademicPeriod;
+import edu.dosw.sirha.sirha_backend.domain.model.CambioGrupo;
+import edu.dosw.sirha.sirha_backend.domain.model.CambioMateria;
+import edu.dosw.sirha.sirha_backend.domain.model.Schedule;
+import edu.dosw.sirha.sirha_backend.domain.model.Student;
+import edu.dosw.sirha.sirha_backend.domain.model.enums.SemaforoColores;
+import edu.dosw.sirha.sirha_backend.domain.model.staterequest.BaseRequest;
+import edu.dosw.sirha.sirha_backend.dto.AuthResponse;
+import edu.dosw.sirha.sirha_backend.dto.LoginRequest;
+import edu.dosw.sirha.sirha_backend.dto.RegisterRequest;
+import edu.dosw.sirha.sirha_backend.dto.SubjectDecoratorDTO;
 
 import java.util.Map;
-import edu.dosw.sirha.SIRHA_BackEnd.dto.AuthResponse;
-import edu.dosw.sirha.SIRHA_BackEnd.dto.LoginRequest;
-import edu.dosw.sirha.SIRHA_BackEnd.dto.RegisterRequest;
-import edu.dosw.sirha.SIRHA_BackEnd.dto.SubjectDecoratorDTO;
 
 public interface StudentService {
     AuthResponse registerStudent(RegisterRequest request);

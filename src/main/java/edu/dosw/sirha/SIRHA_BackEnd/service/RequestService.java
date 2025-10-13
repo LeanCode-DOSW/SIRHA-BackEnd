@@ -1,9 +1,9 @@
-package edu.dosw.sirha.SIRHA_BackEnd.service;
+package edu.dosw.sirha.sirha_backend.service;
 
 import java.util.List;
 import java.util.Optional;
 
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateRequest.BaseRequest;
+import edu.dosw.sirha.sirha_backend.domain.model.staterequest.BaseRequest;
 
 public interface RequestService {
     List<BaseRequest> findAll();

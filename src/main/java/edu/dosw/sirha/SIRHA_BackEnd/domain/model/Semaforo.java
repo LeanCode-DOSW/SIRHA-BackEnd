@@ -1,18 +1,16 @@
-package edu.dosw.sirha.SIRHA_BackEnd.domain.model;
+package edu.dosw.sirha.sirha_backend.domain.model;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.Careers;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.SemaforoColores;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateGroup.Group;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateSubjectDec.SubjectDecorator;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.port.AcademicProgress;
-import edu.dosw.sirha.SIRHA_BackEnd.dto.AcademicIndicatorsDTO;
-import edu.dosw.sirha.SIRHA_BackEnd.dto.RequestApprovalRateDTO;
-import edu.dosw.sirha.SIRHA_BackEnd.dto.SubjectDecoratorDTO;
-import edu.dosw.sirha.SIRHA_BackEnd.exception.ErrorCodeSirha;
-import edu.dosw.sirha.SIRHA_BackEnd.exception.SirhaException;
+import edu.dosw.sirha.sirha_backend.domain.model.enums.Careers;
+import edu.dosw.sirha.sirha_backend.domain.model.enums.SemaforoColores;
+import edu.dosw.sirha.sirha_backend.domain.model.stateGroup.Group;
+import edu.dosw.sirha.sirha_backend.domain.model.statesubjectdec.SubjectDecorator;
+import edu.dosw.sirha.sirha_backend.domain.port.AcademicProgress;
+import edu.dosw.sirha.sirha_backend.dto.AcademicIndicatorsDTO;
+import edu.dosw.sirha.sirha_backend.dto.SubjectDecoratorDTO;
+import edu.dosw.sirha.sirha_backend.exception.ErrorCodeSirha;
+import edu.dosw.sirha.sirha_backend.exception.SirhaException;
 
 /**
  * Implementación del progreso académico que mantiene el estado de las materias
@@ -57,25 +55,25 @@ public class Semaforo implements AcademicProgress {
     public List<SubjectDecorator> getPassedSubjects() {
         return subjects.values().stream()
             .filter(s -> s.getEstadoColor() == SemaforoColores.VERDE)
-            .collect(Collectors.toList());
+            .toList();
     }
 
     public List<SubjectDecorator> getSubjectsInProgress() {
         return subjects.values().stream()
             .filter(s -> s.getEstadoColor() == SemaforoColores.AMARILLO)
-            .collect(Collectors.toList());
+            .toList();
     }
 
     public List<SubjectDecorator> getFailedSubjects() {
         return subjects.values().stream()
             .filter(s -> s.getEstadoColor() == SemaforoColores.ROJO)
-            .collect(Collectors.toList());
+            .toList();
     }
 
     public List<SubjectDecorator> getSubjectsNotTaken() {
         return subjects.values().stream()
             .filter(s -> s.getEstadoColor() == SemaforoColores.GRIS)
-            .collect(Collectors.toList());
+            .toList();
     }
 
     public int getSubjectsCount() {
@@ -151,7 +149,6 @@ public class Semaforo implements AcademicProgress {
     public boolean isSubjectCursando(Subject subject) {
 
         if (!subjects.containsKey(subject.getName())) {
-            System.out.println("Error: La materia no está en el semáforo");
             return false;
         }
         SubjectDecorator decorator = subjects.get(subject.getName());
@@ -181,20 +178,16 @@ public class Semaforo implements AcademicProgress {
 
         SubjectDecorator decorator = subjects.get(subject.getName());
         if (decorator == null) {
-            System.out.println("Error: La materia no está en el semáforo");
             throw new IllegalStateException("La materia no está en el semáforo");
         }
         if (!isSubjectCursando(subject)) {
-            System.out.println("Error: La materia no está en curso");
             throw new IllegalStateException("La materia no está en curso");
         }
 
         if (decorator.getGroup().equals(newGroup)) {
-            System.out.println("Error: El nuevo grupo es el mismo que el actual");
             throw new IllegalStateException("El nuevo grupo es el mismo que el actual");
         }
         if (!subject.hasGroup(newGroup)) {
-            System.out.println("Error: El grupo no pertenece a la materia especificada");
             throw new IllegalStateException("El grupo no pertenece a la materia especificada");
         }
         return true;
@@ -205,11 +198,9 @@ public class Semaforo implements AcademicProgress {
 
         SubjectDecorator decorator = subjects.get(subject.getName());
         if (decorator == null) {
-            System.out.println("Error: La materia no está en el semáforo");
             throw new IllegalArgumentException("La materia no está en el semáforo");
         }
         if (!subject.hasGroup(group)) {
-            System.out.println("Error: El grupo no pertenece a la materia especificada");
             throw new IllegalArgumentException("El grupo no pertenece a la materia especificada");
         }
         decorator.inscribir(group);
@@ -220,14 +211,13 @@ public class Semaforo implements AcademicProgress {
     public Map<AcademicPeriod, List<Schedule>> getAllSchedules() {
         Map<AcademicPeriod, List<Schedule>> schedules = new HashMap<>();
 
-        subjects.values().forEach(sd -> { schedules.putIfAbsent(sd.getAcademicPeriod(), sd.getSchedules());
-        });
+        subjects.values().forEach(sd -> schedules.putIfAbsent(sd.getAcademicPeriod(), sd.getSchedules()));
         return schedules;
     }
 
     @Override
     public Map<SemaforoColores, List<SubjectDecoratorDTO>> getAcademicPensum() {
-        Map<SemaforoColores, List<SubjectDecoratorDTO>> pensum = new HashMap<>();
+        Map<SemaforoColores, List<SubjectDecoratorDTO>> pensum = new EnumMap<>(SemaforoColores.class);
         
         subjects.values().forEach(sd -> {
             SemaforoColores color = sd.getEstadoColor();
@@ -356,7 +346,7 @@ public class Semaforo implements AcademicProgress {
     public void approveSubject(String subject) throws SirhaException {
         SubjectDecorator decorator = subjects.get(subject);
         if (decorator == null) {
-            throw SirhaException.of(ErrorCodeSirha.SUBJECT_NOT_FOUND, "La materia no está en el semáforo");
+            throw SirhaException.of(ErrorCodeSirha.SUBJECT_NOT_FOUND);
         }
         decorator.aprobar();
     }
@@ -365,7 +355,7 @@ public class Semaforo implements AcademicProgress {
     public void failSubject(String subject) throws SirhaException {
         SubjectDecorator decorator = subjects.get(subject);
         if (decorator == null) {
-            throw SirhaException.of(ErrorCodeSirha.SUBJECT_NOT_FOUND, "La materia no está en el semáforo");
+            throw SirhaException.of(ErrorCodeSirha.SUBJECT_NOT_FOUND);
         }
         decorator.reprobar();
     }
@@ -373,7 +363,7 @@ public class Semaforo implements AcademicProgress {
     public void unenrollSubjectFromGroup(String subject, Group group) throws SirhaException {
         SubjectDecorator decorator = subjects.get(subject);
         if (decorator == null) {
-            throw SirhaException.of(ErrorCodeSirha.SUBJECT_NOT_FOUND, "La materia no está en el semáforo");
+            throw SirhaException.of(ErrorCodeSirha.SUBJECT_NOT_FOUND);
         }
         decorator.retirar();
     }
@@ -389,7 +379,7 @@ public class Semaforo implements AcademicProgress {
     public void setSubjectSemester(String name, int semester) throws SirhaException {
         SubjectDecorator decorator = subjects.get(name);
         if (decorator == null) {
-            throw SirhaException.of(ErrorCodeSirha.SUBJECT_NOT_FOUND, "La materia no está en el semáforo");
+            throw SirhaException.of(ErrorCodeSirha.SUBJECT_NOT_FOUND);
         }
         decorator.setSemester(semester);
     }

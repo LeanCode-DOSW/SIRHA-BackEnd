@@ -1,18 +1,19 @@
-package edu.dosw.sirha.SIRHA_BackEnd.controller;
-
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.Schedule;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.Student;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.SemaforoColores;
-import edu.dosw.sirha.SIRHA_BackEnd.dto.StudentDTO;
-import edu.dosw.sirha.SIRHA_BackEnd.dto.SubjectDecoratorDTO;
-import edu.dosw.sirha.SIRHA_BackEnd.service.StudentService;
-import edu.dosw.sirha.SIRHA_BackEnd.util.MapperUtils;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.AcademicPeriod;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.CambioGrupo;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.CambioMateria;
+package edu.dosw.sirha.sirha_backend.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import edu.dosw.sirha.sirha_backend.domain.model.AcademicPeriod;
+import edu.dosw.sirha.sirha_backend.domain.model.CambioGrupo;
+import edu.dosw.sirha.sirha_backend.domain.model.CambioMateria;
+import edu.dosw.sirha.sirha_backend.domain.model.Schedule;
+import edu.dosw.sirha.sirha_backend.domain.model.Student;
+import edu.dosw.sirha.sirha_backend.domain.model.enums.SemaforoColores;
+import edu.dosw.sirha.sirha_backend.dto.StudentDTO;
+import edu.dosw.sirha.sirha_backend.dto.SubjectDecoratorDTO;
+import edu.dosw.sirha.sirha_backend.service.StudentService;
+import edu.dosw.sirha.sirha_backend.util.MapperUtils;
+
 import java.util.List;
 import java.util.Map;
 

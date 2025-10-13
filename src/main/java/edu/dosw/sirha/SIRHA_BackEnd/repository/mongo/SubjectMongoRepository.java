@@ -1,8 +1,9 @@
-package edu.dosw.sirha.SIRHA_BackEnd.repository.mongo;
+package edu.dosw.sirha.sirha_backend.repository.mongo;
 
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.Subject;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
+
+import edu.dosw.sirha.sirha_backend.domain.model.Subject;
 
 import java.util.Optional;
 

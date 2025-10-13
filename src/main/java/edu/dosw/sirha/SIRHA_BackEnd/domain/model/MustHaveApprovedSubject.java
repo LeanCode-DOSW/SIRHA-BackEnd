@@ -1,7 +1,6 @@
-package edu.dosw.sirha.SIRHA_BackEnd.domain.model;
-
-import edu.dosw.sirha.SIRHA_BackEnd.domain.port.AcademicProgress;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.port.PrerequisiteRule;
+package edu.dosw.sirha.sirha_backend.domain.model;
+import edu.dosw.sirha.sirha_backend.domain.port.AcademicProgress;
+import edu.dosw.sirha.sirha_backend.domain.port.PrerequisiteRule;
 
 public class MustHaveApprovedSubject implements PrerequisiteRule {
 

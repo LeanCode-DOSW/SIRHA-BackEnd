@@ -1,9 +1,9 @@
-package edu.dosw.sirha.SIRHA_BackEnd.domain.port;
+package edu.dosw.sirha.sirha_backend.domain.port;
 
 import java.time.LocalDateTime;
 
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.SemaforoColores;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateGroup.Group;
+import edu.dosw.sirha.sirha_backend.domain.model.enums.SemaforoColores;
+import edu.dosw.sirha.sirha_backend.domain.model.stateGroup.Group;
 
 public interface SubjectStateProcess {
     String getId();

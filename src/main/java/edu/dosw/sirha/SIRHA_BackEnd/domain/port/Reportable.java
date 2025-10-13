@@ -1,4 +1,4 @@
-package edu.dosw.sirha.SIRHA_BackEnd.domain.port;
+package edu.dosw.sirha.sirha_backend.domain.port;
 
 /**
  * Define la capacidad de generar reportes para las entidades que implementen esta interfaz.

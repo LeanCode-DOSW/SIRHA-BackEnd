@@ -1,4 +1,4 @@
-package edu.dosw.sirha.SIRHA_BackEnd.dto;
+package edu.dosw.sirha.sirha_backend.dto;
 
 public class RequestApprovalRateDTO {
     private int totalRequests;

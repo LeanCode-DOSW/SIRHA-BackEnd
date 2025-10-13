@@ -1,7 +1,7 @@
-package edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateSubjectDec;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.SemaforoColores;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateGroup.Group;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.port.SubjectState;
+package edu.dosw.sirha.sirha_backend.domain.model.statesubjectdec;
+import edu.dosw.sirha.sirha_backend.domain.model.enums.SemaforoColores;
+import edu.dosw.sirha.sirha_backend.domain.model.stateGroup.Group;
+import edu.dosw.sirha.sirha_backend.domain.port.SubjectState;
 
 public class EnCursoState implements SubjectState {
 
@@ -21,19 +21,16 @@ public class EnCursoState implements SubjectState {
     public void retirar(SubjectDecorator materia) {
         materia.setState(new NoCursadaState());
         materia.getState().setState(materia);
-        System.out.println("Materia retirada.");
     }
 
     public void aprobar(SubjectDecorator materia) {
         materia.setState(new AprobadaState());
         materia.getState().setState(materia);
-        System.out.println("Materia aprobada.");
     }
 
     public void reprobar(SubjectDecorator materia) {
         materia.setState(new ReprobadaState());
         materia.getState().setState(materia); 
-        System.out.println("Materia reprobada.");
     }
 
     public boolean canEnroll() { return false; }

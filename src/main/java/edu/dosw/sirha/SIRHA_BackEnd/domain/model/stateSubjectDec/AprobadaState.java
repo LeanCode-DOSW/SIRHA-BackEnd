@@ -1,8 +1,8 @@
-package edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateSubjectDec;
+package edu.dosw.sirha.sirha_backend.domain.model.statesubjectdec;
+import edu.dosw.sirha.sirha_backend.domain.model.enums.SemaforoColores;
+import edu.dosw.sirha.sirha_backend.domain.model.stateGroup.Group;
+import edu.dosw.sirha.sirha_backend.domain.port.SubjectState;
 
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.SemaforoColores;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateGroup.Group;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.port.SubjectState;
 
 public class AprobadaState implements SubjectState {
 

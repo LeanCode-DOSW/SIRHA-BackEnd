@@ -1,4 +1,4 @@
-package edu.dosw.sirha.SIRHA_BackEnd.util;
+package edu.dosw.sirha.sirha_backend.util;
 
 import java.util.regex.Pattern;
 
@@ -6,6 +6,10 @@ import java.util.regex.Pattern;
  * Utilidades para validaciones del sistema SIRHA.
  */
 public class ValidationUtil {
+
+    private ValidationUtil() {
+        throw new UnsupportedOperationException("Utility class");
+    }
     
     // Patrones de validación
     private static final Pattern EMAIL_INSTITUCIONAL = 

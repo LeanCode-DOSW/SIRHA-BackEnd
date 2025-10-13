@@ -1,7 +1,7 @@
-package edu.dosw.sirha.SIRHA_BackEnd.domain.port;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.*;
-import edu.dosw.sirha.SIRHA_BackEnd.dto.ResponseRequest;
-import edu.dosw.sirha.SIRHA_BackEnd.exception.SirhaException;
+package edu.dosw.sirha.sirha_backend.domain.port;
+import edu.dosw.sirha.sirha_backend.domain.model.enums.*;
+import edu.dosw.sirha.sirha_backend.dto.ResponseRequest;
+import edu.dosw.sirha.sirha_backend.exception.SirhaException;
 
 /**
  * Interfaz que define las operaciones para manejar solicitudes.

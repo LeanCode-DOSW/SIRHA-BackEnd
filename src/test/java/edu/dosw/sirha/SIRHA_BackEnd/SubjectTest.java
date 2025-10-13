@@ -1,13 +1,13 @@
 package edu.dosw.sirha.SIRHA_BackEnd;
 
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.AcademicPeriod;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.Subject;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateGroup.Group;
-
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+
+import edu.dosw.sirha.sirha_backend.domain.model.AcademicPeriod;
+import edu.dosw.sirha.sirha_backend.domain.model.Subject;
+import edu.dosw.sirha.sirha_backend.domain.model.stateGroup.Group;
+
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.same;
 
 import java.time.LocalDate;
 
@@ -73,27 +73,10 @@ class SubjectTest {
         assertEquals("Física", s.getName());
     }
 
-    @Test
-    void setNameNullTest() {
+    void setNameInvalidTest(String invalidName) {
         Subject s = new Subject("101", "Matemáticas", 4);
         assertThrows(IllegalArgumentException.class, () -> {
-            s.setName(null);
-        });
-    }
-
-    @Test
-    void setNameVacioTest() {
-        Subject s = new Subject("101", "Matemáticas", 4);
-        assertThrows(IllegalArgumentException.class, () -> {
-            s.setName("");
-        });
-    }
-
-    @Test
-    void setNameBlankTest() {
-        Subject s = new Subject("101", "Matemáticas", 4);
-        assertThrows(IllegalArgumentException.class, () -> {
-            s.setName("   ");
+            s.setName(invalidName);
         });
     }
 
@@ -279,7 +262,7 @@ class SubjectTest {
     @Test
     void equalsNullTest() {
         Subject s = new Subject("101", "Matemáticas", 4);
-        assertNotEquals(s, null);
+        assertNotEquals(null, s);
     }
 
     @Test

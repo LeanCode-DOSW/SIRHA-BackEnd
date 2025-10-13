@@ -1,15 +1,17 @@
 package edu.dosw.sirha.SIRHA_BackEnd;
 
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.Schedule;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.DiasSemana;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+
+import edu.dosw.sirha.sirha_backend.domain.model.Schedule;
+import edu.dosw.sirha.sirha_backend.domain.model.enums.DiasSemana;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.time.LocalTime;
 
 @SpringBootTest
-public class ScheduleTest {
+class ScheduleTest {
         @Test
         void constructorValido_creaObjeto() {
             Schedule s = new Schedule(DiasSemana.LUNES, LocalTime.of(8, 0), LocalTime.of(10, 0));
@@ -20,8 +22,16 @@ public class ScheduleTest {
 
         @Test
         void constructorInvalido_lanzaExcepcion() {
-            assertThrows(IllegalArgumentException.class, () -> new Schedule(DiasSemana.LUNES, LocalTime.of(10, 0), LocalTime.of(8, 0)));
-            assertThrows(IllegalArgumentException.class, () -> new Schedule(DiasSemana.MARTES, LocalTime.of(5, 0), LocalTime.of(5, 0)));
+            assertThrows(IllegalArgumentException.class, this::crearHorarioInvalido1);
+            assertThrows(IllegalArgumentException.class, this::crearHorarioInvalido2);
+        }
+
+        private void crearHorarioInvalido1() {
+            new Schedule(DiasSemana.LUNES, LocalTime.of(10, 0), LocalTime.of(8, 0));
+        }
+
+        private void crearHorarioInvalido2() {
+            new Schedule(DiasSemana.MARTES, LocalTime.of(5, 0), LocalTime.of(5, 0));
         }
 
         @Test

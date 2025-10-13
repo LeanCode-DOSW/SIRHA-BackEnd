@@ -1,17 +1,18 @@
 package edu.dosw.sirha.SIRHA_BackEnd;
 
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.*;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.SemaforoColores;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateGroup.Group;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateSubjectDec.AprobadaState;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateSubjectDec.EnCursoState;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateSubjectDec.NoCursadaState;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateSubjectDec.ReprobadaState;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateSubjectDec.SubjectDecorator;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.port.SubjectStateProcess;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+
+import edu.dosw.sirha.sirha_backend.domain.model.*;
+import edu.dosw.sirha.sirha_backend.domain.model.enums.SemaforoColores;
+import edu.dosw.sirha.sirha_backend.domain.model.stateGroup.Group;
+import edu.dosw.sirha.sirha_backend.domain.model.statesubjectdec.AprobadaState;
+import edu.dosw.sirha.sirha_backend.domain.model.statesubjectdec.EnCursoState;
+import edu.dosw.sirha.sirha_backend.domain.model.statesubjectdec.NoCursadaState;
+import edu.dosw.sirha.sirha_backend.domain.model.statesubjectdec.ReprobadaState;
+import edu.dosw.sirha.sirha_backend.domain.model.statesubjectdec.SubjectDecorator;
+import edu.dosw.sirha.sirha_backend.domain.port.SubjectStateProcess;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -73,10 +74,10 @@ class SubjectDecoratorHistoryTest {
         List<SubjectStateProcess> history = decorator.getHistory();
         assertEquals(2, history.size());
         
-        SubjectStateProcess record = history.get(1);
-        assertTrue(record instanceof SubjectProgress);
+        SubjectStateProcess stateRecord = history.get(1);
+        assertTrue(stateRecord instanceof SubjectProgress);
         
-        SubjectProgress progress = (SubjectProgress) record;
+        SubjectProgress progress = (SubjectProgress) stateRecord;
         assertEquals(SemaforoColores.VERDE, progress.getState());
         assertEquals(decorator.getSemester(), progress.getSemester());
         assertEquals(group, progress.getGroup());
@@ -96,10 +97,10 @@ class SubjectDecoratorHistoryTest {
         List<SubjectStateProcess> history = decorator.getHistory();
         assertEquals(2, history.size());
         
-        SubjectStateProcess record = history.get(1);
-        assertTrue(record instanceof SubjectProgress);
+        SubjectStateProcess stateRecord = history.get(1);
+        assertTrue(stateRecord instanceof SubjectProgress);
         
-        SubjectProgress progress = (SubjectProgress) record;
+        SubjectProgress progress = (SubjectProgress) stateRecord;
         assertEquals(SemaforoColores.ROJO, progress.getState());
         assertEquals(decorator.getSemester(), progress.getSemester());
         assertEquals(group, progress.getGroup());
@@ -115,10 +116,10 @@ class SubjectDecoratorHistoryTest {
         List<SubjectStateProcess> history = decorator.getHistory();
         assertEquals(2, history.size());
         
-        SubjectStateProcess record = history.get(1);
-        assertTrue(record instanceof SubjectProgress);
+        SubjectStateProcess stateRecord = history.get(1);
+        assertTrue(stateRecord instanceof SubjectProgress);
         
-        SubjectProgress progress = (SubjectProgress) record;
+        SubjectProgress progress = (SubjectProgress) stateRecord;
         assertEquals(SemaforoColores.AMARILLO, progress.getState());
         assertEquals(decorator.getSemester(), progress.getSemester());
         assertEquals(group, progress.getGroup());
@@ -198,9 +199,9 @@ class SubjectDecoratorHistoryTest {
         decorator.aprobar();
         
         List<SubjectStateProcess> history = decorator.getHistory();
-        SubjectStateProcess record = history.get(0);
+        SubjectStateProcess progressRecord = history.get(0);
         
-        SubjectProgress progress = (SubjectProgress) record;
+        SubjectProgress progress = (SubjectProgress) progressRecord;
         assertEquals(group, progress.getGroup());
         assertNotNull(progress.getState());
         assertTrue(progress.getGrade() >= 0);
@@ -265,10 +266,10 @@ class SubjectDecoratorHistoryTest {
         assertTrue(decorator.estaAprobada());
         assertEquals(2, decorator.getHistory().size());
         
-        SubjectProgress record = (SubjectProgress) decorator.getLastStateProcess();
-        assertEquals(SemaforoColores.VERDE, record.getState());
-        assertNotNull(record.getCreatedAt());
-        assertEquals(92, record.getGrade());
+        SubjectProgress progressRecord = (SubjectProgress) decorator.getLastStateProcess();
+        assertEquals(SemaforoColores.VERDE, progressRecord.getState());
+        assertNotNull(progressRecord.getCreatedAt());
+        assertEquals(92, progressRecord.getGrade());
     }
 
     @Test

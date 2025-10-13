@@ -1,7 +1,7 @@
-package edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateSubjectDec;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.SemaforoColores;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateGroup.Group;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.port.SubjectState;
+package edu.dosw.sirha.sirha_backend.domain.model.statesubjectdec;
+import edu.dosw.sirha.sirha_backend.domain.model.enums.SemaforoColores;
+import edu.dosw.sirha.sirha_backend.domain.model.stateGroup.Group;
+import edu.dosw.sirha.sirha_backend.domain.port.SubjectState;
 
 public class ReprobadaState implements SubjectState {
 
@@ -14,7 +14,6 @@ public class ReprobadaState implements SubjectState {
         materia.setState(new EnCursoState());
         materia.setGroup(grupo);        
         materia.getState().setState(materia);
-        System.out.println("Materia re-inscrita después de reprobar.");
     }
 
     public void aprobar(SubjectDecorator materia) {throw new IllegalStateException("No se puede aprobar una materia reprobada sin inscribirse de nuevo");}

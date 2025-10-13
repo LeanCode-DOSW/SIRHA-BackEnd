@@ -1,16 +1,17 @@
 package edu.dosw.sirha.SIRHA_BackEnd;
 
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.*;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.Careers;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.DiasSemana;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.RequestStateEnum;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateGroup.Group;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateGroup.StatusClosed;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateGroup.StatusOpen;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateSubjectDec.NoCursadaState;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateSubjectDec.SubjectDecorator;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+
+import edu.dosw.sirha.sirha_backend.domain.model.*;
+import edu.dosw.sirha.sirha_backend.domain.model.enums.Careers;
+import edu.dosw.sirha.sirha_backend.domain.model.enums.DiasSemana;
+import edu.dosw.sirha.sirha_backend.domain.model.enums.RequestStateEnum;
+import edu.dosw.sirha.sirha_backend.domain.model.stateGroup.Group;
+import edu.dosw.sirha.sirha_backend.domain.model.stateGroup.StatusClosed;
+import edu.dosw.sirha.sirha_backend.domain.model.stateGroup.StatusOpen;
+import edu.dosw.sirha.sirha_backend.domain.model.statesubjectdec.NoCursadaState;
+import edu.dosw.sirha.sirha_backend.domain.model.statesubjectdec.SubjectDecorator;
 
 import java.time.LocalDate;
 import java.time.LocalTime;

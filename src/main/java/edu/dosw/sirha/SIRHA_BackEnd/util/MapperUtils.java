@@ -1,8 +1,7 @@
-package edu.dosw.sirha.SIRHA_BackEnd.util;
+package edu.dosw.sirha.sirha_backend.util;
 
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.Student;
-import edu.dosw.sirha.SIRHA_BackEnd.dto.StudentDTO;
-import java.util.stream.Collectors;
+import edu.dosw.sirha.sirha_backend.domain.model.Student;
+import edu.dosw.sirha.sirha_backend.dto.StudentDTO;
 
 /**
  * Clase utilitaria para la conversión entre entidades del dominio y DTOs (Data Transfer Objects).
@@ -20,6 +19,10 @@ import java.util.stream.Collectors;
  * 
  */
 public class MapperUtils {
+
+    private MapperUtils() {
+        throw new UnsupportedOperationException("Utility class");
+    }
 
     /**
      * Convierte una entidad Student del dominio a su representación DTO.
@@ -68,7 +71,7 @@ public class MapperUtils {
                         .filter(solicitud -> solicitud != null)
                         .map(solicitud -> solicitud.getId())
                         .filter(id -> id != null)
-                        .collect(Collectors.toList())
+                        .toList()
             );
         } else {
             dto.setSolicitudesIds(java.util.Collections.emptyList());

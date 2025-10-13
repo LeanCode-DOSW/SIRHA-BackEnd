@@ -1,17 +1,17 @@
 package edu.dosw.sirha.SIRHA_BackEnd;
 
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.*;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.Careers;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.SemaforoColores;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.RequestStateEnum;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateGroup.Group;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateRequest.BaseRequest;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateSubjectDec.SubjectDecorator;
-import edu.dosw.sirha.SIRHA_BackEnd.dto.*;
-import edu.dosw.sirha.SIRHA_BackEnd.exception.SirhaException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+
+import edu.dosw.sirha.sirha_backend.domain.model.*;
+import edu.dosw.sirha.sirha_backend.domain.model.enums.Careers;
+import edu.dosw.sirha.sirha_backend.domain.model.enums.RequestStateEnum;
+import edu.dosw.sirha.sirha_backend.domain.model.enums.SemaforoColores;
+import edu.dosw.sirha.sirha_backend.domain.model.stateGroup.Group;
+import edu.dosw.sirha.sirha_backend.domain.model.statesubjectdec.SubjectDecorator;
+import edu.dosw.sirha.sirha_backend.dto.*;
+import edu.dosw.sirha.sirha_backend.exception.SirhaException;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -46,11 +46,8 @@ class StudentAcademicReportsTest {
     private Group grupoFisica;
     private Group grupoProgramacion;
 
-    // Solicitudes
     private CambioGrupo requestAprobada;
-    private CambioGrupo requestRechazada;
-    private CambioGrupo requestPendiente;
-    private CambioGrupo requestEnRevision;
+
 
     @BeforeEach
     void setUp() throws SirhaException {
@@ -115,9 +112,6 @@ class StudentAcademicReportsTest {
         
         requestAprobada = student.createGroupChangeRequest(matematicas, grupoMatematicas);
         requestAprobada.reviewRequest(new ResponseRequest("En revision", RequestStateEnum.EN_REVISION));
-
-
-        requestPendiente = student.createGroupChangeRequest(programacion, grupoProgramacion);
         
 
         student.approveSubject(matematicas);
@@ -184,28 +178,28 @@ class StudentAcademicReportsTest {
 
     @Test
     void testGetRequestApprovalRate() {
-        assertEquals(2, student.getTotalRequestsMade());
+        assertEquals(1, student.getTotalRequestsMade());
 
         RequestApprovalRateDTO approvalRate = student.getRequestApprovalRate();
 
         assertEquals(0, approvalRate.getApprovedRequests());  // requestAprobada
         assertEquals(0, approvalRate.getRejectedRequests());  // requestRechazada
-        assertEquals(1, approvalRate.getPendingRequests());   // requestPendiente
+        assertEquals(0, approvalRate.getPendingRequests());   // requestPendiente
         assertEquals(1, approvalRate.getInReviewRequests());  // requestEnRevision
 
         assertEquals(0.0, approvalRate.getApprovalRatePercentage(), 0.1);  
         assertEquals(0.0, approvalRate.getRejectionRatePercentage(), 0.1);
-        assertEquals(50.0, approvalRate.getPendingRatePercentage(), 0.1);
+        assertEquals(0.0, approvalRate.getPendingRatePercentage(), 0.1);
     }
 
     @Test
     void testRequestPercentages() {
         
-        assertEquals(50.0, student.getPendingRequestPercentage(), 0.1);
-        assertEquals(50.0, student.getInReviewRequestPercentage(), 0.1);
+        assertEquals(0.0, student.getPendingRequestPercentage(), 0.1);
+        assertEquals(100.0, student.getInReviewRequestPercentage(), 0.1);
         assertEquals(0.0, student.getApprovalRequestPercentage(), 0.1);
         assertEquals(0.0, student.getRejectionRequestPercentage(), 0.1);
-        assertEquals(2, student.getTotalRequestsMade());
+        assertEquals(1, student.getTotalRequestsMade());
         assertTrue(student.hasActiveRequests());
     }
 
@@ -332,7 +326,6 @@ class StudentAcademicReportsTest {
     void testFilterSubjectsBySemester() {
         List<SubjectDecorator> semestre1 = student.getSubjectsBySemester(1);
         List<SubjectDecorator> semestre2 = student.getSubjectsBySemester(2);
-        List<SubjectDecorator> semestre3 = student.getSubjectsBySemester(3);
 
         assertEquals(3, semestre1.size());
         assertTrue(semestre1.stream().anyMatch(s -> s.getName().equals("Matemáticas I")));

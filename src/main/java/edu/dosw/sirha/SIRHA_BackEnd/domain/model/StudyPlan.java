@@ -1,15 +1,13 @@
-package edu.dosw.sirha.SIRHA_BackEnd.domain.model;
+package edu.dosw.sirha.sirha_backend.domain.model;
 import java.util.*;
 import org.springframework.data.mongodb.core.mapping.Document;
-
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.Careers;
+import edu.dosw.sirha.sirha_backend.domain.model.enums.Careers;
 
 @Document("planesDeEstudio")
 public class StudyPlan {
     private String name;
     private Careers career;
     private Map<String, Subject> subjects;
-    private int totalCredits;
 
 
     public StudyPlan(String name, Careers career) {
@@ -24,7 +22,6 @@ public class StudyPlan {
         for (Subject subject : subjects.values()) {
             total += subject.getCredits();
         }
-        this.totalCredits = total;
         return total;
     }
 

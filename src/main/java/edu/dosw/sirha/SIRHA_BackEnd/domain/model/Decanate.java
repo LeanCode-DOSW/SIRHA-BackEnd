@@ -1,18 +1,16 @@
-package edu.dosw.sirha.SIRHA_BackEnd.domain.model;
-import java.time.LocalDateTime;
+package edu.dosw.sirha.sirha_backend.domain.model;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.Careers;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.RequestStateEnum;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateRequest.BaseRequest;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.port.RequestReceiver;
-import edu.dosw.sirha.SIRHA_BackEnd.dto.ResponseRequest;
-import edu.dosw.sirha.SIRHA_BackEnd.exception.ErrorCodeSirha;
-import edu.dosw.sirha.SIRHA_BackEnd.exception.SirhaException;
-import jakarta.security.auth.message.callback.PrivateKeyCallback.Request;
+import edu.dosw.sirha.sirha_backend.domain.model.enums.Careers;
+import edu.dosw.sirha.sirha_backend.domain.model.enums.RequestStateEnum;
+import edu.dosw.sirha.sirha_backend.domain.model.staterequest.BaseRequest;
+import edu.dosw.sirha.sirha_backend.domain.port.RequestReceiver;
+import edu.dosw.sirha.sirha_backend.dto.ResponseRequest;
+import edu.dosw.sirha.sirha_backend.exception.ErrorCodeSirha;
+import edu.dosw.sirha.sirha_backend.exception.SirhaException;
 
 @Document("decanaturas")
 public class Decanate implements RequestReceiver {
@@ -48,8 +46,7 @@ public class Decanate implements RequestReceiver {
     @Override
     public void receiveRequest(BaseRequest request) throws SirhaException {
         if (request == null) {
-            throw SirhaException.of(ErrorCodeSirha.VALIDATION_ERROR, 
-                "La solicitud no puede ser nula");
+            throw SirhaException.of(ErrorCodeSirha.VALIDATION_ERROR);
         }
         
         if (!canReceiveRequest(request)) {
@@ -61,9 +58,6 @@ public class Decanate implements RequestReceiver {
         setAutoPrioritie(request);
         
         receivedRequests.add(request);
-        
-        System.out.printf("[DECANATE] %s recibió solicitud ID: %s (Prioridad: %d) de estudiante: %s%n",
-            this.name, request.getId(), request.getPriority(), request.getStudent().getUsername());
 
         request.reviewRequest(new ResponseRequest("Solicitud recibida por la decanatura " + this.name, RequestStateEnum.EN_REVISION));
     }
@@ -91,8 +85,7 @@ public class Decanate implements RequestReceiver {
         }
 
         request.approveRequest(new ResponseRequest("Solicitud aprobada por la decanatura " + this.name, RequestStateEnum.APROBADA));
-        System.out.printf("[DECANATE] %s aprobó la solicitud ID: %s%n",
-            this.name, request.getId());
+
         receivedRequests.remove(request);
         updateRequestsAfterResolveOne();
     }
@@ -108,8 +101,6 @@ public class Decanate implements RequestReceiver {
         }
 
         request.rejectRequest(new ResponseRequest("Solicitud rechazada por la decanatura " + this.name, RequestStateEnum.RECHAZADA));
-        System.out.printf("[DECANATE] %s rechazó la solicitud ID: %s%n",
-            this.name, request.getId());
         receivedRequests.remove(request);
         updateRequestsAfterResolveOne();
     }

@@ -1,4 +1,4 @@
-package edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums;
+package edu.dosw.sirha.sirha_backend.domain.model.enums;
 
 public enum RequestStateEnum {
     PENDIENTE,

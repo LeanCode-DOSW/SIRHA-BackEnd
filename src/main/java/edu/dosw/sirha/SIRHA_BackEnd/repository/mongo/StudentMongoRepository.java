@@ -1,12 +1,10 @@
-package edu.dosw.sirha.SIRHA_BackEnd.repository.mongo;
+package edu.dosw.sirha.sirha_backend.repository.mongo;
 
-import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
-import org.springframework.data.mongodb.repository.Query;
 
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.Student;
+import edu.dosw.sirha.sirha_backend.domain.model.Student;
 
 public interface StudentMongoRepository extends MongoRepository<Student, String> {
     Optional<Student> findByUsername(String username);

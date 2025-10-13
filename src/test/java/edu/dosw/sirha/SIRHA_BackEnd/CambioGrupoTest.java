@@ -1,12 +1,13 @@
 package edu.dosw.sirha.SIRHA_BackEnd;
 
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.*;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.Careers;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.DiasSemana;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateGroup.Group;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+
+import edu.dosw.sirha.sirha_backend.domain.model.*;
+import edu.dosw.sirha.sirha_backend.domain.model.enums.Careers;
+import edu.dosw.sirha.sirha_backend.domain.model.enums.DiasSemana;
+import edu.dosw.sirha.sirha_backend.domain.model.stateGroup.Group;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -84,9 +85,7 @@ class CambioGrupoTest {
         CambioGrupo cambioGrupo = new CambioGrupo(student, subject, grupoNuevo, academicPeriod);
         
 
-        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> {
-            cambioGrupo.validateRequest();
-        });
+        IllegalStateException exception = assertThrows(IllegalStateException.class, cambioGrupo::validateRequest);
 
         assertNotNull(exception);
         assertEquals("El nuevo grupo está cerrado", exception.getMessage());
@@ -124,9 +123,6 @@ class CambioGrupoTest {
 
     @Test
     void testCambioGrupoDifferentGroups() {
-        CambioGrupo cambioGrupo = new CambioGrupo(student, subject, grupoNuevo, academicPeriod);
-        
-        // Verificar que son grupos diferentes
         assertNotEquals(grupoActual.getId(), grupoNuevo.getId());
         assertNotEquals(grupoActual.getCapacidad(), grupoNuevo.getCapacidad());
     }

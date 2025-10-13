@@ -1,12 +1,13 @@
 package edu.dosw.sirha.SIRHA_BackEnd;
 
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.*;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.Careers;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.DiasSemana;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateGroup.Group;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+
+import edu.dosw.sirha.sirha_backend.domain.model.*;
+import edu.dosw.sirha.sirha_backend.domain.model.enums.Careers;
+import edu.dosw.sirha.sirha_backend.domain.model.enums.DiasSemana;
+import edu.dosw.sirha.sirha_backend.domain.model.stateGroup.Group;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -187,7 +188,6 @@ class CambioMateriaTest {
     void testCambioMateriaSubjectNotInStudyPlan() {
         Subject materiaFueraPlan = new Subject("999", "Materia Externa", 2);
         try{
-            Group grupoExterno = new Group(materiaFueraPlan, 15, academicPeriod);
 
             assertFalse(studyPlan.hasSubject(materiaFueraPlan));
 
@@ -471,7 +471,7 @@ class CambioMateriaTest {
     }
 
     @Test
-    void testValidateChangeSubject_CasoExitoso() {
+    void testValidateChangeSubjectCasoExitoso() {
         try {
             grupoAntiguo.addSchedule(scheduleConflict);
             grupoNuevo.addSchedule(scheduleNoConflict);
@@ -492,5 +492,10 @@ class CambioMateriaTest {
         assertTrue(grupoNuevo.sameAcademicPeriod(academicPeriod));
         
         assertTrue(student.validateChangeSubject(materiaAntigua, materiaNueva, grupoNuevo));
+
+        CambioMateria solicitud = student.createSubjectChangeRequest(materiaAntigua, materiaNueva, grupoNuevo);
+        assertNotNull(solicitud);
+        assertEquals(materiaAntigua, solicitud.getOldSubject());
+        assertEquals(materiaNueva, solicitud.getNewSubject());
     }
 }

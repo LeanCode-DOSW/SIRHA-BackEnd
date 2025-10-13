@@ -1,6 +1,6 @@
-package edu.dosw.sirha.SIRHA_BackEnd.domain.port;
+package edu.dosw.sirha.sirha_backend.domain.port;
 
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.Subject;
+import edu.dosw.sirha.sirha_backend.domain.model.Subject;
 
 public interface PrerequisiteRule  {
     boolean canEnroll(Subject subject, AcademicProgress progress);

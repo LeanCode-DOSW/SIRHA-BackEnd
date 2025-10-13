@@ -1,29 +1,30 @@
-package edu.dosw.sirha.SIRHA_BackEnd.service.impl;
-
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.Schedule;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.Student;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.Subject;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.SemaforoColores;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.AcademicPeriod;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.CambioGrupo;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.CambioMateria;
+package edu.dosw.sirha.sirha_backend.service.impl;
 
 import java.util.Map;
-import edu.dosw.sirha.SIRHA_BackEnd.dto.AuthResponse;
-import edu.dosw.sirha.SIRHA_BackEnd.dto.LoginRequest;
-import edu.dosw.sirha.SIRHA_BackEnd.dto.RegisterRequest;
-import edu.dosw.sirha.SIRHA_BackEnd.dto.SubjectDecoratorDTO;
-import edu.dosw.sirha.SIRHA_BackEnd.repository.mongo.AcademicPeriodMongoRepository;
-import edu.dosw.sirha.SIRHA_BackEnd.repository.mongo.GroupMongoRepository;
-import edu.dosw.sirha.SIRHA_BackEnd.repository.mongo.StudentMongoRepository;
-import edu.dosw.sirha.SIRHA_BackEnd.repository.mongo.SubjectMongoRepository;
-import edu.dosw.sirha.SIRHA_BackEnd.service.StudentService;
-import edu.dosw.sirha.SIRHA_BackEnd.util.ValidationUtil;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateGroup.Group;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateRequest.BaseRequest;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import edu.dosw.sirha.sirha_backend.domain.model.AcademicPeriod;
+import edu.dosw.sirha.sirha_backend.domain.model.CambioGrupo;
+import edu.dosw.sirha.sirha_backend.domain.model.CambioMateria;
+import edu.dosw.sirha.sirha_backend.domain.model.Schedule;
+import edu.dosw.sirha.sirha_backend.domain.model.Student;
+import edu.dosw.sirha.sirha_backend.domain.model.Subject;
+import edu.dosw.sirha.sirha_backend.domain.model.enums.SemaforoColores;
+import edu.dosw.sirha.sirha_backend.domain.model.stateGroup.Group;
+import edu.dosw.sirha.sirha_backend.domain.model.staterequest.BaseRequest;
+import edu.dosw.sirha.sirha_backend.dto.AuthResponse;
+import edu.dosw.sirha.sirha_backend.dto.LoginRequest;
+import edu.dosw.sirha.sirha_backend.dto.RegisterRequest;
+import edu.dosw.sirha.sirha_backend.dto.SubjectDecoratorDTO;
+import edu.dosw.sirha.sirha_backend.repository.mongo.AcademicPeriodMongoRepository;
+import edu.dosw.sirha.sirha_backend.repository.mongo.GroupMongoRepository;
+import edu.dosw.sirha.sirha_backend.repository.mongo.StudentMongoRepository;
+import edu.dosw.sirha.sirha_backend.repository.mongo.SubjectMongoRepository;
+import edu.dosw.sirha.sirha_backend.service.StudentService;
+import edu.dosw.sirha.sirha_backend.util.ValidationUtil;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -235,7 +236,7 @@ public class StudentServiceImpl implements StudentService {
         log.info("Intento de login para usuario: {}", username);
         try {
             Optional<Student> student = studentRepository.findByUsername(username)
-                    .filter(s -> s.verificarContraseña(password));
+                    .filter(s -> s.verificarContrasena(password));
             
             if (student.isPresent()) {
                 log.info("Login exitoso para usuario: {}", username);

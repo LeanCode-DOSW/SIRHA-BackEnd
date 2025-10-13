@@ -1,11 +1,9 @@
-package edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateSubjectDec;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.SemaforoColores;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateGroup.Group;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.port.SubjectState;
+package edu.dosw.sirha.sirha_backend.domain.model.statesubjectdec;
+import edu.dosw.sirha.sirha_backend.domain.model.enums.SemaforoColores;
+import edu.dosw.sirha.sirha_backend.domain.model.stateGroup.Group;
+import edu.dosw.sirha.sirha_backend.domain.port.SubjectState;
 
 public class NoCursadaState implements SubjectState {
-
-    public NoCursadaState() {}
 
     public void setState(SubjectDecorator materia) {materia.setEstadoColor(SemaforoColores.GRIS);}
 
@@ -17,7 +15,6 @@ public class NoCursadaState implements SubjectState {
         materia.setState(new EnCursoState());
         materia.setGroup(grupo);
         materia.getState().setState(materia);
-        System.out.println("Materia inscrita. Ahora está en curso.");
     }
 
     public void aprobar(SubjectDecorator materia) {throw new IllegalStateException("No se puede aprobar una materia no cursada");}

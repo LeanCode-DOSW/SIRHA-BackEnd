@@ -1,14 +1,15 @@
-package edu.dosw.sirha.SIRHA_BackEnd.controller;
+package edu.dosw.sirha.sirha_backend.controller;
 
-import edu.dosw.sirha.SIRHA_BackEnd.dto.AuthResponse;
-import edu.dosw.sirha.SIRHA_BackEnd.dto.LoginRequest;
-import edu.dosw.sirha.SIRHA_BackEnd.dto.RegisterRequest;
-import edu.dosw.sirha.SIRHA_BackEnd.service.AuthService;
 import jakarta.validation.Valid;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import edu.dosw.sirha.sirha_backend.dto.AuthResponse;
+import edu.dosw.sirha.sirha_backend.dto.LoginRequest;
+import edu.dosw.sirha.sirha_backend.dto.RegisterRequest;
+import edu.dosw.sirha.sirha_backend.service.AuthService;
 
 /**
  * Controlador REST para el manejo de autenticación y registro de usuarios en el sistema SIRHA.

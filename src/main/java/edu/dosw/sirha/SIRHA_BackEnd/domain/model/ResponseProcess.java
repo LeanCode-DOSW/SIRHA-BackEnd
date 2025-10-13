@@ -1,10 +1,11 @@
-package edu.dosw.sirha.SIRHA_BackEnd.domain.model;
+package edu.dosw.sirha.sirha_backend.domain.model;
 
 import java.time.LocalDateTime;
 import org.springframework.data.annotation.Id;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.RequestStateEnum;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.port.RequestProcess;
-import edu.dosw.sirha.SIRHA_BackEnd.dto.ResponseRequest;
+
+import edu.dosw.sirha.sirha_backend.domain.model.enums.RequestStateEnum;
+import edu.dosw.sirha.sirha_backend.domain.port.RequestProcess;
+import edu.dosw.sirha.sirha_backend.dto.ResponseRequest;
 
 public class ResponseProcess implements RequestProcess {
     @Id

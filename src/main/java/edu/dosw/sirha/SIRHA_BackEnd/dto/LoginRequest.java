@@ -1,4 +1,4 @@
-package edu.dosw.sirha.SIRHA_BackEnd.dto;
+package edu.dosw.sirha.sirha_backend.dto;
 
 import jakarta.validation.constraints.NotBlank;
 

@@ -1,23 +1,25 @@
 package edu.dosw.sirha.SIRHA_BackEnd;
 
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.*;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.Careers;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.DiasSemana;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.SemaforoColores;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateGroup.Group;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateGroup.StatusClosed;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateGroup.StatusOpen;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateRequest.BaseRequest;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateSubjectDec.*;
-import edu.dosw.sirha.SIRHA_BackEnd.dto.StudentDTO;
-import edu.dosw.sirha.SIRHA_BackEnd.exception.SirhaException;
-import edu.dosw.sirha.SIRHA_BackEnd.util.*;
 import java.util.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+
+import edu.dosw.sirha.sirha_backend.domain.model.*;
+import edu.dosw.sirha.sirha_backend.domain.model.enums.Careers;
+import edu.dosw.sirha.sirha_backend.domain.model.enums.DiasSemana;
+import edu.dosw.sirha.sirha_backend.domain.model.enums.SemaforoColores;
+import edu.dosw.sirha.sirha_backend.domain.model.stateGroup.Group;
+import edu.dosw.sirha.sirha_backend.domain.model.stateGroup.StatusClosed;
+import edu.dosw.sirha.sirha_backend.domain.model.stateGroup.StatusOpen;
+import edu.dosw.sirha.sirha_backend.domain.model.staterequest.BaseRequest;
+import edu.dosw.sirha.sirha_backend.domain.model.statesubjectdec.*;
+import edu.dosw.sirha.sirha_backend.dto.StudentDTO;
+import edu.dosw.sirha.sirha_backend.exception.SirhaException;
+import edu.dosw.sirha.sirha_backend.util.*;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
@@ -30,8 +32,6 @@ class SirhaBackEndApplicationTests {
     private Student student3;
     private Professor professor;
     private AcademicPeriod academicPeriod;
-    private AcademicPeriod pastPeriod;
-    private AcademicPeriod futurePeriod;
     private Subject matematicas;
     private Subject fisica;
     private Subject quimica;
@@ -41,19 +41,14 @@ class SirhaBackEndApplicationTests {
     private Group grupo3;
     private Schedule schedule1;
     private Schedule schedule2;
-    private Schedule scheduleConflict;
     private StudyPlan studyPlan;
     private Semaforo semaforo;
     private SubjectDecorator matemDecorator;
-    private SubjectDecorator fisicaDecorator;
-    private SubjectDecorator quimicaDecorator;
     private StudentDTO studentDTO;
 
     @BeforeEach
     void setUp() {
         academicPeriod = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
-        pastPeriod = new AcademicPeriod("2023-2", LocalDate.now().minusMonths(8), LocalDate.now().minusMonths(4));
-        futurePeriod = new AcademicPeriod("2024-2", LocalDate.now().plusMonths(6), LocalDate.now().plusMonths(10));
         
         academicPeriod.setStartDatesInscripciones(LocalDate.now(), LocalDate.now().plusMonths(1));
         
@@ -94,7 +89,6 @@ class SirhaBackEndApplicationTests {
         
         schedule1 = new Schedule(DiasSemana.LUNES, LocalTime.of(8, 0), LocalTime.of(10, 0));
         schedule2 = new Schedule(DiasSemana.MARTES, LocalTime.of(10, 0), LocalTime.of(12, 0));
-        scheduleConflict = new Schedule(DiasSemana.LUNES, LocalTime.of(9, 0), LocalTime.of(11, 0));
         try {
             grupo1.addSchedule(schedule1);
             grupo2.addSchedule(schedule2);
@@ -113,8 +107,6 @@ class SirhaBackEndApplicationTests {
         
         semaforo = new Semaforo(studyPlan);
         matemDecorator = new SubjectDecorator(matematicas);
-        fisicaDecorator = new SubjectDecorator(fisica);
-        quimicaDecorator = new SubjectDecorator(quimica);
         
         student.setAcademicProgress(semaforo);
         student.setCurrentPeriod(academicPeriod);
@@ -1766,15 +1758,15 @@ class SirhaBackEndApplicationTests {
         try{
             Group group = new Group(matematicas, 1, period);
         
-            Student student = new Student("test", "test@test.com", "pass", "T001");
+            Student studentTest = new Student("test", "test@test.com", "pass", "T001");
             
             assertTrue(group.getGroupState() instanceof StatusOpen);
             
-            group.enrollStudent(student);
+            group.enrollStudent(studentTest);
             assertTrue(group.getGroupState() instanceof StatusClosed);
             assertTrue(group.isFull());
-            
-            group.unenrollStudent(student);
+
+            group.unenrollStudent(studentTest);
             assertTrue(group.getGroupState() instanceof StatusOpen);
             assertFalse(group.isFull());
         } catch (Exception e) {

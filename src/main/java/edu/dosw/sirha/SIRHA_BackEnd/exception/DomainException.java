@@ -1,4 +1,4 @@
-package edu.dosw.sirha.SIRHA_BackEnd.exception;
+package edu.dosw.sirha.sirha_backend.exception;
 
 public abstract class DomainException extends RuntimeException {
     private final String code;

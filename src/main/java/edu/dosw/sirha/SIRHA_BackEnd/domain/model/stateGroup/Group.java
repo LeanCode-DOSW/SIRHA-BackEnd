@@ -1,18 +1,16 @@
-package edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateGroup;
+package edu.dosw.sirha.sirha_backend.domain.model.stateGroup;
 
 import java.util.*;
-
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
-
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.AcademicPeriod;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.Professor;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.Schedule;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.Student;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.Subject;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.port.GroupState;
-import edu.dosw.sirha.SIRHA_BackEnd.exception.ErrorCodeSirha;
-import edu.dosw.sirha.SIRHA_BackEnd.exception.SirhaException;
+import edu.dosw.sirha.sirha_backend.domain.model.AcademicPeriod;
+import edu.dosw.sirha.sirha_backend.domain.model.Professor;
+import edu.dosw.sirha.sirha_backend.domain.model.Schedule;
+import edu.dosw.sirha.sirha_backend.domain.model.Student;
+import edu.dosw.sirha.sirha_backend.domain.model.Subject;
+import edu.dosw.sirha.sirha_backend.domain.port.GroupState;
+import edu.dosw.sirha.sirha_backend.exception.ErrorCodeSirha;
+import edu.dosw.sirha.sirha_backend.exception.SirhaException;
 
 /**
  * Entidad del dominio que representa un grupo académico en el sistema SIRHA.
@@ -335,11 +333,9 @@ public class Group {
     public boolean conflictoConHorario(Schedule horario) {
         for (Schedule existente : schedules) {
             if (existente.seSolapaCon(horario)) {
-                System.out.println("Conflicto detectado entre schedules: " + existente + " y " + horario);
                 return true;
             }
         }
-        System.out.println("No se detectaron conflictos con el horario: " + horario);
         return false;
     }
 

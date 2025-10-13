@@ -1,11 +1,11 @@
-package edu.dosw.sirha.SIRHA_BackEnd.domain.model;
+package edu.dosw.sirha.sirha_backend.domain.model;
 
 import org.springframework.data.annotation.*;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.*;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.port.Authenticable;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.port.Schedulable;
-import edu.dosw.sirha.SIRHA_BackEnd.util.PasswordUtils;
+import edu.dosw.sirha.sirha_backend.domain.port.Authenticable;
+import edu.dosw.sirha.sirha_backend.domain.port.Schedulable;
+import edu.dosw.sirha.sirha_backend.util.PasswordUtils;
 import jakarta.validation.constraints.Email;
 
 //@Document(collection = "users")
@@ -22,19 +22,19 @@ public abstract class User implements Authenticable, Schedulable {
     @Field("password")
     private String password;
 
-    public User() {}
+    protected User() {}
 
-    public User(String username, String email, String password) {
+    protected User(String username, String email, String password) {
         this.username = username;
         setEmail(email);
         this.password = password.startsWith("$2a$") ? password : PasswordUtils.hashPassword(password);
     }
-    public User(String id, String username, String email, String password) {
+    protected User(String id, String username, String email, String password) {
         this(username, email, password);
         this.id = id;
     }
     
-    public boolean verificarContraseña(String rawPassword) {
+    public boolean verificarContrasena(String rawPassword) {
         return PasswordUtils.verifyPassword(rawPassword, this.password);
     }
 

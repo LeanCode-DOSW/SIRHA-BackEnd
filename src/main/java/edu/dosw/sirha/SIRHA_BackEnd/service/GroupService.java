@@ -1,11 +1,11 @@
-package edu.dosw.sirha.SIRHA_BackEnd.service;
+package edu.dosw.sirha.sirha_backend.service;
 
 import java.util.List;
 
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.Professor;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.Schedule;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.Subject;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateGroup.Group;
+import edu.dosw.sirha.sirha_backend.domain.model.Professor;
+import edu.dosw.sirha.sirha_backend.domain.model.Schedule;
+import edu.dosw.sirha.sirha_backend.domain.model.Subject;
+import edu.dosw.sirha.sirha_backend.domain.model.stateGroup.Group;
 
 public interface GroupService {
     List<Group> findAllGroups();
