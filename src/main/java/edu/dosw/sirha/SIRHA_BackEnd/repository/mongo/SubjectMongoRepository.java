@@ -14,5 +14,6 @@ import java.util.Optional;
 public interface SubjectMongoRepository extends MongoRepository<Subject, String> {
 
     Optional<Subject> findByName(String name);
+    boolean existsByName(String name);
     
 }

@@ -53,11 +53,14 @@ public class MapperUtils {
             return null;
         }
 
-        StudentDTO dto = new StudentDTO();
-        dto.setId(student.getId());
-        dto.setUsername(student.getUsername());
-        dto.setEmail(student.getEmail());
-        dto.setCodigo(student.getCodigo()); 
+        StudentDTO dto = new StudentDTO(
+            student.getId(),
+            student.getUsername(),
+            student.getEmail(),
+            student.getCodigo(),
+            student.getCareer()
+        );
+
 
         if (student.getSolicitudes() != null) {
             dto.setSolicitudesIds(
@@ -93,7 +96,7 @@ public class MapperUtils {
             dto.getUsername(),
             dto.getEmail(),
             "defaultPassword", // Contraseña temporal - debe ser actualizada
-            dto.getCodigo()
+            dto.getCode()
         );
     }
     

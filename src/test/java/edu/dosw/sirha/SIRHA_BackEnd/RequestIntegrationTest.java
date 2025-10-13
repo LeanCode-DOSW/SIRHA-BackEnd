@@ -1,10 +1,13 @@
 package edu.dosw.sirha.SIRHA_BackEnd;
 
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.*;
+import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.Careers;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.DiasSemana;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.RequestStateEnum;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateGroup.Group;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateRequest.*;
+import edu.dosw.sirha.SIRHA_BackEnd.dto.ResponseRequest;
+import edu.dosw.sirha.SIRHA_BackEnd.exception.SirhaException;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -43,23 +46,31 @@ class RequestIntegrationTest {
         physics = new Subject("102", "Física", 3);
         chemistry = new Subject("103", "Química", 4);
 
-        mathGroup1 = new Group(mathematics, 30, academicPeriod);
-        mathGroup2 = new Group(mathematics, 25, academicPeriod);
-        physicsGroup = new Group(physics, 20, academicPeriod);
+        try {
+            mathGroup1 = new Group(mathematics, 30, academicPeriod);
+            mathGroup2 = new Group(mathematics, 10, academicPeriod);
+            physicsGroup = new Group(physics, 20, academicPeriod);
+        } catch (Exception e) {
+            fail("No se esperaba una excepción al crear los grupos: " + e.getMessage());
+        }
+
         
-        mathGroup1.setId(1001);
-        mathGroup2.setId(1002);
-        physicsGroup.setId(1003);
-        
+        mathGroup1.setId("1001");
+        mathGroup2.setId("1002");
+        physicsGroup.setId("1003");
+
         mathSchedule1 = new Schedule(DiasSemana.LUNES, LocalTime.of(8, 0), LocalTime.of(10, 0));
         mathSchedule2 = new Schedule(DiasSemana.MARTES, LocalTime.of(10, 0), LocalTime.of(12, 0));
         physicsSchedule = new Schedule(DiasSemana.MIERCOLES, LocalTime.of(14, 0), LocalTime.of(16, 0));
+        try {
+            mathGroup1.addSchedule(mathSchedule1);
+            mathGroup2.addSchedule(mathSchedule2);
+            physicsGroup.addSchedule(physicsSchedule);
+        } catch (Exception e) {
+            fail("No se esperaba una excepción al agregar horarios: " + e.getMessage());
+        }
         
-        mathGroup1.addSchedule(mathSchedule1);
-        mathGroup2.addSchedule(mathSchedule2);
-        physicsGroup.addSchedule(physicsSchedule);
-        
-        studyPlan = new StudyPlan("Ingeniería de Sistemas");
+        studyPlan = new StudyPlan("Ingeniería de Sistemas", Careers.INGENIERIA_DE_SISTEMAS);
         studyPlan.addSubject(mathematics);
         studyPlan.addSubject(physics);
         studyPlan.addSubject(chemistry);
@@ -71,7 +82,11 @@ class RequestIntegrationTest {
 
     @Test
     void testCompleteGroupChangeWorkflow() {
-        student.enrollSubject(mathematics, mathGroup1);
+        try {
+            student.enrollSubject(mathematics, mathGroup1);
+        } catch (Exception e) {
+            fail("No se esperaba una excepción aquí");
+        }
         assertTrue(student.hasSubject(mathematics));
         assertTrue(mathGroup1.contieneEstudiante(student));
         
@@ -82,7 +97,11 @@ class RequestIntegrationTest {
         assertEquals(academicPeriod, solicitudCambio.getCurrentPeriod());
         assertNotNull(solicitudCambio.getCreadoEn());
         
-        solicitudCambio.reviewRequest("Iniciando revisión de cambio de grupo");
+        try{ 
+            solicitudCambio.reviewRequest(new ResponseRequest("Revisando disponibilidad", RequestStateEnum.EN_REVISION));
+        } catch (Exception e) {
+            fail("No se esperaba una excepción aquí");
+        }
         assertEquals(RequestStateEnum.EN_REVISION, solicitudCambio.getActualState());
         assertEquals(2, solicitudCambio.getProcesos().size());
         
@@ -92,18 +111,26 @@ class RequestIntegrationTest {
         
         assertFalse(mathSchedule1.seSolapaCon(mathSchedule2));
         
-        solicitudCambio.approveRequest("Cambio aprobado - cupos disponibles y sin conflictos");
+        try{ 
+            solicitudCambio.approveRequest(new ResponseRequest("Cupos disponibles", RequestStateEnum.APROBADA));
+        } catch (Exception e) {
+            fail("No se esperaba una excepción aquí");
+        }
         assertEquals(RequestStateEnum.APROBADA, solicitudCambio.getActualState());
         assertEquals(3, solicitudCambio.getProcesos().size());
         
-        assertEquals(RequestStateEnum.PENDIENTE, solicitudCambio.getProcesos().get(0).getEstado());
-        assertEquals(RequestStateEnum.EN_REVISION, solicitudCambio.getProcesos().get(1).getEstado());
-        assertEquals(RequestStateEnum.APROBADA, solicitudCambio.getProcesos().get(2).getEstado());
+        assertEquals(RequestStateEnum.PENDIENTE, solicitudCambio.getProcesos().get(0).getStatus());
+        assertEquals(RequestStateEnum.EN_REVISION, solicitudCambio.getProcesos().get(1).getStatus());
+        assertEquals(RequestStateEnum.APROBADA, solicitudCambio.getProcesos().get(2).getStatus());
     }
 
     @Test
     void testCompleteSubjectChangeWorkflow() {
-        student.enrollSubject(mathematics, mathGroup1);
+        try{ 
+            student.enrollSubject(mathematics, mathGroup1);
+        } catch (Exception e) {
+            fail("No se esperaba una excepción aquí");
+        }
         assertTrue(student.hasSubject(mathematics));
 
         CambioMateria solicitudCambio = new CambioMateria(student, mathematics, physics, mathGroup2, academicPeriod);
@@ -112,7 +139,11 @@ class RequestIntegrationTest {
         assertEquals(student, solicitudCambio.getStudent());
         assertEquals(academicPeriod, solicitudCambio.getCurrentPeriod());
         
-        solicitudCambio.reviewRequest("Revisando cambio de materia");
+        try{ 
+            solicitudCambio.reviewRequest(new ResponseRequest("Revisando conflictos de horario", RequestStateEnum.EN_REVISION));
+        } catch (Exception e) {
+            fail("No se esperaba una excepción aquí");
+        }
         assertEquals(RequestStateEnum.EN_REVISION, solicitudCambio.getActualState());
         
         assertTrue(studyPlan.hasSubject(mathematics));
@@ -122,8 +153,12 @@ class RequestIntegrationTest {
         assertTrue(physicsGroup.isOpen());
         
         assertFalse(mathSchedule1.seSolapaCon(physicsSchedule));
-        
-        solicitudCambio.approveRequest("Cambio de materia aprobado");
+
+        try{ 
+            solicitudCambio.approveRequest(new ResponseRequest("No hay conflictos - cambio aprobado", RequestStateEnum.APROBADA));
+        } catch (Exception e) {
+            fail("No se esperaba una excepción aquí");
+        }
         assertEquals(RequestStateEnum.APROBADA, solicitudCambio.getActualState());
         
         assertEquals(3, solicitudCambio.getProcesos().size());
@@ -131,34 +166,48 @@ class RequestIntegrationTest {
 
     @Test
     void testRejectedRequestWorkflow() {
-        for (int i = 0; i < 25; i++) {
-            Student otroStudent = new Student(String.valueOf(i + 100), "student" + i, "student" + i + "@test.com", "pass", "202400" + i);
-            mathGroup2.enrollStudent(otroStudent);
+        try {
+            for (int i = 0; i < 10; i++) {
+                Student otroStudent = new Student(String.valueOf(i + 100), "student" + i, "student" + i + "@test.com", "pass", "202400" + i);
+                mathGroup2.enrollStudent(otroStudent);
+            }
+        } catch (Exception e) {
+            fail("No se esperaba una excepción al llenar el grupo: " + e.getMessage());
         }
-        
         assertTrue(mathGroup2.isFull());
         assertEquals(0, mathGroup2.getCuposDisponibles());
-        
-        student.enrollSubject(mathematics, mathGroup1);
-        
+
+        try {
+            student.enrollSubject(mathematics, mathGroup1);
+        } catch (Exception e) {
+            fail("No se esperaba una excepción al inscribir al estudiante en el grupo: " + e.getMessage());
+        }
+
         CambioGrupo solicitudCambio = new CambioGrupo(student, mathematics, mathGroup2, academicPeriod);
         
 
-        solicitudCambio.reviewRequest("Revisando disponibilidad");
+        try{ 
+            solicitudCambio.reviewRequest(new ResponseRequest("Revisando disponibilidad", RequestStateEnum.EN_REVISION));
+        } catch (Exception e) {
+            fail("No se esperaba una excepción aquí");
+        }
         assertEquals(RequestStateEnum.EN_REVISION, solicitudCambio.getActualState());
         
-        solicitudCambio.rejectRequest("Grupo lleno - no hay cupos disponibles");
+        try{ 
+            solicitudCambio.rejectRequest(new ResponseRequest("No hay cupos disponibles", RequestStateEnum.RECHAZADA));
+        } catch (Exception e) {
+            fail("No se esperaba una excepción aquí");
+        }
         assertEquals(RequestStateEnum.RECHAZADA, solicitudCambio.getActualState());
         
         EstadoRechazada estadoFinal = new EstadoRechazada();
-        assertThrows(IllegalStateException.class, () -> 
-            estadoFinal.approveRequest(solicitudCambio));
+        assertThrows(SirhaException.class, () -> 
+            estadoFinal.approveRequest( solicitudCambio, new ResponseRequest("Intentando aprobar una solicitud rechazada", RequestStateEnum.APROBADA)));
     }
 
     @Test
     void testSubjectWithPrerequisitesWorkflow() {
         Subject calculus = new Subject("201", "Cálculo", 4);
-        Group calculusGroup = new Group(calculus, 20, academicPeriod);
         studyPlan.addSubject(calculus);
         
         MustHaveApprovedSubject prerequisiteRule = new MustHaveApprovedSubject(mathematics);
@@ -168,18 +217,38 @@ class RequestIntegrationTest {
         
         CambioMateria solicitudSinPrerequisito = new CambioMateria(student, physics, calculus, mathGroup2, academicPeriod);
         
-        solicitudSinPrerequisito.reviewRequest("Revisando prerequisitos");
-        
-        solicitudSinPrerequisito.rejectRequest("No cumple prerequisitos: Matemáticas requerida");
+        try{
+            solicitudSinPrerequisito.reviewRequest(new ResponseRequest("Revisando sin prerequisitos", RequestStateEnum.EN_REVISION));
+        } catch (Exception e) {
+            fail("No se esperaba una excepción aquí");
+        }
+
+        try {
+            solicitudSinPrerequisito.rejectRequest(new ResponseRequest("No cumple con los prerequisitos", RequestStateEnum.RECHAZADA));
+        } catch (Exception e) {
+            fail("No se esperaba una excepción aquí");
+        }
         assertEquals(RequestStateEnum.RECHAZADA, solicitudSinPrerequisito.getActualState());
         
-        student.enrollSubject(mathematics, mathGroup1);
-        
+        try { 
+            student.enrollSubject(mathematics, mathGroup1);
+        } catch (Exception e) {
+            fail("No se esperaba una excepción al inscribir la materia requerida: " + e.getMessage());
+        }
         CambioMateria solicitudConPrerequisito = new CambioMateria(student, physics, calculus, mathGroup2, academicPeriod);
 
-        solicitudConPrerequisito.reviewRequest("Revisando con prerequisitos cumplidos");
-        solicitudConPrerequisito.approveRequest("Prerequisitos cumplidos - cambio aprobado");
-        
+        try{ 
+            solicitudConPrerequisito.reviewRequest(new ResponseRequest("Revisando con prerequisitos", RequestStateEnum.EN_REVISION));
+        } catch (Exception e) {
+            fail("No se esperaba una excepción aquí");
+        }
+
+        try {
+            solicitudConPrerequisito.approveRequest(new ResponseRequest("Cumple con los prerequisitos", RequestStateEnum.APROBADA));
+        } catch (Exception e) {
+            fail("No se esperaba una excepción aquí");
+        }
+
         assertEquals(RequestStateEnum.APROBADA, solicitudConPrerequisito.getActualState());
     }
 
@@ -189,31 +258,44 @@ class RequestIntegrationTest {
         
         
         Subject conflictingSubject = new Subject("999", "Materia Conflictiva", 2);
-        Group conflictingGroup = new Group(conflictingSubject, 15, academicPeriod);
-        conflictingGroup.addSchedule(conflictingSchedule);
-        studyPlan.addSubject(conflictingSubject);
-        
-        student.enrollSubject(mathematics, mathGroup1); // Lunes 8-10
-        
-        assertTrue(mathSchedule1.seSolapaCon(conflictingSchedule));
+        try {
+            Group conflictingGroup = new Group(conflictingSubject, 15, academicPeriod);
+            conflictingGroup.addSchedule(conflictingSchedule);
+            studyPlan.addSubject(conflictingSubject);
+            
+            student.enrollSubject(mathematics, mathGroup1); // Lunes 8-10
 
-        CambioMateria solicitudConflicto = new CambioMateria(student, physics, conflictingSubject, conflictingGroup, academicPeriod);
+            assertTrue(mathSchedule1.seSolapaCon(conflictingSchedule));
 
-        solicitudConflicto.reviewRequest("Revisando conflictos de horario");
+            CambioMateria solicitudConflicto = new CambioMateria(student, physics, conflictingSubject, conflictingGroup, academicPeriod);
+
+            solicitudConflicto.reviewRequest(new ResponseRequest("Revisando conflictos de horario", RequestStateEnum.EN_REVISION));
+            solicitudConflicto.rejectRequest(new ResponseRequest("Conflicto de horario detectado", RequestStateEnum.RECHAZADA));
+            assertEquals(RequestStateEnum.RECHAZADA, solicitudConflicto.getActualState());
+        } catch (Exception e) {
+            fail("No se esperaba una excepción al preparar el escenario: " + e.getMessage());
+        }
         
-        solicitudConflicto.rejectRequest("Conflicto de horario detectado");
-        assertEquals(RequestStateEnum.RECHAZADA, solicitudConflicto.getActualState());
+    
     }
 
     @Test
     void testMultipleRequestsForSameStudent() {
         CambioGrupo solicitud1 = new CambioGrupo(student, mathematics, mathGroup2, academicPeriod);
-        solicitud1.reviewRequest("Revisando primera solicitud");
-        solicitud1.approveRequest("Primera solicitud aprobada");
+        try{
+            solicitud1.reviewRequest(new ResponseRequest("Revisando primera solicitud", RequestStateEnum.EN_REVISION));
+            solicitud1.approveRequest(new ResponseRequest("Primera solicitud aprobada", RequestStateEnum.APROBADA));
+        } catch (Exception e) {
+            fail("No se esperaba una excepción aquí");
+        }
         CambioMateria solicitud2 = new CambioMateria(student, mathematics, physics, mathGroup2, academicPeriod);
-        solicitud2.reviewRequest("Revisando segunda solicitud");
-        solicitud2.approveRequest("Segunda solicitud aprobada");
-        
+        try {
+            solicitud2.reviewRequest(new ResponseRequest("Revisando segunda solicitud", RequestStateEnum.EN_REVISION));
+            solicitud2.approveRequest(new ResponseRequest("Segunda solicitud aprobada", RequestStateEnum.APROBADA));
+        } catch (Exception e) {
+            fail("No se esperaba una excepción aquí");
+        }
+
         assertEquals(RequestStateEnum.APROBADA, solicitud1.getActualState());
         assertEquals(RequestStateEnum.APROBADA, solicitud2.getActualState());
         
@@ -225,25 +307,35 @@ class RequestIntegrationTest {
     void testStateTransitionValidation() {
         CambioGrupo solicitud = new CambioGrupo(student, mathematics, mathGroup2, academicPeriod);
         
-        assertEquals(RequestStateEnum.PENDIENTE, solicitud.getEstado().getState());
+        assertEquals(RequestStateEnum.PENDIENTE, solicitud.getEnumState().getState());
         
-        solicitud.reviewRequest("Iniciando revisión");
+        try{ 
+            solicitud.reviewRequest(new ResponseRequest("Iniciando revisión", RequestStateEnum.EN_REVISION));
+        } catch (Exception e) {
+            fail("No se esperaba una excepción aquí");
+        }
         assertEquals(RequestStateEnum.EN_REVISION, solicitud.getActualState());
-        
-        solicitud.approveRequest("Aprobada después de revisión");
+
+        try {
+            solicitud.approveRequest(new ResponseRequest("Aprobada después de revisión", RequestStateEnum.APROBADA));
+        } catch (Exception e) {
+            fail("No se esperaba una excepción aquí");
+        }
         assertEquals(RequestStateEnum.APROBADA, solicitud.getActualState());
         
         EstadoAprobada estadoFinal = new EstadoAprobada();
-        assertThrows(IllegalStateException.class, () -> 
-            estadoFinal.rejectRequest(solicitud));
-        assertThrows(IllegalStateException.class, () -> 
-            estadoFinal.pendingRequest(solicitud));
+        assertThrows(SirhaException.class, () -> 
+            estadoFinal.rejectRequest(solicitud, new ResponseRequest("Intentando rechazar una solicitud aprobada", RequestStateEnum.RECHAZADA)));
     }
 
     @Test
     void testRequestValidationLogic() {
 
-        student.enrollSubject(mathematics, mathGroup1);
+        try {
+            student.enrollSubject(mathematics, mathGroup1);
+        } catch (Exception e) {
+            fail("No se esperaba una excepción aquí");
+        }
         CambioGrupo solicitud = new CambioGrupo(student, mathematics, mathGroup2, academicPeriod);
         
         assertTrue(academicPeriod.isActive());

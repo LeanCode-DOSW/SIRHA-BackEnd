@@ -7,7 +7,6 @@ import edu.dosw.sirha.SIRHA_BackEnd.dto.StudentDTO;
 import edu.dosw.sirha.SIRHA_BackEnd.dto.SubjectDecoratorDTO;
 import edu.dosw.sirha.SIRHA_BackEnd.service.StudentService;
 import edu.dosw.sirha.SIRHA_BackEnd.util.MapperUtils;
-import io.micrometer.core.ipc.http.HttpSender.Response;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.AcademicPeriod;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.CambioGrupo;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.CambioMateria;
@@ -16,7 +15,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * Controlador REST para la gestión de estudiantes en el sistema SIRHA.
@@ -88,7 +86,7 @@ public class StudentController {
         return studentService.findAll()
                 .stream()
                 .map(MapperUtils::toDTO)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     /**
@@ -220,11 +218,16 @@ public class StudentController {
             dto.getUsername(), 
             dto.getEmail(),  
             "defaultPass", // Contraseña temporal - debe ser actualizada
-            dto.getCodigo()
+            dto.getCode()
         );
         
         Student savedStudent = studentService.save(newStudent);
         return MapperUtils.toDTO(savedStudent);
     }
+
+
+    
+
+    
 
 }

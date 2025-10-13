@@ -4,29 +4,23 @@ import java.util.List;
 
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.Professor;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.Schedule;
+import edu.dosw.sirha.SIRHA_BackEnd.domain.model.Subject;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateGroup.Group;
 
 public interface GroupService {
+    List<Group> findAllGroups();
+    Group saveGroup(Subject subject, Group group);
+    Group deleteGroupById(String id);
 
-    // ===== CRUD de grupos =====
-    List<Group> findAll();
-    Group findById(Integer id);
-    Group save(Group group);
-    void delete(Integer id);
+    Group assignProfessor(String groupId, Professor professor);
+    Group addSchedule(String groupId, Schedule schedule);
 
-    // Gestión de profesores
-    Group asignarProfesor(Integer groupId, Professor professor);
-    Professor getProfesor(Integer groupId);
+    Group findById(String id);
+    Professor getProfessor(String groupId);
+    List<Schedule> getSchedules(String groupId);
+    boolean isFull(String groupId);
+    int getAvailableSeats(String groupId);
 
-    // Gestión de horarios
-    Group agregarHorario(Integer groupId, Schedule schedule);
-    List<Schedule> getHorarios(Integer groupId);
-
-    // Capacidad
-    boolean estaLleno(Integer groupId);
-    int getCuposDisponibles(Integer groupId);
-
-    // Estado del grupo
-    Group cerrarGrupo(Integer groupId);
-    Group abrirGrupo(Integer groupId);
+    Group closeGroup(String groupId);
+    Group openGroup(String groupId);
 }

@@ -15,11 +15,11 @@ public interface SubjectState  {
     void reprobar(SubjectDecorator subject);
     void retirar(SubjectDecorator subject);
 
-    boolean puedeInscribirse();
-    boolean puedeAprobar();
-    boolean puedeReprobar();
-    boolean puedeRetirar();
-    boolean tieneGrupoAsignado();
-    String getEstadoNombre();
+    boolean canEnroll();
+    boolean canApprove();
+    boolean canFail();
+    boolean canDropSubject();
+    boolean hasAssignedGroup();
+    String getStatusName();
 
 }

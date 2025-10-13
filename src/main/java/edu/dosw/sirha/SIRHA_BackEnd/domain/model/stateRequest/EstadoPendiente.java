@@ -1,21 +1,29 @@
 package edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateRequest;
 
+import edu.dosw.sirha.SIRHA_BackEnd.domain.model.ResponseProcess;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.RequestStateEnum;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.port.RequestState;
+import edu.dosw.sirha.SIRHA_BackEnd.dto.ResponseRequest;
+import edu.dosw.sirha.SIRHA_BackEnd.exception.ErrorCodeSirha;
+import edu.dosw.sirha.SIRHA_BackEnd.exception.SirhaException;
 
 public class EstadoPendiente implements RequestState {
 
     @Override
-    public void approveRequest(BaseRequest solicitud) {throw new IllegalStateException("No puedes aprobar una solicitud pendiente directamente.");}
+    public void approveRequest(BaseRequest request, ResponseRequest response) throws SirhaException {
+        throw SirhaException.invalidStateTransition(request.getId(), RequestStateEnum.PENDIENTE, RequestStateEnum.APROBADA);
+    }
 
     @Override
-    public void rejectRequest(BaseRequest solicitud) {throw new IllegalStateException("No puedes rechazar una solicitud pendiente directamente.");}
+    public void rejectRequest(BaseRequest request, ResponseRequest response) throws SirhaException {
+        throw SirhaException.invalidStateTransition(request.getId(), RequestStateEnum.PENDIENTE, RequestStateEnum.RECHAZADA);
+    }
 
     @Override
-    public void pendingRequest(BaseRequest solicitud) {throw new IllegalStateException("La solicitud ya está en estado pendiente.");}
-
-    @Override
-    public void reviewRequest(BaseRequest solicitud) { }
+    public void reviewRequest(BaseRequest request, ResponseRequest response) {
+        request.setState(new EstadoEnRevision());
+        request.changeState(new ResponseProcess(response));
+    }
 
     @Override
     public RequestStateEnum getState() {

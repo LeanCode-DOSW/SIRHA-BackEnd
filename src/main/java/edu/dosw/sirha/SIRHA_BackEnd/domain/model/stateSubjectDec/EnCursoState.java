@@ -36,10 +36,10 @@ public class EnCursoState implements SubjectState {
         System.out.println("Materia reprobada.");
     }
 
-    public boolean puedeInscribirse() { return false; }
-    public boolean puedeAprobar() { return true; }
-    public boolean puedeReprobar() { return true; }
-    public boolean puedeRetirar() { return true; }
-    public boolean tieneGrupoAsignado() { return true; }
-    public String getEstadoNombre() { return "En Curso"; }
+    public boolean canEnroll() { return false; }
+    public boolean canApprove() { return true; }
+    public boolean canFail() { return true; }
+    public boolean canDropSubject() { return true; }
+    public boolean hasAssignedGroup() { return true; }
+    public String getStatusName() { return "En Curso"; }
 }

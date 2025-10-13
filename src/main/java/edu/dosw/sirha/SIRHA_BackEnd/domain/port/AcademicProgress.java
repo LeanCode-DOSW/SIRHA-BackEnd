@@ -8,10 +8,15 @@ import edu.dosw.sirha.SIRHA_BackEnd.domain.model.AcademicPeriod;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.Schedule;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.StudyPlan;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.Subject;
+import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.Careers;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.SemaforoColores;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateGroup.Group;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateSubjectDec.SubjectDecorator;
+import edu.dosw.sirha.SIRHA_BackEnd.dto.AcademicIndicatorsDTO;
+import edu.dosw.sirha.SIRHA_BackEnd.dto.RequestApprovalRateDTO;
+import edu.dosw.sirha.SIRHA_BackEnd.dto.StudentDTO;
 import edu.dosw.sirha.SIRHA_BackEnd.dto.SubjectDecoratorDTO;
+import edu.dosw.sirha.SIRHA_BackEnd.exception.SirhaException;
 
 /**
  * Interface que define el contrato para el progreso académico de un estudiante.
@@ -34,39 +39,41 @@ public interface AcademicProgress {
      * Obtiene las materias aprobadas (color verde).
      * @return lista de materias aprobadas
      */
-    List<SubjectDecorator> getMateriasAprobadas();
+    List<SubjectDecorator> getPassedSubjects();
     
     /**
      * Obtiene las materias que se están cursando actualmente (color amarillo).
      * @return lista de materias en curso
      */
-    List<SubjectDecorator> getMateriasCursando();
+    List<SubjectDecorator> getSubjectsInProgress();
     
     /**
      * Obtiene las materias reprobadas (color rojo).
      * @return lista de materias reprobadas
      */
-    List<SubjectDecorator> getMateriasReprobadas();
+    List<SubjectDecorator> getFailedSubjects();
     
     /**
      * Obtiene las materias no cursadas (color gris).
      * @return lista de materias no cursadas
      */
-    List<SubjectDecorator> getMateriasNoCursadas();
+    List<SubjectDecorator> getSubjectsNotTaken();
     
     /**
      * Calcula el total de créditos por color de semáforo.
      * @param color el color del semáforo a filtrar
      * @return total de créditos
      */
-    int getCreditosPorColor(SemaforoColores color);
+    int getCreditsByColor(SemaforoColores color);
     
+
+    int getSubjectsByColorCount(SemaforoColores color);
     /**
      * Obtiene las materias de un semestre específico.
      * @param semestre el semestre a consultar
      * @return lista de materias del semestre
      */
-    List<SubjectDecorator> getMateriasPorSemestre(int semestre);
+    List<SubjectDecorator> getSubjectsBySemester(int semestre);
     
     /**
      * Obtiene contadores por estado académico.
@@ -81,10 +88,11 @@ public interface AcademicProgress {
     boolean isSubjectReprobada(Subject subject);
     boolean isSubjectNoCursada(Subject subject);
 
-    int getMateriasAprobadasCount();
-    int getMateriasCursandoCount();
-    int getMateriasReprobadasCount();
-    int getMateriasNoCursadasCount();
+    int getTotalSubjectsCount();
+    int getPassedSubjectsCount();
+    int getSubjectsInProgressCount();
+    int getFailedSubjectsCount();
+    int getSubjectsNotTakenCount();
 
     StudyPlan getStudyPlan();
     Map<AcademicPeriod, List<Schedule>> getAllSchedules();
@@ -92,8 +100,23 @@ public interface AcademicProgress {
     void setCurrentAcademicPeriod(AcademicPeriod period);
 
     Map<SemaforoColores, List<SubjectDecoratorDTO>> getAcademicPensum();
+
+    Careers getCareer();
+    Map<SemaforoColores, Double> getPercentageByColor();
+
+    double getOverallProgressPercentage();
+    double getAcademicSuccessRate();
+    double getCompletedCreditsPercentage();
+
+    AcademicIndicatorsDTO getAcademicIndicators();
     
+    int getCreditsStudyPlan();
     boolean verifyChangeGroup(Subject subject, Group newGroup);
     void enrollSubjectInGroup(Subject subject, Group group);
-    //void unenrollSubjectFromGroup(Subject subject, Group group);
+
+    void approveSubject(String subject) throws SirhaException;
+    void failSubject(String subject) throws SirhaException;
+    void unenrollSubjectFromGroup(String subject, Group group) throws SirhaException;
+
+    void setSubjectSemester(String subjectName, int semester) throws SirhaException;
 }

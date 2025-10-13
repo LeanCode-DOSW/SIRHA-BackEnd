@@ -29,7 +29,7 @@ public class SubjectProgress implements SubjectStateProcess {
 
     public String getId() {return id;}
     public SemaforoColores getState() {return state;}
-    public LocalDateTime getCreadoEn() {return creadoEn;}
+    public LocalDateTime getCreatedAt() {return creadoEn;}
     public int getSemester() {return semestre;}
     public int getGrade() {return grade;}
     public Group getGroup() {return group;}

@@ -1,12 +1,16 @@
 package edu.dosw.sirha.SIRHA_BackEnd;
 
+import edu.dosw.sirha.SIRHA_BackEnd.domain.model.CambioGrupo;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.RequestStateEnum;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateRequest.*;
+import edu.dosw.sirha.SIRHA_BackEnd.dto.ResponseRequest;
+import edu.dosw.sirha.SIRHA_BackEnd.exception.SirhaException;
+
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
 /**
  * Pruebas unitarias para los estados de solicitudes (State Pattern)
@@ -14,112 +18,106 @@ import static org.mockito.Mockito.*;
 @SpringBootTest
 class RequestStateTest {
 
+    private BaseRequest testRequest;
+
+    @BeforeEach
+    void setUp() {
+        // Crear una instancia simple para las pruebas - solo necesitamos que exista
+        testRequest = new CambioGrupo(null, null, null, null);
+        testRequest.setId("TEST-001");
+    }
+
     @Test
     void testEstadoPendienteCanOnlyReview() {
         EstadoPendiente estadoPendiente = new EstadoPendiente();
-        BaseRequest mockRequest = mock(BaseRequest.class);
         
         assertEquals(RequestStateEnum.PENDIENTE, estadoPendiente.getState());
         
         // Solo debería permitir poner en revisión
-        assertDoesNotThrow(() -> estadoPendiente.reviewRequest(mockRequest));
+        assertDoesNotThrow(() -> estadoPendiente.reviewRequest(testRequest, new ResponseRequest("Poniendo en revisión", RequestStateEnum.EN_REVISION)));
         
         // No debería permitir otras operaciones
-        assertThrows(IllegalStateException.class, () -> estadoPendiente.approveRequest(mockRequest));
-        assertThrows(IllegalStateException.class, () -> estadoPendiente.rejectRequest(mockRequest));
-        assertThrows(IllegalStateException.class, () -> estadoPendiente.pendingRequest(mockRequest));
+        assertThrows(SirhaException.class, () -> estadoPendiente.approveRequest(testRequest, new ResponseRequest("Intentando aprobar", RequestStateEnum.APROBADA)));
+        assertThrows(SirhaException.class, () -> estadoPendiente.rejectRequest(testRequest, new ResponseRequest("Intentando rechazar", RequestStateEnum.RECHAZADA)));
     }
 
     @Test
     void testEstadoEnRevisionCanApproveOrReject() {
         EstadoEnRevision estadoEnRevision = new EstadoEnRevision();
-        BaseRequest mockRequest = mock(BaseRequest.class);
         
         assertEquals(RequestStateEnum.EN_REVISION, estadoEnRevision.getState());
         
         // Debería permitir aprobar y rechazar
-        assertDoesNotThrow(() -> estadoEnRevision.approveRequest(mockRequest));
-        assertDoesNotThrow(() -> estadoEnRevision.rejectRequest(mockRequest));
-        
+        assertDoesNotThrow(() -> estadoEnRevision.approveRequest(testRequest, new ResponseRequest("Aprobando solicitud", RequestStateEnum.APROBADA)));
+        assertDoesNotThrow(() -> estadoEnRevision.rejectRequest(testRequest, new ResponseRequest("Rechazando solicitud", RequestStateEnum.RECHAZADA)));
+
         // No debería permitir otras operaciones
-        assertThrows(IllegalStateException.class, () -> estadoEnRevision.pendingRequest(mockRequest));
-        assertThrows(IllegalStateException.class, () -> estadoEnRevision.reviewRequest(mockRequest));
+        assertThrows(SirhaException.class, () -> estadoEnRevision.reviewRequest(testRequest, new ResponseRequest("Intentando revisar", RequestStateEnum.EN_REVISION)));
     }
 
     @Test
     void testEstadoAprobadaIsTerminal() {
         EstadoAprobada estadoAprobada = new EstadoAprobada();
-        BaseRequest mockRequest = mock(BaseRequest.class);
         
         assertEquals(RequestStateEnum.APROBADA, estadoAprobada.getState());
         
         // No debería permitir ninguna operación (estado terminal)
-        assertThrows(IllegalStateException.class, () -> estadoAprobada.approveRequest(mockRequest));
-        assertThrows(IllegalStateException.class, () -> estadoAprobada.rejectRequest(mockRequest));
-        assertThrows(IllegalStateException.class, () -> estadoAprobada.pendingRequest(mockRequest));
-        assertThrows(IllegalStateException.class, () -> estadoAprobada.reviewRequest(mockRequest));
+        assertThrows(SirhaException.class, () -> estadoAprobada.approveRequest(testRequest, new ResponseRequest("Intentando aprobar una solicitud aprobada", RequestStateEnum.APROBADA)));
+        assertThrows(SirhaException.class, () -> estadoAprobada.rejectRequest(testRequest, new ResponseRequest("Intentando rechazar una solicitud aprobada", RequestStateEnum.RECHAZADA)));
+        assertThrows(SirhaException.class, () -> estadoAprobada.reviewRequest(testRequest, new ResponseRequest("Intentando revisar una solicitud aprobada", RequestStateEnum.EN_REVISION)));
     }
 
     @Test
     void testEstadoRechazadaIsTerminal() {
         EstadoRechazada estadoRechazada = new EstadoRechazada();
-        BaseRequest mockRequest = mock(BaseRequest.class);
         
         assertEquals(RequestStateEnum.RECHAZADA, estadoRechazada.getState());
         
         // No debería permitir ninguna operación (estado terminal)
-        assertThrows(IllegalStateException.class, () -> estadoRechazada.approveRequest(mockRequest));
-        assertThrows(IllegalStateException.class, () -> estadoRechazada.rejectRequest(mockRequest));
-        assertThrows(IllegalStateException.class, () -> estadoRechazada.pendingRequest(mockRequest));
-        assertThrows(IllegalStateException.class, () -> estadoRechazada.reviewRequest(mockRequest));
+        assertThrows(SirhaException.class, () -> estadoRechazada.approveRequest(testRequest, new ResponseRequest("Intentando aprobar una solicitud rechazada", RequestStateEnum.APROBADA)));
+        assertThrows(SirhaException.class, () -> estadoRechazada.rejectRequest(testRequest, new ResponseRequest("Intentando rechazar una solicitud rechazada", RequestStateEnum.RECHAZADA)));
+        assertThrows(SirhaException.class, () -> estadoRechazada.reviewRequest(testRequest, new ResponseRequest("Intentando revisar una solicitud rechazada", RequestStateEnum.EN_REVISION)));
     }
 
     @Test
     void testStateTransitionFlow() {
-        BaseRequest mockRequest = mock(BaseRequest.class);
-        
         // Flujo normal: Pendiente -> En Revisión -> Aprobada
         EstadoPendiente pendiente = new EstadoPendiente();
-        assertDoesNotThrow(() -> pendiente.reviewRequest(mockRequest));
+        assertDoesNotThrow(() -> pendiente.reviewRequest(testRequest, new ResponseRequest("Revisando solicitud", RequestStateEnum.EN_REVISION)));
         
         EstadoEnRevision enRevision = new EstadoEnRevision();
-        assertDoesNotThrow(() -> enRevision.approveRequest(mockRequest));
-        
+        assertDoesNotThrow(() -> enRevision.approveRequest(testRequest, new ResponseRequest("Aprobando solicitud", RequestStateEnum.APROBADA)));
+
         EstadoAprobada aprobada = new EstadoAprobada();
         assertEquals(RequestStateEnum.APROBADA, aprobada.getState());
     }
 
     @Test
     void testAlternativeStateTransitionFlow() {
-        BaseRequest mockRequest = mock(BaseRequest.class);
-        
         // Flujo alternativo: Pendiente -> En Revisión -> Rechazada
         EstadoPendiente pendiente = new EstadoPendiente();
-        assertDoesNotThrow(() -> pendiente.reviewRequest(mockRequest));
+        assertDoesNotThrow(() -> pendiente.reviewRequest(testRequest, new ResponseRequest("Revisando solicitud", RequestStateEnum.EN_REVISION)));
         
         EstadoEnRevision enRevision = new EstadoEnRevision();
-        assertDoesNotThrow(() -> enRevision.rejectRequest(mockRequest));
-        
+        assertDoesNotThrow(() -> enRevision.rejectRequest(testRequest, new ResponseRequest("Rechazando solicitud", RequestStateEnum.RECHAZADA)));
+
         EstadoRechazada rechazada = new EstadoRechazada();
         assertEquals(RequestStateEnum.RECHAZADA, rechazada.getState());
     }
 
     @Test
     void testInvalidStateTransitions() {
-        BaseRequest mockRequest = mock(BaseRequest.class);
-        
         // Verificar que las transiciones inválidas fallan
         EstadoPendiente pendiente = new EstadoPendiente();
-        assertThrows(IllegalStateException.class, () -> pendiente.approveRequest(mockRequest));
+        assertThrows(SirhaException.class, () -> pendiente.approveRequest(testRequest, new ResponseRequest("Intentando aprobar sin revisión", RequestStateEnum.APROBADA)));
         
         EstadoEnRevision enRevision = new EstadoEnRevision();
-        assertThrows(IllegalStateException.class, () -> enRevision.pendingRequest(mockRequest));
-        
+
         EstadoAprobada aprobada = new EstadoAprobada();
-        assertThrows(IllegalStateException.class, () -> aprobada.rejectRequest(mockRequest));
-        
+        assertThrows(SirhaException.class, () -> aprobada.rejectRequest(testRequest, new ResponseRequest("Intentando rechazar una solicitud aprobada", RequestStateEnum.RECHAZADA)));
+
         EstadoRechazada rechazada = new EstadoRechazada();
-        assertThrows(IllegalStateException.class, () -> rechazada.approveRequest(mockRequest));
+        assertThrows(SirhaException.class, () -> rechazada.approveRequest(testRequest, new ResponseRequest("Intentando aprobar una solicitud rechazada", RequestStateEnum.APROBADA)));
     }
 
     @Test
