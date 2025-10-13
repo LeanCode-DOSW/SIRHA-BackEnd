@@ -6,6 +6,7 @@ import java.util.Optional;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.Schedule;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.Student;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.SemaforoColores;
+import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateRequest.BaseRequest;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.AcademicPeriod;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.CambioGrupo;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.CambioMateria;
@@ -17,26 +18,28 @@ import edu.dosw.sirha.SIRHA_BackEnd.dto.RegisterRequest;
 import edu.dosw.sirha.SIRHA_BackEnd.dto.SubjectDecoratorDTO;
 
 public interface StudentService {
-    Optional<Student> login(String username, String password);
-    Student register(Student student);
-    
-
     AuthResponse registerStudent(RegisterRequest request);
     AuthResponse loginStudent(LoginRequest request);
+
 
     List<Student> findAll();
     Optional<Student> findById(String id);
     Optional<Student> findByUsername(String username);
     Optional<Student> findByEmail(String email);
 
-    boolean existsByCodigo(String codigo);
+    boolean existsByCode(String code);
     boolean existsByEmail(String email);
 
-    Student save(Student student);
+    Student save(Student student); //deberia ser un studentDTO
+    Student deleteById(String id);
 
     List<Schedule> getCurrentSchedule(String username);
     List<Schedule> getScheduleForPeriod(String username, String period);
     Map<AcademicPeriod,List<Schedule>> getAllSchedules(String username);
+    
+    List<BaseRequest> getAllRequests(String username);
+    BaseRequest getRequestById(String username, String requestId);
+    List<BaseRequest> getRequestsHistory(String username); // el historial son las solicitudes que ya fueron aprobadas o rechazadas
 
     Map<SemaforoColores,List<SubjectDecoratorDTO>> getAcademicPensum(String username);
 

@@ -8,11 +8,6 @@ import edu.dosw.sirha.SIRHA_BackEnd.dto.LoginRequest;
 import edu.dosw.sirha.SIRHA_BackEnd.dto.RegisterRequest;
 
 public interface AuthService {
-    Optional<Student> login(String username, String password);
-    Student register(Student student);
-
     AuthResponse registerStudent(RegisterRequest request);
     AuthResponse loginStudent(LoginRequest request);
-
-    
 }

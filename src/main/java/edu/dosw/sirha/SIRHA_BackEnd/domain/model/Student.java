@@ -3,22 +3,33 @@ package edu.dosw.sirha.SIRHA_BackEnd.domain.model;
 import java.util.List;
 import java.util.Map;
 import java.util.ArrayList;
+import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.Objects;
- 
+import java.util.stream.Collectors;
+
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import com.fasterxml.jackson.databind.JsonSerializable.Base;
+
+import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.Careers;
+import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.RequestStateEnum;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.SemaforoColores;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateGroup.Group;
+import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateRequest.BaseRequest;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateSubjectDec.SubjectDecorator;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.port.AcademicOperations;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.port.AcademicProgress;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.port.AcademicProgressViewer;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.port.PrerequisiteRule;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.port.RequestTo;
-import edu.dosw.sirha.SIRHA_BackEnd.domain.port.RequestProcess;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.port.ScheduleManager;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.port.SolicitudFactory;
+import edu.dosw.sirha.SIRHA_BackEnd.dto.AcademicIndicatorsDTO;
+import edu.dosw.sirha.SIRHA_BackEnd.dto.RequestApprovalRateDTO;
+import edu.dosw.sirha.SIRHA_BackEnd.dto.StudentDTO;
+import edu.dosw.sirha.SIRHA_BackEnd.dto.StudentReportDTO;
 import edu.dosw.sirha.SIRHA_BackEnd.dto.SubjectDecoratorDTO;
+import edu.dosw.sirha.SIRHA_BackEnd.exception.ErrorCodeSirha;
+import edu.dosw.sirha.SIRHA_BackEnd.exception.SirhaException;
 
 /**
  * Entidad del dominio que representa a un estudiante en el sistema SIRHA.
@@ -36,15 +47,17 @@ import edu.dosw.sirha.SIRHA_BackEnd.dto.SubjectDecoratorDTO;
 public class Student extends User implements SolicitudFactory, ScheduleManager, AcademicProgressViewer, AcademicOperations {
     private String codigo;
     private AcademicProgress academicProgress;
-    private List<RequestTo> solicitudes;
+    private List<BaseRequest> solicitudes;
     
  
     public Student() {
-        super();
+        solicitudes = new ArrayList<>();
     }
 
     public Student(String id, String username, String email, String passwordHash, String codigo) {
         super(id, username, email, passwordHash);
+        this.codigo = codigo;
+        solicitudes = new ArrayList<>();
     }
 
     /**
@@ -56,10 +69,8 @@ public class Student extends User implements SolicitudFactory, ScheduleManager, 
      */
     public Student(String username, String email, String passwordHash, String codigo) {
         super(username, email, passwordHash);
-        if (codigo == null || codigo.trim().isEmpty()) {
-            throw new IllegalStateException("El código de estudiante no puede ser null o vacío");
-        }
         this.codigo = codigo;
+        solicitudes = new ArrayList<>();
     }
 
     /**
@@ -69,7 +80,7 @@ public class Student extends User implements SolicitudFactory, ScheduleManager, 
      * a la lista de solicitudes del estudiante. La solicitud debe estar
      * completamente inicializada antes de agregarla.
      */
-    public void addRequest(RequestTo solicitud) {
+    public void addRequest(BaseRequest solicitud) {
         if (solicitud == null) {
             throw new IllegalStateException("La solicitud no puede ser null");
         }
@@ -79,6 +90,18 @@ public class Student extends User implements SolicitudFactory, ScheduleManager, 
         }
         
         this.solicitudes.add(solicitud);
+    }
+
+    public void removeRequest(BaseRequest solicitud) {
+        if (solicitud == null) {
+            throw new IllegalStateException("La solicitud no puede ser null");
+        }
+        
+        if (this.solicitudes == null || !this.solicitudes.contains(solicitud)) {
+            throw new IllegalStateException("La solicitud no existe en la lista del estudiante");
+        }
+        
+        this.solicitudes.remove(solicitud);
     }
  
     /**
@@ -124,11 +147,19 @@ public class Student extends User implements SolicitudFactory, ScheduleManager, 
      * Obtiene la lista de solicitudes del estudiante.
      * @return lista de solicitudes, nunca null (inicializada como lista vacía)
      */
-    public List<RequestTo> getSolicitudes() {
+    public List<BaseRequest> getSolicitudes() {
         if (solicitudes == null) {
             solicitudes = new ArrayList<>();
         }
         return new ArrayList<>(solicitudes);
+    }
+    
+    @Override
+    public Careers getCareer() {
+        if (academicProgress == null) {
+            return Careers.DEFAULT;
+        }
+        return academicProgress.getCareer();
     }
     
  
@@ -148,38 +179,44 @@ public class Student extends User implements SolicitudFactory, ScheduleManager, 
         return Objects.equals(codigo, student.codigo);
     }
     
-    public List<SubjectDecorator> getMateriasCursando() {
+    public List<SubjectDecorator> getSubjectsInProgress() {
         if (this.academicProgress == null) {
             return new ArrayList<>();
         }
-        return academicProgress.getMateriasCursando();
+        return academicProgress.getSubjectsInProgress();
     }
-    public int getMateriasCursandoCount() {
+    public int getTotalSubjectsCount() {
         if (academicProgress == null) {
             return 0;
         }
-        return academicProgress.getMateriasCursandoCount();
+        return academicProgress.getTotalSubjectsCount();
+    }
+    public int getSubjectsInProgressCount() {
+        if (academicProgress == null) {
+            return 0;
+        }
+        return academicProgress.getSubjectsInProgressCount();
     }
     
-    public int getMateriasAprobadasCount() {
+    public int getPassedSubjectsCount() {
         if (academicProgress == null) {
             return 0;
         }
-        return academicProgress.getMateriasAprobadasCount();
+        return academicProgress.getPassedSubjectsCount();
     }
    
-    public int getMateriasReprobadasCount() {
+    public int getFailedSubjectsCount() {
         if (academicProgress == null) {
             return 0;
         }
-        return academicProgress.getMateriasReprobadasCount();
+        return academicProgress.getFailedSubjectsCount();
     }
     
-    public int getMateriasNoCursadasCount() {
+    public int getSubjectsNotTakenCount() {
         if (academicProgress == null) {
             return 0;
         }
-        return academicProgress.getMateriasNoCursadasCount();
+        return academicProgress.getSubjectsNotTakenCount();
     }
     
     /**
@@ -188,11 +225,11 @@ public class Student extends User implements SolicitudFactory, ScheduleManager, 
      * @param semestre el semestre a consultar
      * @return lista de materias del semestre
      */
-    public List<SubjectDecorator> getMateriasPorSemestre(int semestre) {
+    public List<SubjectDecorator> getSubjectsBySemester(int semestre) {
         if (this.academicProgress == null) {
             return new ArrayList<>();
         }
-        return academicProgress.getMateriasPorSemestre(semestre);
+        return academicProgress.getSubjectsBySemester(semestre);
     }
  
     /**
@@ -201,40 +238,23 @@ public class Student extends User implements SolicitudFactory, ScheduleManager, 
      * @param color el color del semáforo a filtrar
      * @return total de créditos
      */
-    public int getCreditosPorColor(SemaforoColores color) {
+    public int getCreditsByColor(SemaforoColores color) {
         if (academicProgress == null) {
             return 0;
         }
-        return academicProgress.getCreditosPorColor(color);
+        return academicProgress.getCreditsByColor(color);
     }
  
    
-    /**
-     * Obtiene un resumen del progreso académico del estudiante.
-     *
-     * @return string con el resumen
-     */
-    public String getResumenAcademico() {
-        int aprobadas = getMateriasAprobadasCount();
-        int cursando = getMateriasCursandoCount();
-        int reprobadas = getMateriasReprobadasCount();
-        int noCursadas = getMateriasNoCursadasCount();
-        int creditosAprobados = getCreditosPorColor(SemaforoColores.VERDE);
-        int creditosCursando = getCreditosPorColor(SemaforoColores.AMARILLO);
- 
-        return String.format(
-            "Estudiante: %s - Aprobadas: %d (%d créditos) | Cursando: %d (%d créditos) | Reprobadas: %d | No Cursadas: %d",
-            codigo, aprobadas, creditosAprobados, cursando, creditosCursando, reprobadas, noCursadas
-        );
-    }
+    
  
  
-    public boolean tieneConflictoConHorario(Group nuevoGrupo) {
+    public boolean hasScheduleConflictWith(Group nuevoGrupo) {
         if (nuevoGrupo == null || academicProgress == null) {
             return false;
         }
- 
-        return getMateriasCursando().stream()
+
+        return getSubjectsInProgress().stream()
             .filter(materia -> materia.getGroup() != null)
             .anyMatch(materia -> materia.getGroup().conflictoConHorario(nuevoGrupo));
     }
@@ -249,7 +269,7 @@ public class Student extends User implements SolicitudFactory, ScheduleManager, 
         if (academicProgress == null) {
             return new ArrayList<>();
         }
-        return getMateriasCursando().stream()
+        return getSubjectsInProgress().stream()
             .filter(materia -> materia.getGroup() != null)
             .flatMap(materia -> materia.getGroup().getSchedules().stream())
             .toList();
@@ -260,8 +280,8 @@ public class Student extends User implements SolicitudFactory, ScheduleManager, 
      * 
      * @return true si tiene materias cursando, false en caso contrario
      */
-    public boolean tieneMateriasEnCurso() {
-        return getMateriasCursandoCount() > 0;
+    public boolean hasCoursesInProgress() {
+        return getSubjectsInProgressCount() > 0;
     }
     
     /**
@@ -269,11 +289,11 @@ public class Student extends User implements SolicitudFactory, ScheduleManager, 
      * 
      * @return total de créditos en curso
      */
-    public int getCreditosEnCurso() {
+    public int getCreditsInProgress() {
         if (academicProgress == null) {
             return 0;
         }
-        return getCreditosPorColor(SemaforoColores.AMARILLO);
+        return getCreditsByColor(SemaforoColores.AMARILLO);
     }
     
     /**
@@ -281,8 +301,8 @@ public class Student extends User implements SolicitudFactory, ScheduleManager, 
      * 
      * @return semestre actual calculado
      */
-    public int getSemestreActual() {
-        List<SubjectDecorator> cursando = getMateriasCursando();
+    public int getCurrentSemester() {
+        List<SubjectDecorator> cursando = getSubjectsInProgress();
         if (cursando.isEmpty()) {
             return 1; // Si no tiene materias en curso, asume primer semestre
         }
@@ -307,7 +327,7 @@ public class Student extends User implements SolicitudFactory, ScheduleManager, 
         if (academicProgress == null) {
             throw new IllegalStateException("El progreso académico no está inicializado");
         }
-        if (!academicProgress.getMateriasCursando().isEmpty()) {
+        if (!academicProgress.getSubjectsInProgress().isEmpty()) {
             throw new IllegalStateException("No se puede cambiar el período académico mientras hay materias en curso");
         }
         academicProgress.setCurrentAcademicPeriod(currentPeriod);
@@ -356,7 +376,7 @@ public class Student extends User implements SolicitudFactory, ScheduleManager, 
         }
         
         // 7. Verificar conflicto de horarios
-        if (tieneConflictoConHorario(group)) {
+        if (hasScheduleConflictWith(group)) {
             throw new IllegalStateException("Conflicto de horarios detectado");
         }
         
@@ -365,25 +385,41 @@ public class Student extends User implements SolicitudFactory, ScheduleManager, 
         return true;
     }
 
-    public void enrollSubject(Subject subject, Group group) {
+    public void enrollSubject(Subject subject, Group group) throws SirhaException {
         if (!canEnrollInGroup(subject, group)) {
-            throw new IllegalStateException("No se puede inscribir en la materia o grupo especificado");
+            throw SirhaException.of(ErrorCodeSirha.OPERATION_NOT_ALLOWED, "No se puede inscribir en la materia o grupo especificado");
         }
-        
         
         group.enrollStudent(this);
         academicProgress.enrollSubjectInGroup(subject, group);
+
         //academicProgress.recordEnrollment(subject, group, currentPeriod); despues
-        
-        /*try {   
-        } catch (Exception e) {
-            throw new RuntimeException("Error durante la inscripción: " + e.getMessage(), e);
-            //rollback si es necesario
-        }*/
+    }
+    public void enrollSubject(Subject subject, Group group, int Semester) throws SirhaException {
+        enrollSubject(subject, group);
+        academicProgress.setSubjectSemester(subject.getName(), Semester);
+
     }
 
-    public void unenrollSubject(Subject subject, Group group) {
-        throw new UnsupportedOperationException("Método no implementado aún"); //:C
+    @Override
+    public void unenrollSubject(Subject subject, Group group) throws SirhaException {
+        AcademicPeriod currentPeriod = getCurrentPeriod();
+        if (currentPeriod == null || !currentPeriod.isActive() || !group.sameAcademicPeriod(currentPeriod)) {
+            throw new IllegalStateException("El período académico no es válido para el grupo especificado");
+        }
+
+        group.unenrollStudent(this);
+        academicProgress.unenrollSubjectFromGroup(subject.getName(), group);
+    }
+
+    @Override
+    public void approveSubject(Subject subject) throws SirhaException {
+        academicProgress.approveSubject(subject.getName());
+    }
+
+    @Override
+    public void failSubject(Subject subject) throws SirhaException {
+        academicProgress.failSubject(subject.getName());
     }
 
     /*
@@ -411,7 +447,7 @@ public class Student extends User implements SolicitudFactory, ScheduleManager, 
         if (!newGroup.isOpen()) {
             throw new IllegalStateException("El nuevo grupo está cerrado");
         }
-        if (tieneConflictoConHorario(newGroup)) {
+        if (hasScheduleConflictWith(newGroup)) {
             throw new IllegalStateException("Conflicto de horarios con el nuevo grupo");
         }
         AcademicPeriod currentPeriod = getCurrentPeriod();
@@ -446,7 +482,7 @@ public class Student extends User implements SolicitudFactory, ScheduleManager, 
         if (!newGroup.isOpen()) {
             throw new IllegalStateException("El nuevo grupo está cerrado");
         }
-        if (tieneConflictoConHorario(newGroup)) {
+        if (hasScheduleConflictWith(newGroup)) {
             throw new IllegalStateException("Conflicto de horarios con el nuevo grupo");
         }
         AcademicPeriod currentPeriod = getCurrentPeriod();
@@ -456,13 +492,13 @@ public class Student extends User implements SolicitudFactory, ScheduleManager, 
         return true;
     }
 
-    public CambioGrupo createSolicitudCambioGrupo(Subject subject, Group newGroup) {
+    public CambioGrupo createGroupChangeRequest(Subject subject, Group newGroup) {
         validateChangeGroup(subject, newGroup);
         CambioGrupo solicitud = new CambioGrupo(this, subject, newGroup, getCurrentPeriod());
         addRequest(solicitud);
         return solicitud;
     }
-    public CambioMateria createSolicitudCambioMateria(Subject oldSubject, Subject newSubject, Group newGroup) {
+    public CambioMateria createSubjectChangeRequest(Subject oldSubject, Subject newSubject, Group newGroup) {
         validateChangeSubject(oldSubject, newSubject, newGroup);
         CambioMateria solicitud = new CambioMateria(this, oldSubject, newSubject, newGroup, getCurrentPeriod());
         addRequest(solicitud);
@@ -504,6 +540,213 @@ public class Student extends User implements SolicitudFactory, ScheduleManager, 
         }
         return academicProgress.getAcademicPensum();
     }
+
+
+    @Override
+    public Map<SemaforoColores, Double> getPercentageByColor() {
+        if (academicProgress == null) {
+            return new EnumMap<>(SemaforoColores.class);
+        }
+        return academicProgress.getPercentageByColor();
+    }
+
+    @Override
+    public StudentDTO getStudentBasicInfo() {
+        return new StudentDTO(
+            getId(),
+            getUsername(),
+            getEmail(),
+            getCodigo(),
+            getCareer()
+        );
+    }
+
+    @Override
+    public double getOverallProgressPercentage() {
+        if (academicProgress == null) {
+            return 0.0;
+        }
+        return academicProgress.getOverallProgressPercentage();
+    }
+
+    public double getAcademicSuccessRate(){
+        if (academicProgress == null) {
+            return 0.0;
+        }
+        return academicProgress.getAcademicSuccessRate();
+    }
+    public double getCompletedCreditsPercentage(){
+        if (academicProgress == null) {
+            return 0.0;
+        }
+        return academicProgress.getCompletedCreditsPercentage();
+    }
+
+    public AcademicIndicatorsDTO getAcademicIndicators(){
+        if (academicProgress == null) {
+            return null;
+        }
+        return academicProgress.getAcademicIndicators();
+    }
+
+    @Override
+    public StudentReportDTO generateCompleteReport() {
+        if (academicProgress == null) {
+            return null;
+        }
+        return new StudentReportDTO(
+            getStudentBasicInfo(),
+            getAcademicIndicators(),
+            getRequestApprovalRate()
+        );
+    }
+
+    /**
+     * Obtiene un resumen del progreso académico del estudiante.
+     *
+     * @return string con el resumen
+     */
+    @Override
+    public String getAcademicSummary() {
+        int aprobadas = getPassedSubjectsCount();
+        int cursando = getSubjectsInProgressCount();
+        int reprobadas = getFailedSubjectsCount();
+        int noCursadas = getSubjectsNotTakenCount();
+        int creditosAprobados = getCreditsByColor(SemaforoColores.VERDE);
+        int creditosCursando = getCreditsByColor(SemaforoColores.AMARILLO);
+ 
+        return String.format(
+            "Estudiante: %s del programa %s - Aprobadas: %d (%d créditos) | Cursando: %d (%d créditos) | Reprobadas: %d | No Cursadas: %d - Progreso: %.2f%%",
+            codigo, getCareer().getDisplayName(), aprobadas, creditosAprobados, cursando, creditosCursando, reprobadas, noCursadas, getOverallProgressPercentage()
+        );
+    }
+
+    @Override
+    public double getApprovalRequestPercentage() {
+        if (solicitudes == null || solicitudes.isEmpty()) {
+            return 0.0;
+        }
+        return getRequestApprovalRate().getApprovalRatePercentage();
+    }
+    @Override
+    public double getRejectionRequestPercentage(){
+        if (solicitudes == null || solicitudes.isEmpty()) {
+            return 0.0;
+        }
+        return getRequestApprovalRate().getRejectionRatePercentage();
+    }
+    @Override
+    public double getPendingRequestPercentage(){
+        if (solicitudes == null || solicitudes.isEmpty()) {
+            return 0.0;
+        }
+        return getRequestApprovalRate().getPendingRatePercentage();
+    }
+    @Override
+    public double getInReviewRequestPercentage(){
+        if (solicitudes == null || solicitudes.isEmpty()) {
+            return 0.0;
+        }
+        return getRequestApprovalRate().getInReviewRatePercentage();
+    }
+
+    @Override
+    public int getTotalRequestsMade(){
+        if (solicitudes == null) {
+            return 0;
+        }
+        return solicitudes.size();
+    }
+    @Override
+    public boolean hasActiveRequests() {
+        if (solicitudes == null) {
+            return false;
+        }
+        return solicitudes.stream().anyMatch(s -> s.getActualState() == RequestStateEnum.PENDIENTE || s.getActualState() == RequestStateEnum.EN_REVISION);
+    }
+
+
+    @Override
+    public RequestApprovalRateDTO getRequestApprovalRate() {
+        if (solicitudes == null || solicitudes.isEmpty()) {
+            return new RequestApprovalRateDTO(0, 
+            0, 0,
+            0, 0);
+        }
+        int totalRequests = getTotalRequestsMade();
+        int approvedRequests = getTotalApprovedRequests();
+        int rejectedRequests = getTotalRejectedRequests();
+        int pendingRequests = getTotalPendingRequests();
+        int inReviewRequests = getTotalInReviewRequests();
+
+        return new RequestApprovalRateDTO(
+            totalRequests,
+            approvedRequests,
+            rejectedRequests,
+            pendingRequests,
+            inReviewRequests
+        );
+    }
+
+    @Override
+    public int getTotalApprovedRequests() {
+        if (solicitudes == null) {
+            return 0;
+        }
+        return (int) solicitudes.stream().filter(s -> s.getActualState() == RequestStateEnum.APROBADA).count();
+    }
+
+    @Override
+    public int getTotalRejectedRequests() {
+        if (solicitudes == null) {
+            return 0;
+        }
+        return (int) solicitudes.stream().filter(s -> s.getActualState() == RequestStateEnum.RECHAZADA).count();
+    }
+
+    @Override
+    public int getTotalPendingRequests() {
+        if (solicitudes == null) {
+            return 0;
+        }
+        return (int) solicitudes.stream().filter(s -> s.getActualState() == RequestStateEnum.PENDIENTE).count();
+    }
+
+    @Override
+    public int getTotalInReviewRequests() {
+        if (solicitudes == null) {
+            return 0;
+        }
+        return (int) solicitudes.stream().filter(s -> s.getActualState() == RequestStateEnum.EN_REVISION).count();
+    }
+    @Override
+    public int getSubjectsByColorCount(SemaforoColores color) {
+        if (academicProgress == null) {
+            return 0;
+        }
+        return academicProgress.getSubjectsByColorCount(color);
+    }
     
+    public BaseRequest getRequestById(String requestId) {
+        if (solicitudes == null || solicitudes.isEmpty()) {
+            return null;
+        }
+        return solicitudes.stream()
+            .filter(s -> s.getId().equals(requestId))
+            .findFirst()
+            .orElse(null);
+    }
+    /*
+     * Devuelve el historial de solicitudes resueltas: aprobadas o rechazadas.
+     */
+    public List<BaseRequest> getRequestsHistory() {
+        if (solicitudes == null) {
+            return new ArrayList<>();
+        }
+        return solicitudes.stream()
+            .filter(s -> s.getActualState() == RequestStateEnum.APROBADA || s.getActualState() == RequestStateEnum.RECHAZADA)
+            .toList();
+    }
+
 }
  

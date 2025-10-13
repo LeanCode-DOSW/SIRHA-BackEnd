@@ -85,9 +85,9 @@ public class Subject {
 
     public String getId() {return id;}
     public String getName() {return name;}
-    public List<Group> getGrupos(){return groups;}
     public List<PrerequisiteRule> getPrerequisites() {return prerequisites;}
     public List<Group> getGroups() {return groups;}
+    public void deleteGroups() {this.groups.clear();}
     public int getCredits() {return credits;}
 
     public boolean canEnroll(AcademicProgress progress) {
@@ -115,5 +115,15 @@ public class Subject {
                 ", credits=" + credits +
                 ", grupos=" + groups.size() +
                 '}';
+    }
+
+    public List<Group> getOpenGroups() {
+        List<Group> openGroups = new ArrayList<>();
+        for (Group g : groups) {
+            if (g.isOpen()) {
+                openGroups.add(g);
+            }
+        }
+        return openGroups;
     }
 }

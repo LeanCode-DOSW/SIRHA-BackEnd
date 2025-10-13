@@ -12,6 +12,8 @@ import edu.dosw.sirha.SIRHA_BackEnd.domain.model.ResponseProcess;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.Student;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.*;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.port.*;
+import edu.dosw.sirha.SIRHA_BackEnd.dto.ResponseRequest;
+import edu.dosw.sirha.SIRHA_BackEnd.exception.SirhaException;
 
 /**
  * Clase abstracta base para todas las solicitudes académicas en el sistema SIRHA.
@@ -42,6 +44,7 @@ public abstract class BaseRequest implements RequestTo {
     private AcademicPeriod currentPeriod;
     private ArrayList<RequestProcess> procesos;
     private RequestState state;
+    private int priority;
 
     public BaseRequest(Student student, AcademicPeriod currentPeriod) {
         this.creadoEn = LocalDateTime.now();
@@ -58,43 +61,42 @@ public abstract class BaseRequest implements RequestTo {
 
     public List<RequestProcess> getProcesos() {return procesos;}
 
-    public RequestState getEstado() {return state;}
+    public int getPriority() {
+        return priority;
+    }
+
+    public void setPriority(int priority) {
+        this.priority = priority;
+    }
+
+    public RequestState getEnumState() {return state;}
     public AcademicPeriod getCurrentPeriod() {return currentPeriod;}
     public void setCurrentPeriod(AcademicPeriod currentPeriod) {this.currentPeriod = currentPeriod;}
 
 
-    public void approveRequest(String comentario){
-        state.approveRequest(this);
-        state = new EstadoAprobada();
-        changeState(new ResponseProcess(RequestStateEnum.APROBADA, comentario));
+    public void approveRequest(ResponseRequest response) throws SirhaException{
+        state.approveRequest(this, response);
     }
-    public void rejectRequest(String comentario){
-        state.rejectRequest(this);
-        state = new EstadoRechazada();
-        changeState(new ResponseProcess(RequestStateEnum.RECHAZADA, comentario));
-    }
-    public void pendingRequest(String comentario){
-        state.pendingRequest(this);
-        state = new EstadoPendiente();
-        changeState(new ResponseProcess(RequestStateEnum.PENDIENTE, comentario));
-    }
-    public void reviewRequest(String comentario){
-        state.reviewRequest(this);
-        state = new EstadoEnRevision();
-        changeState(new ResponseProcess(RequestStateEnum.EN_REVISION, comentario));
+    public void rejectRequest(ResponseRequest response) throws SirhaException{
+        state.rejectRequest(this, response);
     }
 
-    private void changeState(ResponseProcess proceso){
+    public void reviewRequest(ResponseRequest response) throws SirhaException{
+        state.reviewRequest(this, response);
+    }
+
+    void changeState(ResponseProcess proceso){
         agregarProceso(proceso);
-        setActualState(proceso.getEstado());
+        setActualState(proceso.getStatus());
     }
 
     public String getId() {return id;}
     public void setId(String id) {this.id = id;}
+    void setState(RequestState state) {this.state = state;}
 
     public RequestProcess getActualProcess(){return procesos.get(procesos.size() - 1);}
-    public RequestStateEnum getActualState(){return getActualProcess().getEstado();}
-    private void setActualState(RequestStateEnum estado){getActualProcess().setEstado(estado);}
+    public RequestStateEnum getActualState(){return getActualProcess().getStatus();}
+    private void setActualState(RequestStateEnum estado){getActualProcess().setStatus(estado);}
 
     /**
      * Obtiene la fecha y hora de creación de la solicitud.
@@ -103,4 +105,11 @@ public abstract class BaseRequest implements RequestTo {
     public LocalDateTime getCreadoEn() {return creadoEn;}
     public Student getStudent() {return student;}
 
+
+    public Careers getStudentCareer() {
+        if (student == null) {
+            return null;
+        }
+        return student.getCareer();
+    }
 }

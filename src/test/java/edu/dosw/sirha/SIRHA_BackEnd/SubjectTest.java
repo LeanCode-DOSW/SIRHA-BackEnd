@@ -140,30 +140,40 @@ class SubjectTest {
     void addGrupoTest() {
         Subject s = new Subject("101", "Matemáticas", 4);
         AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
-        Group g = new Group(s, 30, period);
-        g.setId(1);
-
-        assertTrue(s.hasGroup(g));
-        assertEquals(1, s.getGroups().size());
-        assertTrue(s.getGroups().contains(g));
+        try {
+            Group g = new Group(s, 30, period);
+            g.setId("1");
+            assertTrue(s.hasGroup(g));
+            assertEquals(1, s.getGroups().size());
+            assertTrue(s.getGroups().contains(g));
+        } catch (Exception e) {
+            fail("No se esperaba una excepción al crear el grupo: " + e.getMessage());
+        }
+        
     }
 
     @Test
     void addMultiplesGruposTest() {
         Subject s = new Subject("101", "Matemáticas", 4);
         AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
-        Group g1 = new Group(s, 30, period);
-        Group g2 = new Group(s, 25, period);
-        Group g3 = new Group(s, 20, period);
+        try {
+            Group g1 = new Group(s, 30, period);
+            Group g2 = new Group(s, 25, period);
+            Group g3 = new Group(s, 20, period);
 
-        g1.setId(1);
-        g2.setId(2);
-        g3.setId(3);
+            g1.setId("1");
+            g2.setId("2");
+            g3.setId("3");
 
-        assertEquals(3, s.getGroups().size());
-        assertTrue(s.hasGroup(g1));
-        assertTrue(s.hasGroup(g2));
-        assertTrue(s.hasGroup(g3));
+            assertEquals(3, s.getGroups().size());
+            assertTrue(s.hasGroup(g1));
+            assertTrue(s.hasGroup(g2));
+            assertTrue(s.hasGroup(g3));
+        } catch (Exception e) {
+            fail("No se esperaba una excepción al crear los grupos: " + e.getMessage());
+        }
+
+        
     }
 
     @Test
@@ -178,42 +188,54 @@ class SubjectTest {
     void removeGroupTest() {
         Subject s = new Subject("101", "Matemáticas", 4);
         AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
-        Group g1 = new Group(s, 30, period);
-        Group g2 = new Group(s, 25, period);
+        try {
+            Group g1 = new Group(s, 30, period);
+            Group g2 = new Group(s, 25, period);
 
-        g1.setId(1);
-        g2.setId(2);
+            g1.setId("1");
+            g2.setId("2");
 
-        boolean removed = s.removeGroup(g2);
+            boolean removed = s.removeGroup(g2);
 
-        assertTrue(removed);
-        assertFalse(s.hasGroup(g2));
-        assertTrue(s.hasGroup(g1));
-        assertEquals(1, s.getGroups().size());
+            assertTrue(removed);
+            assertFalse(s.hasGroup(g2));
+            assertTrue(s.hasGroup(g1));
+            assertEquals(1, s.getGroups().size());
+        } catch (Exception e) {
+            fail("No se esperaba una excepción al crear los grupos: " + e.getMessage());
+        }
     }
 
     @Test
     void removeGrupoNoExistenteTest() {
         Subject s = new Subject("101", "Matemáticas", 4);
         AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
-        Group g1 = new Group(s, 30, period);
-        Group g2 = new Group(s, 25, period);
+        try {
+            Group g1 = new Group(s, 30, period);
+            Group g2 = new Group(s, 25, period);
 
-        g1.setId(1);
-        g2.setId(2);
+            g1.setId("1");
+            g2.setId("2");
 
-        assertTrue(s.removeGroup(g2));
-        assertTrue(s.hasGroup(g1));
-        assertEquals(1, s.getGroups().size());
+            assertTrue(s.removeGroup(g2));
+            assertTrue(s.hasGroup(g1));
+            assertEquals(1, s.getGroups().size());
+        } catch (Exception e) {
+            fail("No se esperaba una excepción al crear los grupos: " + e.getMessage());
+        }
     }
 
     @Test
     void hasGroupTrueTest() {
         Subject s = new Subject("101", "Matemáticas", 4);
         AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
-        Group g = new Group(s, 30, period);
-        g.setId(1);
-        assertTrue(s.hasGroup(g));
+        try {
+            Group g = new Group(s, 30, period);
+            g.setId("1");
+            assertTrue(s.hasGroup(g));
+        } catch (Exception e) {
+            fail("No se esperaba una excepción al crear el grupo: " + e.getMessage());
+        }
     }
 
     @Test
@@ -221,11 +243,15 @@ class SubjectTest {
         Subject s = new Subject("101", "Matemáticas", 4);
         Subject s2 = new Subject("102", "Física", 6);
         AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
-        Group g1 = new Group(s, 30, period);
-        Group g2 = new Group(s2, 25, period);
-        g1.setId(1);
-        g2.setId(2);
-        assertFalse(s.hasGroup(g2));
+        try {
+            Group g1 = new Group(s, 30, period);
+            Group g2 = new Group(s2, 25, period);
+            g1.setId("1");
+            g2.setId("2");
+            assertFalse(s.hasGroup(g2));
+        } catch (Exception e) {
+            fail("No se esperaba una excepción al crear los grupos: " + e.getMessage());
+        }
     }
 
     @Test
@@ -280,18 +306,22 @@ class SubjectTest {
     void toStringTest() {
         Subject s = new Subject("101", "Matemáticas", 4);
         AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
-        Group g1 = new Group(s, 30, period);
-        Group g2 = new Group(s, 25, period);
+        try {
+            Group g1 = new Group(s, 30, period);
+            Group g2 = new Group(s, 25, period);
 
-        g1.setId(1);
-        g2.setId(2);
+            g1.setId("1");
+            g2.setId("2");
 
-        String result = s.toString();
+            String result = s.toString();
 
-        assertTrue(result.contains("101"));
-        assertTrue(result.contains("Matemáticas"));
-        assertTrue(result.contains("4"));
-        assertTrue(result.contains("2")); // Número de grupos
+            assertTrue(result.contains("101"));
+            assertTrue(result.contains("Matemáticas"));
+            assertTrue(result.contains("4"));
+            assertTrue(result.contains("2")); // Número de grupos
+        } catch (Exception e) {
+            fail("No se esperaba una excepción al crear los grupos: " + e.getMessage());
+        }
     }
 
     @Test
@@ -311,53 +341,65 @@ class SubjectTest {
     void addMismoGrupoDosVecesTest() {
         Subject s = new Subject("101", "Matemáticas", 4);
         AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
-        Group g = new Group(s, 30, period);
-        g.setId(1);
+        try {
+            Group g = new Group(s, 30, period);
+            g.setId("1");
 
-        s.addGroup(g); // Añadir el mismo grupo otra vez
+            s.addGroup(g); // Añadir el mismo grupo otra vez
 
-        assertEquals(2, s.getGroups().size());
-        assertTrue(s.hasGroup(g));
+            assertEquals(2, s.getGroups().size());
+            assertTrue(s.hasGroup(g));
+        } catch (Exception e) {
+            fail("No se esperaba una excepción al crear el grupo: " + e.getMessage());
+        }
     }
 
     @Test
     void removeFromEmptyListTest() {
         Subject s = new Subject("101", "Matemáticas", 4);
         AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
-        Group g = new Group(s, 30, period);
-        g.setId(1);
-        boolean removed = s.removeGroup(g);
-        assertTrue(removed);
-        assertEquals(0, s.getGroups().size());
+        try {
+            Group g = new Group(s, 30, period);
+            g.setId("1");
+            boolean removed = s.removeGroup(g);
+            assertTrue(removed);
+            assertEquals(0, s.getGroups().size());
+        } catch (Exception e) {
+            fail("No se esperaba una excepción al crear el grupo: " + e.getMessage());
+        }
     }
 
     @Test
     void addRemoveMultipleOperationsTest() {
         Subject s = new Subject("101", "Matemáticas", 4);
         AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
-        Group g1 = new Group(s, 30, period);
-        Group g2 = new Group(s, 25, period);
-        Group g3 = new Group(s, 20, period);
+        try {
+            Group g1 = new Group(s, 30, period);
+            Group g2 = new Group(s, 25, period);
+            Group g3 = new Group(s, 20, period);
 
-        g1.setId(1);
-        g2.setId(2);
-        g3.setId(3);
+            g1.setId("1");
+            g2.setId("2");
+            g3.setId("3");
 
-        assertEquals(3, s.getGroups().size());
+            assertEquals(3, s.getGroups().size());
 
-        s.removeGroup(g2);
-        assertEquals(2, s.getGroups().size());
-        assertFalse(s.hasGroup(g2));
+            s.removeGroup(g2);
+            assertEquals(2, s.getGroups().size());
+            assertFalse(s.hasGroup(g2));
 
-        Group g4 = new Group(s, 15, period);
-        g4.setId(4);
-        assertEquals(3, s.getGroups().size());
-        assertTrue(s.hasGroup(g4));
+            Group g4 = new Group(s, 15, period);
+            g4.setId("4");
+            assertEquals(3, s.getGroups().size());
+            assertTrue(s.hasGroup(g4));
 
-        s.removeGroup(g1);
-        s.removeGroup(g3);
-        s.removeGroup(g4);
-        assertEquals(0, s.getGroups().size());
+            s.removeGroup(g1);
+            s.removeGroup(g3);
+            s.removeGroup(g4);
+            assertEquals(0, s.getGroups().size());
+        } catch (Exception e) {
+            fail("No se esperaba una excepción al crear los grupos: " + e.getMessage());
+        }
     }
 
     @Test

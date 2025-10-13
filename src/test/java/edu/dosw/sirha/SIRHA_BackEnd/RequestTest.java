@@ -1,6 +1,7 @@
 package edu.dosw.sirha.SIRHA_BackEnd;
 
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.*;
+import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.Careers;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.DiasSemana;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.RequestStateEnum;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateGroup.Group;
@@ -30,22 +31,27 @@ class RequestTest {
         AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
         Subject subject = new Subject("101", "Matemáticas", 4);
 
-        Group group = new Group(subject, 30, period);
-        
-        StudyPlan studyPlan = new StudyPlan("Ingeniería de Sistemas");
-        studyPlan.addSubject(subject);
-        
-        Semaforo semaforo = new Semaforo(studyPlan);
+        try {
+            Group group = new Group(subject, 30, period);
+            StudyPlan studyPlan = new StudyPlan("Ingeniería de Sistemas", Careers.INGENIERIA_DE_SISTEMAS);
+            studyPlan.addSubject(subject);
+            
+            Semaforo semaforo = new Semaforo(studyPlan);
 
-        student.setAcademicProgress(semaforo);
+            student.setAcademicProgress(semaforo);
+            
+            SubjectDecorator decorator = new SubjectDecorator(subject);
+            assertTrue(decorator.getState() instanceof NoCursadaState);
+            
+            assertTrue(studyPlan.hasSubject(subject));
+            assertTrue(group.getGroupState() instanceof StatusOpen);
+            assertFalse(decorator.getState().canApprove());
+            assertTrue(decorator.getState().canEnroll());
+        } catch (Exception e) {
+            fail("No se esperaba una excepción al crear el grupo: " + e.getMessage());
+        }
+
         
-        SubjectDecorator decorator = new SubjectDecorator(subject);
-        assertTrue(decorator.getState() instanceof NoCursadaState);
-        
-        assertTrue(studyPlan.hasSubject(subject));
-        assertTrue(group.getGroupState() instanceof StatusOpen);
-        assertFalse(decorator.getState().puedeAprobar());
-        assertTrue(decorator.getState().puedeInscribirse());
     }
 
 
@@ -53,14 +59,18 @@ class RequestTest {
     void testGroupStateValidation() {
         AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
         Subject subject = new Subject("101", "Matemáticas", 4);
-        Group group = new Group(subject, 30, period);
+        try {
+            Group group = new Group(subject, 30, period);
         
-        assertTrue(group.getGroupState() instanceof StatusOpen);
-        assertTrue(group.isOpen());
-        
-        group.closeGroup();
-        assertTrue(group.getGroupState() instanceof StatusClosed);
-        assertFalse(group.isOpen());
+            assertTrue(group.getGroupState() instanceof StatusOpen);
+            assertTrue(group.isOpen());
+            
+            group.closeGroup();
+            assertTrue(group.getGroupState() instanceof StatusClosed);
+            assertFalse(group.isOpen());
+        } catch (Exception e) {
+            fail("No se esperaba una excepción al crear el grupo: " + e.getMessage());
+        }
     }
 
     @Test
@@ -69,66 +79,72 @@ class RequestTest {
         Subject subject = new Subject("101", "Matemáticas", 4);
 
         Schedule schedule1 = new Schedule(DiasSemana.LUNES, LocalTime.of(8, 0), LocalTime.of(10, 0));
-        Group group1 = new Group(subject, 30, period);
-        group1.addSchedule(schedule1);
-        
-        Schedule schedule2 = new Schedule(DiasSemana.LUNES, LocalTime.of(9, 0), LocalTime.of(11, 0));
-        Group group2 = new Group(subject, 25, period);
-        group2.addSchedule(schedule2);
-        
-        assertEquals(1, group1.getSchedules().size());
-        assertEquals(1, group2.getSchedules().size());
-        
-        assertTrue(schedule1.seSolapaCon(schedule2));
+        try {
+            Group group1 = new Group(subject, 30, period);
+            group1.addSchedule(schedule1);
+            
+            Schedule schedule2 = new Schedule(DiasSemana.LUNES, LocalTime.of(9, 0), LocalTime.of(11, 0));
+            Group group2 = new Group(subject, 25, period);
+            group2.addSchedule(schedule2);
+            
+            assertEquals(1, group1.getSchedules().size());
+            assertEquals(1, group2.getSchedules().size());
+            
+            assertTrue(schedule1.seSolapaCon(schedule2));
+        } catch (Exception e) {
+            fail("No se esperaba una excepción al crear los grupos o agregar horarios: " + e.getMessage());
+        }
     }
 
     @Test
     void testPrerequisiteValidation() {
         AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
 
-        StudyPlan studyPlan = new StudyPlan("Ingenieria de Sistemas");
+        StudyPlan studyPlan = new StudyPlan("Ingenieria de Sistemas", Careers.INGENIERIA_DE_SISTEMAS);
         Subject prerequisite = new Subject("100", "Algebra", 3);
         MustHaveApprovedSubject rule = new MustHaveApprovedSubject(prerequisite);
         Subject mainSubject = new Subject("101", "Calculo", 4);
 
-        Group group1 = new Group(prerequisite, 30, period);
-        Group group2 = new Group(mainSubject, 25, period);
+        try {
+            Group group1 = new Group(prerequisite, 30, period);
+            Group group2 = new Group(mainSubject, 25, period);
+
+            studyPlan.addSubject(prerequisite);
+            studyPlan.addSubject(mainSubject);
+
+            mainSubject.addPrerequisite(rule);
+
+            Student student = new Student("1", "juan.perez", "juan@example.com", "hashedPassword", "20231001");
+            Semaforo semaforo = new Semaforo(studyPlan);
+            student.setAcademicProgress(semaforo);
+            student.setCurrentPeriod(period);
 
 
-        studyPlan.addSubject(prerequisite);
-        studyPlan.addSubject(mainSubject);
-
-        mainSubject.addPrerequisite(rule);
-
-        Student student = new Student("1", "juan.perez", "juan@example.com", "hashedPassword", "20231001");
-        Semaforo semaforo = new Semaforo(studyPlan);
-        student.setAcademicProgress(semaforo);
-        student.setCurrentPeriod(period);
+            assertNotNull(student.getAcademicProgress());
+            assertEquals(2, student.getAcademicProgress().getSubjects().size());
+            assertEquals(2, student.getAcademicProgress().getSubjectsNotTaken().size());
+            assertTrue(student.getAcademicProgress().hasSubject(mainSubject));
+            assertTrue(student.getAcademicProgress().hasSubject(prerequisite));
 
 
-        assertNotNull(student.getAcademicProgress());
-        assertEquals(2, student.getAcademicProgress().getSubjects().size());
-        assertEquals(2, student.getAcademicProgress().getMateriasNoCursadas().size());
-        assertTrue(student.getAcademicProgress().hasSubject(mainSubject));
-        assertTrue(student.getAcademicProgress().hasSubject(prerequisite));
+            assertThrows(IllegalStateException.class, () -> {
+                student.enrollSubject(mainSubject, group2);
+            });
 
+            assertTrue(mainSubject.hasPrerequisites());
+            assertTrue(mainSubject.getPrerequisites().contains(rule));
 
-        assertThrows(IllegalStateException.class, () -> {
+            student.enrollSubject(prerequisite, group1);
+            student.approveSubject(prerequisite);
             student.enrollSubject(mainSubject, group2);
-        });
+            student.approveSubject(mainSubject);
 
-        assertTrue(mainSubject.hasPrerequisites());
-        assertTrue(mainSubject.getPrerequisites().contains(rule));
-
-        student.enrollSubject(prerequisite, group1);   
+            assertTrue(student.hasSubject(prerequisite));
+            assertTrue(student.hasSubject(mainSubject));
+        } catch (Exception e) {
+            fail("No se esperaba una excepción al crear los grupos o inscribir materias: " + e.getMessage());
+        }
         
-        student.getAcademicProgress().getMateriasCursando().get(0).aprobar();   // AQUI USAR METODO APROVAR MATERIA DESDE STUDENT
-        
-
-        student.enrollSubject(mainSubject, group2);
-
-        assertTrue(student.hasSubject(prerequisite));
-        assertTrue(student.hasSubject(mainSubject));
     }
 
     @Test
@@ -146,7 +162,7 @@ class RequestTest {
 
     @Test
     void testStudyPlanConfiguration() {
-        StudyPlan studyPlan = new StudyPlan("Ingeniería de Sistemas"); // Constructor con nombre
+        StudyPlan studyPlan = new StudyPlan("Ingeniería de Sistemas", Careers.INGENIERIA_DE_SISTEMAS); // Constructor con nombre
         Subject subject1 = new Subject("101", "Matemáticas", 4);
         Subject subject2 = new Subject("102", "Física", 3);
         Subject subject3 = new Subject("103", "Química", 4);

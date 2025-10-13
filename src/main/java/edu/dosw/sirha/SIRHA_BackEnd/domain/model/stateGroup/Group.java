@@ -2,6 +2,7 @@ package edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateGroup;
 
 import java.util.*;
 
+import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.AcademicPeriod;
@@ -10,6 +11,8 @@ import edu.dosw.sirha.SIRHA_BackEnd.domain.model.Schedule;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.Student;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.Subject;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.port.GroupState;
+import edu.dosw.sirha.SIRHA_BackEnd.exception.ErrorCodeSirha;
+import edu.dosw.sirha.SIRHA_BackEnd.exception.SirhaException;
 
 /**
  * Entidad del dominio que representa un grupo académico en el sistema SIRHA.
@@ -36,7 +39,8 @@ import edu.dosw.sirha.SIRHA_BackEnd.domain.port.GroupState;
  */
 @Document(collection = "groups")
 public class Group {
-    private int id;
+    @Id
+    private String id;
     private String code;
     private int capacidad;
     private int inscritos;
@@ -54,10 +58,11 @@ public class Group {
      *
      * Inicializa el grupo con una capacidad específica y lo establece
      * en estado ABIERTO por defecto. La lista de estudiantes se inicializa vacía.
+     * @throws SirhaException 
      */
-    public Group(Subject subject,int capacidad, AcademicPeriod currentPeriod) {
+    public Group(Subject subject,int capacidad, AcademicPeriod currentPeriod) throws SirhaException {
         if (capacidad <= 0) {
-            throw new IllegalArgumentException("La capacidad del grupo debe ser mayor a cero");
+            throw SirhaException.of(ErrorCodeSirha.INVALID_CAPACITY_GROUP, "La capacidad del grupo debe ser mayor a cero");
         }
         curso = subject;
         setCapacidad(capacidad);
@@ -69,9 +74,9 @@ public class Group {
         schedules = new ArrayList<>();
         addToSubject();
     }
-    public void setEstadoGrupo(GroupState estado) {
+    void setEstadoGrupo(GroupState estado) throws SirhaException {
         if (estado == null) {
-            throw new IllegalArgumentException("El estado del grupo no puede ser null");
+            throw SirhaException.of(ErrorCodeSirha.INVALID_ARGUMENT, "El estado del grupo no puede ser null");
         }
         this.estadoGrupo = estado;
     }
@@ -100,10 +105,11 @@ public class Group {
      * - Cambiar el estado del grupo si es necesario
      *
      * @param estudiante estudiante a inscribir en el grupo. No debe ser null.
+     * @throws SirhaException 
      */
-    public void inscribirEstudiante(Student estudiante) {
+    public void inscribirEstudiante(Student estudiante) throws SirhaException {
         if (estudiante == null) {
-            throw new IllegalArgumentException("El estudiante no puede ser null");
+            throw SirhaException.of(ErrorCodeSirha.INVALID_ARGUMENT, "El estudiante no puede ser null");
         }
 
         estadoGrupo.addStudent(this, estudiante);
@@ -132,15 +138,16 @@ public class Group {
      * Validaciones realizadas:
      * - Verifica que el estudiante no esté ya inscrito
      * - Mantiene consistencia entre la lista y el contador
+     * @throws SirhaException 
      *
      */
-    void addStudent(Student estudiante) {
+    void addStudent(Student estudiante) throws SirhaException {
         if (estudiante == null) {
-            throw new IllegalArgumentException("El estudiante no puede ser null");
+            throw SirhaException.of(ErrorCodeSirha.INVALID_ARGUMENT, "El estudiante no puede ser null");
         }
 
         if (estudiantes.contains(estudiante)) {
-            throw new IllegalArgumentException("El estudiante ya está inscrito en el grupo");
+            throw SirhaException.of(ErrorCodeSirha.STUDENT_ALREADY_IN_GROUP);
         }
 
         estudiantes.add(estudiante);
@@ -152,23 +159,21 @@ public class Group {
      *
      * Elimina al estudiante de la lista y actualiza el contador.
      * Puede cambiar el estado del grupo si es necesario.
+     * @throws SirhaException 
      */
-    void removeStudent(Student estudiante) {
-        if (estudiante == null) {
-            throw new IllegalArgumentException("El estudiante no puede ser null");
-        }
-        if (!estudiantes.contains(estudiante)) {
-            throw new IllegalArgumentException("El estudiante no está inscrito en el grupo");
+    void removeStudent(Student estudiante) throws SirhaException {
+        if (!estudiantes.contains(estudiante) || estudiante == null || estudiante.hasSubject(curso)) {
+            throw SirhaException.of(ErrorCodeSirha.STUDENT_NOT_IN_GROUP);
         }
 
         estudiantes.remove(estudiante);
         inscritos--;
   
     }
-    public boolean enrollStudent(Student estudiante) {
+    public boolean enrollStudent(Student estudiante) throws SirhaException {
         return estadoGrupo.addStudent(this, estudiante);
     }
-    public boolean unenrollStudent(Student student) {
+    public boolean unenrollStudent(Student student) throws SirhaException {
         return estadoGrupo.removeStudent(this, student);
     }
     public String getCode() {
@@ -198,11 +203,11 @@ public class Group {
 
     // Getters y Setters con documentación
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
     public AcademicPeriod getCurrentPeriod() {
@@ -225,21 +230,16 @@ public class Group {
      * Solo debe modificarse si no hay estudiantes inscritos.
      *
      * @param capacidad nueva capacidad. Debe ser mayor a cero.
-     * @throws IllegalArgumentException si la capacidad es inválida
-     * @throws IllegalStateException si hay estudiantes inscritos
+     * @throws SirhaException 
      */
-    public void setCapacidad(int capacidad) {
+    public void setCapacidad(int capacidad) throws SirhaException {
         if (capacidad <= 0) {
-            throw new IllegalArgumentException("La capacidad debe ser mayor a cero");
+            throw SirhaException.of(ErrorCodeSirha.INVALID_CAPACITY_GROUP, "La capacidad debe ser mayor a cero");
         }
-        if (inscritos > 0) {
-            throw new IllegalStateException("No se puede cambiar la capacidad con estudiantes inscritos");
-        }
-
+        canEditGroup();
         if (capacidad < inscritos) {
-            throw new IllegalArgumentException("La nueva capacidad no puede ser menor que el número actual de inscritos");
+            throw SirhaException.of(ErrorCodeSirha.INVALID_CAPACITY_GROUP, "La nueva capacidad no puede ser menor que el número actual de inscritos");
         }
-
         this.capacidad = capacidad;
     }
 
@@ -311,13 +311,21 @@ public class Group {
         curso = null;
     }
 
-    public void addSchedule(Schedule horario) {
+    public void addSchedule(Schedule horario) throws SirhaException {
+        canEditGroup();
         for (Schedule existente : schedules) {
             if (existente.seSolapaCon(horario)) {
-                throw new IllegalArgumentException("El horario se solapa con otro ya asignado en el grupo");
+                throw SirhaException.of(ErrorCodeSirha.SCHEDULE_CONFLICT);
             }
         }
         schedules.add(horario);
+    }
+
+    public boolean canEditGroup() throws SirhaException {
+        if (inscritos != 0) {
+            throw SirhaException.of(ErrorCodeSirha.OPERATION_NOT_ALLOWED, "No se puede modificar el grupo con estudiantes inscritos");
+        }
+        return inscritos == 0;
     }
 
     public List<Schedule> getSchedules() {
@@ -336,9 +344,9 @@ public class Group {
     }
 
 
-    public boolean conflictoConHorario(Group otroGrupo) {
+    public boolean conflictoConHorario(Group otroGrupo){
         if (otroGrupo == null || otroGrupo.getSchedules() == null) {
-            throw new IllegalArgumentException("El otro grupo o sus schedules no pueden ser nulos");
+            return false;
         }
         for (Schedule horarioOtro : otroGrupo.getSchedules()) {
             if (conflictoConHorario(horarioOtro)) {
@@ -348,8 +356,11 @@ public class Group {
         return false;
     }
 
-    public void closeGroup() {
-        this.estadoGrupo = new StatusClosed();
+    public void closeGroup() throws SirhaException {
+        setEstadoGrupo(new StatusClosed());
+    }
+    public void openGroup() throws SirhaException {
+        setEstadoGrupo(new StatusOpen());
     }
     public boolean sameAcademicPeriod(AcademicPeriod period){
         return this.currentPeriod.equals(period);
