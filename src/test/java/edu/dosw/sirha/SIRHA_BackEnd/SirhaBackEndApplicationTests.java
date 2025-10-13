@@ -74,19 +74,19 @@ class SirhaBackEndApplicationTests {
         
         try {
             grupo1 = new Group(matematicas,30, academicPeriod);
-            grupo1.setId(1);
+            grupo1.setId("1");
             grupo1.setAula("A101");
             grupo1.setProfesor(professor);
             grupo1.setCurso(matematicas);
             
             grupo2 = new Group(fisica, 25, academicPeriod);
-            grupo2.setId(2);
+            grupo2.setId("2");
             grupo2.setAula("B202");
             grupo2.setProfesor(professor);
             grupo2.setCurso(fisica);
             
             grupo3 = new Group(quimica, 35, academicPeriod);
-            grupo3.setId(3);
+            grupo3.setId("3");
             grupo3.setAula("C303");
         } catch (Exception e) {
             fail("No se esperaba una excepción al crear los grupos: " + e.getMessage());

@@ -55,10 +55,10 @@ class RequestIntegrationTest {
         }
 
         
-        mathGroup1.setId(1001);
-        mathGroup2.setId(1002);
-        physicsGroup.setId(1003);
-        
+        mathGroup1.setId("1001");
+        mathGroup2.setId("1002");
+        physicsGroup.setId("1003");
+
         mathSchedule1 = new Schedule(DiasSemana.LUNES, LocalTime.of(8, 0), LocalTime.of(10, 0));
         mathSchedule2 = new Schedule(DiasSemana.MARTES, LocalTime.of(10, 0), LocalTime.of(12, 0));
         physicsSchedule = new Schedule(DiasSemana.MIERCOLES, LocalTime.of(14, 0), LocalTime.of(16, 0));

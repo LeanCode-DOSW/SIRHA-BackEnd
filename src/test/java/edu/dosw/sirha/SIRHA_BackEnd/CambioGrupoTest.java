@@ -36,9 +36,9 @@ class CambioGrupoTest {
         subject.setId("01");
         try {
             grupoActual = new Group(subject, 30, academicPeriod);
-            grupoActual.setId(1);
+            grupoActual.setId("1");
             grupoNuevo = new Group(subject, 25, academicPeriod);
-            grupoNuevo.setId(2);
+            grupoNuevo.setId("2");
         } catch (Exception e) {
             fail("No se esperaba una excepción al crear los grupos: " + e.getMessage());
         }
@@ -237,7 +237,7 @@ class CambioGrupoTest {
         
             Subject otraMateria = new Subject("102", "Física", 3);
             Group grupoExterno = new Group(otraMateria, 20, academicPeriod);
-            grupoExterno.setId(999);
+            grupoExterno.setId("999");
             
             IllegalStateException exception = assertThrows(IllegalStateException.class, () -> {
                 student.validateChangeGroup(subject, grupoExterno);
@@ -295,7 +295,7 @@ class CambioGrupoTest {
             LocalDate.now().plusMonths(10));
         try {
             Group grupoOtroPeriodo = new Group(subject, 20, otroPeriodo);
-            grupoOtroPeriodo.setId(888);
+            grupoOtroPeriodo.setId("888");
             
             IllegalStateException exception = assertThrows(IllegalStateException.class, () -> {
                 student.validateChangeGroup(subject, grupoOtroPeriodo);
@@ -341,7 +341,7 @@ class CambioGrupoTest {
 
         try {
             Group grupoLleno = new Group(subject, 2, academicPeriod);
-            grupoLleno.setId(777);
+            grupoLleno.setId("777");
 
             Student otroStudent1 = new Student("100", "otro1", "otro1@test.com", "pass", "OTR001");
             Student otroStudent2 = new Student("101", "otro2", "otro2@test.com", "pass", "OTR002");

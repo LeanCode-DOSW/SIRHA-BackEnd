@@ -40,7 +40,7 @@ import edu.dosw.sirha.SIRHA_BackEnd.exception.SirhaException;
 @Document(collection = "groups")
 public class Group {
     @Id
-    private int id;
+    private String id;
     private String code;
     private int capacidad;
     private int inscritos;
@@ -203,11 +203,11 @@ public class Group {
 
     // Getters y Setters con documentación
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
     public AcademicPeriod getCurrentPeriod() {

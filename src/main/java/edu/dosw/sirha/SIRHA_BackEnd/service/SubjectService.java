@@ -11,25 +11,28 @@ public interface SubjectService {
     List<Subject> findAll();
     Subject findByName(String name);
     Subject save(Subject subject);
-    void deleteByName(String name);
+    Subject deleteByName(String name);
     boolean existsByName(String name);
     List<Group> getGroupsOfSubject(String subjectName);
 
     List<Group> getOpenGroupsOfSubject(String subjectName);
     Group getGroupById(String id);
     Group saveGroup(String subjectName, Group group);
-    void deleteGroupById(String id);
+    Group deleteGroupById(String id);
     boolean existsGroupById(String id);
     
     List<Group> findAllGroups();
 
-    Group assignProfessor(Integer groupId, Professor professor);
-    Group addSchedule(Integer groupId, Schedule schedule);
+    Group assignProfessor(String groupId, Professor professor);
+    Group addSchedule(String groupId, Schedule schedule);
 
-    Professor getProfessor(Integer groupId);
-    List<Schedule> getSchedules(Integer groupId);
-    boolean isFull(Integer groupId);
-    int getAvailableSeats(Integer groupId);
-    //Group cerrarGrupo(Integer groupId);
-    //Group abrirGrupo(Integer groupId);
+    Professor getProfessor(String groupId);
+    List<Schedule> getSchedules(String groupId);
+    boolean isFull(String groupId);
+    int getAvailableSeats(String groupId);
+
+    List<Group> deleteGroupsBySubjectName(String subjectName);
+    
+    //Group cerrarGrupo(String groupId);
+    //Group abrirGrupo(String groupId);
 }   

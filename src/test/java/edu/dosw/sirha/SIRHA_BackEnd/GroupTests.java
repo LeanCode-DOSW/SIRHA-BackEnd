@@ -72,8 +72,8 @@ public class GroupTests {
 
     @Test
     void verificateIdTest() {
-        group.setId(11111);
-        assertEquals(11111, group.getId());
+        group.setId("11111");
+        assertEquals("11111", group.getId());
     }
 
     @Test
@@ -358,8 +358,8 @@ public class GroupTests {
             Group group1 = new Group(subject, 5, academicPeriod);
             Group group2 = new Group(subject, 5, academicPeriod);
 
-            group1.setId(1);
-            group2.setId(2);
+            group1.setId("1");
+            group2.setId("2");
 
             assertNotEquals(group1, group2);
         } catch (Exception e) {
@@ -381,7 +381,7 @@ public class GroupTests {
 
     @Test
     void toStringTest() {
-        group.setId(100000);
+        group.setId("100000");
         group.setAula("A101");
         try{
             group.enrollStudent(student1);

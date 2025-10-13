@@ -23,7 +23,7 @@ import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateGroup.Group;
 import edu.dosw.sirha.SIRHA_BackEnd.domain.model.stateRequest.BaseRequest;
 
 import org.springframework.stereotype.Service;
-
+import org.springframework.transaction.annotation.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,7 +51,7 @@ public class StudentServiceImpl implements StudentService {
         
         log.info("StudentServiceImpl inicializado correctamente");
     }
-
+    @Transactional
     @Override
     public Student save(Student student) {
         log.info("Guardando estudiante: {}", student.getUsername());
@@ -64,7 +64,7 @@ public class StudentServiceImpl implements StudentService {
             throw e;
         }
     }
-    
+    @Transactional    
     @Override
     public List<Student> findAll() {
         log.info("Consultando todos los estudiantes");
@@ -77,7 +77,7 @@ public class StudentServiceImpl implements StudentService {
             throw e;
         }
     }
-
+    @Transactional
     @Override
     public Optional<Student> findById(String id) {
         log.debug("Buscando estudiante por ID: {}", id);
@@ -94,7 +94,7 @@ public class StudentServiceImpl implements StudentService {
             throw e;
         }
     }
-
+    @Transactional
     @Override
     public Optional<Student> findByUsername(String username) {
         log.debug("Buscando estudiante por username: {}", username);
@@ -111,7 +111,7 @@ public class StudentServiceImpl implements StudentService {
             throw e;
         }
     }
-
+    @Transactional
     @Override
     public Optional<Student> findByEmail(String email) {
         log.debug("Buscando estudiante por email: {}", email);
@@ -128,7 +128,7 @@ public class StudentServiceImpl implements StudentService {
             throw e;
         }
     }
-
+    @Transactional
     @Override
     public boolean existsByCode(String code) {
         log.debug("Verificando existencia de código: {}", code);
@@ -141,7 +141,7 @@ public class StudentServiceImpl implements StudentService {
             throw e;
         }
     }
-
+    @Transactional
     @Override
     public boolean existsByEmail(String email) {
         log.debug("Verificando existencia de email: {}", email);
@@ -172,7 +172,7 @@ public class StudentServiceImpl implements StudentService {
     }
 
 
-
+    @Transactional
     @Override
     public AuthResponse registerStudent(RegisterRequest request) {
         log.info("Iniciando proceso de registro para usuario: {}", request.getUsername());
@@ -249,7 +249,7 @@ public class StudentServiceImpl implements StudentService {
             throw e;
         }
     }
-
+    @Transactional
     @Override
     public AuthResponse loginStudent(LoginRequest request) {
         log.info("Iniciando proceso de login para usuario: {}", request.getUsername());
@@ -282,7 +282,7 @@ public class StudentServiceImpl implements StudentService {
             throw new RuntimeException("Error interno durante el login", e);
         }
     }
-
+    @Transactional
     @Override
     public List<Schedule> getCurrentSchedule(String username) {
         log.info("Consultando horario actual para usuario: {}", username);
@@ -306,7 +306,7 @@ public class StudentServiceImpl implements StudentService {
             throw new RuntimeException("Error interno al consultar horario", e);
         }
     }
-
+    @Transactional
     @Override
     public List<Schedule> getScheduleForPeriod(String username, String period) {
         log.info("Consultando horario para usuario: {} en período: {}", username, period);
@@ -337,7 +337,7 @@ public class StudentServiceImpl implements StudentService {
             throw new RuntimeException("Error interno al consultar horario del período", e);
         }
     }
-
+    @Transactional
     @Override
     public Map<AcademicPeriod, List<Schedule>> getAllSchedules(String username) {
         log.info("Consultando todos los horarios para usuario: {}", username);
@@ -361,7 +361,7 @@ public class StudentServiceImpl implements StudentService {
             throw new RuntimeException("Error interno al consultar todos los horarios", e);
         }
     }
-
+    @Transactional
     @Override
     public Map<SemaforoColores, List<SubjectDecoratorDTO>> getAcademicPensum(String username) {
         log.info("Consultando pensum académico para usuario: {}", username);
@@ -390,7 +390,7 @@ public class StudentServiceImpl implements StudentService {
             throw new RuntimeException("Error interno al consultar pensum académico", e);
         }
     }
-
+    @Transactional
     @Override
     public CambioGrupo createRequestCambioGrupo(String studentName, String subjectName, String codeNewGroup) {
         log.info("Creando solicitud de cambio de grupo - Usuario: {}, Materia: {}, Nuevo Grupo: {}", 
@@ -434,7 +434,7 @@ public class StudentServiceImpl implements StudentService {
             throw new RuntimeException("Error interno al crear solicitud de cambio de grupo", e);
         }
     }
-
+    @Transactional
     @Override
     public CambioMateria createRequestCambioMateria(String studentName, String subjectName, 
                                                    String newSubjectName, String codeNewGroup) {
@@ -485,7 +485,7 @@ public class StudentServiceImpl implements StudentService {
             throw new RuntimeException("Error interno al crear solicitud de cambio de materia", e);
         }
     }
-
+    @Transactional
     @Override
     public Student deleteById(String id) {
         log.info("Eliminando estudiante por ID: {}", id);
@@ -506,7 +506,7 @@ public class StudentServiceImpl implements StudentService {
             throw new RuntimeException("Error interno al eliminar estudiante", e);
         }
     }
-
+    @Transactional
     @Override
     public List<BaseRequest> getAllRequests(String username) {
         log.info("Consultando todas las solicitudes para usuario: {}", username);
@@ -529,7 +529,7 @@ public class StudentServiceImpl implements StudentService {
             throw new RuntimeException("Error interno al consultar solicitudes", e);
         }
     }
-
+    @Transactional
     @Override
     public BaseRequest getRequestById(String username, String requestId) {
         log.info("Consultando solicitud por ID: {} para usuario: {}", requestId, username);
@@ -553,7 +553,7 @@ public class StudentServiceImpl implements StudentService {
             throw new RuntimeException("Error interno al consultar solicitud", e);
         }
     }
-
+    @Transactional
     @Override
     public List<BaseRequest> getRequestsHistory(String username) {
         log.info("Consultando historial de solicitudes para usuario: {}", username);

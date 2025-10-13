@@ -7,7 +7,7 @@ import edu.dosw.sirha.SIRHA_BackEnd.exception.SirhaException;
 import edu.dosw.sirha.SIRHA_BackEnd.repository.mongo.BaseRequestMongoRepository;
 import edu.dosw.sirha.SIRHA_BackEnd.service.RequestService;
 import org.springframework.stereotype.Service;
-
+import org.springframework.transaction.annotation.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,12 +20,14 @@ public class RequestServiceImpl implements RequestService {
     private static final Logger log = LoggerFactory.getLogger(RequestServiceImpl.class);
     
     private final BaseRequestMongoRepository repository;
+    private final StudentServiceImpl studentService;
 
-    public RequestServiceImpl(BaseRequestMongoRepository repository) {
+    public RequestServiceImpl(BaseRequestMongoRepository repository, StudentServiceImpl studentService) {
         this.repository = repository;
+        this.studentService = studentService;
         log.info("RequestServiceImpl inicializado correctamente");
     }
-
+    @Transactional
     @Override
     public List<BaseRequest> findAll() {
         log.info("Consultando todas las solicitudes");
@@ -48,7 +50,7 @@ public class RequestServiceImpl implements RequestService {
             throw new RuntimeException("Error interno al consultar solicitudes", e);
         }
     }
-
+    @Transactional
     @Override
     public Optional<BaseRequest> findById(String id) {
         log.debug("Buscando solicitud por ID: {}", id);
@@ -68,7 +70,7 @@ public class RequestServiceImpl implements RequestService {
             throw new RuntimeException("Error interno al buscar solicitud", e);
         }
     }
-
+    @Transactional
     @Override
     public BaseRequest save(BaseRequest request) {
         log.info("Guardando solicitud - ID: {}, Tipo: {}", 
@@ -92,7 +94,7 @@ public class RequestServiceImpl implements RequestService {
             throw new RuntimeException("Error interno al guardar solicitud", e);
         }
     }
-
+    @Transactional
     @Override
     public BaseRequest deleteById(String id) {
         log.info("Eliminando solicitud por ID: {}", id);
@@ -111,6 +113,50 @@ public class RequestServiceImpl implements RequestService {
         } catch (Exception e) {
             log.error("Error al eliminar solicitud por ID {}: {}", id, e.getMessage(), e);
             throw new RuntimeException("Error interno al eliminar solicitud", e);
+        }
+    }
+
+
+    @Transactional
+    @Override
+    public List<BaseRequest> getAllRequests(String studentUsername) {
+        log.info("Consultando solicitudes para el estudiante: {}", studentUsername);
+        try {
+            List<BaseRequest> requests = studentService.getAllRequests(studentUsername);
+            log.info("Se encontraron {} solicitudes para el estudiante {}", requests.size(), studentUsername);
+            return requests;
+        } catch (Exception e) {
+            log.error("Error al consultar solicitudes para el estudiante {}: {}", studentUsername, e.getMessage(), e);
+            throw new RuntimeException("Error interno al consultar solicitudes", e);
+        }
+    }
+    @Transactional
+    @Override
+    public BaseRequest getRequestById(String studentUsername, String requestId) {
+        log.info("Consultando solicitud ID: {} para el estudiante: {}", requestId, studentUsername);
+        try {
+            BaseRequest request = studentService.getRequestById(studentUsername, requestId);
+            log.info("Solicitud encontrada - ID: {}, Tipo: {}, Estado: {}", 
+                    request.getId(), 
+                    request.getClass().getSimpleName(),
+                    request.getEnumState());
+            return request;
+        } catch (Exception e) {
+            log.error("Error al consultar solicitud ID: {} para el estudiante {}: {}", requestId, studentUsername, e.getMessage(), e);
+            throw new RuntimeException("Error interno al consultar solicitud", e);
+        }
+    }
+    @Transactional
+    @Override
+    public List<BaseRequest> getRequestsHistory(String studentUsername) {
+        log.info("Consultando historial de solicitudes para el estudiante: {}", studentUsername);
+        try {
+            List<BaseRequest> requests = studentService.getRequestsHistory(studentUsername);
+            log.info("Se encontraron {} solicitudes en el historial para el estudiante {}", requests.size(), studentUsername);
+            return requests;
+        } catch (Exception e) {
+            log.error("Error al consultar historial de solicitudes para el estudiante {}: {}", studentUsername, e.getMessage(), e);
+            throw new RuntimeException("Error interno al consultar historial de solicitudes", e);
         }
     }
 }
