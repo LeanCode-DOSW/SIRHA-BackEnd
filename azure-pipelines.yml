@@ -1,0 +1,35 @@
+trigger:
+  - main 
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+steps:
+  - task: Checkout@1
+    displayName: 'Checkout del repositorio'
+
+  - task: UseJavaVersion@1
+    inputs:
+      versionSpec: '17'
+      jdkArchitecture: 'x64'
+    displayName: 'Configurar Java 17'
+
+  - task: Maven@4
+    inputs:
+      mavenPomFile: 'pom.xml'
+      goals: 'clean package'
+      publishJUnitResults: true
+      testResultsFiles: '**/surefire-reports/TEST-*.xml'
+      javaHomeOption: 'JDKVersion'
+      mavenOptions: '-Xmx3072m'
+      jdkVersionOption: '1.17'
+      mavenAuthenticateFeed: false
+      effectivePomSkip: false
+    displayName: 'Compilar y empaquetar con Maven'
+
+  - task: PublishBuildArtifacts@1
+    inputs:
+      pathToPublish: '$(System.DefaultWorkingDirectory)/target'
+      artifactName: 'springboot-build'
+      publishLocation: 'Container'
+    displayName: 'Publicar artefacto del backend (.jar)'
