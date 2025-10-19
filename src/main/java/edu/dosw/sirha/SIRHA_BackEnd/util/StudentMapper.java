@@ -1,7 +1,9 @@
 package edu.dosw.sirha.sirha_backend.util;
 
 import edu.dosw.sirha.sirha_backend.domain.model.Student;
+import edu.dosw.sirha.sirha_backend.domain.port.RequestTo;
 import edu.dosw.sirha.sirha_backend.dto.StudentDTO;
+import edu.dosw.sirha.sirha_backend.exception.SirhaException;
 
 /**
  * Clase utilitaria para la conversión entre entidades del dominio y DTOs (Data Transfer Objects).
@@ -18,9 +20,9 @@ import edu.dosw.sirha.sirha_backend.dto.StudentDTO;
  * - Performance: Reduce el tamaño de los datos transferidos
  * 
  */
-public class MapperUtils {
+public class StudentMapper {
 
-    private MapperUtils() {
+    private StudentMapper() {
         throw new UnsupportedOperationException("Utility class");
     }
 
@@ -68,9 +70,9 @@ public class MapperUtils {
         if (student.getSolicitudes() != null) {
             dto.setSolicitudesIds(
                 student.getSolicitudes().stream()
-                        .filter(solicitud -> solicitud != null)
-                        .map(solicitud -> solicitud.getId())
-                        .filter(id -> id != null)
+                        .filter(java.util.Objects::nonNull)
+                        .map(RequestTo::getId)
+                        .filter(java.util.Objects::nonNull)
                         .toList()
             );
         } else {
@@ -88,7 +90,7 @@ public class MapperUtils {
      * en la lógica de negocio.
      * 
      */
-    public static Student fromDTOnewStudent(StudentDTO dto) {
+    public static Student fromDTOnewStudent(StudentDTO dto) throws SirhaException {
         if (dto == null) {
             return null;
         }

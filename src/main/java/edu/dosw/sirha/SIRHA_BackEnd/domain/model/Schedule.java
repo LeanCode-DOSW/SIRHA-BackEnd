@@ -1,6 +1,10 @@
 package edu.dosw.sirha.sirha_backend.domain.model;
 import java.time.LocalTime;
+import java.util.Objects;
+
 import edu.dosw.sirha.sirha_backend.domain.model.enums.DiasSemana;
+import edu.dosw.sirha.sirha_backend.exception.ErrorCodeSirha;
+import edu.dosw.sirha.sirha_backend.exception.SirhaException;
 
 /**
  * Representa un horario de clase con un día y un rango de horas.
@@ -31,11 +35,12 @@ public class Schedule {
      * @param dia        Día de la semana (no distingue mayúsculas/minúsculas).
      * @param horaInicio Hora de inicio (en 24h).
      * @param horaFin    Hora de fin (en 24h, debe ser mayor que la hora de inicio).
-     * @throws IllegalArgumentException si la hora de inicio no es menor a la hora de fin.
+     * @throws SirhaException 
      */
-    public Schedule(DiasSemana dia, LocalTime horaInicio, LocalTime horaFin) {
+    public Schedule(DiasSemana dia, LocalTime horaInicio, LocalTime horaFin) throws SirhaException {
         if (horaInicio.isAfter(horaFin) || horaInicio.equals(horaFin)) {
-            throw new IllegalArgumentException("La hora de inicio debe ser menor que la hora de fin");
+            throw SirhaException.of(ErrorCodeSirha.INVALID_DATE_RANGE,
+                    "La hora de inicio debe ser menor que la hora de fin");
         }
         this.dia = dia;
         this.horaInicio = horaInicio;
@@ -100,7 +105,10 @@ public class Schedule {
                 horaFin.equals(that.horaFin) &&
                 dia.equals(that.dia);
     }
-
+    @Override
+    public int hashCode() {
+        return Objects.hash(dia, horaInicio, horaFin);
+    }
 
     /**
      * Representación en texto del horario.

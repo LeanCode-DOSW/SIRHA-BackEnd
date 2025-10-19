@@ -9,31 +9,33 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import edu.dosw.sirha.sirha_backend.dto.ApiErrorResponse;
 import edu.dosw.sirha.sirha_backend.exception.SirhaException;
+import edu.dosw.sirha.sirha_backend.exception.ErrorCodeSirha;
 import jakarta.servlet.http.HttpServletRequest;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
     private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+    private static final String SIRHA_BUSINESS_ERROR_MESSAGE = "Error de lógica de negocio en SIRHA.";
 
     /**
      * Maneja todas las excepciones SirhaException (checked exceptions del dominio)
      */
     @ExceptionHandler(SirhaException.class)
     public ResponseEntity<ApiErrorResponse> handleSirhaException(SirhaException ex, HttpServletRequest request) {
-        log.error("SIRHA exception: {} - {}", ex.getCode(), ex.getMessage());
+        log.error("SIRHA exception: {} - {}", ex.getErrorCode().getCode(), ex.getMessage());
 
-        HttpStatus status = determineHttpStatus(ex.getCode());
-
+        HttpStatus status = determineHttpStatus(ex.getErrorCode());
         ApiErrorResponse error = new ApiErrorResponse(
             status,
-            ex.getCode(),
+            ex.getErrorCode().getCode(),
             ex.getMessage(),
-            "Error de lógica de negocio en SIRHA.",
+            SIRHA_BUSINESS_ERROR_MESSAGE,
             request.getRequestURI()
         );
+        
 
-        addSuggestion(error, ex.getCode());
+        addSuggestion(error, ex.getErrorCode());
         return new ResponseEntity<>(error, status);
     }
 
@@ -45,19 +47,19 @@ public class GlobalExceptionHandler {
         
         // Verificar si es una SirhaException envuelta
         if (ex.getCause() instanceof SirhaException sirhaEx) {
-            log.error("Wrapped SIRHA exception: {} - {}", sirhaEx.getCode(), sirhaEx.getMessage());
+            log.error("Wrapped SIRHA exception: {} - {}", sirhaEx.getErrorCode().getCode(), sirhaEx.getMessage());
             
-            HttpStatus status = determineHttpStatus(sirhaEx.getCode());
-            
+            HttpStatus status = determineHttpStatus(sirhaEx.getErrorCode());
             ApiErrorResponse error = new ApiErrorResponse(
                 status,
-                sirhaEx.getCode(),
+                sirhaEx.getErrorCode().getCode(),
                 sirhaEx.getMessage(),
-                "Error de lógica de negocio en SIRHA.",
+                SIRHA_BUSINESS_ERROR_MESSAGE,
                 request.getRequestURI()
             );
             
-            addSuggestion(error, sirhaEx.getCode());
+            
+            addSuggestion(error, sirhaEx.getErrorCode());
             return new ResponseEntity<>(error, status);
         }
         
@@ -66,7 +68,7 @@ public class GlobalExceptionHandler {
         
         ApiErrorResponse error = new ApiErrorResponse(
             HttpStatus.INTERNAL_SERVER_ERROR,
-            "INTERNAL_ERROR",
+            ErrorCodeSirha.INTERNAL_ERROR.getCode(),
             "Ha ocurrido un error interno en el servidor.",
             ex.getMessage(),
             request.getRequestURI()
@@ -85,7 +87,7 @@ public class GlobalExceptionHandler {
 
         ApiErrorResponse error = new ApiErrorResponse(
             HttpStatus.BAD_REQUEST,
-            "INVALID_ARGUMENT",
+            ErrorCodeSirha.INVALID_ARGUMENT.getCode(),
             ex.getMessage(),
             "Los datos proporcionados no son válidos.",
             request.getRequestURI()
@@ -103,19 +105,19 @@ public class GlobalExceptionHandler {
         
         // Verificar si es una SirhaException envuelta en Exception
         if (ex.getCause() instanceof SirhaException sirhaEx) {
-            log.error("Exception wrapping SIRHA exception: {} - {}", sirhaEx.getCode(), sirhaEx.getMessage());
+            log.error("Exception wrapping SIRHA exception: {} - {}", sirhaEx.getErrorCode().getCode(), sirhaEx.getMessage());
             
-            HttpStatus status = determineHttpStatus(sirhaEx.getCode());
+            HttpStatus status = determineHttpStatus(sirhaEx.getErrorCode());
             
             ApiErrorResponse error = new ApiErrorResponse(
                 status,
-                sirhaEx.getCode(),
+                sirhaEx.getErrorCode().getCode(),
                 sirhaEx.getMessage(),
-                "Error de lógica de negocio en SIRHA.",
+                SIRHA_BUSINESS_ERROR_MESSAGE,
                 request.getRequestURI()
             );
             
-            addSuggestion(error, sirhaEx.getCode());
+            addSuggestion(error, sirhaEx.getErrorCode());
             return new ResponseEntity<>(error, status);
         }
         
@@ -124,7 +126,7 @@ public class GlobalExceptionHandler {
 
         ApiErrorResponse error = new ApiErrorResponse(
             HttpStatus.INTERNAL_SERVER_ERROR,
-            "UNEXPECTED_ERROR",
+            ErrorCodeSirha.INTERNAL_ERROR.getCode(),
             "Ha ocurrido un error inesperado en el servidor.",
             ex.getMessage(),
             request.getRequestURI()
@@ -135,37 +137,38 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * Determina el HttpStatus basado en el código de error
+     * Determina el HttpStatus basado en el ErrorCodeSirha enum
      */
-    private HttpStatus determineHttpStatus(String errorCode) {
+    private HttpStatus determineHttpStatus(ErrorCodeSirha errorCode) {
         return switch (errorCode) {
             // 404 Not Found - Recursos no encontrados
-            case "STUDENT_NOT_FOUND", "SUBJECT_NOT_FOUND", "GROUP_NOT_FOUND", 
-                 "REQUEST_NOT_FOUND", "ACADEMIC_PERIOD_NOT_FOUND" -> 
+            case STUDENT_NOT_FOUND, SUBJECT_NOT_FOUND, GROUP_NOT_FOUND, 
+                 REQUEST_NOT_FOUND, ACADEMIC_PERIOD_NOT_FOUND -> 
                 HttpStatus.NOT_FOUND;
             
             // 409 Conflict - Conflictos de estado o datos
-            case "REQUEST_ALREADY_APPROVED", "REQUEST_ALREADY_REJECTED", "REQUEST_ALREADY_PENDING",
-                 "REQUEST_ALREADY_IN_REVIEW", "INVALID_STATE_TRANSITION", "EMAIL_ALREADY_EXISTS",
-                 "CODE_ALREADY_EXISTS", "USERNAME_ALREADY_EXISTS", "DUPLICATE_REQUEST",
-                 "SCHEDULE_CONFLICT" -> 
+            case REQUEST_ALREADY_APPROVED, REQUEST_ALREADY_REJECTED, REQUEST_ALREADY_PENDING,
+                 REQUEST_ALREADY_IN_REVIEW, INVALID_STATE_TRANSITION, EMAIL_ALREADY_EXISTS,
+                 CODE_ALREADY_EXISTS, USERNAME_ALREADY_EXISTS, DUPLICATE_REQUEST,
+                 SCHEDULE_CONFLICT, GROUP_FULL, STUDENT_ALREADY_IN_GROUP -> 
                 HttpStatus.CONFLICT;
             
             // 400 Bad Request - Datos inválidos o errores de validación
-            case "INVALID_CREDENTIALS", "VALIDATION_ERROR", "INVALID_ARGUMENT", 
-                 "MISSING_REQUIRED_FIELD", "REQUEST_NOT_IN_REVIEW" -> 
+            case INVALID_CREDENTIALS, VALIDATION_ERROR, INVALID_ARGUMENT, 
+                 MISSING_REQUIRED_FIELD, REQUEST_NOT_IN_REVIEW, INVALID_CAPACITY_GROUP,
+                 INVALID_CAREER, GROUP_CLOSED, STUDENT_NOT_IN_GROUP, NO_STUDENTS_TO_REMOVE -> 
                 HttpStatus.BAD_REQUEST;
             
             // 403 Forbidden - Permisos insuficientes
-            case "INSUFFICIENT_PERMISSIONS", "OPERATION_NOT_ALLOWED" -> 
+            case INSUFFICIENT_PERMISSIONS, OPERATION_NOT_ALLOWED -> 
                 HttpStatus.FORBIDDEN;
             
             // 502 Bad Gateway - Errores de servicios externos
-            case "EXTERNAL_SERVICE_ERROR" -> 
+            case EXTERNAL_SERVICE_ERROR -> 
                 HttpStatus.BAD_GATEWAY;
             
             // 500 Internal Server Error - Errores del sistema
-            case "INTERNAL_ERROR", "DATABASE_ERROR" -> 
+            case INTERNAL_ERROR, DATABASE_ERROR -> 
                 HttpStatus.INTERNAL_SERVER_ERROR;
             
             // Default para códigos no reconocidos
@@ -177,68 +180,155 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * Añade sugerencias específicas basadas en el código de error
+     * Añade sugerencias específicas basadas en el ErrorCodeSirha enum
      */
-    private void addSuggestion(ApiErrorResponse error, String code) {
-        String suggestion = switch (code) {
-            // Errores de recursos no encontrados
-            case "STUDENT_NOT_FOUND", "SUBJECT_NOT_FOUND", "GROUP_NOT_FOUND", 
-                 "REQUEST_NOT_FOUND", "ACADEMIC_PERIOD_NOT_FOUND" -> 
-                "Verifique que el recurso existe y los parámetros son correctos.";
-            
-            // Errores de transición de estado
-            case "REQUEST_ALREADY_APPROVED" -> 
+    private void addSuggestion(ApiErrorResponse error, ErrorCodeSirha errorCode) {
+        String suggestion = switch (errorCode) {
+            // ========== REQUEST STATE ERRORS ==========
+            case REQUEST_ALREADY_APPROVED -> 
                 "Esta solicitud ya fue aprobada previamente. No se requiere acción adicional.";
                 
-            case "REQUEST_ALREADY_REJECTED" -> 
+            case REQUEST_ALREADY_REJECTED -> 
                 "Esta solicitud ya fue rechazada. Puede crear una nueva solicitud si es necesario.";
                 
-            case "INVALID_STATE_TRANSITION" -> 
+            case REQUEST_ALREADY_PENDING -> 
+                "Ya existe una solicitud pendiente del mismo tipo. Espere a que sea procesada.";
+                
+            case REQUEST_ALREADY_IN_REVIEW -> 
+                "La solicitud ya está siendo revisada por el personal administrativo.";
+                
+            case INVALID_STATE_TRANSITION -> 
                 "La transición de estado solicitada no es válida para el estado actual de la solicitud.";
+                
+            case REQUEST_NOT_IN_REVIEW -> 
+                "La solicitud debe estar en estado 'EN_REVISION' para realizar esta operación.";
             
-            // Errores de conflictos de datos
-            case "EMAIL_ALREADY_EXISTS" -> 
-                "Use un email diferente que no esté registrado en el sistema.";
+            // ========== RESOURCE NOT FOUND ERRORS ==========
+            case STUDENT_NOT_FOUND -> 
+                "Verifique que el código o ID del estudiante sea correcto.";
                 
-            case "CODE_ALREADY_EXISTS" -> 
-                "Use un código estudiantil diferente que no esté registrado.";
+            case SUBJECT_NOT_FOUND -> 
+                "Verifique que el código o ID de la materia sea correcto.";
                 
-            case "USERNAME_ALREADY_EXISTS" -> 
-                "Elija un nombre de usuario diferente que esté disponible.";
+            case GROUP_NOT_FOUND -> 
+                "Verifique que el ID del grupo sea correcto y que el grupo exista.";
                 
-            case "DUPLICATE_REQUEST" -> 
-                "Ya existe una solicitud similar. Revise sus solicitudes pendientes.";
+            case REQUEST_NOT_FOUND -> 
+                "Verifique que el ID de la solicitud sea correcto.";
+                
+            case ACADEMIC_PERIOD_NOT_FOUND -> 
+                "Verifique que el período académico esté configurado correctamente.";
             
-            // Errores de validación
-            case "INVALID_CREDENTIALS" -> 
+            // ========== VALIDATION ERRORS ==========
+            case INVALID_CREDENTIALS -> 
                 "Verifique que su usuario y contraseña sean correctos.";
                 
-            case "VALIDATION_ERROR", "INVALID_ARGUMENT" -> 
-                "Revise que todos los campos estén correctamente completados.";
+            case VALIDATION_ERROR -> 
+                "Revise que todos los campos estén correctamente completados según las reglas de validación.";
                 
-            case "MISSING_REQUIRED_FIELD" -> 
+            case INVALID_ARGUMENT -> 
+                "Revise que todos los parámetros enviados sean válidos y estén en el formato correcto.";
+                
+            case MISSING_REQUIRED_FIELD -> 
                 "Complete todos los campos obligatorios antes de continuar.";
             
-            // Errores de permisos
-            case "INSUFFICIENT_PERMISSIONS" -> 
+            // ========== CONFLICT ERRORS ==========
+            case EMAIL_ALREADY_EXISTS -> 
+                "Use un email diferente que no esté registrado en el sistema.";
+                
+            case CODE_ALREADY_EXISTS -> 
+                "Use un código estudiantil diferente que no esté registrado.";
+                
+            case USERNAME_ALREADY_EXISTS -> 
+                "Elija un nombre de usuario diferente que esté disponible.";
+                
+            case DUPLICATE_REQUEST -> 
+                "Ya existe una solicitud similar. Revise sus solicitudes pendientes.";
+            
+            // ========== BUSINESS LOGIC ERRORS ==========
+            case INSUFFICIENT_PERMISSIONS -> 
                 "Contacte al administrador del sistema para obtener los permisos necesarios.";
                 
-            case "OPERATION_NOT_ALLOWED" -> 
+            case OPERATION_NOT_ALLOWED -> 
                 "Esta operación no está permitida en las circunstancias actuales.";
+                
+            case SCHEDULE_CONFLICT -> 
+                "Existe un conflicto de horarios. Seleccione un horario diferente que no se superponga.";
             
-            // Errores de horarios
-            case "SCHEDULE_CONFLICT" -> 
-                "Existe un conflicto de horarios. Seleccione un horario diferente.";
+            // ========== GROUP STATE ERRORS ==========
+            case GROUP_CLOSED -> 
+                "El grupo está cerrado para inscripciones. Contacte al administrador académico.";
+                
+            case GROUP_FULL -> 
+                "El grupo ha alcanzado su capacidad máxima. Intente con otro grupo o espere cupos disponibles.";
             
-            // Errores técnicos
-            case "EXTERNAL_SERVICE_ERROR" -> 
+            case SAME_GROUP -> 
+                "El estudiante ya pertenece a este grupo. No es necesario realizar cambios.";
+
+            case STUDENT_ALREADY_IN_GROUP -> 
+                "El estudiante ya está inscrito en este grupo. No es necesario inscribirlo nuevamente.";
+                
+            case STUDENT_NOT_IN_GROUP -> 
+                "El estudiante no está inscrito en este grupo. Verifique la información antes de continuar.";
+                
+            case NO_STUDENTS_TO_REMOVE -> 
+                "No hay estudiantes para remover de este grupo.";
+                
+            case INVALID_CAPACITY_GROUP -> 
+                "La capacidad del grupo debe ser un número positivo mayor a cero.";
+                
+            case INVALID_CAREER -> 
+                "La carrera especificada no es válida para esta operación. Verifique los datos.";
+            
+            
+            // ========== SYSTEM ERRORS ==========
+            case INTERNAL_ERROR -> 
+                "Error interno del servidor. Contacte soporte técnico si el problema persiste.";
+                
+            case EXTERNAL_SERVICE_ERROR -> 
                 "Problema con un servicio externo. Intente nuevamente en unos minutos.";
                 
-            case "DATABASE_ERROR" -> 
-                "Error de base de datos. Contacte soporte técnico si persiste.";
+            case DATABASE_ERROR -> 
+                "Error de base de datos. Contacte soporte técnico si el problema persiste.";
+            case INVALID_DATE_RANGE ->
+                "Verifique que las fechas proporcionadas sean correctas y estén en el formato adecuado.";
+
+
+            // Subject errors
+            case SUBJECT_NOT_IN_PROGRESS ->
+                "La materia no está en curso. Verifique el estado de la materia.";
             
-            // Default
-            default -> "Consulte la documentación de la API para más información.";
+            case ACADEMIC_PERIOD_NOT_VALID ->
+                "El período académico no es válido. Verifique las fechas del período académico.";
+        
+            case SAME_SUBJECT ->
+                "La materia nueva es la misma que la antigua. Seleccione una materia diferente.";
+
+            case SUBJECT_ALREADY_ENROLLED ->
+                "El estudiante ya tiene la materia inscrita o aprobada. Verifique su historial académico.";
+            case SUBJECT_NOT_IN_STUDY_PLAN ->
+                "La materia no está en el plan de estudios del estudiante. Verifique el plan de estudios.";
+            case PREREQUISITES_NOT_MET ->
+                "No se cumplen los prerrequisitos para inscribir la materia. Revise los requisitos previos.";
+
+            case CANNOT_CHANGE_SEMESTER ->
+                "No se puede cambiar el semestre de la materia en su estado actual.";
+            case CANNOT_CHANGE_GROUP ->
+                "No se puede cambiar el grupo de la materia en su estado actual.";
+            case CANNOT_CHANGE_GRADE ->
+                "No se puede cambiar la nota de la materia en su estado actual.";
+            case CANNOT_ENROLL ->
+                "No se puede inscribir la materia en su estado actual.";
+            case CANNOT_APPROVE ->
+                "No se puede aprobar la materia en su estado actual.";
+            case CANNOT_FAIL ->
+                "No se puede reprobar la materia en su estado actual.";
+            case CANNOT_DROP_SUBJECT ->
+                "No se puede retirar la materia en su estado actual.";
+            case SUBJECT_ALREADY_EXISTS ->
+                "La materia que intenta crear ya existe. Verifique el nombre o código de la materia.";
+            case PROFESSOR_NOT_FOUND ->
+                "El profesor especificado no fue encontrado. Verifique el ID o la información del profesor.";
         };
         error.setSuggestion(suggestion);
     }

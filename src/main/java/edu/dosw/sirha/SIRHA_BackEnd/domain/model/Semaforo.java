@@ -4,7 +4,7 @@ import java.util.*;
 
 import edu.dosw.sirha.sirha_backend.domain.model.enums.Careers;
 import edu.dosw.sirha.sirha_backend.domain.model.enums.SemaforoColores;
-import edu.dosw.sirha.sirha_backend.domain.model.stateGroup.Group;
+import edu.dosw.sirha.sirha_backend.domain.model.stategroup.Group;
 import edu.dosw.sirha.sirha_backend.domain.model.statesubjectdec.SubjectDecorator;
 import edu.dosw.sirha.sirha_backend.domain.port.AcademicProgress;
 import edu.dosw.sirha.sirha_backend.dto.AcademicIndicatorsDTO;
@@ -21,18 +21,20 @@ public class Semaforo implements AcademicProgress {
     private final StudyPlan studyPlan;
     private AcademicPeriod currentPeriod;
 
-    public Semaforo(StudyPlan studyPlan) {
+    public Semaforo(StudyPlan studyPlan) throws SirhaException {
         this.subjects = new HashMap<>();
         this.studyPlan = studyPlan;
         iniciarSemaforo();
     }
 
-    private void iniciarSemaforo() {
-        studyPlan.getSubjects().forEach((name, subject) -> {
-            SubjectDecorator decorator = new SubjectDecorator(subject);
-            subjects.put(name, decorator);
-        });
+    private void iniciarSemaforo() throws SirhaException {
+    for (Map.Entry<String, Subject> entry : studyPlan.getSubjects().entrySet()) {
+        String name = entry.getKey();
+        Subject subject = entry.getValue();
+        SubjectDecorator decorator = new SubjectDecorator(subject);
+        subjects.put(name, decorator);
     }
+}
 
     public Collection<SubjectDecorator> getSubjects() {
         return subjects.values();
@@ -174,34 +176,34 @@ public class Semaforo implements AcademicProgress {
     }
 
 
-    public boolean verifyChangeGroup(Subject subject, Group newGroup) {
+    public boolean verifyChangeGroup(Subject subject, Group newGroup) throws SirhaException {
 
         SubjectDecorator decorator = subjects.get(subject.getName());
         if (decorator == null) {
-            throw new IllegalStateException("La materia no está en el semáforo");
+            throw SirhaException.of(ErrorCodeSirha.SUBJECT_NOT_FOUND, "La materia no está en el semáforo");
         }
         if (!isSubjectCursando(subject)) {
-            throw new IllegalStateException("La materia no está en curso");
+            throw SirhaException.of(ErrorCodeSirha.SUBJECT_NOT_IN_PROGRESS, "La materia no está en curso");
         }
 
         if (decorator.getGroup().equals(newGroup)) {
-            throw new IllegalStateException("El nuevo grupo es el mismo que el actual");
+            throw SirhaException.of(ErrorCodeSirha.SAME_GROUP, "El nuevo grupo es el mismo que el actual");
         }
         if (!subject.hasGroup(newGroup)) {
-            throw new IllegalStateException("El grupo no pertenece a la materia especificada");
+            throw SirhaException.of(ErrorCodeSirha.GROUP_NOT_FOUND, "El grupo no pertenece a la materia especificada");
         }
         return true;
     }
 
     @Override
-    public void enrollSubjectInGroup(Subject subject, Group group) {
+    public void enrollSubjectInGroup(Subject subject, Group group) throws SirhaException {
 
         SubjectDecorator decorator = subjects.get(subject.getName());
         if (decorator == null) {
-            throw new IllegalArgumentException("La materia no está en el semáforo");
+            throw SirhaException.of(ErrorCodeSirha.SUBJECT_NOT_FOUND, "La materia no está en el semáforo");
         }
         if (!subject.hasGroup(group)) {
-            throw new IllegalArgumentException("El grupo no pertenece a la materia especificada");
+            throw SirhaException.of(ErrorCodeSirha.GROUP_NOT_FOUND, "El grupo no pertenece a la materia especificada");
         }
         decorator.inscribir(group);
         //faltaria set semestre

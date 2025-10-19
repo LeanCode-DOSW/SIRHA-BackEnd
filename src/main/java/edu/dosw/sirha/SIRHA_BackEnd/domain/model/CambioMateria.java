@@ -1,6 +1,7 @@
 package edu.dosw.sirha.sirha_backend.domain.model;
-import edu.dosw.sirha.sirha_backend.domain.model.stateGroup.Group;
+import edu.dosw.sirha.sirha_backend.domain.model.stategroup.Group;
 import edu.dosw.sirha.sirha_backend.domain.model.staterequest.BaseRequest;
+import edu.dosw.sirha.sirha_backend.exception.SirhaException;
 
 public class CambioMateria extends BaseRequest {
 
@@ -19,7 +20,7 @@ public class CambioMateria extends BaseRequest {
     public Group getNewGroup() {return newGroup;}
 
     @Override
-    public boolean validateRequest() {// para validar si se puede hacer el cambio de materia necesitamos ver si la materia nueva no tiene problemas con el horario y si el estudiante cumple con los requisitos para cursarla
+    public boolean validateRequest() throws SirhaException {// para validar si se puede hacer el cambio de materia necesitamos ver si la materia nueva no tiene problemas con el horario y si el estudiante cumple con los requisitos para cursarla
         return student.validateChangeSubject(oldSubject, newSubject, newGroup);
     }
 

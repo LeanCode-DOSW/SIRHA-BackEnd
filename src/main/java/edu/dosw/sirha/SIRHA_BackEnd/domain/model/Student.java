@@ -11,7 +11,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import edu.dosw.sirha.sirha_backend.domain.model.enums.Careers;
 import edu.dosw.sirha.sirha_backend.domain.model.enums.RequestStateEnum;
 import edu.dosw.sirha.sirha_backend.domain.model.enums.SemaforoColores;
-import edu.dosw.sirha.sirha_backend.domain.model.stateGroup.Group;
+import edu.dosw.sirha.sirha_backend.domain.model.stategroup.Group;
 import edu.dosw.sirha.sirha_backend.domain.model.staterequest.BaseRequest;
 import edu.dosw.sirha.sirha_backend.domain.model.statesubjectdec.SubjectDecorator;
 import edu.dosw.sirha.sirha_backend.domain.port.AcademicOperations;
@@ -50,7 +50,7 @@ public class Student extends User implements SolicitudFactory, ScheduleManager, 
         solicitudes = new ArrayList<>();
     }
 
-    public Student(String id, String username, String email, String passwordHash, String codigo) {
+    public Student(String id, String username, String email, String passwordHash, String codigo) throws SirhaException {
         super(id, username, email, passwordHash);
         this.codigo = codigo;
         solicitudes = new ArrayList<>();
@@ -63,7 +63,7 @@ public class Student extends User implements SolicitudFactory, ScheduleManager, 
      * La lista de solicitudes se inicializa como lista vacía.
      * El plan de estudios y semáforo deben ser asignados posteriormente.
      */
-    public Student(String username, String email, String passwordHash, String codigo) {
+    public Student(String username, String email, String passwordHash, String codigo) throws SirhaException {
         super(username, email, passwordHash);
         this.codigo = codigo;
         solicitudes = new ArrayList<>();
@@ -76,9 +76,9 @@ public class Student extends User implements SolicitudFactory, ScheduleManager, 
      * a la lista de solicitudes del estudiante. La solicitud debe estar
      * completamente inicializada antes de agregarla.
      */
-    public void addRequest(BaseRequest solicitud) {
+    public void addRequest(BaseRequest solicitud) throws SirhaException {
         if (solicitud == null) {
-            throw new IllegalStateException("La solicitud no puede ser null");
+            throw SirhaException.of(ErrorCodeSirha.REQUEST_NOT_FOUND, "La solicitud no puede ser null");
         }
         
         if (this.solicitudes == null) {
@@ -88,18 +88,18 @@ public class Student extends User implements SolicitudFactory, ScheduleManager, 
         this.solicitudes.add(solicitud);
     }
 
-    public void removeRequest(BaseRequest solicitud) {
+    public void removeRequest(BaseRequest solicitud) throws SirhaException {
         if (solicitud == null) {
-            throw new IllegalStateException("La solicitud no puede ser null");
+            throw SirhaException.of(ErrorCodeSirha.REQUEST_NOT_FOUND, "La solicitud no puede ser null");
         }
-        
+
         if (this.solicitudes == null || !this.solicitudes.contains(solicitud)) {
-            throw new IllegalStateException("La solicitud no existe en la lista del estudiante");
+            throw SirhaException.of(ErrorCodeSirha.REQUEST_NOT_FOUND, "La solicitud no existe en la lista del estudiante");
         }
-        
+
         this.solicitudes.remove(solicitud);
     }
- 
+
     /**
      * Obtiene el código estudiantil.
      * @return código único del estudiante
@@ -111,11 +111,12 @@ public class Student extends User implements SolicitudFactory, ScheduleManager, 
     /**
      * Establece el código estudiantil.
      * @param codigo nuevo código del estudiante. No debe ser null o vacío.
+     * @throws SirhaException 
      * @throws IllegalStateException si el código es null o vacío
      */
-    public void setCodigo(String codigo) {
+    public void setCodigo(String codigo) throws SirhaException {
         if (codigo == null || codigo.trim().isEmpty()) {
-            throw new IllegalStateException("El código no puede ser null o vacío");
+            throw SirhaException.of(ErrorCodeSirha.INVALID_ARGUMENT, "El código no puede ser null o vacío");
         }
         this.codigo = codigo;
     }
@@ -166,6 +167,7 @@ public class Student extends User implements SolicitudFactory, ScheduleManager, 
      * @param obj objeto a comparar
      * @return true si los objetos son iguales, false en caso contrario
      */
+    @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
         if (obj == null || getClass() != obj.getClass()) return false;
@@ -173,6 +175,11 @@ public class Student extends User implements SolicitudFactory, ScheduleManager, 
        
         Student student = (Student) obj;
         return Objects.equals(codigo, student.codigo);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), codigo);
     }
     
     public List<SubjectDecorator> getSubjectsInProgress() {
@@ -319,12 +326,12 @@ public class Student extends User implements SolicitudFactory, ScheduleManager, 
         }
         return academicProgress.getCurrentAcademicPeriod();
     }
-    public void setCurrentPeriod(AcademicPeriod currentPeriod) {
+    public void setCurrentPeriod(AcademicPeriod currentPeriod) throws SirhaException {
         if (academicProgress == null) {
-            throw new IllegalStateException("El progreso académico no está inicializado");
+            throw SirhaException.of(ErrorCodeSirha.INVALID_ARGUMENT, "El progreso académico no está inicializado");
         }
         if (!academicProgress.getSubjectsInProgress().isEmpty()) {
-            throw new IllegalStateException("No se puede cambiar el período académico mientras hay materias en curso");
+            throw SirhaException.of(ErrorCodeSirha.OPERATION_NOT_ALLOWED, "No se puede cambiar el período académico mientras hay materias en curso");
         }
         academicProgress.setCurrentAcademicPeriod(currentPeriod);
     }
@@ -336,45 +343,46 @@ public class Student extends User implements SolicitudFactory, ScheduleManager, 
         return hasSubject(subject.getSubject());
     }
 
-    public boolean canEnroll(Subject subject) {
+    public boolean canEnroll(Subject subject) throws SirhaException {
         // 1. Verificar que la materia esté en el plan de estudios
         if (academicProgress.getStudyPlan() == null || !academicProgress.getStudyPlan().hasSubject(subject)) {
-            throw new IllegalStateException("La materia no está en el plan de estudios del estudiante");
+            throw SirhaException.of(ErrorCodeSirha.INVALID_ARGUMENT, "La materia no está en el plan de estudios del estudiante");
         }
         
         // 2. Verificar que la materia no esté ya inscrita
 
         if (!academicProgress.isSubjectNoCursada(subject)) {
-            throw new IllegalStateException("La materia ya está inscrita");
+            throw SirhaException.of(ErrorCodeSirha.OPERATION_NOT_ALLOWED, "La materia ya está inscrita");
         }
         
         // 3. Verificar prerrequisitos
         if (subject.hasPrerequisites() && !subject.canEnroll(academicProgress)) {
-                throw new IllegalStateException("No se cumplen los prerrequisitos para inscribir la materia");
+            throw SirhaException.of(ErrorCodeSirha.OPERATION_NOT_ALLOWED, "No se cumplen los prerrequisitos para inscribir la materia");
             }
         
         return true;
     }
-    public boolean canEnrollInGroup(Subject subject, Group group) {
+    
+    public boolean canEnrollInGroup(Subject subject, Group group) throws SirhaException {
         // Primero verificar las validaciones básicas de la materia
         if (!canEnroll(subject)) {
-            throw new IllegalStateException("La materia no se puede inscribir");
+            throw SirhaException.of(ErrorCodeSirha.OPERATION_NOT_ALLOWED, "La materia no se puede inscribir");
         }
         
         // 4. Verificar que el grupo esté abierto
         if (!group.isOpen()) {
-            throw new IllegalStateException("El grupo está cerrado");
+            throw SirhaException.of(ErrorCodeSirha.GROUP_CLOSED, "El grupo está cerrado");
         }
         
         // 6. Verificar período académico activo
         AcademicPeriod currentPeriod = getCurrentPeriod();
         if (currentPeriod == null || !currentPeriod.isActive() || !group.sameAcademicPeriod(currentPeriod)) {
-            throw new IllegalStateException("El período académico no es válido");
+            throw SirhaException.of(ErrorCodeSirha.ACADEMIC_PERIOD_NOT_VALID, "El período académico no es válido");
         }
         
         // 7. Verificar conflicto de horarios
         if (hasScheduleConflictWith(group)) {
-            throw new IllegalStateException("Conflicto de horarios detectado");
+            throw SirhaException.of(ErrorCodeSirha.SCHEDULE_CONFLICT, "Conflicto de horarios detectado");
         }
         
         // 9. Verificar límite de créditos por semestre FALTA IMPLEMENTAR AAAAAAAAAAAAAAAAAAA
@@ -392,6 +400,7 @@ public class Student extends User implements SolicitudFactory, ScheduleManager, 
 
         //academicProgress.recordEnrollment(subject, group, currentPeriod); despues
     }
+
     public void enrollSubject(Subject subject, Group group, int semester) throws SirhaException {
         enrollSubject(subject, group);
         academicProgress.setSubjectSemester(subject.getName(), semester);
@@ -402,7 +411,7 @@ public class Student extends User implements SolicitudFactory, ScheduleManager, 
     public void unenrollSubject(Subject subject, Group group) throws SirhaException {
         AcademicPeriod currentPeriod = getCurrentPeriod();
         if (currentPeriod == null || !currentPeriod.isActive() || !group.sameAcademicPeriod(currentPeriod)) {
-            throw new IllegalStateException("El período académico no es válido para el grupo especificado");
+            throw SirhaException.of(ErrorCodeSirha.ACADEMIC_PERIOD_NOT_VALID, "El período académico no es válido para el grupo especificado");
         }
 
         group.unenrollStudent(this);
@@ -426,77 +435,77 @@ public class Student extends User implements SolicitudFactory, ScheduleManager, 
         return academicProgress != null && academicProgress.hasSubject(subject);
     }
 
-    public boolean validateChangeGroup(Subject subject, Group newGroup){
+    public boolean validateChangeGroup(Subject subject, Group newGroup) throws SirhaException {
 
         if (!hasSubject(subject)) {
-            throw new IllegalStateException("El estudiante no tiene la materia especificada");
+            throw SirhaException.of(ErrorCodeSirha.SUBJECT_NOT_FOUND, "El estudiante no tiene la materia especificada");
         }
         if (!academicProgress.isSubjectCursando(subject)) {
-            throw new IllegalStateException("La materia no está en curso");
+            throw SirhaException.of(ErrorCodeSirha.SUBJECT_NOT_IN_PROGRESS, "La materia no está en curso");
         }
 
         if (!academicProgress.verifyChangeGroup(subject, newGroup)) {
-            throw new IllegalStateException("El nuevo grupo es el mismo que el actual");
+            throw SirhaException.of(ErrorCodeSirha.INVALID_STATE_TRANSITION, "No se puede cambiar al nuevo grupo especificado");
         }
         if (!subject.hasGroup(newGroup)) {
-            throw new IllegalStateException("El nuevo grupo no pertenece a la materia especificada");
+            throw SirhaException.of(ErrorCodeSirha.INVALID_STATE_TRANSITION, "El nuevo grupo no pertenece a la materia especificada");
         }
         if (!newGroup.isOpen()) {
-            throw new IllegalStateException("El nuevo grupo está cerrado");
+            throw SirhaException.of(ErrorCodeSirha.GROUP_CLOSED, "El nuevo grupo está cerrado");
         }
         if (hasScheduleConflictWith(newGroup)) {
-            throw new IllegalStateException("Conflicto de horarios con el nuevo grupo");
+            throw SirhaException.of(ErrorCodeSirha.SCHEDULE_CONFLICT, "Conflicto de horarios con el nuevo grupo");
         }
         AcademicPeriod currentPeriod = getCurrentPeriod();
         if (currentPeriod == null || !currentPeriod.isActive() || !newGroup.sameAcademicPeriod(currentPeriod)) {
-            throw new IllegalStateException("El período académico no es válido para el nuevo grupo");
+            throw SirhaException.of(ErrorCodeSirha.ACADEMIC_PERIOD_NOT_VALID, "El período académico no es válido para el nuevo grupo");
         }
         return true;
     }
 
-    public boolean validateChangeSubject(Subject oldSubject, Subject newSubject, Group newGroup) {
+    public boolean validateChangeSubject(Subject oldSubject, Subject newSubject, Group newGroup) throws SirhaException {
         if (!hasSubject(oldSubject)) {
-            throw new IllegalStateException("El estudiante no tiene la materia antigua especificada");
+            throw SirhaException.of(ErrorCodeSirha.SUBJECT_NOT_FOUND, "El estudiante no tiene la materia antigua especificada");
         }
         if (!academicProgress.isSubjectCursando(oldSubject)) {
-            throw new IllegalStateException("La materia antigua no está en curso");
+            throw SirhaException.of(ErrorCodeSirha.SUBJECT_NOT_IN_PROGRESS, "La materia antigua no está en curso");
         }
         if (oldSubject.equals(newSubject)) {
-            throw new IllegalStateException("La materia nueva es la misma que la antigua");
+            throw SirhaException.of(ErrorCodeSirha.SAME_SUBJECT, "La materia nueva es la misma que la antigua");
         }
         if (academicProgress.hasSubject(newSubject) && !academicProgress.isSubjectNoCursada(newSubject)) {
-            throw new IllegalStateException("El estudiante ya tiene la materia nueva inscrita o aprobada");
+            throw SirhaException.of(ErrorCodeSirha.SUBJECT_ALREADY_ENROLLED, "El estudiante ya tiene la materia nueva inscrita o aprobada");
         }
         if (!academicProgress.getStudyPlan().hasSubject(newSubject)) {
-            throw new IllegalStateException("La materia nueva no está en el plan de estudios del estudiante");
+            throw SirhaException.of(ErrorCodeSirha.SUBJECT_NOT_IN_STUDY_PLAN, "La materia nueva no está en el plan de estudios del estudiante");
         }
         if (newSubject.hasPrerequisites() && !newSubject.canEnroll(academicProgress)) {
-            throw new IllegalStateException("No se cumplen los prerrequisitos para inscribir la materia nueva");
+            throw SirhaException.of(ErrorCodeSirha.PREREQUISITES_NOT_MET, "No se cumplen los prerrequisitos para inscribir la materia nueva");
         }
         if (!newSubject.hasGroup(newGroup)) {
-            throw new IllegalStateException("El nuevo grupo no pertenece a la materia nueva especificada");
+            throw SirhaException.of(ErrorCodeSirha.GROUP_NOT_FOUND, "El nuevo grupo no pertenece a la materia nueva especificada");
         }
         if (!newGroup.isOpen()) {
-            throw new IllegalStateException("El nuevo grupo está cerrado");
+            throw SirhaException.of(ErrorCodeSirha.GROUP_CLOSED, "El nuevo grupo está cerrado");
         }
         if (hasScheduleConflictWith(newGroup)) {
-            throw new IllegalStateException("Conflicto de horarios con el nuevo grupo");
+            throw SirhaException.of(ErrorCodeSirha.SCHEDULE_CONFLICT, "Conflicto de horarios con el nuevo grupo");
         }
         AcademicPeriod currentPeriod = getCurrentPeriod();
         if (currentPeriod == null || !currentPeriod.isActive() || !newGroup.sameAcademicPeriod(currentPeriod)) {
-            throw new IllegalStateException("El período académico no es válido para el nuevo grupo");
+            throw SirhaException.of(ErrorCodeSirha.ACADEMIC_PERIOD_NOT_VALID, "El período académico no es válido para el nuevo grupo");
         }
         return true;
     }
 
-    public CambioGrupo createGroupChangeRequest(Subject subject, Group newGroup) {
+    public CambioGrupo createGroupChangeRequest(Subject subject, Group newGroup) throws SirhaException {
         validateChangeGroup(subject, newGroup);
         CambioGrupo solicitud = new CambioGrupo(this, subject, newGroup, getCurrentPeriod());
         addRequest(solicitud);
         return solicitud;
     }
-    public CambioMateria createSubjectChangeRequest(Subject oldSubject, Subject newSubject, Group newGroup) {
-        validateChangeSubject(oldSubject, newSubject, newGroup);
+    public CambioMateria createSubjectChangeRequest(Subject oldSubject, Subject newSubject, Group newGroup) throws SirhaException {
+        validateChangeSubject(oldSubject, newSubject, newGroup) ;
         CambioMateria solicitud = new CambioMateria(this, oldSubject, newSubject, newGroup, getCurrentPeriod());
         addRequest(solicitud);
         return solicitud;

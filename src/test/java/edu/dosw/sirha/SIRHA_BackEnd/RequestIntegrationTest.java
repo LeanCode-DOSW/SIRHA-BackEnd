@@ -8,7 +8,7 @@ import edu.dosw.sirha.sirha_backend.domain.model.*;
 import edu.dosw.sirha.sirha_backend.domain.model.enums.Careers;
 import edu.dosw.sirha.sirha_backend.domain.model.enums.DiasSemana;
 import edu.dosw.sirha.sirha_backend.domain.model.enums.RequestStateEnum;
-import edu.dosw.sirha.sirha_backend.domain.model.stateGroup.Group;
+import edu.dosw.sirha.sirha_backend.domain.model.stategroup.Group;
 import edu.dosw.sirha.sirha_backend.domain.model.staterequest.*;
 import edu.dosw.sirha.sirha_backend.dto.ResponseRequest;
 import edu.dosw.sirha.sirha_backend.exception.SirhaException;
@@ -19,7 +19,7 @@ import java.time.LocalTime;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Pruebas de integración para todo el flujo de solicitudes académicas
+ * Integration tests covering the complete academic request workflow.
  */
 @SpringBootTest
 class RequestIntegrationTest {
@@ -39,7 +39,11 @@ class RequestIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        student = new Student("1", "juan.perez", "juan@example.com", "hashedPassword", "20231001");
+        try {
+            student = new Student("1", "juan.perez", "juan@example.com", "hashedPassword", "20231001");
+        } catch (Exception e) {
+            fail("No se esperaba una excepción al crear el estudiante: " + e.getMessage());
+        }
         academicPeriod = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
         
         mathematics = new Subject("101", "Matemáticas", 4);
@@ -58,11 +62,10 @@ class RequestIntegrationTest {
         mathGroup1.setId("1001");
         mathGroup2.setId("1002");
         physicsGroup.setId("1003");
-
-        mathSchedule1 = new Schedule(DiasSemana.LUNES, LocalTime.of(8, 0), LocalTime.of(10, 0));
-        mathSchedule2 = new Schedule(DiasSemana.MARTES, LocalTime.of(10, 0), LocalTime.of(12, 0));
-        physicsSchedule = new Schedule(DiasSemana.MIERCOLES, LocalTime.of(14, 0), LocalTime.of(16, 0));
         try {
+            mathSchedule1 = new Schedule(DiasSemana.LUNES, LocalTime.of(8, 0), LocalTime.of(10, 0));
+            mathSchedule2 = new Schedule(DiasSemana.MARTES, LocalTime.of(10, 0), LocalTime.of(12, 0));
+            physicsSchedule = new Schedule(DiasSemana.MIERCOLES, LocalTime.of(14, 0), LocalTime.of(16, 0));
             mathGroup1.addSchedule(mathSchedule1);
             mathGroup2.addSchedule(mathSchedule2);
             physicsGroup.addSchedule(physicsSchedule);
@@ -75,9 +78,14 @@ class RequestIntegrationTest {
         studyPlan.addSubject(physics);
         studyPlan.addSubject(chemistry);
         
-        Semaforo semaforo = new Semaforo(studyPlan);
-        student.setAcademicProgress(semaforo);
-        student.setCurrentPeriod(academicPeriod);
+        
+        try {
+            Semaforo semaforo = new Semaforo(studyPlan);
+            student.setAcademicProgress(semaforo);
+            student.setCurrentPeriod(academicPeriod);
+        } catch (Exception e) {
+            fail("No se esperaba una excepción al establecer el período actual: " + e.getMessage());
+        }
     }
 
     @Test
@@ -253,12 +261,10 @@ class RequestIntegrationTest {
     }
 
     @Test
-    void testScheduleConflictDetection() {
-        Schedule conflictingSchedule = new Schedule(DiasSemana.LUNES, LocalTime.of(9, 0), LocalTime.of(11, 0));
-        
-        
-        Subject conflictingSubject = new Subject("999", "Materia Conflictiva", 2);
+    void testScheduleConflictDetection() { 
         try {
+            Schedule conflictingSchedule = new Schedule(DiasSemana.LUNES, LocalTime.of(9, 0), LocalTime.of(11, 0));
+            Subject conflictingSubject = new Subject("999", "Materia Conflictiva", 2);
             Group conflictingGroup = new Group(conflictingSubject, 15, academicPeriod);
             conflictingGroup.addSchedule(conflictingSchedule);
             studyPlan.addSubject(conflictingSubject);

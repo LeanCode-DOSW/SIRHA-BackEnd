@@ -1,4 +1,4 @@
-package edu.dosw.sirha.sirha_backend.domain.model.stateGroup;
+package edu.dosw.sirha.sirha_backend.domain.model.stategroup;
 
 import edu.dosw.sirha.sirha_backend.domain.model.Student;
 import edu.dosw.sirha.sirha_backend.domain.port.GroupState;

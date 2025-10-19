@@ -1,6 +1,7 @@
 package edu.dosw.sirha.sirha_backend.domain.model;
-import edu.dosw.sirha.sirha_backend.domain.model.stateGroup.Group;
+import edu.dosw.sirha.sirha_backend.domain.model.stategroup.Group;
 import edu.dosw.sirha.sirha_backend.domain.model.staterequest.BaseRequest;
+import edu.dosw.sirha.sirha_backend.exception.SirhaException;
 
 public class CambioGrupo extends BaseRequest {
     private Subject subject;
@@ -16,7 +17,7 @@ public class CambioGrupo extends BaseRequest {
     public Group getNewGroup() {return newGroup;}
     
     @Override
-    public boolean validateRequest() {
+    public boolean validateRequest() throws SirhaException {
         return student.validateChangeGroup(subject, newGroup);
     }
 

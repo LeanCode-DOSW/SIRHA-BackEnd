@@ -6,10 +6,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import edu.dosw.sirha.sirha_backend.domain.model.*;
 import edu.dosw.sirha.sirha_backend.domain.model.enums.DiasSemana;
-import edu.dosw.sirha.sirha_backend.domain.model.stateGroup.Group;
-import edu.dosw.sirha.sirha_backend.domain.model.stateGroup.StatusClosed;
-import edu.dosw.sirha.sirha_backend.domain.model.stateGroup.StatusOpen;
-import edu.dosw.sirha.sirha_backend.domain.port.GroupState;
+import edu.dosw.sirha.sirha_backend.domain.model.stategroup.Group;
+import edu.dosw.sirha.sirha_backend.domain.model.stategroup.StatusClosed;
+import edu.dosw.sirha.sirha_backend.domain.model.stategroup.StatusOpen;
 import edu.dosw.sirha.sirha_backend.exception.SirhaException;
 
 import java.time.LocalDate;
@@ -18,7 +17,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
-public class GroupTests {
+class GroupTests {
 
     private AcademicPeriod academicPeriod;
     private Group group;
@@ -34,13 +33,15 @@ public class GroupTests {
     @BeforeEach
     void setUp() {
         academicPeriod = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
-        
-        student1 = new Student("jacobo", "jacobo@test.com", "hash123", "20231001");
-        student2 = new Student("maria", "maria@test.com", "hash456", "20231002");
-        student3 = new Student("carlos", "carlos@test.com", "hash789", "20231003");
-        
-        professor = new Professor("Dr. Smith", "smith@university.edu", "hash");
-        
+        try {
+            student1 = new Student("jacobo", "jacobo@test.com", "hash123", "20231001");
+            student2 = new Student("maria", "maria@test.com", "hash456", "20231002");
+            student3 = new Student("carlos", "carlos@test.com", "hash789", "20231003");
+            
+            professor = new Professor("Dr. Smith", "smith@university.edu", "hash");
+        } catch (Exception e) {
+            fail("No se esperaba una excepción al crear los usuarios: " + e.getMessage());
+        }
         subject = new Subject("101", "Cálculo I", 4);
         
         try {
@@ -48,10 +49,13 @@ public class GroupTests {
         } catch (Exception e) {
             fail("No se esperaba una excepción al crear el grupo: " + e.getMessage());
         }
-        
-        schedule1 = new Schedule(DiasSemana.LUNES, LocalTime.of(8, 0), LocalTime.of(10, 0));
-        schedule2 = new Schedule(DiasSemana.MARTES, LocalTime.of(10, 0), LocalTime.of(12, 0));
-        scheduleConflict = new Schedule(DiasSemana.LUNES, LocalTime.of(9, 0), LocalTime.of(11, 0));
+        try {
+            schedule1 = new Schedule(DiasSemana.LUNES, LocalTime.of(8, 0), LocalTime.of(10, 0));
+            schedule2 = new Schedule(DiasSemana.MARTES, LocalTime.of(10, 0), LocalTime.of(12, 0));
+            scheduleConflict = new Schedule(DiasSemana.LUNES, LocalTime.of(9, 0), LocalTime.of(11, 0));
+        } catch (Exception e) {
+            fail("No se esperaba una excepción al crear los horarios: " + e.getMessage());
+        }
     }
 
 
@@ -102,13 +106,12 @@ public class GroupTests {
 
     @Test
     void setEstadoTest() {
-        GroupState estadoCerrado = new StatusClosed();
         try {
             group.closeGroup();
         } catch (Exception e) {
             fail("No se esperaba una excepción al cambiar el estado: " + e.getMessage());
         }
-        assertEquals(estadoCerrado.getClass(), group.getGroupState().getClass());
+        assertEquals(StatusClosed.class, group.getGroupState().getClass());
     }
 
     @Test

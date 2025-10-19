@@ -6,8 +6,9 @@ import edu.dosw.sirha.sirha_backend.domain.model.Schedule;
 import edu.dosw.sirha.sirha_backend.domain.model.Subject;
 import edu.dosw.sirha.sirha_backend.domain.model.SubjectProgress;
 import edu.dosw.sirha.sirha_backend.domain.model.enums.SemaforoColores;
-import edu.dosw.sirha.sirha_backend.domain.model.stateGroup.Group;
+import edu.dosw.sirha.sirha_backend.domain.model.stategroup.Group;
 import edu.dosw.sirha.sirha_backend.domain.port.*;
+import edu.dosw.sirha.sirha_backend.exception.SirhaException;
 
 public class SubjectDecorator {
     private final Subject subject;
@@ -18,16 +19,16 @@ public class SubjectDecorator {
     private int grade;
     private List<SubjectStateProcess> history;
 
-    public SubjectDecorator(Subject subject) {
+    public SubjectDecorator(Subject subject) throws SirhaException {
         this.subject = subject;
         this.state = new NoCursadaState();
         state.setState(this);
         history = new ArrayList<>();
     }
 
-    public void setGroup(Group group) { state.setGroup(this, group); }
-    public void setSemester(int semester) { state.setSemester(this, semester); }
-    public void setGrade(int grade) { state.setGrade(this, grade); }
+    public void setGroup(Group group) throws SirhaException { state.setGroup(this, group); }
+    public void setSemester(int semester) throws SirhaException { state.setSemester(this, semester); }
+    public void setGrade(int grade) throws SirhaException { state.setGrade(this, grade); }
 
     void setState(SubjectState state) {this.state = state;}
     void setEstadoColor(SemaforoColores estadoColor) {this.estadoColor = estadoColor;}
@@ -35,20 +36,20 @@ public class SubjectDecorator {
     void setGroupDirect(Group group) { this.group = group; }
     void setGradeDirect(int grade) { this.grade = grade; }
 
-    public void inscribir(Group grupo) { 
+    public void inscribir(Group grupo) throws SirhaException {
         state.inscribir(this, grupo); 
         recordChangeState(new SubjectProgress(SemaforoColores.GRIS, semestre, grupo, 0));
     }
 
-    public void inscribir(Group grupo, int semester) {
+    public void inscribir(Group grupo, int semester) throws SirhaException {
         inscribir(grupo);
         state.setSemester(this, semester);
         
     }
-    public void aprobar()   { state.aprobar(this); recordChangeState(new SubjectProgress(SemaforoColores.VERDE, this.semestre, this.group, this.grade));}
-    public void reprobar()  { state.reprobar(this); recordChangeState(new SubjectProgress(SemaforoColores.ROJO, this.semestre, this.group, this.grade)); }
-    public void retirar()   { state.retirar(this); recordChangeState(new SubjectProgress(SemaforoColores.AMARILLO, this.semestre, this.group, this.grade));}
-    
+    public void aprobar() throws SirhaException { state.aprobar(this); recordChangeState(new SubjectProgress(SemaforoColores.VERDE, this.semestre, this.group, this.grade));}
+    public void reprobar() throws SirhaException { state.reprobar(this); recordChangeState(new SubjectProgress(SemaforoColores.ROJO, this.semestre, this.group, this.grade)); }
+    public void retirar() throws SirhaException { state.retirar(this); recordChangeState(new SubjectProgress(SemaforoColores.AMARILLO, this.semestre, this.group, this.grade));}
+
     private void recordChangeState(SubjectStateProcess stateProcess){
         addState(stateProcess);
     }

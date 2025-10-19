@@ -13,37 +13,39 @@ import edu.dosw.sirha.sirha_backend.domain.model.staterequest.BaseRequest;
 import edu.dosw.sirha.sirha_backend.dto.AuthResponse;
 import edu.dosw.sirha.sirha_backend.dto.LoginRequest;
 import edu.dosw.sirha.sirha_backend.dto.RegisterRequest;
+import edu.dosw.sirha.sirha_backend.dto.StudentDTO;
 import edu.dosw.sirha.sirha_backend.dto.SubjectDecoratorDTO;
+import edu.dosw.sirha.sirha_backend.exception.SirhaException;
 
 import java.util.Map;
 
 public interface StudentService {
-    AuthResponse registerStudent(RegisterRequest request);
-    AuthResponse loginStudent(LoginRequest request);
+    AuthResponse registerStudent(RegisterRequest request) throws SirhaException;
+    AuthResponse loginStudent(LoginRequest request) throws SirhaException;
 
 
-    List<Student> findAll();
-    Optional<Student> findById(String id);
-    Optional<Student> findByUsername(String username);
-    Optional<Student> findByEmail(String email);
+    List<Student> findAll() throws SirhaException;
+    Optional<Student> findById(String id) throws SirhaException;
+    Optional<Student> findByUsername(String username) throws SirhaException;
+    Optional<Student> findByEmail(String email) throws SirhaException;
 
-    boolean existsByCode(String code);
-    boolean existsByEmail(String email);
+    boolean existsByCode(String code) throws SirhaException;
+    boolean existsByEmail(String email) throws SirhaException;
 
-    Student save(Student student); //deberia ser un studentDTO
-    Student deleteById(String id);
+    Student save(StudentDTO studentDTO) throws SirhaException;
+    Student deleteById(String id) throws SirhaException;
 
-    List<Schedule> getCurrentSchedule(String username);
-    List<Schedule> getScheduleForPeriod(String username, String period);
-    Map<AcademicPeriod,List<Schedule>> getAllSchedules(String username);
+    List<Schedule> getCurrentSchedule(String username) throws SirhaException;
+    List<Schedule> getScheduleForPeriod(String username, String period) throws SirhaException;
+    Map<AcademicPeriod,List<Schedule>> getAllSchedules(String username) throws SirhaException;
     
-    List<BaseRequest> getAllRequests(String username);
-    BaseRequest getRequestById(String username, String requestId);
-    List<BaseRequest> getRequestsHistory(String username); // el historial son las solicitudes que ya fueron aprobadas o rechazadas
+    List<BaseRequest> getAllRequests(String username) throws SirhaException;
+    BaseRequest getRequestById(String username, String requestId) throws SirhaException;
+    List<BaseRequest> getRequestsHistory(String username) throws SirhaException; // el historial son las solicitudes que ya fueron aprobadas o rechazadas
 
-    Map<SemaforoColores,List<SubjectDecoratorDTO>> getAcademicPensum(String username);
+    Map<SemaforoColores,List<SubjectDecoratorDTO>> getAcademicPensum(String username) throws SirhaException;
 
-    CambioGrupo createRequestCambioGrupo(String studentName, String subjectName, String codeNewGroup);
-    CambioMateria createRequestCambioMateria(String studentName, String subjectName, String newSubjectName, String codeNewGroup);
+    CambioGrupo createRequestCambioGrupo(String studentName, String subjectName, String codeNewGroup) throws SirhaException;
+    CambioMateria createRequestCambioMateria(String studentName, String subjectName, String newSubjectName, String codeNewGroup) throws SirhaException;
 
 }

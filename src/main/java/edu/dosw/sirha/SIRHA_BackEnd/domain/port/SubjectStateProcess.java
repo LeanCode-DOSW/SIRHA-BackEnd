@@ -3,7 +3,7 @@ package edu.dosw.sirha.sirha_backend.domain.port;
 import java.time.LocalDateTime;
 
 import edu.dosw.sirha.sirha_backend.domain.model.enums.SemaforoColores;
-import edu.dosw.sirha.sirha_backend.domain.model.stateGroup.Group;
+import edu.dosw.sirha.sirha_backend.domain.model.stategroup.Group;
 
 public interface SubjectStateProcess {
     String getId();

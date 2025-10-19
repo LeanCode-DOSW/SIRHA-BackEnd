@@ -3,7 +3,7 @@ package edu.dosw.sirha.sirha_backend.domain.model;
 import java.time.LocalDateTime;
 import org.springframework.data.annotation.Id;
 import edu.dosw.sirha.sirha_backend.domain.model.enums.SemaforoColores;
-import edu.dosw.sirha.sirha_backend.domain.model.stateGroup.Group;
+import edu.dosw.sirha.sirha_backend.domain.model.stategroup.Group;
 import edu.dosw.sirha.sirha_backend.domain.port.SubjectStateProcess;
 
 public class SubjectProgress implements SubjectStateProcess {

@@ -13,7 +13,7 @@ import edu.dosw.sirha.sirha_backend.domain.model.StudyPlan;
 import edu.dosw.sirha.sirha_backend.domain.model.Subject;
 import edu.dosw.sirha.sirha_backend.domain.model.enums.Careers;
 import edu.dosw.sirha.sirha_backend.domain.model.enums.RequestStateEnum;
-import edu.dosw.sirha.sirha_backend.domain.model.stateGroup.Group;
+import edu.dosw.sirha.sirha_backend.domain.model.stategroup.Group;
 import edu.dosw.sirha.sirha_backend.domain.model.staterequest.BaseRequest;
 import edu.dosw.sirha.sirha_backend.exception.SirhaException;
 

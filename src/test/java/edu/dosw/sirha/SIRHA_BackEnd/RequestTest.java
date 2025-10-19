@@ -7,11 +7,12 @@ import edu.dosw.sirha.sirha_backend.domain.model.*;
 import edu.dosw.sirha.sirha_backend.domain.model.enums.Careers;
 import edu.dosw.sirha.sirha_backend.domain.model.enums.DiasSemana;
 import edu.dosw.sirha.sirha_backend.domain.model.enums.RequestStateEnum;
-import edu.dosw.sirha.sirha_backend.domain.model.stateGroup.Group;
-import edu.dosw.sirha.sirha_backend.domain.model.stateGroup.StatusClosed;
-import edu.dosw.sirha.sirha_backend.domain.model.stateGroup.StatusOpen;
+import edu.dosw.sirha.sirha_backend.domain.model.stategroup.Group;
+import edu.dosw.sirha.sirha_backend.domain.model.stategroup.StatusClosed;
+import edu.dosw.sirha.sirha_backend.domain.model.stategroup.StatusOpen;
 import edu.dosw.sirha.sirha_backend.domain.model.statesubjectdec.NoCursadaState;
 import edu.dosw.sirha.sirha_backend.domain.model.statesubjectdec.SubjectDecorator;
+import edu.dosw.sirha.sirha_backend.exception.SirhaException;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -27,12 +28,12 @@ class RequestTest {
 
     @Test
     void testInscriptionRequestValidation() {
-        Student student = new Student("1", "juan.perez", "juan@example.com", "hashedPassword", "20231001");
-        
-        AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
-        Subject subject = new Subject("101", "Matemáticas", 4);
-
         try {
+            Student student = new Student("1", "juan.perez", "juan@example.com", "hashedPassword", "20231001");
+            
+            AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
+            Subject subject = new Subject("101", "Matemáticas", 4);
+
             Group group = new Group(subject, 30, period);
             StudyPlan studyPlan = new StudyPlan("Ingeniería de Sistemas", Careers.INGENIERIA_DE_SISTEMAS);
             studyPlan.addSubject(subject);
@@ -78,13 +79,15 @@ class RequestTest {
     void testScheduleConflictDetection() {
         AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
         Subject subject = new Subject("101", "Matemáticas", 4);
-
-        Schedule schedule1 = new Schedule(DiasSemana.LUNES, LocalTime.of(8, 0), LocalTime.of(10, 0));
+        
         try {
+            Schedule schedule1 = new Schedule(DiasSemana.LUNES, LocalTime.of(8, 0), LocalTime.of(10, 0));
             Group group1 = new Group(subject, 30, period);
             group1.addSchedule(schedule1);
             
             Schedule schedule2 = new Schedule(DiasSemana.LUNES, LocalTime.of(9, 0), LocalTime.of(11, 0));
+            schedule1.equals(schedule2);
+            schedule1.equals(group1);
             Group group2 = new Group(subject, 25, period);
             group2.addSchedule(schedule2);
             
@@ -128,7 +131,7 @@ class RequestTest {
             assertTrue(student.getAcademicProgress().hasSubject(prerequisite));
 
 
-            assertThrows(IllegalStateException.class, () -> {
+            assertThrows(SirhaException.class, () -> {
                 student.enrollSubject(mainSubject, group2);
             });
 
@@ -182,16 +185,21 @@ class RequestTest {
 
     @Test
     void testBaseRequestFlow() {
-        Student student = new Student("1", "juan.perez", "juan@example.com", "hashedPassword", "20231001");
-        AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
+        try {
+            Student student = new Student("1", "juan.perez", "juan@example.com", "hashedPassword", "20231001");
+            AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
         
-        assertNotNull(student);
-        assertNotNull(period);
-        assertEquals("juan.perez", student.getUsername());
-        assertTrue(period.isActive());
+            assertNotNull(student);
+            assertNotNull(period);
+            assertEquals("juan.perez", student.getUsername());
+            assertTrue(period.isActive());
+            
+            assertEquals(LocalDate.now(), period.getStartDate());
+            assertEquals(LocalDate.now().plusMonths(4), period.getEndDate());
+        } catch (Exception e) {
+            fail("No se esperaba una excepción al crear el estudiante: " + e.getMessage());
+        }
         
-        assertEquals(LocalDate.now(), period.getStartDate());
-        assertEquals(LocalDate.now().plusMonths(4), period.getEndDate());
     }
 
     @Test

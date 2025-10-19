@@ -1,7 +1,7 @@
 package edu.dosw.sirha.sirha_backend.domain.port;
 
 import edu.dosw.sirha.sirha_backend.domain.model.*;
-import edu.dosw.sirha.sirha_backend.domain.model.stateGroup.Group;
+import edu.dosw.sirha.sirha_backend.domain.model.stategroup.Group;
 import edu.dosw.sirha.sirha_backend.exception.SirhaException;
 
 public interface GroupState {

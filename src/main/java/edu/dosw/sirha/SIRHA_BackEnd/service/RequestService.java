@@ -4,14 +4,15 @@ import java.util.List;
 import java.util.Optional;
 
 import edu.dosw.sirha.sirha_backend.domain.model.staterequest.BaseRequest;
+import edu.dosw.sirha.sirha_backend.exception.SirhaException;
 
 public interface RequestService {
-    List<BaseRequest> findAll();
-    Optional<BaseRequest> findById(String id);
-    BaseRequest save(BaseRequest request);
-    BaseRequest deleteById(String id);
+    List<BaseRequest> findAll() throws SirhaException;
+    Optional<BaseRequest> findById(String id) throws SirhaException;
+    BaseRequest save(BaseRequest request) throws SirhaException;
+    BaseRequest deleteById(String id) throws SirhaException;
 
-    List<BaseRequest> getAllRequests(String username);
-    BaseRequest getRequestById(String username, String requestId);
-    List<BaseRequest> getRequestsHistory(String username); // el historial son las solicitudes que ya fueron aprobadas o rechazadas
+    List<BaseRequest> getAllRequests(String username) throws SirhaException;
+    BaseRequest getRequestById(String username, String requestId) throws SirhaException;
+    List<BaseRequest> getRequestsHistory(String username) throws SirhaException; // el historial son las solicitudes que ya fueron aprobadas o rechazadas
 }

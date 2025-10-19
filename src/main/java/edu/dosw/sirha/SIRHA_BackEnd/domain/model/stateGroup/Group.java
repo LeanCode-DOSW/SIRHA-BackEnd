@@ -1,4 +1,4 @@
-package edu.dosw.sirha.sirha_backend.domain.model.stateGroup;
+package edu.dosw.sirha.sirha_backend.domain.model.stategroup;
 
 import java.util.*;
 import org.springframework.data.annotation.Id;
@@ -297,6 +297,11 @@ public class Group {
                 && Objects.equals(profesor, group.profesor)
                 && Objects.equals(aula, group.aula)
                 && Objects.equals(schedules, group.schedules);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(currentPeriod, code, curso, profesor, aula, schedules);
     }
 
     @Override

@@ -1,7 +1,9 @@
 package edu.dosw.sirha.sirha_backend.domain.model.statesubjectdec;
 import edu.dosw.sirha.sirha_backend.domain.model.enums.SemaforoColores;
-import edu.dosw.sirha.sirha_backend.domain.model.stateGroup.Group;
+import edu.dosw.sirha.sirha_backend.domain.model.stategroup.Group;
 import edu.dosw.sirha.sirha_backend.domain.port.SubjectState;
+import edu.dosw.sirha.sirha_backend.exception.ErrorCodeSirha;
+import edu.dosw.sirha.sirha_backend.exception.SirhaException;
 
 public class EnCursoState implements SubjectState {
 
@@ -16,19 +18,19 @@ public class EnCursoState implements SubjectState {
         }
     }
     public void setGrade(SubjectDecorator materia, int grade) {materia.setGradeDirect(grade);}
-    public void inscribir(SubjectDecorator materia, Group grupo) {throw new IllegalStateException("La materia ya está inscrita");}
+    public void inscribir(SubjectDecorator materia, Group grupo) throws SirhaException { throw SirhaException.of(ErrorCodeSirha.SUBJECT_ALREADY_ENROLLED,"La materia ya está inscrita"); }
 
-    public void retirar(SubjectDecorator materia) {
+    public void retirar(SubjectDecorator materia) throws SirhaException {
         materia.setState(new NoCursadaState());
         materia.getState().setState(materia);
     }
 
-    public void aprobar(SubjectDecorator materia) {
+    public void aprobar(SubjectDecorator materia) throws SirhaException {
         materia.setState(new AprobadaState());
         materia.getState().setState(materia);
     }
 
-    public void reprobar(SubjectDecorator materia) {
+    public void reprobar(SubjectDecorator materia) throws SirhaException {
         materia.setState(new ReprobadaState());
         materia.getState().setState(materia); 
     }

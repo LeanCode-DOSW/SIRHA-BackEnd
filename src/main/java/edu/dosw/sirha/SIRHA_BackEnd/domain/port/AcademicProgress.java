@@ -9,7 +9,7 @@ import edu.dosw.sirha.sirha_backend.domain.model.StudyPlan;
 import edu.dosw.sirha.sirha_backend.domain.model.Subject;
 import edu.dosw.sirha.sirha_backend.domain.model.enums.Careers;
 import edu.dosw.sirha.sirha_backend.domain.model.enums.SemaforoColores;
-import edu.dosw.sirha.sirha_backend.domain.model.stateGroup.Group;
+import edu.dosw.sirha.sirha_backend.domain.model.stategroup.Group;
 import edu.dosw.sirha.sirha_backend.domain.model.statesubjectdec.SubjectDecorator;
 import edu.dosw.sirha.sirha_backend.dto.AcademicIndicatorsDTO;
 import edu.dosw.sirha.sirha_backend.dto.SubjectDecoratorDTO;
@@ -110,8 +110,8 @@ public interface AcademicProgress {
     AcademicIndicatorsDTO getAcademicIndicators();
     
     int getCreditsStudyPlan();
-    boolean verifyChangeGroup(Subject subject, Group newGroup);
-    void enrollSubjectInGroup(Subject subject, Group group);
+    boolean verifyChangeGroup(Subject subject, Group newGroup) throws SirhaException;
+    void enrollSubjectInGroup(Subject subject, Group group) throws SirhaException;
 
     void approveSubject(String subject) throws SirhaException;
     void failSubject(String subject) throws SirhaException;

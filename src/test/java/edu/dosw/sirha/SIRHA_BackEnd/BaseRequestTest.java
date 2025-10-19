@@ -6,7 +6,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import edu.dosw.sirha.sirha_backend.domain.model.*;
 import edu.dosw.sirha.sirha_backend.domain.model.enums.RequestStateEnum;
-import edu.dosw.sirha.sirha_backend.domain.model.stateGroup.Group;
+import edu.dosw.sirha.sirha_backend.domain.model.stategroup.Group;
 import edu.dosw.sirha.sirha_backend.domain.model.staterequest.*;
 import edu.dosw.sirha.sirha_backend.domain.port.RequestProcess;
 import edu.dosw.sirha.sirha_backend.dto.ResponseRequest;
@@ -30,12 +30,13 @@ class BaseRequestTest {
 
     @BeforeEach
     void setUp() {
-        student = new Student("1", "juan.perez", "juan@example.com", "hashedPassword", "20231001");
-        academicPeriod = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
-
-        subject1 = new Subject("101", "Matemáticas", 4);
-        subject2 = new Subject("102", "Física", 3);
+        
         try {
+            student = new Student("1", "juan.perez", "juan@example.com", "hashedPassword", "20231001");
+            academicPeriod = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
+
+            subject1 = new Subject("101", "Matemáticas", 4);
+            subject2 = new Subject("102", "Física", 3);
             group1 = new Group(subject1, 30, academicPeriod);
             group2 = new Group(subject2, 25, academicPeriod);
         } catch (Exception e) {

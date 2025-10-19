@@ -1,8 +1,10 @@
 package edu.dosw.sirha.sirha_backend.repository.mongo;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.data.mongodb.repository.Query;
 
 import edu.dosw.sirha.sirha_backend.domain.model.Student;
 
@@ -16,15 +18,20 @@ public interface StudentMongoRepository extends MongoRepository<Student, String>
     boolean existsByEmail(String email);
     boolean existsByUsername(String username);
 
-    //List<Student> findStudentsTakingSubject(String subjectId);
+    
+    @Query("{ 'materias': { $elemMatch: { 'subject.id': ?0, 'state': 'EN_CURSO' } } }")
+    List<Student> findStudentsTakingSubject(String subjectId);
 
-    //List<Student> findStudentsBySemester(int semester);
+    
 
-    //List<Student> findStudentsWithClassesOnDay(String day);
+    @Query("{ 'materias': { $elemMatch: { " +
+           "'group.schedules': { $elemMatch: { 'day': ?0 } } " +
+           "} } }")
+    List<Student> findStudentsWithClassesOnDay(String day);
     
-    //List<Student> findStudentsByProfessor(String professorId);
+    @Query("{ 'materias': { $elemMatch: { " +
+           "'group.profesor.id': ?0 " +
+           "} } }")
+    List<Student> findStudentsByProfessor(String professorId);
     
-    //List<Student> findStudentsByStudyPlan(String studyPlanId);
-    
-    //List<Student> findStudentsByCreditRange(int minCredits, int maxCredits);
 }

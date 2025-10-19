@@ -7,9 +7,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import edu.dosw.sirha.sirha_backend.dto.AuthResponse;
+import edu.dosw.sirha.sirha_backend.dto.ErrorResponse;
 import edu.dosw.sirha.sirha_backend.dto.LoginRequest;
 import edu.dosw.sirha.sirha_backend.dto.RegisterRequest;
 import edu.dosw.sirha.sirha_backend.service.AuthService;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 
 /**
  * Controlador REST para el manejo de autenticación y registro de usuarios en el sistema SIRHA.
@@ -50,16 +53,27 @@ public class AuthController {
      *               (username y password). No debe ser null.
      */
     @PostMapping("/login")
-    public ResponseEntity<?> login(@Valid @RequestBody LoginRequest request) {
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Login exitoso"),
+        @ApiResponse(responseCode = "401", description = "Credenciales inválidas"),
+        @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    })
+    public ResponseEntity<Object> login(@Valid @RequestBody LoginRequest request) {
         try {
             AuthResponse response = authService.loginStudent(request);
             return ResponseEntity.ok(response);
         } catch (IllegalArgumentException e) {
-            System.out.println(e.getMessage());
-            return ResponseEntity.status(401).body(new LoginRequest(null, e.getMessage()));
+            return ResponseEntity.status(401).body(new ErrorResponse(
+                HttpStatus.UNAUTHORIZED.value(),
+                "Unauthorized",
+                e.getMessage()
+            ));
         } catch (Exception e) {
-            System.out.println(e.getMessage());
-            return ResponseEntity.status(500).body(new LoginRequest(null, "Error interno del servidor"));
+            return ResponseEntity.status(500).body(new ErrorResponse(
+                HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                "Internal Server Error",
+                "Error interno del servidor"
+            ));
         }
     }
 
@@ -80,7 +94,7 @@ public class AuthController {
      *            No debe ser null.
      */
     @PostMapping("/register")
-    public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest request) {
+    public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest request) {
         try{
             AuthResponse response = authService.registerStudent(request);
             return ResponseEntity.status(HttpStatus.CREATED).body(response);

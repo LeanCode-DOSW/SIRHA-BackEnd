@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import edu.dosw.sirha.sirha_backend.dto.AuthResponse;
 import edu.dosw.sirha.sirha_backend.dto.LoginRequest;
 import edu.dosw.sirha.sirha_backend.dto.RegisterRequest;
+import edu.dosw.sirha.sirha_backend.exception.SirhaException;
 import edu.dosw.sirha.sirha_backend.service.*;
 
 
@@ -23,12 +24,12 @@ public class AuthServiceImpl implements AuthService {
     }
     @Transactional
     @Override
-    public AuthResponse registerStudent(RegisterRequest request) {
+    public AuthResponse registerStudent(RegisterRequest request) throws SirhaException {
         return studentService.registerStudent(request);
     }
     @Transactional
     @Override
-    public AuthResponse loginStudent(LoginRequest request) {
+    public AuthResponse loginStudent(LoginRequest request) throws SirhaException {
         return studentService.loginStudent(request);
     }
 }

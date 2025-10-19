@@ -11,8 +11,10 @@ import edu.dosw.sirha.sirha_backend.domain.model.Student;
 import edu.dosw.sirha.sirha_backend.domain.model.enums.SemaforoColores;
 import edu.dosw.sirha.sirha_backend.dto.StudentDTO;
 import edu.dosw.sirha.sirha_backend.dto.SubjectDecoratorDTO;
+import edu.dosw.sirha.sirha_backend.exception.ErrorCodeSirha;
+import edu.dosw.sirha.sirha_backend.exception.SirhaException;
 import edu.dosw.sirha.sirha_backend.service.StudentService;
-import edu.dosw.sirha.sirha_backend.util.MapperUtils;
+import edu.dosw.sirha.sirha_backend.util.StudentMapper;
 
 import java.util.List;
 import java.util.Map;
@@ -35,7 +37,7 @@ import java.util.Map;
  * @see StudentService
  * @see StudentDTO
  * @see Student
- * @see MapperUtils
+ * @see StudentMapper
  */
 @RestController
 @RequestMapping("/api/students")
@@ -83,10 +85,10 @@ public class StudentController {
      * ]
      */
     @GetMapping
-    public List<StudentDTO> getAll() {
+    public List<StudentDTO> getAll() throws SirhaException{
         return studentService.findAll()
                 .stream()
-                .map(MapperUtils::toDTO)
+                .map(StudentMapper::toDTO)
                 .toList();
     }
 
@@ -101,83 +103,65 @@ public class StudentController {
      *          No debe ser null o vacío.
      * @return StudentDTO con la información del estudiante encontrado
      * 
-     * @throws RuntimeException si no se encuentra un estudiante con el ID especificado
-     * 
-     * @example
-     * GET /api/students/12345
-     * Accept: application/json
-     * 
-     * Respuesta exitosa:
-     * {
-     *   "id": "12345",
-     *   "username": "juan.perez",
-     *   "codigo": "202112345",
-     *   "solicitudesIds": ["req1", "req2"]
-     * }
-     * 
-     * Respuesta de error (500):
-     * {
-     *   "error": "Estudiante no encontrado"
-     * }
      */
     @GetMapping("/{id}")
-    public StudentDTO getById(@PathVariable String id) {
+    public StudentDTO getById(@PathVariable String id) throws SirhaException{
         return studentService.findById(id)
-                .map(MapperUtils::toDTO)
-                .orElseThrow(() -> new RuntimeException("Estudiante no encontrado"));
+                .map(StudentMapper::toDTO)
+                .orElseThrow(() -> new SirhaException(ErrorCodeSirha.STUDENT_NOT_FOUND));
     }
 
     @GetMapping("/schedule/{username}")
-    public ResponseEntity<List<Schedule>> getCurrentSchedule(@PathVariable String username){
+    public ResponseEntity<List<Schedule>> getCurrentSchedule(@PathVariable String username) {
         try {
             List<Schedule> schedules = studentService.getCurrentSchedule(username);
             return ResponseEntity.ok(schedules);
-        } catch (IllegalArgumentException e) {
+        } catch (SirhaException e) {
             // Retornar 404 cuando el estudiante no existe
             return ResponseEntity.notFound().build();
         }
     }
     @GetMapping("/schedule/{username}/period")
-    public ResponseEntity<List<Schedule>> getScheduleForPeriod(@PathVariable String username, @RequestParam String period){
+    public ResponseEntity<List<Schedule>> getScheduleForPeriod(@PathVariable String username, @RequestParam String period) {
         try {
             List<Schedule> schedules = studentService.getScheduleForPeriod(username, period);
             return ResponseEntity.ok(schedules);
-        } catch (IllegalArgumentException e) {
+        } catch (SirhaException e) {
             // Retornar 404 cuando el estudiante no existe
             return ResponseEntity.notFound().build();
         }
     }
     @GetMapping("/schedules/{username}")
-    public ResponseEntity<Map<AcademicPeriod,List<Schedule>>> getAllSchedules(@PathVariable String username){
+    public ResponseEntity<Map<AcademicPeriod,List<Schedule>>> getAllSchedules(@PathVariable String username) {
         try {
             Map<AcademicPeriod,List<Schedule>> schedules = studentService.getAllSchedules(username);
             return ResponseEntity.ok(schedules);
-        } catch (IllegalArgumentException e) {
+        } catch (SirhaException e) {
             // Retornar 404 cuando el estudiante no existe
             return ResponseEntity.notFound().build();
         }
     }
 
     @GetMapping("/academicPensum/{username}")
-    public ResponseEntity<Map<SemaforoColores,List<SubjectDecoratorDTO>>> getAcademicPensum(@PathVariable String username){
+    public ResponseEntity<Map<SemaforoColores,List<SubjectDecoratorDTO>>> getAcademicPensum(@PathVariable String username) {
         try {
             Map<SemaforoColores,List<SubjectDecoratorDTO>> pensum = studentService.getAcademicPensum(username);
             return ResponseEntity.ok(pensum);
-        } catch (IllegalArgumentException e) {
+        } catch (SirhaException e) {
             // Retornar 404 cuando el estudiante no existe
             return ResponseEntity.notFound().build();
         }
     }
 
     @PostMapping("/{studentName}/solicitudes/cambio-grupo")
-    public ResponseEntity<CambioGrupo> createRequestCambioGrupo(
+    public ResponseEntity<CambioGrupo> createRequestCambioGrupo (
             @PathVariable String studentName, 
             @RequestParam String subjectName, 
             @RequestParam String codeNewGroup) {
         try {
             CambioGrupo cambioGrupo = studentService.createRequestCambioGrupo(studentName, subjectName, codeNewGroup);
             return ResponseEntity.ok(cambioGrupo);
-        } catch (IllegalArgumentException e) {
+        } catch (SirhaException e) {
             // Retornar 404 cuando el estudiante no existe
             return ResponseEntity.notFound().build();
         }
@@ -192,7 +176,7 @@ public class StudentController {
         try {
             CambioMateria cambioMateria = studentService.createRequestCambioMateria(studentName, subjectName, newSubjectName, codeNewGroup);
             return ResponseEntity.ok(cambioMateria);
-        } catch (IllegalArgumentException e) {
+        } catch (SirhaException e) {
             // Retornar 404 cuando el estudiante no existe
             return ResponseEntity.notFound().build();
         }
@@ -214,16 +198,14 @@ public class StudentController {
      * 
      */
     @PostMapping
-    public StudentDTO create(@RequestBody StudentDTO dto) {
-        Student newStudent = new Student(
-            dto.getUsername(), 
-            dto.getEmail(),  
-            "defaultPass", // Contraseña temporal - debe ser actualizada
-            dto.getCode()
-        );
-        
-        Student savedStudent = studentService.save(newStudent);
-        return MapperUtils.toDTO(savedStudent);
+    public ResponseEntity<StudentDTO> create(@RequestBody StudentDTO dto) {
+        try {
+            Student student = studentService.save(dto);
+            return ResponseEntity.status(201).body(StudentMapper.toDTO(student));
+        } catch (Exception e) {
+            // Retornar 500 en caso de error al guardar
+            return ResponseEntity.status(500).build();
+        }
     }
 
 

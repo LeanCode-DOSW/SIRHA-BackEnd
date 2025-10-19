@@ -5,7 +5,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import edu.dosw.sirha.sirha_backend.domain.model.AcademicPeriod;
 import edu.dosw.sirha.sirha_backend.domain.model.Subject;
-import edu.dosw.sirha.sirha_backend.domain.model.stateGroup.Group;
+import edu.dosw.sirha.sirha_backend.domain.model.stategroup.Group;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -398,4 +398,5 @@ class SubjectTest {
         s.getGroupByCode("1");
     }
 
+    
 }

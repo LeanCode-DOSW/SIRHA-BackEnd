@@ -7,7 +7,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import edu.dosw.sirha.sirha_backend.domain.model.*;
 import edu.dosw.sirha.sirha_backend.domain.model.enums.Careers;
 import edu.dosw.sirha.sirha_backend.domain.model.enums.DiasSemana;
-import edu.dosw.sirha.sirha_backend.domain.model.stateGroup.Group;
+import edu.dosw.sirha.sirha_backend.domain.model.stategroup.Group;
+import edu.dosw.sirha.sirha_backend.exception.SirhaException;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -34,13 +35,15 @@ class CambioMateriaTest {
 
     @BeforeEach
     void setUp() {
-        student = new Student("1", "juan.perez", "juan@example.com", "hashedPassword", "20231001");
-        academicPeriod = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
-
-        materiaAntigua = new Subject("101", "Álgebra", 3);
-        materiaNueva = new Subject("102", "Cálculo", 4);
-        prerequisito = new Subject("100", "Matemáticas Básicas", 3);
+        
         try {
+            student = new Student("1", "juan.perez", "juan@example.com", "hashedPassword", "20231001");
+            academicPeriod = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
+
+            materiaAntigua = new Subject("101", "Álgebra", 3);
+            materiaNueva = new Subject("102", "Cálculo", 4);
+            prerequisito = new Subject("100", "Matemáticas Básicas", 3);
+
             grupoAntiguo = new Group(materiaAntigua, 30, academicPeriod);
             grupoNuevo = new Group(materiaNueva, 25, academicPeriod);
             grupoPrerequisito = new Group(prerequisito, 35, academicPeriod);
@@ -52,14 +55,17 @@ class CambioMateriaTest {
         studyPlan.addSubject(materiaAntigua);
         studyPlan.addSubject(materiaNueva);
         studyPlan.addSubject(prerequisito);
-        
-        Semaforo semaforo = new Semaforo(studyPlan);
-        student.setAcademicProgress(semaforo);
-        student.setCurrentPeriod(academicPeriod);
-        
-        // Configurar horarios para probar conflictos
-        scheduleConflict = new Schedule(DiasSemana.LUNES, LocalTime.of(8, 0), LocalTime.of(10, 0));
-        scheduleNoConflict = new Schedule(DiasSemana.MARTES, LocalTime.of(10, 0), LocalTime.of(12, 0));
+        try{
+            Semaforo semaforo = new Semaforo(studyPlan);
+            student.setAcademicProgress(semaforo);
+            student.setCurrentPeriod(academicPeriod);
+            
+            // Configurar horarios para probar conflictos
+            scheduleConflict = new Schedule(DiasSemana.LUNES, LocalTime.of(8, 0), LocalTime.of(10, 0));
+            scheduleNoConflict = new Schedule(DiasSemana.MARTES, LocalTime.of(10, 0), LocalTime.of(12, 0));
+        } catch (Exception e) {
+            fail("No se esperaba una excepción al configurar el estudiante: " + e.getMessage());
+        }
     }
 
     @Test
@@ -217,14 +223,17 @@ class CambioMateriaTest {
         
         assertTrue(studyPlan.hasSubject(materiaAntigua));
         assertTrue(studyPlan.hasSubject(materiaNueva));
-
-        CambioMateria solicitud = student.createSubjectChangeRequest(materiaAntigua, materiaNueva, grupoNuevo);
-        assertNotNull(solicitud);
-        assertEquals(student, solicitud.getStudent());
-        assertEquals(materiaAntigua, solicitud.getOldSubject());
-        assertEquals(materiaNueva, solicitud.getNewSubject());
-        assertEquals(grupoNuevo, solicitud.getNewGroup());
+        try {
+            CambioMateria solicitud = student.createSubjectChangeRequest(materiaAntigua, materiaNueva, grupoNuevo);
+            assertNotNull(solicitud);
+            assertEquals(student, solicitud.getStudent());
+            assertEquals(materiaAntigua, solicitud.getOldSubject());
+            assertEquals(materiaNueva, solicitud.getNewSubject());
+            assertEquals(grupoNuevo, solicitud.getNewGroup());
         solicitud.validateRequest();
+        } catch (Exception e) {
+            fail("No se esperaba una excepción al crear la solicitud de cambio de materia: " + e.getMessage());
+        }
     }
 
     @Test
@@ -247,8 +256,11 @@ class CambioMateriaTest {
         assertFalse(student.hasScheduleConflictWith(grupoNuevo));
         assertTrue(academicPeriod.isActive());
         assertTrue(grupoNuevo.sameAcademicPeriod(academicPeriod));
-        
-        assertTrue(student.validateChangeSubject(materiaAntigua, materiaNueva, grupoNuevo));
+        try {
+            assertTrue(student.validateChangeSubject(materiaAntigua, materiaNueva, grupoNuevo));
+        } catch (Exception e) {
+            fail("No se esperaba una excepción al validar el cambio de materia: " + e.getMessage());
+        }
     }
 
 
@@ -272,10 +284,10 @@ class CambioMateriaTest {
         } catch (Exception e) {
             fail("No se esperaba una excepción al crear el grupo de matemáticas básicas: " + e.getMessage());
         }
-        
-        
-        assertThrows(IllegalStateException.class, () -> student.enrollSubject(materiaAntigua, grupoAntiguo));
-        
+
+
+        assertThrows(SirhaException.class, () -> student.enrollSubject(materiaAntigua, grupoAntiguo));
+
         assertTrue(student.hasSubject(matematicasBasicas));
         assertTrue(student.hasSubject(materiaAntigua));
 
@@ -287,19 +299,19 @@ class CambioMateriaTest {
     void testError1_EstudianteNoTieneMateriaAntigua() {
         Subject materiaNoInscrita = new Subject("999", "Materia No Inscrita", 3);
         studyPlan.addSubject(materiaNoInscrita);
-        
-        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> {
+
+        SirhaException exception = assertThrows(SirhaException.class, () -> {
             student.validateChangeSubject(materiaNoInscrita, materiaNueva, grupoNuevo);
         });
-        assertEquals("El estudiante no tiene la materia antigua especificada", exception.getMessage());
+        assertEquals("Materia no encontrada - El estudiante no tiene la materia antigua especificada", exception.getMessage());
     }
 
     @Test
-    void testError2_MateriaAntiguaNoEstaEnCurso() {    
-        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> {
+    void testError2_MateriaAntiguaNoEstaEnCurso() {
+        SirhaException exception = assertThrows(SirhaException.class, () -> {
             student.validateChangeSubject(materiaAntigua, materiaNueva, grupoNuevo);
         });
-        assertEquals("La materia antigua no está en curso", exception.getMessage());
+        assertEquals("La materia no está en curso - La materia antigua no está en curso", exception.getMessage());
     }
 
     @Test
@@ -309,10 +321,10 @@ class CambioMateriaTest {
         } catch (Exception e) {
             fail("No se esperaba una excepción al inscribir la materia antigua: " + e.getMessage());
         }
-        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> {
+        SirhaException exception = assertThrows(SirhaException.class, () -> {
             student.validateChangeSubject(materiaAntigua, materiaAntigua, grupoAntiguo);
         });
-        assertEquals("La materia nueva es la misma que la antigua", exception.getMessage());
+        assertEquals("La materia nueva es la misma que la antigua - La materia nueva es la misma que la antigua", exception.getMessage());
     }
 
     @Test
@@ -323,10 +335,10 @@ class CambioMateriaTest {
         } catch (Exception e) {
             fail("No se esperaba una excepción al inscribir las materias: " + e.getMessage());
         }
-        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> {
+        SirhaException exception = assertThrows(SirhaException.class, () -> {
             student.validateChangeSubject(materiaAntigua, materiaNueva, grupoNuevo);
         });
-        assertEquals("El estudiante ya tiene la materia nueva inscrita o aprobada", exception.getMessage());
+        assertEquals("El estudiante ya tiene la materia inscrita o aprobada - El estudiante ya tiene la materia nueva inscrita o aprobada", exception.getMessage());
     }
 
     @Test
@@ -341,10 +353,10 @@ class CambioMateriaTest {
         try {
             Group grupoExterno = new Group(materiaFueraPlan, 15, academicPeriod);
 
-            IllegalStateException exception = assertThrows(IllegalStateException.class, () -> {
+            SirhaException exception = assertThrows(SirhaException.class, () -> {
             student.validateChangeSubject(materiaAntigua, materiaFueraPlan, grupoExterno);
             });
-            assertEquals("La materia nueva no está en el plan de estudios del estudiante", exception.getMessage());
+            assertEquals("La materia no está en el plan de estudios del estudiante - La materia nueva no está en el plan de estudios del estudiante", exception.getMessage());
         } catch (Exception e) {
             fail("No se esperaba una excepción al crear el grupo externo: " + e.getMessage());
         }
@@ -362,16 +374,15 @@ class CambioMateriaTest {
 
         MustHaveApprovedSubject prerequisiteRule = new MustHaveApprovedSubject(prerequisito);
         materiaNueva.addPrerequisite(prerequisiteRule);
-        
-        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> {
+
+        SirhaException exception = assertThrows(SirhaException.class, () -> {
             student.validateChangeSubject(materiaAntigua, materiaNueva, grupoNuevo);
         });
-        assertEquals("No se cumplen los prerrequisitos para inscribir la materia nueva", exception.getMessage());
+        assertEquals("No se cumplen los prerrequisitos para inscribir la materia - No se cumplen los prerrequisitos para inscribir la materia nueva", exception.getMessage());
     }
 
     @Test
     void testError7_GrupoNoPerteneceMaterianNueva() {
-        // Error: El nuevo grupo no pertenece a la materia nueva especificada
         assertFalse(student.hasCoursesInProgress());
         try {
             student.enrollSubject(materiaAntigua, grupoAntiguo);
@@ -379,10 +390,10 @@ class CambioMateriaTest {
             Group grupoIncorrecto = new Group(materiaAntigua, 20, academicPeriod);
             grupoIncorrecto.addSchedule(new Schedule(DiasSemana.DOMINGO, LocalTime.of(14, 0), LocalTime.of(16, 0)));
             
-            IllegalStateException exception = assertThrows(IllegalStateException.class, () -> {
+            SirhaException exception = assertThrows(SirhaException.class, () -> {
                 student.createSubjectChangeRequest(materiaAntigua, materiaNueva, grupoIncorrecto);
             });
-            assertEquals("El nuevo grupo no pertenece a la materia nueva especificada", exception.getMessage());
+            assertEquals("Grupo no encontrado - El nuevo grupo no pertenece a la materia nueva especificada", exception.getMessage());
         } catch (Exception e) {
             fail("No se esperaba una excepción al inscribir la materia antigua o crear el grupo incorrecto: " + e.getMessage());
         }
@@ -397,30 +408,31 @@ class CambioMateriaTest {
         } catch (Exception e) {
             fail("No se esperaba una excepción al inscribir la materia antigua: " + e.getMessage());
         }
-        
-        
-        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> {
+
+
+        SirhaException exception = assertThrows(SirhaException.class, () -> {
             student.validateChangeSubject(materiaAntigua, materiaNueva, grupoNuevo);
         });
-        assertEquals("El nuevo grupo está cerrado", exception.getMessage());
+        assertEquals("El grupo está cerrado para inscripciones - El nuevo grupo está cerrado", exception.getMessage());
     }
 
     @Test
     void testError9_ConflictoDeHorarios() {
-        Schedule horarioConflicto = new Schedule(DiasSemana.LUNES, LocalTime.of(8, 0), LocalTime.of(10, 0));
+        
         try {
+            Schedule horarioConflicto = new Schedule(DiasSemana.LUNES, LocalTime.of(8, 0), LocalTime.of(10, 0));
             grupoAntiguo.addSchedule(horarioConflicto);
             grupoNuevo.addSchedule(horarioConflicto); 
             student.enrollSubject(materiaAntigua, grupoAntiguo);
         } catch (Exception e) {
             fail("No se esperaba una excepción al inscribir la materia antigua: " + e.getMessage());
         }
-        
-        
-        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> {
+
+
+        SirhaException exception = assertThrows(SirhaException.class, () -> {
             student.validateChangeSubject(materiaAntigua, materiaNueva, grupoNuevo);
         });
-        assertEquals("Conflicto de horarios con el nuevo grupo", exception.getMessage());
+        assertEquals("Conflicto de horarios detectado - Conflicto de horarios con el nuevo grupo", exception.getMessage());
     }
 
     @Test
@@ -435,11 +447,11 @@ class CambioMateriaTest {
             LocalDate.now().minusMonths(2));
         try {
             Group grupoPerodoInvalido = new Group(materiaNueva, 20, periodoInactivo);
-            
-            IllegalStateException exception = assertThrows(IllegalStateException.class, () -> {
+
+            SirhaException exception = assertThrows(SirhaException.class, () -> {
                 student.validateChangeSubject(materiaAntigua, materiaNueva, grupoPerodoInvalido);
             });
-            assertEquals("El período académico no es válido para el nuevo grupo", exception.getMessage());
+            assertEquals("El período académico no es válido - El período académico no es válido para el nuevo grupo", exception.getMessage());
         } catch (Exception e) {
             fail("No se esperaba una excepción al crear el grupo con período inválido: " + e.getMessage());
         }
@@ -458,12 +470,12 @@ class CambioMateriaTest {
             LocalDate.now().plusMonths(6), 
             LocalDate.now().plusMonths(10));
         try {
-            Group grupoOtroPeriodo = new Group(materiaNueva, 20, otroPeriodo);        
-            IllegalStateException exception = assertThrows(IllegalStateException.class, () -> {
+            Group grupoOtroPeriodo = new Group(materiaNueva, 20, otroPeriodo);
+            SirhaException exception = assertThrows(SirhaException.class, () -> {
                 student.validateChangeSubject(materiaAntigua, materiaNueva, grupoOtroPeriodo);
 
             });
-            assertEquals("El período académico no es válido para el nuevo grupo", exception.getMessage());
+            assertEquals("El período académico no es válido - El período académico no es válido para el nuevo grupo", exception.getMessage());
         } catch (Exception e) {
             fail("No se esperaba una excepción al crear el grupo con otro período: " + e.getMessage());
         }
@@ -490,12 +502,15 @@ class CambioMateriaTest {
         assertFalse(student.hasScheduleConflictWith(grupoNuevo));
         assertTrue(academicPeriod.isActive());
         assertTrue(grupoNuevo.sameAcademicPeriod(academicPeriod));
+        try {
+            assertTrue(student.validateChangeSubject(materiaAntigua, materiaNueva, grupoNuevo));
+            CambioMateria solicitud = student.createSubjectChangeRequest(materiaAntigua, materiaNueva, grupoNuevo);
+            assertNotNull(solicitud);
+            assertEquals(materiaAntigua, solicitud.getOldSubject());
+            assertEquals(materiaNueva, solicitud.getNewSubject());
+        } catch (Exception e) {
+            fail("No se esperaba una excepción al validar el cambio de materia: " + e.getMessage());
+        }
         
-        assertTrue(student.validateChangeSubject(materiaAntigua, materiaNueva, grupoNuevo));
-
-        CambioMateria solicitud = student.createSubjectChangeRequest(materiaAntigua, materiaNueva, grupoNuevo);
-        assertNotNull(solicitud);
-        assertEquals(materiaAntigua, solicitud.getOldSubject());
-        assertEquals(materiaNueva, solicitud.getNewSubject());
     }
 }

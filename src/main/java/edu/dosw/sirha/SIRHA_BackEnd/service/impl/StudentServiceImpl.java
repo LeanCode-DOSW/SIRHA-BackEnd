@@ -1,10 +1,8 @@
 package edu.dosw.sirha.sirha_backend.service.impl;
 
 import java.util.Map;
-
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import edu.dosw.sirha.sirha_backend.domain.model.AcademicPeriod;
 import edu.dosw.sirha.sirha_backend.domain.model.CambioGrupo;
 import edu.dosw.sirha.sirha_backend.domain.model.CambioMateria;
@@ -12,22 +10,23 @@ import edu.dosw.sirha.sirha_backend.domain.model.Schedule;
 import edu.dosw.sirha.sirha_backend.domain.model.Student;
 import edu.dosw.sirha.sirha_backend.domain.model.Subject;
 import edu.dosw.sirha.sirha_backend.domain.model.enums.SemaforoColores;
-import edu.dosw.sirha.sirha_backend.domain.model.stateGroup.Group;
+import edu.dosw.sirha.sirha_backend.domain.model.stategroup.Group;
 import edu.dosw.sirha.sirha_backend.domain.model.staterequest.BaseRequest;
 import edu.dosw.sirha.sirha_backend.dto.AuthResponse;
 import edu.dosw.sirha.sirha_backend.dto.LoginRequest;
 import edu.dosw.sirha.sirha_backend.dto.RegisterRequest;
+import edu.dosw.sirha.sirha_backend.dto.StudentDTO;
 import edu.dosw.sirha.sirha_backend.dto.SubjectDecoratorDTO;
+import edu.dosw.sirha.sirha_backend.exception.ErrorCodeSirha;
+import edu.dosw.sirha.sirha_backend.exception.SirhaException;
 import edu.dosw.sirha.sirha_backend.repository.mongo.AcademicPeriodMongoRepository;
 import edu.dosw.sirha.sirha_backend.repository.mongo.GroupMongoRepository;
 import edu.dosw.sirha.sirha_backend.repository.mongo.StudentMongoRepository;
 import edu.dosw.sirha.sirha_backend.repository.mongo.SubjectMongoRepository;
 import edu.dosw.sirha.sirha_backend.service.StudentService;
 import edu.dosw.sirha.sirha_backend.util.ValidationUtil;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import java.util.List;
 import java.util.Optional;
 
@@ -52,114 +51,126 @@ public class StudentServiceImpl implements StudentService {
         
         log.info("StudentServiceImpl inicializado correctamente");
     }
+
     @Transactional
     @Override
-    public Student save(Student student) {
-        log.info("Guardando estudiante: {}", student.getUsername());
+    public Student save(StudentDTO studentDTO) throws SirhaException {
+        log.info("Guardando estudiante desde DTO: {}", studentDTO.getUsername());
         try {
+            Student student = new Student(
+                studentDTO.getUsername(),
+                studentDTO.getEmail(),
+                "defaultPass", // Contraseña temporal - debe ser actualizada
+                studentDTO.getCode()
+            );
+            log.info("Guardando estudiante: {}", student.getUsername());
             Student savedStudent = studentRepository.save(student);
             log.debug("Estudiante guardado exitosamente con ID: {}", savedStudent.getId());
             return savedStudent;
-        } catch (Exception e) {
-            log.error("Error al guardar estudiante {}: {}", student.getUsername(), e.getMessage(), e);
+        } catch (SirhaException e) {
             throw e;
+        } catch (Exception e) {
+            throw SirhaException.of(ErrorCodeSirha.INTERNAL_ERROR,"Error interno al guardar estudiante: " + e.getMessage(), e);
         }
     }
+
     @Transactional    
     @Override
-    public List<Student> findAll() {
+    public List<Student> findAll() throws SirhaException {
         log.info("Consultando todos los estudiantes");
         try {
             List<Student> students = studentRepository.findAll();
             log.info("Se encontraron {} estudiantes", students.size());
             return students;
         } catch (Exception e) {
-            log.error("Error al consultar todos los estudiantes: {}", e.getMessage(), e);
-            throw e;
+            throw SirhaException.of(ErrorCodeSirha.INTERNAL_ERROR,"Error interno al consultar todos los estudiantes: " + e.getMessage(), e);
         }
     }
+
     @Transactional
     @Override
-    public Optional<Student> findById(String id) {
+    public Optional<Student> findById(String id) throws SirhaException {
         log.debug("Buscando estudiante por ID: {}", id);
         try {
             Optional<Student> student = studentRepository.findById(id);
-            if (student.isPresent()) {
-                log.debug("Estudiante encontrado por ID: {}", id);
-            } else {
+            if (!student.isPresent()) {
                 log.debug("No se encontró estudiante con ID: {}", id);
+                throw SirhaException.of(ErrorCodeSirha.STUDENT_NOT_FOUND,"Estudiante no encontrado con ID: " + id);
             }
+            log.debug("Estudiante encontrado por ID: {}", id);
             return student;
-        } catch (Exception e) {
-            log.error("Error al buscar estudiante por ID {}: {}", id, e.getMessage(), e);
+        } catch (SirhaException e) {
             throw e;
+        } catch (Exception e) {
+            throw SirhaException.of(ErrorCodeSirha.INTERNAL_ERROR,"Error interno al buscar estudiante por ID: " + id, e);
         }
     }
+
     @Transactional
     @Override
-    public Optional<Student> findByUsername(String username) {
+    public Optional<Student> findByUsername(String username) throws SirhaException {
         log.debug("Buscando estudiante por username: {}", username);
         try {
             Optional<Student> student = studentRepository.findByUsername(username);
-            if (student.isPresent()) {
-                log.debug("Estudiante encontrado por username: {}", username);
-            } else {
+            if (!student.isPresent()) {
                 log.debug("No se encontró estudiante con username: {}", username);
+                throw SirhaException.of(ErrorCodeSirha.STUDENT_NOT_FOUND,"Estudiante no encontrado con username: " + username);
             }
+            log.debug("Estudiante encontrado por username: {}", username);
             return student;
-        } catch (Exception e) {
-            log.error("Error al buscar estudiante por username {}: {}", username, e.getMessage(), e);
+        } catch (SirhaException e) {
             throw e;
+        } catch (Exception e) {
+            throw SirhaException.of(ErrorCodeSirha.INTERNAL_ERROR,"Error interno al buscar estudiante por username: " + username, e);
         }
     }
+
     @Transactional
     @Override
-    public Optional<Student> findByEmail(String email) {
+    public Optional<Student> findByEmail(String email) throws SirhaException {
         log.debug("Buscando estudiante por email: {}", email);
         try {
             Optional<Student> student = studentRepository.findByEmail(email);
-            if (student.isPresent()) {
-                log.debug("Estudiante encontrado por email: {}", email);
-            } else {
+            if (!student.isPresent()) {
                 log.debug("No se encontró estudiante con email: {}", email);
+                throw SirhaException.of(ErrorCodeSirha.STUDENT_NOT_FOUND,"Estudiante no encontrado con email: " + email);
             }
+            log.debug("Estudiante encontrado por email: {}", email);
             return student;
-        } catch (Exception e) {
-            log.error("Error al buscar estudiante por email {}: {}", email, e.getMessage(), e);
+        } catch (SirhaException e) {
             throw e;
+        } catch (Exception e) {
+            throw SirhaException.of(ErrorCodeSirha.INTERNAL_ERROR,"Error interno al buscar estudiante por email: " + email, e);
         }
     }
+
     @Transactional
     @Override
-    public boolean existsByCode(String code) {
+    public boolean existsByCode(String code) throws SirhaException {
         log.debug("Verificando existencia de código: {}", code);
         try {
             boolean exists = studentRepository.existsByCodigo(code);
             log.debug("Código {} existe: {}", code, exists);
             return exists;
         } catch (Exception e) {
-            log.error("Error al verificar código {}: {}", code, e.getMessage(), e);
-            throw e;
+            throw SirhaException.of(ErrorCodeSirha.INTERNAL_ERROR,"Error interno al verificar código: " + code, e);
         }
     }
+
     @Transactional
     @Override
-    public boolean existsByEmail(String email) {
+    public boolean existsByEmail(String email) throws SirhaException {
         log.debug("Verificando existencia de email: {}", email);
         try {
             boolean exists = studentRepository.findByEmail(email).isPresent();
             log.debug("Email {} existe: {}", email, exists);
             return exists;
         } catch (Exception e) {
-            log.error("Error al verificar email {}: {}", email, e.getMessage(), e);
-            throw e;
+            throw SirhaException.of(ErrorCodeSirha.INTERNAL_ERROR,"Error interno al verificar email: " + email, e);
         }
     }
 
-
-
-    
-    private Student registerStudent(Student student) {
+    private Student registerStudent(Student student) throws SirhaException {
         log.info("Registrando estudiante: {}", student.getUsername());
         try {
             Student registeredStudent = studentRepository.save(student);
@@ -167,15 +178,13 @@ public class StudentServiceImpl implements StudentService {
                     registeredStudent.getUsername(), registeredStudent.getId());
             return registeredStudent;
         } catch (Exception e) {
-            log.error("Error al registrar estudiante {}: {}", student.getUsername(), e.getMessage(), e);
-            throw e;
+            throw SirhaException.of(ErrorCodeSirha.INTERNAL_ERROR,"Error interno al registrar estudiante: " + e.getMessage(), e);
         }
     }
 
-
     @Transactional
     @Override
-    public AuthResponse registerStudent(RegisterRequest request) {
+    public AuthResponse registerStudent(RegisterRequest request) throws SirhaException {
         log.info("Iniciando proceso de registro para usuario: {}", request.getUsername());
         
         try {
@@ -188,16 +197,16 @@ public class StudentServiceImpl implements StudentService {
             );
             log.debug("Validación exitosa para: {}", request.getUsername());
             
-            if (existsByCode(request.getCodigo())) {
+            if (studentRepository.existsByCodigo(request.getCodigo())) {
                 log.warn("Intento de registro con código duplicado: {} para usuario: {}", 
                         request.getCodigo(), request.getUsername());
-                throw new IllegalArgumentException("El código estudiantil ya está registrado");
+                throw SirhaException.of(ErrorCodeSirha.CODE_ALREADY_EXISTS,"El código estudiantil ya está registrado");
             }
             
-            if (existsByEmail(request.getEmail())) {
+            if (studentRepository.findByEmail(request.getEmail()).isPresent()) {
                 log.warn("Intento de registro con email duplicado: {} para usuario: {}", 
                         request.getEmail(), request.getUsername());
-                throw new IllegalArgumentException("El email ya está registrado");
+                throw SirhaException.of(ErrorCodeSirha.EMAIL_ALREADY_EXISTS,"El email ya está registrado");
             }
             
             log.debug("Creando nuevo estudiante: {}", request.getUsername());
@@ -221,49 +230,46 @@ public class StudentServiceImpl implements StudentService {
                 "Registro exitoso"
             );
             
-        } catch (IllegalArgumentException e) {
-            log.warn("Error de validación en registro para {}: {}", request.getUsername(), e.getMessage());
+        } catch (SirhaException e) {
             throw e;
         } catch (Exception e) {
-            log.error("Error inesperado durante registro para {}: {}", request.getUsername(), e.getMessage(), e);
-            throw new RuntimeException("Error interno durante el registro", e);
+            throw SirhaException.of(ErrorCodeSirha.INTERNAL_ERROR,"Error interno durante el registro: " + e.getMessage(), e);
         }
     }
 
 
 
-    private Optional<Student> loginStudent(String username, String password) {
+    private Optional<Student> loginStudent(String username, String password) throws SirhaException {
         log.info("Intento de login para usuario: {}", username);
         try {
             Optional<Student> student = studentRepository.findByUsername(username)
                     .filter(s -> s.verificarContrasena(password));
             
-            if (student.isPresent()) {
-                log.info("Login exitoso para usuario: {}", username);
-            } else {
+            if (!student.isPresent()) {
                 log.warn("Login fallido para usuario: {} - credenciales incorrectas", username);
+                throw SirhaException.of(ErrorCodeSirha.INVALID_CREDENTIALS,"Credenciales inválidas");
             }
-            
+            log.info("Login exitoso para usuario: {}", username);
             return student;
-        } catch (Exception e) {
-            log.error("Error durante login para usuario {}: {}", username, e.getMessage(), e);
+        } catch (SirhaException e) {
             throw e;
+        } catch (Exception e) {
+            throw SirhaException.of(ErrorCodeSirha.INTERNAL_ERROR,"Error interno durante el login: " + e.getMessage(), e);
         }
     }
+
     @Transactional
     @Override
-    public AuthResponse loginStudent(LoginRequest request) {
+    public AuthResponse loginStudent(LoginRequest request) throws SirhaException {
         log.info("Iniciando proceso de login para usuario: {}", request.getUsername());
         
         try {
             Optional<Student> userOpt = loginStudent(request.getUsername(), request.getPassword());
             
-            if (userOpt.isEmpty()) {
+            Student student = userOpt.orElseThrow(() -> {
                 log.warn("Login fallido para usuario: {} - credenciales inválidas", request.getUsername());
-                throw new IllegalArgumentException("Credenciales inválidas");
-            }
-            
-            Student student = userOpt.get();
+                return SirhaException.of(ErrorCodeSirha.INVALID_CREDENTIALS,"Credenciales inválidas");
+            });
             
             log.info("Login completado exitosamente para usuario: {}", student.getUsername());
             
@@ -274,104 +280,99 @@ public class StudentServiceImpl implements StudentService {
                 student.getCodigo(),
                 "Login exitoso"
             );
-            
-        } catch (IllegalArgumentException e) {
-            log.warn("Error de autenticación para {}: {}", request.getUsername(), e.getMessage());
+
+        } catch (SirhaException e) {
             throw e;
         } catch (Exception e) {
-            log.error("Error inesperado durante login para {}: {}", request.getUsername(), e.getMessage(), e);
-            throw new RuntimeException("Error interno durante el login", e);
+            throw SirhaException.of(ErrorCodeSirha.INTERNAL_ERROR,"Error interno durante el login: " + e.getMessage(), e);
         }
     }
+
     @Transactional
     @Override
-    public List<Schedule> getCurrentSchedule(String username) {
+    public List<Schedule> getCurrentSchedule(String username) throws SirhaException {
         log.info("Consultando horario actual para usuario: {}", username);
         
         try {
             Student student = studentRepository.findByUsername(username)
                 .orElseThrow(() -> {
                     log.warn("Estudiante no encontrado para consulta de horario: {}", username);
-                    return new IllegalArgumentException("Estudiante no encontrado");
+                    return SirhaException.of(ErrorCodeSirha.STUDENT_NOT_FOUND);
                 });
                 
             List<Schedule> schedule = student.getCurrentSchedule();
             log.info("Horario actual obtenido exitosamente para {}: {} materias", username, schedule.size());
             return schedule;
             
-        } catch (IllegalArgumentException e) {
-            log.warn("Error al consultar horario para {}: {}", username, e.getMessage());
+        } catch (SirhaException e) {
             throw e;
         } catch (Exception e) {
-            log.error("Error inesperado al consultar horario para {}: {}", username, e.getMessage(), e);
-            throw new RuntimeException("Error interno al consultar horario", e);
+            throw SirhaException.of(ErrorCodeSirha.INTERNAL_ERROR,"Error interno al consultar horario actual: " + e.getMessage(), e);
         }
     }
+
     @Transactional
     @Override
-    public List<Schedule> getScheduleForPeriod(String username, String period) {
+    public List<Schedule> getScheduleForPeriod(String username, String period) throws SirhaException {
         log.info("Consultando horario para usuario: {} en período: {}", username, period);
         
         try {
             Student student = studentRepository.findByUsername(username)
                 .orElseThrow(() -> {
-                    log.warn("Estudiante no encontrado: {}", username);
-                    return new IllegalArgumentException("Estudiante no encontrado");
+                    log.warn(ErrorCodeSirha.STUDENT_NOT_FOUND.getDefaultMessage(),"{}", username);
+                    return SirhaException.of(ErrorCodeSirha.STUDENT_NOT_FOUND);
                 });
                 
             AcademicPeriod academicPeriod = academicPeriodRepository.findByPeriod(period)
                 .orElseThrow(() -> {
-                    log.warn("Período académico no encontrado: {}", period);
-                    return new IllegalArgumentException("Periodo académico no encontrado");
+                    log.warn(ErrorCodeSirha.ACADEMIC_PERIOD_NOT_FOUND.getDefaultMessage(),"{}", period);
+                    return SirhaException.of(ErrorCodeSirha.ACADEMIC_PERIOD_NOT_FOUND);
                 });
                 
             List<Schedule> schedule = student.getScheduleForPeriod(academicPeriod);
             log.info("Horario del período {} obtenido para {}: {} materias", period, username, schedule.size());
             return schedule;
             
-        } catch (IllegalArgumentException e) {
-            log.warn("Error al consultar horario del período {} para {}: {}", period, username, e.getMessage());
+        } catch (SirhaException e) {
             throw e;
         } catch (Exception e) {
-            log.error("Error inesperado al consultar horario del período {} para {}: {}", 
-                     period, username, e.getMessage(), e);
-            throw new RuntimeException("Error interno al consultar horario del período", e);
+            throw SirhaException.of(ErrorCodeSirha.INTERNAL_ERROR,"Error interno al consultar horario del período", e);
         }
     }
+
     @Transactional
     @Override
-    public Map<AcademicPeriod, List<Schedule>> getAllSchedules(String username) {
+    public Map<AcademicPeriod, List<Schedule>> getAllSchedules(String username) throws SirhaException {
         log.info("Consultando todos los horarios para usuario: {}", username);
         
         try {
             Student student = studentRepository.findByUsername(username)
                 .orElseThrow(() -> {
-                    log.warn("Estudiante no encontrado: {}", username);
-                    return new IllegalArgumentException("Estudiante no encontrado");
+                    log.warn(ErrorCodeSirha.STUDENT_NOT_FOUND.getDefaultMessage(),"{}", username);
+                    return SirhaException.of(ErrorCodeSirha.STUDENT_NOT_FOUND);
                 });
                 
             Map<AcademicPeriod, List<Schedule>> allSchedules = student.getAllSchedules();
             log.info("Todos los horarios obtenidos para {}: {} períodos", username, allSchedules.size());
             return allSchedules;
-            
-        } catch (IllegalArgumentException e) {
-            log.warn("Error al consultar todos los horarios para {}: {}", username, e.getMessage());
+
+        } catch (SirhaException e) {
             throw e;
         } catch (Exception e) {
-            log.error("Error inesperado al consultar todos los horarios para {}: {}", username, e.getMessage(), e);
-            throw new RuntimeException("Error interno al consultar todos los horarios", e);
+            throw SirhaException.of(ErrorCodeSirha.INTERNAL_ERROR,"Error interno al consultar todos los horarios: " + e.getMessage(), e);
         }
     }
+
     @Transactional
     @Override
-    public Map<SemaforoColores, List<SubjectDecoratorDTO>> getAcademicPensum(String username) {
+    public Map<SemaforoColores, List<SubjectDecoratorDTO>> getAcademicPensum(String username) throws SirhaException {
         log.info("Consultando pensum académico para usuario: {}", username);
         
         try {
             Student student = studentRepository.findByUsername(username)
                 .orElseThrow(() -> {
-                    log.warn("Estudiante no encontrado: {}", username);
-                    return new IllegalArgumentException("Estudiante no encontrado");
+                    log.warn(ErrorCodeSirha.STUDENT_NOT_FOUND.getDefaultMessage(),"{}", username);
+                    return SirhaException.of(ErrorCodeSirha.STUDENT_NOT_FOUND);
                 });
                 
             Map<SemaforoColores, List<SubjectDecoratorDTO>> pensum = student.getAcademicPensum();
@@ -383,17 +384,16 @@ public class StudentServiceImpl implements StudentService {
                 
             return pensum;
             
-        } catch (IllegalArgumentException e) {
-            log.warn("Error al consultar pensum para {}: {}", username, e.getMessage());
+        } catch (SirhaException e) {
             throw e;
         } catch (Exception e) {
-            log.error("Error inesperado al consultar pensum para {}: {}", username, e.getMessage(), e);
-            throw new RuntimeException("Error interno al consultar pensum académico", e);
+            throw SirhaException.of(ErrorCodeSirha.INTERNAL_ERROR,"Error interno al consultar pensum académico: " + e.getMessage(), e);
         }
     }
+
     @Transactional
     @Override
-    public CambioGrupo createRequestCambioGrupo(String studentName, String subjectName, String codeNewGroup) {
+    public CambioGrupo createRequestCambioGrupo(String studentName, String subjectName, String codeNewGroup) throws SirhaException {
         log.info("Creando solicitud de cambio de grupo - Usuario: {}, Materia: {}, Nuevo Grupo: {}", 
                 studentName, subjectName, codeNewGroup);
         
@@ -401,19 +401,19 @@ public class StudentServiceImpl implements StudentService {
             Student student = studentRepository.findByUsername(studentName)
                 .orElseThrow(() -> {
                     log.warn("Estudiante no encontrado para cambio de grupo: {}", studentName);
-                    return new IllegalArgumentException("Estudiante no encontrado");
+                    return SirhaException.of(ErrorCodeSirha.STUDENT_NOT_FOUND);
                 });
             
             Subject subject = subjectRepository.findByName(subjectName)
                 .orElseThrow(() -> {
                     log.warn("Materia no encontrada: {}", subjectName);
-                    return new IllegalArgumentException("Materia no encontrada");
+                    return SirhaException.of(ErrorCodeSirha.SUBJECT_NOT_FOUND);
                 });
 
             Group group = groupRepository.findByCode(codeNewGroup)
                 .orElseThrow(() -> {
                     log.warn("Grupo no encontrado: {}", codeNewGroup);
-                    return new IllegalArgumentException("Grupo no encontrado");
+                    return SirhaException.of(ErrorCodeSirha.GROUP_NOT_FOUND);
                 });
 
             log.debug("Creando solicitud de cambio de grupo para {}: {} -> {}", 
@@ -425,20 +425,17 @@ public class StudentServiceImpl implements StudentService {
                     cambio.getId(), studentName);
             
             return cambio;
-            
-        } catch (IllegalArgumentException e) {
-            log.warn("Error al crear solicitud de cambio de grupo para {}: {}", studentName, e.getMessage());
+
+        } catch (SirhaException e) {
             throw e;
         } catch (Exception e) {
-            log.error("Error inesperado al crear solicitud de cambio de grupo para {}: {}", 
-                     studentName, e.getMessage(), e);
-            throw new RuntimeException("Error interno al crear solicitud de cambio de grupo", e);
+            throw SirhaException.of(ErrorCodeSirha.INTERNAL_ERROR,"Error interno al crear solicitud de cambio de grupo: " + e.getMessage(), e);
         }
     }
+
     @Transactional
     @Override
-    public CambioMateria createRequestCambioMateria(String studentName, String subjectName, 
-                                                   String newSubjectName, String codeNewGroup) {
+    public CambioMateria createRequestCambioMateria(String studentName, String subjectName, String newSubjectName, String codeNewGroup) throws SirhaException {
         log.info("Creando solicitud de cambio de materia - Usuario: {}, De: {} -> A: {}, Grupo: {}", 
                 studentName, subjectName, newSubjectName, codeNewGroup);
         
@@ -446,25 +443,25 @@ public class StudentServiceImpl implements StudentService {
             Student student = studentRepository.findByUsername(studentName)
                 .orElseThrow(() -> {
                     log.warn("Estudiante no encontrado para cambio de materia: {}", studentName);
-                    return new IllegalArgumentException("Estudiante no encontrado");
+                    return SirhaException.of(ErrorCodeSirha.STUDENT_NOT_FOUND);
                 });
 
             Subject subjectOld = subjectRepository.findByName(subjectName)
                 .orElseThrow(() -> {
                     log.warn("Materia antigua no encontrada: {}", subjectName);
-                    return new IllegalArgumentException("Materia antigua no encontrada");
+                    return SirhaException.of(ErrorCodeSirha.SUBJECT_NOT_FOUND);
                 });
 
             Subject subjectNew = subjectRepository.findByName(newSubjectName)
                 .orElseThrow(() -> {
                     log.warn("Materia nueva no encontrada: {}", newSubjectName);
-                    return new IllegalArgumentException("Materia nueva no encontrada");
+                    return SirhaException.of(ErrorCodeSirha.SUBJECT_NOT_FOUND);
                 });
 
             Group group = groupRepository.findByCode(codeNewGroup)
                 .orElseThrow(() -> {
                     log.warn("Grupo no encontrado: {}", codeNewGroup);
-                    return new IllegalArgumentException("Grupo no encontrado");
+                    return SirhaException.of(ErrorCodeSirha.GROUP_NOT_FOUND);
                 });
 
             log.debug("Creando solicitud de cambio de materia para {}: {} -> {} en grupo {}", 
@@ -476,69 +473,65 @@ public class StudentServiceImpl implements StudentService {
                     cambio.getId(), studentName);
             
             return cambio;
-            
-        } catch (IllegalArgumentException e) {
-            log.warn("Error al crear solicitud de cambio de materia para {}: {}", studentName, e.getMessage());
+
+        } catch (SirhaException e) {
             throw e;
         } catch (Exception e) {
-            log.error("Error inesperado al crear solicitud de cambio de materia para {}: {}", 
-                     studentName, e.getMessage(), e);
-            throw new RuntimeException("Error interno al crear solicitud de cambio de materia", e);
+            throw SirhaException.of(ErrorCodeSirha.INTERNAL_ERROR,"Error interno al crear solicitud de cambio de materia: " + e.getMessage(), e);
         }
     }
+
     @Transactional
     @Override
-    public Student deleteById(String id) {
+    public Student deleteById(String id) throws SirhaException {
         log.info("Eliminando estudiante por ID: {}", id);
         try {
             Optional<Student> existingStudent = studentRepository.findById(id);
             if (existingStudent.isEmpty()) {
                 log.warn("No se encontró estudiante con ID: {} para eliminar", id);
-                throw new IllegalArgumentException("Estudiante no encontrado");
+                throw SirhaException.of(ErrorCodeSirha.STUDENT_NOT_FOUND);
             }
             studentRepository.deleteById(id);
             log.info("Estudiante eliminado exitosamente - ID: {}", id);
             return existingStudent.get();
-        } catch (IllegalArgumentException e) {
-            log.warn("Error al eliminar estudiante por ID {}: {}", id, e.getMessage());
+        } catch (SirhaException e) {
             throw e;
         } catch (Exception e) {
-            log.error("Error al eliminar estudiante por ID {}: {}", id, e.getMessage(), e);
-            throw new RuntimeException("Error interno al eliminar estudiante", e);
+            throw SirhaException.of(ErrorCodeSirha.INTERNAL_ERROR,"Error interno al eliminar estudiante: " + e.getMessage(), e);
         }
     }
+
     @Transactional
     @Override
-    public List<BaseRequest> getAllRequests(String username) {
+    public List<BaseRequest> getAllRequests(String username) throws SirhaException {
         log.info("Consultando todas las solicitudes para usuario: {}", username);
         try {
             Student student = studentRepository.findByUsername(username)
                 .orElseThrow(() -> {
-                    log.warn("Estudiante no encontrado: {}", username);
-                    return new IllegalArgumentException("Estudiante no encontrado");
+                    log.warn(ErrorCodeSirha.STUDENT_NOT_FOUND.getDefaultMessage(),"{}", username);
+                    return SirhaException.of(ErrorCodeSirha.STUDENT_NOT_FOUND);
                 });
                 
             List<BaseRequest> requests = student.getSolicitudes();
             log.info("Se encontraron {} solicitudes para {}", requests.size(), username);
             return requests;
-            
-        } catch (IllegalArgumentException e) {
-            log.warn("Error al consultar solicitudes para {}: {}", username, e.getMessage());
+
+        } catch (SirhaException e) {
             throw e;
         } catch (Exception e) {
-            log.error("Error inesperado al consultar solicitudes para {}: {}", username, e.getMessage(), e);
-            throw new RuntimeException("Error interno al consultar solicitudes", e);
+            throw SirhaException.of(ErrorCodeSirha.INTERNAL_ERROR,"Error interno al consultar solicitudes: " + e.getMessage(), e);
         }
     }
+
     @Transactional
     @Override
-    public BaseRequest getRequestById(String username, String requestId) {
+    public BaseRequest getRequestById(String username, String requestId) throws SirhaException {
         log.info("Consultando solicitud por ID: {} para usuario: {}", requestId, username);
         try {
             Student student = studentRepository.findByUsername(username)
                 .orElseThrow(() -> {
-                    log.warn("Estudiante no encontrado: {}", username);
-                    return new IllegalArgumentException("Estudiante no encontrado");
+                    log.warn(ErrorCodeSirha.STUDENT_NOT_FOUND.getDefaultMessage(),"{}", username);
+                    return SirhaException.of(ErrorCodeSirha.STUDENT_NOT_FOUND);
                 });
 
             BaseRequest request = student.getRequestById(requestId);
@@ -546,35 +539,32 @@ public class StudentServiceImpl implements StudentService {
             log.info("Solicitud encontrada - ID: {} para usuario: {}", requestId, username);
             return request;
 
-        } catch (IllegalArgumentException e) {
-            log.warn("Error al consultar solicitud por ID {} para {}: {}", requestId, username, e.getMessage());
+        } catch (SirhaException e) {
             throw e;
         } catch (Exception e) {
-            log.error("Error inesperado al consultar solicitud por ID {} para {}: {}", requestId, username, e.getMessage(), e);
-            throw new RuntimeException("Error interno al consultar solicitud", e);
+            throw SirhaException.of(ErrorCodeSirha.INTERNAL_ERROR,"Error interno al consultar solicitud: " + e.getMessage(), e);
         }
     }
+
     @Transactional
     @Override
-    public List<BaseRequest> getRequestsHistory(String username) {
+    public List<BaseRequest> getRequestsHistory(String username) throws SirhaException {
         log.info("Consultando historial de solicitudes para usuario: {}", username);
         try {
             Student student = studentRepository.findByUsername(username)
                 .orElseThrow(() -> {
                     log.warn("Estudiante no encontrado: {}", username);
-                    return new IllegalArgumentException("Estudiante no encontrado");
+                    return SirhaException.of(ErrorCodeSirha.STUDENT_NOT_FOUND);
                 });
 
             List<BaseRequest> requests = student.getRequestsHistory();
             log.info("Se encontraron {} solicitudes en el historial para {}", requests.size(), username);
             return requests;
 
-        } catch (IllegalArgumentException e) {
-            log.warn("Error al consultar historial de solicitudes para {}: {}", username, e.getMessage());
+        } catch (SirhaException e) {
             throw e;
         } catch (Exception e) {
-            log.error("Error inesperado al consultar historial de solicitudes para {}: {}", username, e.getMessage(), e);
-            throw new RuntimeException("Error interno al consultar historial de solicitudes", e);
+            throw SirhaException.of(ErrorCodeSirha.INTERNAL_ERROR,"Error interno al consultar historial de solicitudes: " + e.getMessage(), e);
         }
     }
 }

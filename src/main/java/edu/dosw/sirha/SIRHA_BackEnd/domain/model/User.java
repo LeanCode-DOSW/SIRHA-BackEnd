@@ -5,6 +5,8 @@ import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.*;
 import edu.dosw.sirha.sirha_backend.domain.port.Authenticable;
 import edu.dosw.sirha.sirha_backend.domain.port.Schedulable;
+import edu.dosw.sirha.sirha_backend.exception.ErrorCodeSirha;
+import edu.dosw.sirha.sirha_backend.exception.SirhaException;
 import edu.dosw.sirha.sirha_backend.util.PasswordUtils;
 import jakarta.validation.constraints.Email;
 
@@ -24,12 +26,12 @@ public abstract class User implements Authenticable, Schedulable {
 
     protected User() {}
 
-    protected User(String username, String email, String password) {
+    protected User(String username, String email, String password) throws SirhaException {
         this.username = username;
         setEmail(email);
         this.password = password.startsWith("$2a$") ? password : PasswordUtils.hashPassword(password);
     }
-    protected User(String id, String username, String email, String password) {
+    protected User(String id, String username, String email, String password) throws SirhaException {
         this(username, email, password);
         this.id = id;
     }
@@ -45,9 +47,9 @@ public abstract class User implements Authenticable, Schedulable {
     public String getPasswordHash(){return password;}
     public String getEmail(){return email;}
 
-    public void setEmail(String email) {
+    public void setEmail(String email) throws SirhaException {
         if (!isValidEmail(email)) {
-            throw new IllegalArgumentException("Invalid email format");
+            throw SirhaException.of(ErrorCodeSirha.INVALID_ARGUMENT, "Invalid email format");
         }
         this.email = email;
     }

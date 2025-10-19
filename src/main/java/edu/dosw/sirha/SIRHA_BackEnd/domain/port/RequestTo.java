@@ -19,6 +19,6 @@ public interface RequestTo {
     String getId();
     void setId(String id);
 
-    boolean validateRequest();  //preguntamos : se puede resolver la solicitud?
+    boolean validateRequest() throws SirhaException;  //preguntamos : se puede resolver la solicitud?
     RequestStateEnum getActualState();
 }

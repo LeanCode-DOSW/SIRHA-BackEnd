@@ -6,7 +6,7 @@ import java.util.Objects;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import edu.dosw.sirha.sirha_backend.domain.model.stateGroup.Group;
+import edu.dosw.sirha.sirha_backend.domain.model.stategroup.Group;
 import edu.dosw.sirha.sirha_backend.domain.port.AcademicProgress;
 import edu.dosw.sirha.sirha_backend.domain.port.PrerequisiteRule;
 
@@ -27,13 +27,16 @@ public class Subject {
     private List<PrerequisiteRule> prerequisites;
 
     public Subject(String id, String name, int credits) {
+        this(name, credits);
+        this.id = id;
+    }
+    public Subject(String name, int credits) {
         if (name == null || name.isBlank()) {
             throw new IllegalArgumentException("El nombre de la materia no puede estar vacío");
         }
         if (credits <= 0) {
             throw new IllegalArgumentException("La materia debe tener al menos 1 crédito");
         }
-        this.id = id;
         this.name = name;
         this.credits = credits;
         this.groups = new ArrayList<>();
@@ -80,7 +83,7 @@ public class Subject {
     }
     public void setPrerequisites(List<PrerequisiteRule> prerequisites) {this.prerequisites = prerequisites;}
 
-    
+    public void setGroups(List<Group> groups) {this.groups = groups;}
 
     public String getId() {return id;}
     public String getName() {return name;}
@@ -106,6 +109,12 @@ public class Subject {
         Subject subject = (Subject) o;
         return Objects.equals(id, subject.id);
     }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
+
     @Override
     public String toString() {
         return "Subject{" +

@@ -36,6 +36,7 @@ public enum ErrorCodeSirha {
     // ========== GROUP STATE ERRORS ==========
     GROUP_CLOSED("El grupo está cerrado para inscripciones"),
     GROUP_FULL("El grupo está lleno"),
+    SAME_GROUP("El nuevo grupo es el mismo que el actual"),
     STUDENT_ALREADY_IN_GROUP("El estudiante ya está inscrito en el grupo"),
     STUDENT_NOT_IN_GROUP("El estudiante no está inscrito en el grupo"),
     NO_STUDENTS_TO_REMOVE("No hay estudiantes para remover del grupo"),
@@ -46,8 +47,25 @@ public enum ErrorCodeSirha {
     DATABASE_ERROR("Error de base de datos"), 
     INVALID_CAPACITY_GROUP("Capacidad del grupo inválida"),
 
-    INVALID_CAREER("Carrera inválida para esta operación");
-    
+    INVALID_CAREER("Carrera inválida para esta operación"),
+    INVALID_DATE_RANGE("Rango de fechas inválido"),
+    // ============ SUBJECT ERRORS ========
+    SUBJECT_NOT_IN_PROGRESS("La materia no está en curso"),
+    SAME_SUBJECT("La materia nueva es la misma que la antigua"),
+    ACADEMIC_PERIOD_NOT_VALID("El período académico no es válido"),
+    SUBJECT_ALREADY_ENROLLED("El estudiante ya tiene la materia inscrita o aprobada"),
+    SUBJECT_NOT_IN_STUDY_PLAN("La materia no está en el plan de estudios del estudiante"),
+    PREREQUISITES_NOT_MET("No se cumplen los prerrequisitos para inscribir la materia"), 
+    CANNOT_CHANGE_SEMESTER("No se puede cambiar el semestre"),
+    CANNOT_CHANGE_GROUP("No se puede cambiar el grupo"),
+    CANNOT_CHANGE_GRADE("No se puede cambiar la nota"),
+    CANNOT_ENROLL("No se puede inscribir la materia"),
+    CANNOT_APPROVE("No se puede aprobar la materia"),
+    CANNOT_FAIL("No se puede reprobar la materia"),
+    CANNOT_DROP_SUBJECT("No se puede retirar la materia"),
+    SUBJECT_ALREADY_EXISTS("La materia ya existe"),
+    PROFESSOR_NOT_FOUND("Profesor no encontrado")
+    ;
     private final String defaultMessage;
     
     ErrorCodeSirha(String defaultMessage) {

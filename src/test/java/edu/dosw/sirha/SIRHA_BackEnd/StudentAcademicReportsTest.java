@@ -8,7 +8,7 @@ import edu.dosw.sirha.sirha_backend.domain.model.*;
 import edu.dosw.sirha.sirha_backend.domain.model.enums.Careers;
 import edu.dosw.sirha.sirha_backend.domain.model.enums.RequestStateEnum;
 import edu.dosw.sirha.sirha_backend.domain.model.enums.SemaforoColores;
-import edu.dosw.sirha.sirha_backend.domain.model.stateGroup.Group;
+import edu.dosw.sirha.sirha_backend.domain.model.stategroup.Group;
 import edu.dosw.sirha.sirha_backend.domain.model.statesubjectdec.SubjectDecorator;
 import edu.dosw.sirha.sirha_backend.dto.*;
 import edu.dosw.sirha.sirha_backend.exception.SirhaException;
@@ -145,16 +145,6 @@ class StudentAcademicReportsTest {
         assertEquals("juan@universidad.edu", basicInfo.getEmail());
         assertEquals(Careers.INGENIERIA_DE_SISTEMAS, basicInfo.getCareer());
         assertEquals("Ingeniería de Sistemas", basicInfo.getCareer().getDisplayName());
-
-        /* 
-        assertEquals(2, basicInfo.getApprovedSubjects()); // matematicas, programacion aprobadas
-        assertEquals(1, basicInfo.getCurrentSubjects());  // fisica cursando
-        assertEquals(1, basicInfo.getFailedSubjects());   // calculo reprobada
-
-        assertNotNull(basicInfo.getCreatedAt());
-        assertEquals(currentPeriod.getId(), basicInfo.getCurrentPeriodId());
-        */
-
     }
 
     @Test

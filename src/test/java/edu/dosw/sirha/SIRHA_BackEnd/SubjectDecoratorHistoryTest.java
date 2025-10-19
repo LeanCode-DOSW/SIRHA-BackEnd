@@ -6,7 +6,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import edu.dosw.sirha.sirha_backend.domain.model.*;
 import edu.dosw.sirha.sirha_backend.domain.model.enums.SemaforoColores;
-import edu.dosw.sirha.sirha_backend.domain.model.stateGroup.Group;
+import edu.dosw.sirha.sirha_backend.domain.model.stategroup.Group;
 import edu.dosw.sirha.sirha_backend.domain.model.statesubjectdec.AprobadaState;
 import edu.dosw.sirha.sirha_backend.domain.model.statesubjectdec.EnCursoState;
 import edu.dosw.sirha.sirha_backend.domain.model.statesubjectdec.NoCursadaState;
@@ -28,10 +28,11 @@ class SubjectDecoratorHistoryTest {
 
     @BeforeEach
     void setUp() {
-        subject = new Subject("101", "Matemáticas", 4);
-        decorator = new SubjectDecorator(subject);
-        period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
-        try{
+        
+        try {
+            subject = new Subject("101", "Matemáticas", 4);
+            decorator = new SubjectDecorator(subject);
+            period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
             group = new Group(subject, 30, period);
         } catch (Exception e) {
             fail("No se esperaba una excepción al crear el grupo: " + e.getMessage());
@@ -50,24 +51,30 @@ class SubjectDecoratorHistoryTest {
 
     @Test
     void testInscribirCreatesHistoryRecord() {
-        decorator.inscribir(group);
-        
-        assertTrue(decorator.getState() instanceof EnCursoState);
-        assertEquals(SemaforoColores.AMARILLO, decorator.getEstadoColor());
-        assertEquals(group, decorator.getGroup());
-        
-        List<SubjectStateProcess> history = decorator.getHistory();
-        assertEquals(1, history.size());
+        try {
+            decorator.inscribir(group);
+            
+            assertTrue(decorator.getState() instanceof EnCursoState);
+            assertEquals(SemaforoColores.AMARILLO, decorator.getEstadoColor());
+            assertEquals(group, decorator.getGroup());
+            
+            List<SubjectStateProcess> history = decorator.getHistory();
+            assertEquals(1, history.size());
+        } catch (Exception e) {
+            fail("No se esperaba una excepción aquí");
+        }
     }
 
     @Test
     void testAprobarCreatesHistoryRecord() {
         // Setup: inscribir primero
-        decorator.inscribir(group);
-        decorator.setGrade(85);
-        
-        decorator.aprobar();
-        
+        try {
+            decorator.inscribir(group);
+            decorator.setGrade(85);
+            decorator.aprobar();
+        } catch (Exception e) {
+            fail("No se esperaba una excepción aquí");
+        }
         assertTrue(decorator.getState() instanceof AprobadaState);
         assertEquals(SemaforoColores.VERDE, decorator.getEstadoColor());
         
@@ -86,11 +93,14 @@ class SubjectDecoratorHistoryTest {
 
     @Test
     void testReprobarCreatesHistoryRecord() {
-        decorator.inscribir(group);
-        decorator.setGrade(35);
-        
-        decorator.reprobar();
-        
+        try {
+            decorator.inscribir(group);
+            decorator.setGrade(35);
+            
+            decorator.reprobar();
+        } catch (Exception e) {
+            fail("No se esperaba una excepción aquí");
+        }
         assertTrue(decorator.getState() instanceof ReprobadaState);
         assertEquals(SemaforoColores.ROJO, decorator.getEstadoColor());
         
@@ -109,10 +119,13 @@ class SubjectDecoratorHistoryTest {
 
     @Test
     void testRetirarCreatesHistoryRecord() {
-        decorator.inscribir(group);
+        try {
+            decorator.inscribir(group);
         
-        decorator.retirar();
-        
+            decorator.retirar();
+        } catch (Exception e) {
+            fail("No se esperaba una excepción aquí");
+        }
         List<SubjectStateProcess> history = decorator.getHistory();
         assertEquals(2, history.size());
         
@@ -128,9 +141,13 @@ class SubjectDecoratorHistoryTest {
 
     @Test
     void testMultipleStateChangesCreateMultipleRecords() {
-        decorator.inscribir(group);
-        decorator.setGrade(30);        
-        decorator.reprobar();
+        try {
+            decorator.inscribir(group);
+            decorator.setGrade(30);        
+            decorator.reprobar();
+        } catch (Exception e) {
+            fail("No se esperaba una excepción al inscribir y reprobar: " + e.getMessage());
+        }
         assertEquals(2, decorator.getHistory().size());
         
         try {
@@ -165,10 +182,13 @@ class SubjectDecoratorHistoryTest {
 
     @Test
     void testGetLastStateProcessWithRecords() {
-        decorator.inscribir(group);
-        decorator.setGrade(75);
-        decorator.aprobar();
-        
+        try {
+            decorator.inscribir(group);
+            decorator.setGrade(75);
+            decorator.aprobar();
+        } catch (Exception e) {
+            fail("No se esperaba una excepción aquí");
+        }
         SubjectStateProcess lastRecord = decorator.getLastStateProcess();
         assertNotNull(lastRecord);
         assertTrue(lastRecord instanceof SubjectProgress);
@@ -180,24 +200,31 @@ class SubjectDecoratorHistoryTest {
 
     @Test
     void testInscribirWithSemesterCreatesCorrectRecord() {
-        int targetSemester = 3;
-        decorator.inscribir(group, targetSemester);
-        
-        assertEquals(targetSemester, decorator.getSemester());
-        
-        decorator.setGrade(88);
-        decorator.aprobar();
-        
-        SubjectProgress progress = (SubjectProgress) decorator.getLastStateProcess();
-        assertEquals(targetSemester, progress.getSemester());
+        try {
+            int targetSemester = 3;
+            decorator.inscribir(group, targetSemester);
+            
+            assertEquals(targetSemester, decorator.getSemester());
+            
+            decorator.setGrade(88);
+            decorator.aprobar();
+            
+            SubjectProgress progress = (SubjectProgress) decorator.getLastStateProcess();
+            assertEquals(targetSemester, progress.getSemester());
+        } catch (Exception e) {
+            fail("No se esperaba una excepción aquí");
+        }
     }
 
     @Test
     void testHistoryIntegrity() {
-        decorator.inscribir(group);
-        decorator.setGrade(95);
-        decorator.aprobar();
-        
+        try { 
+            decorator.inscribir(group);
+            decorator.setGrade(95);
+            decorator.aprobar();
+        } catch (Exception e) {
+            fail("No se esperaba una excepción aquí");
+        }
         List<SubjectStateProcess> history = decorator.getHistory();
         SubjectStateProcess progressRecord = history.get(0);
         
@@ -228,10 +255,13 @@ class SubjectDecoratorHistoryTest {
 
     @Test
     void testHistoryImmutabilityAttempt() {
-        decorator.inscribir(group);
-        decorator.setGrade(80);
-        decorator.aprobar();
-        
+        try {
+            decorator.inscribir(group);
+            decorator.setGrade(80);
+            decorator.aprobar();
+        } catch (Exception e) {
+            fail("No se esperaba una excepción aquí");
+        }
         List<SubjectStateProcess> history = decorator.getHistory();
         int originalSize = history.size();
         
@@ -253,32 +283,38 @@ class SubjectDecoratorHistoryTest {
         assertEquals(SemaforoColores.GRIS, decorator.getEstadoColor());
         assertTrue(decorator.getHistory().isEmpty());
         
-        decorator.inscribir(group);
-        assertTrue(decorator.getState() instanceof EnCursoState);
-        assertEquals(SemaforoColores.AMARILLO, decorator.getEstadoColor());
-        assertTrue(decorator.estaCursando());
-        assertEquals(1, decorator.getHistory().size());
-        
-        decorator.setGrade(92);
-        decorator.aprobar();
-        assertTrue(decorator.getState() instanceof AprobadaState);
-        assertEquals(SemaforoColores.VERDE, decorator.getEstadoColor());
-        assertTrue(decorator.estaAprobada());
-        assertEquals(2, decorator.getHistory().size());
-        
-        SubjectProgress progressRecord = (SubjectProgress) decorator.getLastStateProcess();
-        assertEquals(SemaforoColores.VERDE, progressRecord.getState());
-        assertNotNull(progressRecord.getCreatedAt());
-        assertEquals(92, progressRecord.getGrade());
+        try { 
+            decorator.inscribir(group);
+            assertTrue(decorator.getState() instanceof EnCursoState);
+            assertEquals(SemaforoColores.AMARILLO, decorator.getEstadoColor());
+            assertTrue(decorator.estaCursando());
+            assertEquals(1, decorator.getHistory().size());
+            
+            decorator.setGrade(92);
+            decorator.aprobar();
+            assertTrue(decorator.getState() instanceof AprobadaState);
+            assertEquals(SemaforoColores.VERDE, decorator.getEstadoColor());
+            assertTrue(decorator.estaAprobada());
+            assertEquals(2, decorator.getHistory().size());
+            
+            SubjectProgress progressRecord = (SubjectProgress) decorator.getLastStateProcess();
+            assertEquals(SemaforoColores.VERDE, progressRecord.getState());
+            assertNotNull(progressRecord.getCreatedAt());
+            assertEquals(92, progressRecord.getGrade());
+        } catch (Exception e) {
+            fail("No se esperaba una excepción aquí");
+        }
     }
 
     @Test
     void testGradeManagementInHistory() {
-        decorator.inscribir(group);
-        
-        decorator.setGrade(45);
-        decorator.reprobar();
-        
+        try {
+            decorator.inscribir(group);
+            decorator.setGrade(45);
+            decorator.reprobar();
+        } catch (Exception e) {
+            fail("No se esperaba una excepción aquí");
+        }
         SubjectProgress failRecord = (SubjectProgress) decorator.getLastStateProcess();
         assertEquals(45, failRecord.getGrade());
         assertEquals(SemaforoColores.ROJO, failRecord.getState());
@@ -297,6 +333,9 @@ class SubjectDecoratorHistoryTest {
             
         } catch (IllegalStateException e) {
             assertEquals(1, decorator.getHistory().size());
+        }
+        catch (Exception e) {
+            fail("No se esperaba una excepción aquí");
         }
     }
 }

@@ -29,32 +29,30 @@ public class RequestServiceImpl implements RequestService {
         this.studentService = studentService;
         log.info("RequestServiceImpl inicializado correctamente");
     }
+
     @Transactional
     @Override
-    public List<BaseRequest> findAll() {
+    public List<BaseRequest> findAll() throws SirhaException {
         log.info("Consultando todas las solicitudes");
         try {
             List<BaseRequest> requests = repository.findAll();
             log.info("Se encontraron {} solicitudes", requests.size());
-            
-            // Log detallado en DEBUG
-            if (log.isDebugEnabled()) {
-                requests.forEach(request -> 
-                    log.debug("Solicitud encontrada - ID: {}, Tipo: {}, Estado: {}", 
+
+            requests.forEach(request ->
+                log.debug("Solicitud encontrada - ID: {}, Tipo: {}, Estado: {}",
                              request.getId(), 
                              request.getClass().getSimpleName(), 
                              request.getEnumState()));
-            }
             
             return requests;
         } catch (Exception e) {
-            log.error("Error al consultar todas las solicitudes: {}", e.getMessage(), e);
-            throw new RuntimeException("Error interno al consultar solicitudes", e);
+            throw SirhaException.of(ErrorCodeSirha.INTERNAL_ERROR,"Error interno al consultar todas las solicitudes: " + e.getMessage(), e);
         }
     }
+
     @Transactional
     @Override
-    public Optional<BaseRequest> findById(String id) {
+    public Optional<BaseRequest> findById(String id) throws SirhaException {
         log.debug("Buscando solicitud por ID: {}", id);
         try {
             Optional<BaseRequest> request = repository.findById(id);
@@ -68,13 +66,13 @@ public class RequestServiceImpl implements RequestService {
             
             return request;
         } catch (Exception e) {
-            log.error("Error al buscar solicitud por ID {}: {}", id, e.getMessage(), e);
-            throw new RuntimeException("Error interno al buscar solicitud", e);
+            throw SirhaException.of(ErrorCodeSirha.INTERNAL_ERROR,"Error interno al buscar solicitud: " + e.getMessage(), e);
         }
     }
+
     @Transactional
     @Override
-    public BaseRequest save(BaseRequest request) {
+    public BaseRequest save(BaseRequest request) throws SirhaException {
         log.info("Guardando solicitud - ID: {}, Tipo: {}", 
                 request.getId() != null ? request.getId() : "NUEVO", 
                 request.getClass().getSimpleName());
@@ -90,18 +88,16 @@ public class RequestServiceImpl implements RequestService {
             
             return savedRequest;
         } catch (Exception e) {
-            log.error("Error al guardar solicitud {}: {}", 
-                     request.getId() != null ? request.getId() : "NUEVA", 
-                     e.getMessage(), e);
-            throw new RuntimeException("Error interno al guardar solicitud", e);
+            throw SirhaException.of(ErrorCodeSirha.INTERNAL_ERROR,"Error interno al guardar solicitud: " + e.getMessage(), e);
         }
     }
+
     @Transactional
     @Override
-    public BaseRequest deleteById(String id) {
+    public BaseRequest deleteById(String id) throws SirhaException {
         log.info("Eliminando solicitud por ID: {}", id);
         try {
-            Optional<BaseRequest> existingRequest = repository.findById(id);
+            Optional<BaseRequest> existingRequest = findById(id);
             if (existingRequest.isEmpty()) {
                 log.warn("No se encontró solicitud con ID: {} para eliminar", id);
                 throw SirhaException.of(ErrorCodeSirha.REQUEST_NOT_FOUND, "Solicitud no encontrada");
@@ -112,29 +108,32 @@ public class RequestServiceImpl implements RequestService {
             log.info("Solicitud eliminada exitosamente - ID: {}", id);
             
             return existingRequest.get();
+        } catch (SirhaException e) {
+            throw e;
         } catch (Exception e) {
-            log.error("Error al eliminar solicitud por ID {}: {}", id, e.getMessage(), e);
-            throw new RuntimeException("Error interno al eliminar solicitud", e);
+            throw SirhaException.of(ErrorCodeSirha.INTERNAL_ERROR,"Error interno al eliminar solicitud: " + e.getMessage(), e);
         }
     }
 
 
     @Transactional
     @Override
-    public List<BaseRequest> getAllRequests(String studentUsername) {
+    public List<BaseRequest> getAllRequests(String studentUsername) throws SirhaException {
         log.info("Consultando solicitudes para el estudiante: {}", studentUsername);
         try {
             List<BaseRequest> requests = studentService.getAllRequests(studentUsername);
             log.info("Se encontraron {} solicitudes para el estudiante {}", requests.size(), studentUsername);
             return requests;
+        } catch (SirhaException e) {
+            throw e;
         } catch (Exception e) {
-            log.error("Error al consultar solicitudes para el estudiante {}: {}", studentUsername, e.getMessage(), e);
-            throw new RuntimeException("Error interno al consultar solicitudes", e);
+            throw SirhaException.of(ErrorCodeSirha.INTERNAL_ERROR,"Error interno al consultar solicitudes: " + e.getMessage(), e);
         }
     }
+
     @Transactional
     @Override
-    public BaseRequest getRequestById(String studentUsername, String requestId) {
+    public BaseRequest getRequestById(String studentUsername, String requestId) throws SirhaException {
         log.info("Consultando solicitud ID: {} para el estudiante: {}", requestId, studentUsername);
         try {
             BaseRequest request = studentService.getRequestById(studentUsername, requestId);
@@ -143,22 +142,24 @@ public class RequestServiceImpl implements RequestService {
                     request.getClass().getSimpleName(),
                     request.getEnumState());
             return request;
+        } catch (SirhaException e) {
+            throw e;
         } catch (Exception e) {
-            log.error("Error al consultar solicitud ID: {} para el estudiante {}: {}", requestId, studentUsername, e.getMessage(), e);
-            throw new RuntimeException("Error interno al consultar solicitud", e);
+            throw SirhaException.of(ErrorCodeSirha.INTERNAL_ERROR,"Error interno al consultar solicitud: " + e.getMessage(), e);
         }
     }
     @Transactional
     @Override
-    public List<BaseRequest> getRequestsHistory(String studentUsername) {
+    public List<BaseRequest> getRequestsHistory(String studentUsername) throws SirhaException {
         log.info("Consultando historial de solicitudes para el estudiante: {}", studentUsername);
         try {
             List<BaseRequest> requests = studentService.getRequestsHistory(studentUsername);
             log.info("Se encontraron {} solicitudes en el historial para el estudiante {}", requests.size(), studentUsername);
             return requests;
+        } catch (SirhaException e) {
+            throw e;
         } catch (Exception e) {
-            log.error("Error al consultar historial de solicitudes para el estudiante {}: {}", studentUsername, e.getMessage(), e);
-            throw new RuntimeException("Error interno al consultar historial de solicitudes", e);
+            throw SirhaException.of(ErrorCodeSirha.INTERNAL_ERROR,"Error interno al consultar historial de solicitudes: " + e.getMessage(), e);
         }
     }
 }
