@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ValidationUtil.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">SIRHA-BackEnd</a> &gt; <a href="index.source.html" class="el_package">edu.dosw.sirha.SIRHA_BackEnd.util</a> &gt; <span class="el_source">ValidationUtil.java</span></div><h1>ValidationUtil.java</h1><pre class="source lang-java linenums">package edu.dosw.sirha.SIRHA_BackEnd.util;
+
+import java.util.regex.Pattern;
+
+/**
+ * Utilidades para validaciones del sistema SIRHA.
+ */
+<span class="nc" id="L8">public class ValidationUtil {</span>
+    
+    // Patrones de validación
+<span class="nc" id="L11">    private static final Pattern EMAIL_INSTITUCIONAL = </span>
+<span class="nc" id="L12">        Pattern.compile(&quot;^[a-zA-Z0-9._%+-]+@universidad\\.edu\\.co$&quot;);</span>
+    
+<span class="nc" id="L14">    private static final Pattern CODIGO_ESTUDIANTIL = </span>
+<span class="nc" id="L15">        Pattern.compile(&quot;^\\d{4}-\\d{6}$&quot;);</span>
+    
+<span class="nc" id="L17">    private static final Pattern USERNAME_VALIDO = </span>
+<span class="nc" id="L18">        Pattern.compile(&quot;^[a-zA-Z0-9._-]{3,50}$&quot;);</span>
+
+    /**
+     * Valida que el email sea del dominio institucional.
+     */
+    public static boolean isValidInstitutionalEmail(String email) {
+<span class="nc bnc" id="L24" title="All 4 branches missed.">        return email != null &amp;&amp; EMAIL_INSTITUCIONAL.matcher(email).matches();</span>
+    }
+
+    /**
+     * Valida el formato del código estudiantil (YYYY-NNNNNN).
+     */
+    public static boolean isValidStudentCode(String codigo) {
+<span class="nc bnc" id="L31" title="All 4 branches missed.">        return codigo != null &amp;&amp; CODIGO_ESTUDIANTIL.matcher(codigo).matches();</span>
+    }
+
+    /**
+     * Valida el formato del username.
+     */
+    public static boolean isValidUsername(String username) {
+<span class="nc bnc" id="L38" title="All 4 branches missed.">        return username != null &amp;&amp; USERNAME_VALIDO.matcher(username).matches();</span>
+    }
+
+    /**
+     * Valida la fortaleza de la contraseña.
+     */
+    public static boolean isValidPassword(String password) {
+<span class="nc bnc" id="L45" title="All 4 branches missed.">        if (password == null || password.length() &lt; 8) {</span>
+<span class="nc" id="L46">            return false;</span>
+        }
+        
+        // Al menos una mayúscula, una minúscula, un número
+<span class="nc" id="L50">        boolean hasUpper = password.chars().anyMatch(Character::isUpperCase);</span>
+<span class="nc" id="L51">        boolean hasLower = password.chars().anyMatch(Character::isLowerCase);</span>
+<span class="nc" id="L52">        boolean hasDigit = password.chars().anyMatch(Character::isDigit);</span>
+        
+<span class="nc bnc" id="L54" title="All 6 branches missed.">        return hasUpper &amp;&amp; hasLower &amp;&amp; hasDigit;</span>
+    }
+
+    /**
+     * Valida todos los campos de registro de estudiante.
+     */
+    public static void validateStudentRegistration(String username, String email, 
+                                                 String password, String codigo) {
+<span class="nc bnc" id="L62" title="All 2 branches missed.">        if (!isValidUsername(username)) {</span>
+<span class="nc" id="L63">            throw new IllegalArgumentException(&quot;Username inválido: debe tener 3-50 caracteres alfanuméricos&quot;);</span>
+        }
+        
+<span class="nc bnc" id="L66" title="All 2 branches missed.">        if (!isValidInstitutionalEmail(email)) {</span>
+<span class="nc" id="L67">            throw new IllegalArgumentException(&quot;Email debe ser del dominio @universidad.edu.co&quot;);</span>
+        }
+        
+<span class="nc bnc" id="L70" title="All 2 branches missed.">        if (!isValidPassword(password)) {</span>
+<span class="nc" id="L71">            throw new IllegalArgumentException(&quot;Contraseña debe tener al menos 8 caracteres, mayúscula, minúscula y número&quot;);</span>
+        }
+        
+<span class="nc bnc" id="L74" title="All 2 branches missed.">        if (!isValidStudentCode(codigo)) {</span>
+<span class="nc" id="L75">            throw new IllegalArgumentException(&quot;Código estudiantil debe tener formato YYYY-NNNNNN&quot;);</span>
+        }
+<span class="nc" id="L77">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

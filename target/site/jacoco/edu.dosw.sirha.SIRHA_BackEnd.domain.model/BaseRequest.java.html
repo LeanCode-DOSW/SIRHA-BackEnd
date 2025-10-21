@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>BaseRequest.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">SIRHA-BackEnd</a> &gt; <a href="index.source.html" class="el_package">edu.dosw.sirha.SIRHA_BackEnd.domain.model</a> &gt; <span class="el_source">BaseRequest.java</span></div><h1>BaseRequest.java</h1><pre class="source lang-java linenums">package edu.dosw.sirha.SIRHA_BackEnd.domain.model;
+
+import java.time.LocalDateTime;
+
+import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.*;
+import edu.dosw.sirha.SIRHA_BackEnd.domain.port.*;
+
+/**
+ * Clase abstracta base para todas las solicitudes académicas en el sistema SIRHA.
+ * 
+ * Esta clase define la estructura común y comportamiento básico para todos los tipos
+ * de solicitudes que pueden realizar los estudiantes, como cambios de grupo,
+ * cambios de materia, solicitudes de reinscripción, etc.
+ * 
+ * Implementa el patrón Template Method, donde define la estructura común de las
+ * solicitudes y delega la implementación específica de aprobar() y rechazar()
+ * a las clases concretas.
+ * 
+ * Características principales:
+ * - Sistema de prioridades para ordenamiento de solicitudes
+ * - Estados bien definidos (PENDIENTE, APROBADA, RECHAZADA)
+ * - Timestamp automático de creación
+ * - Interface común para todas las solicitudes
+ * 
+ * Estados de solicitud:
+ * - PENDIENTE: Solicitud creada, esperando revisión
+ * - APROBADA: Solicitud aceptada y procesada
+ * - RECHAZADA: Solicitud denegada con razón específica
+ * 
+ * @see RequestState
+ * @see Request
+ * @see CambioGrupo
+ * @see CambioMateria
+ */
+public abstract class BaseRequest implements Request {
+    private String id;
+    private int prioridad;
+    private RequestState estado;
+    private LocalDateTime creadoEn;
+    private Student student;
+    private Subject previousSubject;
+    private Group previousGroup;    
+    private Subject newSubject;
+    private Group newGroup;
+    private String motivo;
+
+    /**
+     * Constructor base para todas las solicitudes.
+     * 
+     * Inicializa una solicitud con una prioridad específica y establece
+     * automáticamente el estado como PENDIENTE y el timestamp de creación.
+     * 
+     * @param prioridad nivel de prioridad de la solicitud.
+     * @param previousSubject materia previa del estudiante
+     * @param previousGroup grupo previo del estudiante
+     * @param newSubject nueva materia solicitada
+     * @param newGroup nuevo grupo solicitado
+     * @param motivo razón o justificación de la solicitud
+     * @param student estudiante que realiza la solicitud
+     * 
+     */
+<span class="fc" id="L62">    public BaseRequest(Subject previousSubject, Group previousGroup, Subject newSubject, Group newGroup, String motivo, int prioridad, Student student) {</span>
+<span class="fc" id="L63">        this.prioridad = prioridad;</span>
+<span class="fc" id="L64">        this.estado = RequestState.PENDIENTE;</span>
+<span class="fc" id="L65">        this.creadoEn = LocalDateTime.now();</span>
+<span class="fc" id="L66">        this.previousSubject = previousSubject;</span>
+<span class="fc" id="L67">        this.previousGroup = previousGroup;</span>
+<span class="fc" id="L68">        this.newSubject = newSubject;</span>
+<span class="fc" id="L69">        this.newGroup = newGroup;</span>
+<span class="fc" id="L70">        this.motivo = motivo;</span>
+<span class="fc" id="L71">        this.student = student;</span>
+<span class="fc" id="L72">    }</span>
+
+
+    /**
+     * Implementación del método de validación de la solicitud.
+     * si la solicitud no afecta las demas materias, existe el grupo y la materia, sera valida
+     * de lo contrario sera rechazada
+     */
+    public boolean valideResquest(){
+<span class="nc bnc" id="L81" title="All 2 branches missed.">        if (validar(newSubject, newGroup)){</span>
+<span class="nc" id="L82">            return true;</span>
+        }else{
+<span class="nc" id="L84">            setEstado(RequestState.RECHAZADA);</span>
+<span class="nc" id="L85">            return false;</span>
+        }
+    };
+    
+
+    
+    public AdminState approveRequest(){
+        //LOGICA PARA COMUNICARSE CON DECANATURA O PROFESORES Y MANEJARLA
+        // establecer el estado a aprobado o rechazado
+<span class="nc" id="L94">        setEstado(RequestState.APROBADA);</span>
+<span class="nc" id="L95">        return AdminState.APROBAR;</span>
+    };
+    
+
+    public abstract void aprobar();
+    public abstract void rechazar();
+
+
+    public String getId() {
+<span class="nc" id="L104">        return id;</span>
+    }
+    public void setId(String id) {
+<span class="nc" id="L107">        this.id = id;</span>
+<span class="nc" id="L108">    }</span>
+
+    /**
+     * Obtiene el nivel de prioridad de la solicitud.
+     * @return prioridad en escala 1-5
+     */
+    public int getPrioridad() {
+<span class="nc" id="L115">        return prioridad;</span>
+    }
+
+    /**
+     * Establece el nivel de prioridad de la solicitud.
+     * Solo se permite cambiar si la solicitud está pendiente.
+     * 
+     * @param prioridad nueva prioridad (1-5)
+     * @throws IllegalArgumentException si la prioridad está fuera del rango
+     * @throws IllegalStateException si la solicitud no está pendiente
+     */
+    
+    public void setPrioridad(int prioridad) {
+<span class="nc bnc" id="L128" title="All 4 branches missed.">        if (prioridad &lt; 1 || prioridad &gt; 5) {</span>
+<span class="nc" id="L129">            throw new IllegalArgumentException(&quot;La prioridad debe estar entre 1 y 5&quot;);</span>
+        }
+        /*
+        if (!puedeSerProcesada()) {
+            throw new IllegalStateException(&quot;No se puede cambiar la prioridad de una solicitud finalizada&quot;);
+        }
+            */
+<span class="nc" id="L136">        this.prioridad = prioridad;</span>
+<span class="nc" id="L137">    }</span>
+
+    /**
+     * Obtiene el estado actual de la solicitud.
+     * @return estado de la solicitud
+     */
+    public RequestState getEstado() {
+<span class="fc" id="L144">        return estado;</span>
+    }
+
+    /**
+     * Establece el estado de la solicitud.
+     * Usado internamente por los métodos aprobar() y rechazar().
+     * 
+     * @param estado nuevo estado de la solicitud
+     * @throws IllegalArgumentException si el estado es null
+     */
+    protected void setEstado(RequestState estado) {
+<span class="nc bnc" id="L155" title="All 2 branches missed.">        if (estado == null) {</span>
+<span class="nc" id="L156">            throw new IllegalArgumentException(&quot;El estado no puede ser null&quot;);</span>
+        }
+<span class="nc" id="L158">        this.estado = estado;</span>
+<span class="nc" id="L159">    }</span>
+
+    /**
+     * Obtiene la fecha y hora de creación de la solicitud.
+     * @return timestamp de creación
+     */
+    public LocalDateTime getCreadoEn() {
+<span class="nc" id="L166">        return creadoEn;</span>
+    }
+
+    /**
+     * Establece la fecha de creación de la solicitud.
+     * Usado para pruebas o migración de datos.
+     * 
+     * @param creadoEn nueva fecha de creación
+     * @throws IllegalArgumentException si la fecha es null o futura
+     */
+    public void setCreadoEn(LocalDateTime creadoEn) {
+<span class="nc bnc" id="L177" title="All 2 branches missed.">        if (creadoEn == null) {</span>
+<span class="nc" id="L178">            throw new IllegalArgumentException(&quot;La fecha de creación no puede ser null&quot;);</span>
+        }
+<span class="nc bnc" id="L180" title="All 2 branches missed.">        if (creadoEn.isAfter(LocalDateTime.now())) {</span>
+<span class="nc" id="L181">            throw new IllegalArgumentException(&quot;La fecha de creación no puede ser futura&quot;);</span>
+        }
+<span class="nc" id="L183">        this.creadoEn = creadoEn;</span>
+<span class="nc" id="L184">    }</span>
+    public Student getStudent() {
+<span class="fc" id="L186">        return student;</span>
+    }
+
+    /**
+     * Representación en string de la solicitud con información básica.
+     */
+    @Override
+    public String toString() {
+<span class="nc" id="L194">        return String.format(&quot;%s{id='%s', prioridad=%d, estado=%s, creadoEn=%s}&quot;, </span>
+<span class="nc" id="L195">                            getClass().getSimpleName(), id, prioridad, estado, creadoEn);</span>
+    }
+
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

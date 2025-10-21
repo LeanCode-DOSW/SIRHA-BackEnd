@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CambioGrupo.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">SIRHA-BackEnd</a> &gt; <a href="index.source.html" class="el_package">edu.dosw.sirha.SIRHA_BackEnd.domain.model</a> &gt; <span class="el_source">CambioGrupo.java</span></div><h1>CambioGrupo.java</h1><pre class="source lang-java linenums">package edu.dosw.sirha.SIRHA_BackEnd.domain.model;
+
+import java.util.Map;
+
+import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.AdminState;
+import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.SemaforoColores;
+
+public class CambioGrupo extends BaseRequest {
+
+    public CambioGrupo(Subject previousSubject, Group previousGroup,
+                       Subject newSubject, Group newGroup, String motivo,int prioridad, Student student) {
+<span class="fc" id="L12">        super(previousSubject, previousGroup, newSubject, newGroup, motivo,prioridad, student);</span>
+       
+<span class="fc" id="L14">    }</span>
+
+    @Override
+    public boolean validar(Subject newSubject, Group newGroup) {
+<span class="fc" id="L18">        String subjectName = newSubject.getName();</span>
+
+<span class="fc" id="L20">        Student student = this.getStudent();</span>
+<span class="fc" id="L21">        Semaforo semaforo = student.getSemaforo();</span>
+<span class="fc" id="L22">        Map&lt;String, SemaforoColores&gt; colores = semaforo.getAll();</span>
+
+        
+
+<span class="pc bpc" id="L26" title="1 of 2 branches missed.">        if (colores.get(subjectName) == SemaforoColores.ROJO){</span>
+<span class="nc" id="L27">            return false;</span>
+        }
+<span class="fc" id="L29">        return true;</span>
+
+    }
+
+    @Override
+    public boolean aplicar() {
+<span class="nc" id="L35">        return false;</span>
+    }
+
+    @Override
+    public void aprobar() {
+        
+<span class="nc" id="L41">    }</span>
+
+    @Override
+    public void rechazar() {
+<span class="nc" id="L45">    }</span>
+
+    @Override
+    public boolean valideResquest() {
+<span class="nc" id="L49">        return false;</span>
+    }
+
+    @Override
+    public AdminState approveRequest() {
+<span class="nc" id="L54">        return null;</span>
+    }
+    @Override
+    public void proccessRequest() {
+<span class="nc" id="L58">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

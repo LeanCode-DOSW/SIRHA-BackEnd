@@ -1,0 +1,307 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Group.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">SIRHA-BackEnd</a> &gt; <a href="index.source.html" class="el_package">edu.dosw.sirha.SIRHA_BackEnd.domain.model</a> &gt; <span class="el_source">Group.java</span></div><h1>Group.java</h1><pre class="source lang-java linenums">package edu.dosw.sirha.SIRHA_BackEnd.domain.model;
+
+import java.util.*;
+import edu.dosw.sirha.SIRHA_BackEnd.domain.port.GroupState;
+
+/**
+ * Entidad del dominio que representa un grupo académico en el sistema SIRHA.
+ *
+ * Un grupo es una instancia específica de una materia en un semestre determinado,
+ * con un profesor asignado, un aula, horarios específicos y una capacidad máxima
+ * de estudiantes. Esta clase implementa el patrón State para manejar los diferentes
+ * estados del grupo (Abierto, Cerrado, Lleno).
+ *
+ * Características principales:
+ * - Gestión de capacidad y cupos disponibles
+ * - Estado dinámico que controla las inscripciones (State Pattern)
+ * - Lista de estudiantes inscritos
+ * - Información del profesor y curso asignado
+ * - Control de inscripciones duplicadas
+ *
+ * Estados del grupo:
+ * - ABIERTO: Acepta nuevas inscripciones si hay cupos
+ * - CERRADO: No acepta mas inscripciones
+ * @see GroupState
+ * @see Professor
+ * @see Subject
+ * @see Student
+ */
+public class Group {
+    private String id;
+    private int capacidad;
+    private int inscritos;
+    private GroupState estadoGrupo; // State Pattern
+    private Professor profesor;
+    private Subject curso;
+    private List&lt;Schedule&gt; horarios;
+    private String aula;
+    private List&lt;Student&gt; estudiantes;
+
+    /**
+     * Constructor principal para crear un nuevo grupo académico.
+     *
+     * Inicializa el grupo con una capacidad específica y lo establece
+     * en estado ABIERTO por defecto. La lista de estudiantes se inicializa vacía.
+     *
+     * @param capacidad capacidad máxima de estudiantes para el grupo.
+     *                 Debe ser un valor positivo mayor a cero.
+     *
+     * @example
+     * &lt;pre&gt;
+     * Group grupo = new Group(30);  // Grupo con capacidad para 30 estudiantes
+     * grupo.setProfesor(profesor);
+     * grupo.setCurso(curso);
+     * grupo.setAula(&quot;A101&quot;);
+     * &lt;/pre&gt;
+     */
+<span class="fc" id="L57">    public Group(int capacidad) {</span>
+<span class="fc bfc" id="L58" title="All 2 branches covered.">        if (capacidad &lt;= 0) {</span>
+<span class="fc" id="L59">            throw new IllegalArgumentException(&quot;La capacidad del grupo debe ser mayor a cero&quot;);</span>
+        }
+
+<span class="fc" id="L62">        this.capacidad = capacidad;</span>
+<span class="fc" id="L63">        this.inscritos = 0;</span>
+<span class="fc" id="L64">        this.estadoGrupo = new StatusOpen(); // Estado inicial: abierto</span>
+<span class="fc" id="L65">        this.estudiantes = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L66">    }</span>
+    public void setEstadoGrupo(GroupState estado) {
+<span class="fc bfc" id="L68" title="All 2 branches covered.">        if (estado == null) {</span>
+<span class="fc" id="L69">            throw new IllegalArgumentException(&quot;El estado del grupo no puede ser null&quot;);</span>
+        }
+<span class="fc" id="L71">        this.estadoGrupo = estado;</span>
+<span class="fc" id="L72">    }</span>
+
+    /**
+     * Obtiene el estado actual del grupo.
+     * @return estado actual del grupo, nunca null
+     */
+    public GroupState getEstadoGrupo() {
+<span class="fc" id="L79">        return estadoGrupo;</span>
+    }
+
+    /**
+     * Intenta inscribir un estudiante en el grupo.
+     *
+     * Delega la operación de inscripción al estado actual del grupo,
+     * que determina si la inscripción es posible según las reglas específicas
+     * de cada estado (abierto, cerrado, lleno).
+     *
+     * El estado se encarga de:
+     * - Validar si se puede realizar la inscripción
+     * - Actualizar la lista de estudiantes y contador
+     * - Cambiar el estado del grupo si es necesario
+     *
+     * @param estudiante estudiante a inscribir en el grupo. No debe ser null.
+     */
+    public void inscribirEstudiante(Student estudiante) {
+<span class="fc bfc" id="L97" title="All 2 branches covered.">        if (estudiante == null) {</span>
+<span class="fc" id="L98">            throw new IllegalArgumentException(&quot;El estudiante no puede ser null&quot;);</span>
+        }
+
+<span class="fc" id="L101">        estadoGrupo.inscribirEstudiante(this, estudiante);</span>
+<span class="fc" id="L102">    }</span>
+
+    /**
+     * Calcula el número de cupos disponibles en el grupo.
+     *
+     * @return número de cupos libres (capacidad - inscritos).
+     *         Retorna 0 si el grupo está lleno.
+     */
+    public int getCuposDisponibles() {
+<span class="fc" id="L111">        return Math.max(0, capacidad - inscritos);</span>
+    }
+
+    /**
+     * Agrega un estudiante directamente a la lista del grupo.
+     *
+     * Este método es utilizado internamente por los estados del grupo
+     * para realizar la inscripción efectiva. Actualiza tanto la lista
+     * de estudiantes como el contador de inscritos.
+     *
+     * Validaciones realizadas:
+     * - Verifica que el estudiante no esté ya inscrito
+     * - Mantiene consistencia entre la lista y el contador
+     *
+     * @param estudiante estudiante a agregar. No debe ser null.
+     * @throws IllegalArgumentException si el estudiante ya está inscrito
+     *                                o si el parámetro es null
+     *
+     * @implNote Este método es package-private para uso interno del estado
+     */
+    public void addEstudiante(Student estudiante) {
+<span class="fc bfc" id="L132" title="All 2 branches covered.">        if (estudiante == null) {</span>
+<span class="fc" id="L133">            throw new IllegalArgumentException(&quot;El estudiante no puede ser null&quot;);</span>
+        }
+
+<span class="fc bfc" id="L136" title="All 2 branches covered.">        if (estudiantes.contains(estudiante)) {</span>
+<span class="fc" id="L137">            throw new IllegalArgumentException(&quot;El estudiante ya está inscrito en el grupo&quot;);</span>
+        }
+
+<span class="fc" id="L140">        estudiantes.add(estudiante);</span>
+<span class="fc" id="L141">        inscritos++;</span>
+<span class="fc" id="L142">    }</span>
+
+    /**
+     * Remueve un estudiante del grupo.
+     *
+     * Elimina al estudiante de la lista y actualiza el contador.
+     * Puede cambiar el estado del grupo si es necesario.
+     *
+     * @param estudiante estudiante a remover. No debe ser null.
+     * @return true si el estudiante fue removido, false si no estaba inscrito
+     * @throws IllegalArgumentException si el estudiante es null
+     */
+    public boolean removerEstudiante(Student estudiante) {
+<span class="fc bfc" id="L155" title="All 2 branches covered.">        if (estudiante == null) {</span>
+<span class="fc" id="L156">            throw new IllegalArgumentException(&quot;El estudiante no puede ser null&quot;);</span>
+        }
+
+<span class="fc" id="L159">        boolean removed = estudiantes.remove(estudiante);</span>
+<span class="fc bfc" id="L160" title="All 2 branches covered.">        if (removed) {</span>
+<span class="fc" id="L161">            inscritos--;</span>
+
+
+        }
+
+<span class="fc" id="L166">        return removed;</span>
+    }
+
+    /**
+     * Verifica si el grupo está lleno.
+     * @return true si no hay cupos disponibles, false en caso contrario
+     */
+    public boolean estaLleno() {
+<span class="fc bfc" id="L174" title="All 2 branches covered.">        return inscritos &gt;= capacidad;</span>
+    }
+
+    /**
+     * Verifica si un estudiante está inscrito en el grupo.
+     * @param estudiante estudiante a verificar
+     * @return true si está inscrito, false en caso contrario
+     */
+    public boolean contieneEstudiante(Student estudiante) {
+<span class="fc bfc" id="L183" title="All 4 branches covered.">        return estudiante != null &amp;&amp; estudiantes.contains(estudiante);</span>
+    }
+
+    // Getters y Setters con documentación
+
+    public String getId() {
+<span class="fc" id="L189">        return id;</span>
+    }
+
+    public void setId(String id) {
+<span class="fc" id="L193">        this.id = id;</span>
+<span class="fc" id="L194">    }</span>
+
+    /**
+     * Obtiene la capacidad máxima del grupo.
+     * @return capacidad máxima de estudiantes
+     */
+    public int getCapacidad() {
+<span class="fc" id="L201">        return capacidad;</span>
+    }
+
+    /**
+     * Establece la capacidad máxima del grupo.
+     * Solo debe modificarse si no hay estudiantes inscritos.
+     *
+     * @param capacidad nueva capacidad. Debe ser mayor a cero.
+     * @throws IllegalArgumentException si la capacidad es inválida
+     * @throws IllegalStateException si hay estudiantes inscritos
+     */
+    public void setCapacidad(int capacidad) {
+<span class="fc bfc" id="L213" title="All 2 branches covered.">        if (capacidad &lt;= 0) {</span>
+<span class="fc" id="L214">            throw new IllegalArgumentException(&quot;La capacidad debe ser mayor a cero&quot;);</span>
+        }
+<span class="pc bpc" id="L216" title="1 of 2 branches missed.">        if (inscritos &gt; 0) {</span>
+<span class="fc" id="L217">            throw new IllegalStateException(&quot;No se puede cambiar la capacidad con estudiantes inscritos&quot;);</span>
+        }
+
+<span class="nc bnc" id="L220" title="All 2 branches missed.">        if (capacidad &lt; inscritos) {</span>
+<span class="nc" id="L221">            throw new IllegalArgumentException(&quot;La nueva capacidad no puede ser menor que el número actual de inscritos&quot;);</span>
+        }
+
+<span class="nc" id="L224">        this.capacidad = capacidad;</span>
+<span class="nc" id="L225">    }</span>
+
+    /**
+     * Obtiene el número de estudiantes inscritos.
+     * @return número actual de inscritos
+     */
+    public int getInscritos() {
+<span class="fc" id="L232">        return inscritos;</span>
+    }
+
+    public Professor getProfesor() {
+<span class="fc" id="L236">        return profesor;</span>
+    }
+
+    public void setProfesor(Professor profesor) {
+<span class="fc" id="L240">        this.profesor = profesor;</span>
+<span class="fc" id="L241">    }</span>
+
+    public Subject getCurso() {
+<span class="fc" id="L244">        return curso;</span>
+    }
+
+    public void setCurso(Subject curso) {
+<span class="fc" id="L248">        this.curso = curso;</span>
+<span class="fc" id="L249">    }</span>
+
+    public String getAula() {
+<span class="fc" id="L252">        return aula;</span>
+    }
+
+    public void setAula(String aula) {
+<span class="fc" id="L256">        this.aula = aula;</span>
+<span class="fc" id="L257">    }</span>
+
+    /**
+     * Obtiene una copia de la lista de estudiantes inscritos.
+     * @return lista inmutable de estudiantes para evitar modificaciones externas
+     */
+    public List&lt;Student&gt; getEstudiantes() {
+<span class="fc" id="L264">        return Collections.unmodifiableList(estudiantes);</span>
+    }
+
+    /**
+     * Compara este grupo con otro objeto para determinar igualdad.
+     * Dos grupos son iguales si tienen el mismo ID.
+     */
+    @Override
+    public boolean equals(Object obj) {
+<span class="fc bfc" id="L273" title="All 2 branches covered.">        if (this == obj) return true;</span>
+<span class="pc bpc" id="L274" title="2 of 4 branches missed.">        if (obj == null || getClass() != obj.getClass()) return false;</span>
+
+<span class="fc" id="L276">        Group group = (Group) obj;</span>
+<span class="fc" id="L277">        return Objects.equals(id, group.id);</span>
+    }
+
+    @Override
+    public int hashCode() {
+<span class="fc" id="L282">        return Objects.hash(id);</span>
+    }
+
+    @Override
+    public String toString() {
+<span class="fc" id="L287">        return String.format(&quot;Group{id='%s', capacidad=%d, inscritos=%d, aula='%s', estado=%s}&quot;,</span>
+<span class="fc" id="L288">                id, capacidad, inscritos, aula,</span>
+<span class="pc bpc" id="L289" title="1 of 2 branches missed.">                estadoGrupo != null ? estadoGrupo.getClass().getSimpleName() : &quot;null&quot;);</span>
+    }
+
+
+    public void addHorario(Schedule horario) {
+<span class="nc bnc" id="L294" title="All 2 branches missed.">        for (Schedule existente : horarios) {</span>
+<span class="nc bnc" id="L295" title="All 2 branches missed.">            if (existente.seSolapaCon(horario)) {</span>
+<span class="nc" id="L296">                throw new IllegalArgumentException(&quot;El horario se solapa con otro ya asignado en el grupo&quot;);</span>
+            }
+<span class="nc" id="L298">        }</span>
+<span class="nc" id="L299">        horarios.add(horario);</span>
+<span class="nc" id="L300">    }</span>
+
+    public List&lt;Schedule&gt; getHorarios() {
+<span class="nc" id="L303">        return horarios;</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

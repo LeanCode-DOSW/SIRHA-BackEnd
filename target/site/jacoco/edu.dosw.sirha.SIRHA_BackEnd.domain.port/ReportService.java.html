@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ReportService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">SIRHA-BackEnd</a> &gt; <a href="index.source.html" class="el_package">edu.dosw.sirha.SIRHA_BackEnd.domain.port</a> &gt; <span class="el_source">ReportService.java</span></div><h1>ReportService.java</h1><pre class="source lang-java linenums">package edu.dosw.sirha.SIRHA_BackEnd.domain.port;
+
+import edu.dosw.sirha.SIRHA_BackEnd.domain.model.Group;
+import edu.dosw.sirha.SIRHA_BackEnd.domain.model.Student;
+import edu.dosw.sirha.SIRHA_BackEnd.domain.model.Semaforo;
+import edu.dosw.sirha.SIRHA_BackEnd.domain.model.enums.SemaforoColores;
+import edu.dosw.sirha.SIRHA_BackEnd.domain.port.Reportable;
+
+import java.util.*;
+import java.util.stream.Collectors;
+
+/**
+ * Servicio de reportes y estadísticas para el sistema SIRHA.
+ *
+ * Implementa los casos de uso:
+ * - Indicador de aprobación
+ * - Semáforo académico global
+ * - Materias más solicitadas
+ */
+<span class="nc" id="L20">public class ReportService implements Reportable {</span>
+
+    @Override
+    public String generarReporte() {
+<span class="nc" id="L24">        return &quot;Generando reporte de estadísticas académicas...&quot;;</span>
+    }
+
+    /**
+     * Calcula el indicador de aprobación global.
+     * Supone que el 70% de los inscritos aprueban como lógica de ejemplo.
+     *
+     * @param grupos lista de grupos académicos
+     * @return porcentaje de aprobación (0.0 - 1.0)
+     */
+    public double calcularIndicadorAprobacion(List&lt;Group&gt; grupos) {
+<span class="nc" id="L35">        int total = 0;</span>
+<span class="nc" id="L36">        int aprobados = 0;</span>
+
+<span class="nc bnc" id="L38" title="All 2 branches missed.">        for (Group g : grupos) {</span>
+<span class="nc" id="L39">            total += g.getInscritos();</span>
+<span class="nc" id="L40">            aprobados += (int) (g.getInscritos() * 0.7); // Ejemplo</span>
+<span class="nc" id="L41">        }</span>
+
+<span class="nc bnc" id="L43" title="All 2 branches missed.">        return total == 0 ? 0.0 : (double) aprobados / total;</span>
+    }
+
+    /**
+     * Obtiene un semáforo global para todos los estudiantes.
+     *
+     * @param estudiantes lista de estudiantes
+     * @return mapa con estudiante -&gt; color del semáforo
+     */
+    public Map&lt;String, SemaforoColores&gt; obtenerSemaforoGlobal(List&lt;Student&gt; estudiantes) {
+<span class="nc" id="L53">        Map&lt;String, SemaforoColores&gt; global = new HashMap&lt;&gt;();</span>
+
+<span class="nc bnc" id="L55" title="All 2 branches missed.">        for (Student s : estudiantes) {</span>
+<span class="nc" id="L56">            Semaforo sem = s.getSemaforo();</span>
+<span class="nc bnc" id="L57" title="All 4 branches missed.">            if (sem != null &amp;&amp; s.getPlanGeneral() != null) {</span>
+                // Ejemplo: se toma el primer curso del plan de estudios
+<span class="nc bnc" id="L59" title="All 2 branches missed.">                String materia = s.getPlanGeneral().getMaterias().isEmpty()</span>
+<span class="nc" id="L60">                        ? null</span>
+<span class="nc" id="L61">                        : s.getPlanGeneral().getMaterias().get(0).getCodigo();</span>
+
+<span class="nc bnc" id="L63" title="All 2 branches missed.">                if (materia != null) {</span>
+<span class="nc" id="L64">                    global.put(s.getCodigo(), sem.getColor(materia));</span>
+                }
+            }
+<span class="nc" id="L67">        }</span>
+
+<span class="nc" id="L69">        return global;</span>
+    }
+
+    /**
+     * Devuelve las materias más solicitadas según número de inscritos en grupos.
+     *
+     * @param grupos lista de grupos
+     * @return lista de materias ordenadas por popularidad
+     */
+    public List&lt;String&gt; obtenerMateriasMasSolicitadas(List&lt;Group&gt; grupos) {
+<span class="nc" id="L79">        Map&lt;String, Integer&gt; contador = new HashMap&lt;&gt;();</span>
+
+<span class="nc bnc" id="L81" title="All 2 branches missed.">        for (Group g : grupos) {</span>
+<span class="nc bnc" id="L82" title="All 2 branches missed.">            String codigo = g.getCurso() != null ? g.getCurso().getCodigo() : &quot;DESCONOCIDO&quot;;</span>
+<span class="nc" id="L83">            contador.put(codigo, contador.getOrDefault(codigo, 0) + g.getInscritos());</span>
+<span class="nc" id="L84">        }</span>
+
+<span class="nc" id="L86">        return contador.entrySet().stream()</span>
+<span class="nc" id="L87">                .sorted((a, b) -&gt; b.getValue().compareTo(a.getValue()))</span>
+<span class="nc" id="L88">                .map(Map.Entry::getKey)</span>
+<span class="nc" id="L89">                .collect(Collectors.toList());</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>
