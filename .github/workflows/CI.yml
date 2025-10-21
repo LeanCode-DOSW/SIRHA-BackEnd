@@ -2,9 +2,9 @@ name: Java CI with Maven and JaCoCo
 
 on:
   push:
-    branches: [ main, develop, feature/* ]
+    branches: [develop]
   pull_request:
-    branches: [ main, develop ]
+    branches: [develop]
 
 env:
   JAVA_VERSION: '17'
