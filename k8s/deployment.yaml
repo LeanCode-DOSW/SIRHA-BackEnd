@@ -1,0 +1,145 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sirha-backend
+  namespace: sirha
+  labels:
+    app: sirha-backend
+    version: v1
+    project: SIRHA
+    team: Genesis
+  annotations:
+    description: "SIRHA Backend API - Sistema de Información de Recursos Humanos y Administrativos"
+    contact: "Equipo Genesis - DOSW 2025"
+spec:
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
+  selector:
+    matchLabels:
+      app: sirha-backend
+  template:
+    metadata:
+      labels:
+        app: sirha-backend
+        version: v1
+    spec:
+      containers:
+        - name: sirha-backend
+          image: sirha-backend:dev
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8080
+              name: http
+              protocol: TCP
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              valueFrom:
+                configMapKeyRef:
+                  name: sirha-backend-config
+                  key: SPRING_PROFILES_ACTIVE
+            - name: SERVER_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: sirha-backend-config
+                  key: SERVER_PORT
+            - name: LOGGING_LEVEL_ROOT
+              valueFrom:
+                configMapKeyRef:
+                  name: sirha-backend-config
+                  key: LOGGING_LEVEL_ROOT
+            - name: LOGGING_LEVEL_EDU_DOSW_SIRHA
+              valueFrom:
+                configMapKeyRef:
+                  name: sirha-backend-config
+                  key: LOGGING_LEVEL_EDU_DOSW_SIRHA
+            - name: LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_DATA_MONGODB
+              valueFrom:
+                configMapKeyRef:
+                  name: sirha-backend-config
+                  key: LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_DATA_MONGODB
+            - name: SPRINGDOC_SWAGGER_UI_PATH
+              valueFrom:
+                configMapKeyRef:
+                  name: sirha-backend-config
+                  key: SPRINGDOC_SWAGGER_UI_PATH
+            - name: SPRINGDOC_API_DOCS_PATH
+              valueFrom:
+                configMapKeyRef:
+                  name: sirha-backend-config
+                  key: SPRINGDOC_API_DOCS_PATH
+            - name: SPRINGDOC_SWAGGER_UI_OPERATIONS_SORTER
+              valueFrom:
+                configMapKeyRef:
+                  name: sirha-backend-config
+                  key: SPRINGDOC_SWAGGER_UI_OPERATIONS_SORTER
+            - name: MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE
+              valueFrom:
+                configMapKeyRef:
+                  name: sirha-backend-config
+                  key: MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE
+            - name: MANAGEMENT_ENDPOINT_HEALTH_PROBES_ENABLED
+              valueFrom:
+                configMapKeyRef:
+                  name: sirha-backend-config
+                  key: MANAGEMENT_ENDPOINT_HEALTH_PROBES_ENABLED
+            - name: LOGGING_FILE_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: sirha-backend-config
+                  key: LOGGING_FILE_NAME
+            - name: LOGGING_PATTERN_FILE
+              valueFrom:
+                configMapKeyRef:
+                  name: sirha-backend-config
+                  key: LOGGING_PATTERN_FILE
+            - name: LOGGING_PATTERN_CONSOLE
+              valueFrom:
+                configMapKeyRef:
+                  name: sirha-backend-config
+                  key: LOGGING_PATTERN_CONSOLE
+            - name: SPRING_DATA_MONGODB_URI
+              valueFrom:
+                secretKeyRef:
+                  name: sirha-backend-secrets
+                  key: SPRING_DATA_MONGODB_URI
+            - name: SPRING_DATA_MONGODB_DATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: sirha-backend-secrets
+                  key: SPRING_DATA_MONGODB_DATABASE
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "256Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+          startupProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 30
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+            initialDelaySeconds: 20
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 3
+      terminationGracePeriodSeconds: 30
