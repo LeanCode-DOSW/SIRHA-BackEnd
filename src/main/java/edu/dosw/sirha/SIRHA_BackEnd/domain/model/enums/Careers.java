@@ -2,7 +2,7 @@ package edu.dosw.sirha.sirha_backend.domain.model.enums;
 
 public enum Careers {
     DEFAULT("Default Career"),
-    INGENIERIA_DE_SISTEMAS("Ingeniería de Sistemas"),
+    INGENIERIA_DE_SISTEMAS("Ingenieria de Sistemas"),
     INGENIERIA_INDUSTRIAL("Ingeniería Industrial"),
     INGENIERIA_CIVIL("Ingeniería Civil"),
     INGENIERIA_ELECTRONICA("Ingeniería Electrónica"),

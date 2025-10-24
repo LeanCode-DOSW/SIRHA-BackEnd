@@ -43,13 +43,14 @@ public class Group {
     private int capacidad;
     private int inscritos;
     private GroupState estadoGrupo; // State Pattern
-    private Professor profesor;
-    private Subject curso;
+    private Professor professor;
     private List<Schedule> schedules;
     private String aula;
     private AcademicPeriod currentPeriod;
     private List<Student> estudiantes;
 
+    public Group() {
+    }
 
     /**
      * Constructor principal para crear un nuevo grupo académico.
@@ -58,19 +59,19 @@ public class Group {
      * en estado ABIERTO por defecto. La lista de estudiantes se inicializa vacía.
      * @throws SirhaException 
      */
+
     public Group(Subject subject,int capacidad, AcademicPeriod currentPeriod) throws SirhaException {
         if (capacidad <= 0) {
             throw SirhaException.of(ErrorCodeSirha.INVALID_CAPACITY_GROUP, "La capacidad del grupo debe ser mayor a cero");
         }
-        curso = subject;
         setCapacidad(capacidad);
-        setCode();
+        setCode(subject);
         setCurrentPeriod(currentPeriod);
         this.inscritos = 0;
         this.estadoGrupo = new StatusOpen(); // Estado inicial: abierto
         this.estudiantes = new ArrayList<>();
-        schedules = new ArrayList<>();
-        addToSubject();
+        this.schedules = new ArrayList<>();
+        addToSubject( subject );
     }
     void setEstadoGrupo(GroupState estado) throws SirhaException {
         if (estado == null) {
@@ -78,8 +79,9 @@ public class Group {
         }
         this.estadoGrupo = estado;
     }
-    private void addToSubject() {
-        curso.addGroup(this);   
+
+    private void addToSubject(Subject subject) {
+        subject.addGroup(this);
     }
 
     /**
@@ -112,8 +114,8 @@ public class Group {
 
         estadoGrupo.addStudent(this, estudiante);
     }
-    private void setCode(){
-        this.code = curso.getName().substring(0,3).toUpperCase() + "-" + (curso.getGroupCount() + 1);
+    private void setCode(Subject subject){
+        this.code = subject.getName().substring(0,3).toUpperCase() + "-" + (subject.getGroupCount() + 1);
     }
 
     /**
@@ -160,7 +162,7 @@ public class Group {
      * @throws SirhaException 
      */
     void removeStudent(Student estudiante) throws SirhaException {
-        if (!estudiantes.contains(estudiante) || estudiante == null || estudiante.hasSubject(curso)) {
+        if (!estudiantes.contains(estudiante) || estudiante == null) {
             throw SirhaException.of(ErrorCodeSirha.STUDENT_NOT_IN_GROUP);
         }
 
@@ -219,7 +221,7 @@ public class Group {
      * Obtiene la capacidad máxima del grupo.
      * @return capacidad máxima de estudiantes
      */
-    public int getCapacidad() {
+    public int getCapacity() {
         return capacidad;
     }
 
@@ -249,20 +251,12 @@ public class Group {
         return inscritos;
     }
 
-    public Professor getProfesor() {
-        return profesor;
+    public Professor getProfessor() {
+        return professor;
     }
 
-    public void setProfesor(Professor profesor) {
-        this.profesor = profesor;
-    }
-
-    public Subject getCurso() {
-        return curso;
-    }
-
-    public void setCurso(Subject curso) {
-        this.curso = curso;
+    public void setProfessor(Professor professor) {
+        this.professor = professor;
     }
 
     public String getAula() {
@@ -293,15 +287,14 @@ public class Group {
         Group group = (Group) obj;
         return Objects.equals(currentPeriod, group.currentPeriod)
                 && Objects.equals(code, group.code)
-                && Objects.equals(curso, group.curso)
-                && Objects.equals(profesor, group.profesor)
+                && Objects.equals(professor, group.professor)
                 && Objects.equals(aula, group.aula)
                 && Objects.equals(schedules, group.schedules);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(currentPeriod, code, curso, profesor, aula, schedules);
+        return Objects.hash(currentPeriod, code, professor, aula, schedules);
     }
 
     @Override
@@ -310,14 +303,11 @@ public class Group {
                 id, capacidad, inscritos, aula,
                 estadoGrupo != null ? estadoGrupo.getClass().getSimpleName() : "null");
     }
-    public void removeGroup(){
-        curso = null;
-    }
 
     public void addSchedule(Schedule horario) throws SirhaException {
         canEditGroup();
         for (Schedule existente : schedules) {
-            if (existente.seSolapaCon(horario)) {
+            if (existente.overlapsWith(horario)) {
                 throw SirhaException.of(ErrorCodeSirha.SCHEDULE_CONFLICT);
             }
         }
@@ -337,7 +327,7 @@ public class Group {
 
     public boolean conflictoConHorario(Schedule horario) {
         for (Schedule existente : schedules) {
-            if (existente.seSolapaCon(horario)) {
+            if (existente.overlapsWith(horario)) {
                 return true;
             }
         }
@@ -365,5 +355,9 @@ public class Group {
     }
     public boolean sameAcademicPeriod(AcademicPeriod period){
         return this.currentPeriod.equals(period);
+    }
+
+    public boolean hasSchedule(Schedule schedule){
+        return schedules.contains(schedule);
     }
 }

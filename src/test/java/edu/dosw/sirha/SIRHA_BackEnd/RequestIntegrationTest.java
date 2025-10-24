@@ -117,7 +117,7 @@ class RequestIntegrationTest {
         assertFalse(mathGroup2.isFull());
         assertTrue(mathGroup2.isOpen());
         
-        assertFalse(mathSchedule1.seSolapaCon(mathSchedule2));
+        assertFalse(mathSchedule1.overlapsWith(mathSchedule2));
         
         try{ 
             solicitudCambio.approveRequest(new ResponseRequest("Cupos disponibles", RequestStateEnum.APROBADA));
@@ -160,7 +160,7 @@ class RequestIntegrationTest {
         assertTrue(physicsGroup.getCuposDisponibles() > 0);
         assertTrue(physicsGroup.isOpen());
         
-        assertFalse(mathSchedule1.seSolapaCon(physicsSchedule));
+        assertFalse(mathSchedule1.overlapsWith(physicsSchedule));
 
         try{ 
             solicitudCambio.approveRequest(new ResponseRequest("No hay conflictos - cambio aprobado", RequestStateEnum.APROBADA));
@@ -271,7 +271,7 @@ class RequestIntegrationTest {
             
             student.enrollSubject(mathematics, mathGroup1); // Lunes 8-10
 
-            assertTrue(mathSchedule1.seSolapaCon(conflictingSchedule));
+            assertTrue(mathSchedule1.overlapsWith(conflictingSchedule));
 
             CambioMateria solicitudConflicto = new CambioMateria(student, physics, conflictingSubject, conflictingGroup, academicPeriod);
 
@@ -313,7 +313,7 @@ class RequestIntegrationTest {
     void testStateTransitionValidation() {
         CambioGrupo solicitud = new CambioGrupo(student, mathematics, mathGroup2, academicPeriod);
         
-        assertEquals(RequestStateEnum.PENDIENTE, solicitud.getEnumState().getState());
+        assertEquals(RequestStateEnum.PENDIENTE, solicitud.getState().getState());
         
         try{ 
             solicitud.reviewRequest(new ResponseRequest("Iniciando revisión", RequestStateEnum.EN_REVISION));
@@ -348,7 +348,7 @@ class RequestIntegrationTest {
         assertTrue(mathGroup2.isOpen());
         assertTrue(mathGroup2.getCuposDisponibles() > 0);
         assertTrue(student.hasSubject(mathematics));
-        assertFalse(mathSchedule1.seSolapaCon(mathSchedule2));
+        assertFalse(mathSchedule1.overlapsWith(mathSchedule2));
         
         assertTrue(solicitud.getCurrentPeriod().isActive());
     }

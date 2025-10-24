@@ -61,7 +61,7 @@ class GroupTests {
 
     @Test
     void groupTest() {
-        assertEquals(5, group.getCapacidad());
+        assertEquals(5, group.getCapacity());
         assertTrue(group.getGroupState() instanceof StatusOpen);
         assertEquals(0, group.getInscritos());
         assertNotNull(group.getEstudiantes());
@@ -87,17 +87,10 @@ class GroupTests {
     }
 
     @Test
-    void setProfesorTest() {
-        group.setProfesor(professor);
-        assertEquals(professor, group.getProfesor());
+    void setProfessorTest() {
+        group.setProfessor(professor);
+        assertEquals(professor, group.getProfessor());
     }
-
-    @Test
-    void setCursoTest() {
-        group.setCurso(subject);
-        assertEquals(subject, group.getCurso());
-    }
-
 
     @Test
     void estadoInicialEsAbiertoTest() {

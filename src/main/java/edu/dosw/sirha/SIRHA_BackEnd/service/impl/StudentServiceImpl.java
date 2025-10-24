@@ -15,7 +15,9 @@ import edu.dosw.sirha.sirha_backend.domain.model.staterequest.BaseRequest;
 import edu.dosw.sirha.sirha_backend.dto.AuthResponse;
 import edu.dosw.sirha.sirha_backend.dto.LoginRequest;
 import edu.dosw.sirha.sirha_backend.dto.RegisterRequest;
+import edu.dosw.sirha.sirha_backend.dto.RequestApprovalRateDTO;
 import edu.dosw.sirha.sirha_backend.dto.StudentDTO;
+import edu.dosw.sirha.sirha_backend.dto.StudentReportDTO;
 import edu.dosw.sirha.sirha_backend.dto.SubjectDecoratorDTO;
 import edu.dosw.sirha.sirha_backend.exception.ErrorCodeSirha;
 import edu.dosw.sirha.sirha_backend.exception.SirhaException;
@@ -553,7 +555,7 @@ public class StudentServiceImpl implements StudentService {
         try {
             Student student = studentRepository.findByUsername(username)
                 .orElseThrow(() -> {
-                    log.warn("Estudiante no encontrado: {}", username);
+                    log.warn(ErrorCodeSirha.STUDENT_NOT_FOUND.getDefaultMessage(),"{}", username);
                     return SirhaException.of(ErrorCodeSirha.STUDENT_NOT_FOUND);
                 });
 
@@ -567,4 +569,196 @@ public class StudentServiceImpl implements StudentService {
             throw SirhaException.of(ErrorCodeSirha.INTERNAL_ERROR,"Error interno al consultar historial de solicitudes: " + e.getMessage(), e);
         }
     }
+
+    @Override
+    public Map<SemaforoColores, Double> getPercentageByColor(String username) throws SirhaException {
+        try {
+            Student student = studentRepository.findByUsername(username)
+                .orElseThrow(() -> {
+                    log.warn(ErrorCodeSirha.STUDENT_NOT_FOUND.getDefaultMessage(),"{}", username);
+                    return SirhaException.of(ErrorCodeSirha.STUDENT_NOT_FOUND);
+                });
+
+            Map<SemaforoColores, Double> percentages = student.getPercentageByColor();
+            log.info("Porcentajes por color obtenidos para {}", username);
+            return percentages;
+        } catch ( SirhaException e) {
+            throw e;
+        } catch (Exception e) {
+            throw SirhaException.of(ErrorCodeSirha.INTERNAL_ERROR,"Error interno al consultar pensum académico: " + e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public StudentDTO getStudentBasicInfo(String username) throws SirhaException {
+        try {
+            Student student = studentRepository.findByUsername(username)
+                .orElseThrow(() -> {
+                    log.warn(ErrorCodeSirha.STUDENT_NOT_FOUND.getDefaultMessage(),"{}", username);
+                    return SirhaException.of(ErrorCodeSirha.STUDENT_NOT_FOUND);
+                });
+
+            StudentDTO studentDTO = student.getStudentBasicInfo();
+            log.info("Información básica del estudiante obtenida para {}", username);
+            return studentDTO;
+        } catch ( SirhaException e) {
+            throw e;
+        } catch (Exception e) {
+            throw SirhaException.of(ErrorCodeSirha.INTERNAL_ERROR,"Error interno al consultar pensum académico: " + e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public StudentReportDTO generateCompleteReport(String username) throws SirhaException {
+        try {
+            Student student = studentRepository.findByUsername(username)
+                .orElseThrow(() -> {
+                    log.warn(ErrorCodeSirha.STUDENT_NOT_FOUND.getDefaultMessage(),"{}", username);
+                    return SirhaException.of(ErrorCodeSirha.STUDENT_NOT_FOUND);
+                });
+
+            StudentReportDTO reportDTO = student.generateCompleteReport();
+            log.info("Reporte completo generado para {}", username);
+            return reportDTO;
+        } catch ( SirhaException e) {
+            throw e;
+        } catch (Exception e) {
+            throw SirhaException.of(ErrorCodeSirha.INTERNAL_ERROR,"Error interno al consultar pensum académico: " + e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public String getAcademicSummary(String username) throws SirhaException {
+        try {
+            Student student = studentRepository.findByUsername(username)
+                .orElseThrow(() -> {
+                    log.warn(ErrorCodeSirha.STUDENT_NOT_FOUND.getDefaultMessage(),"{}", username);
+                    return SirhaException.of(ErrorCodeSirha.STUDENT_NOT_FOUND);
+                });
+
+            String summary = student.getAcademicSummary();
+            log.info("Resumen académico obtenido para {}", username);
+            return summary;
+        } catch ( SirhaException e) {
+            throw e;
+        } catch (Exception e) {
+            throw SirhaException.of(ErrorCodeSirha.INTERNAL_ERROR,"Error interno al consultar pensum académico: " + e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public RequestApprovalRateDTO getRequestApprovalRate(String username) throws SirhaException {
+        try {
+            Student student = studentRepository.findByUsername(username)
+                .orElseThrow(() -> {
+                    log.warn(ErrorCodeSirha.STUDENT_NOT_FOUND.getDefaultMessage(),"{}", username);
+                    return SirhaException.of(ErrorCodeSirha.STUDENT_NOT_FOUND);
+                });
+
+            RequestApprovalRateDTO approvalRateDTO = student.getRequestApprovalRate();
+            log.info("Tasa de aprobación de solicitudes obtenida para {}", username);
+            return approvalRateDTO;
+        } catch ( SirhaException e) {
+            throw e;
+        } catch (Exception e) {
+            throw SirhaException.of(ErrorCodeSirha.INTERNAL_ERROR,"Error interno al consultar pensum académico: " + e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public int getSubjectsByColorCount(String username, SemaforoColores color) throws SirhaException {
+        try {
+            Student student = studentRepository.findByUsername(username)
+                .orElseThrow(() -> {
+                    log.warn(ErrorCodeSirha.STUDENT_NOT_FOUND.getDefaultMessage(),"{}", username);
+                    return SirhaException.of(ErrorCodeSirha.STUDENT_NOT_FOUND);
+                });
+
+            int count = student.getSubjectsByColorCount(color);
+            log.info("Cantidad de materias con color {} obtenida para {}: {}", color, username, count);
+            return count;
+        } catch ( SirhaException e) {
+            throw e;
+        } catch (Exception e) {
+            throw SirhaException.of(ErrorCodeSirha.INTERNAL_ERROR,"Error interno al consultar pensum académico: " + e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public double getApprovalRequestPercentage(String username) throws SirhaException {
+        try {
+            Student student = studentRepository.findByUsername(username)
+                .orElseThrow(() -> {
+                    log.warn(ErrorCodeSirha.STUDENT_NOT_FOUND.getDefaultMessage(),"{}", username);
+                    return SirhaException.of(ErrorCodeSirha.STUDENT_NOT_FOUND);
+                });
+
+            double percentage = student.getApprovalRequestPercentage();
+            log.info("Porcentaje de solicitudes aprobadas obtenido para {}: {}", username, percentage);
+            return percentage;
+        } catch ( SirhaException e) {
+            throw e;
+        } catch (Exception e) {
+            throw SirhaException.of(ErrorCodeSirha.INTERNAL_ERROR,"Error interno al consultar pensum académico: " + e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public double getRejectionRequestPercentage(String username) throws SirhaException {
+        try {
+            Student student = studentRepository.findByUsername(username)
+                .orElseThrow(() -> {
+                    log.warn(ErrorCodeSirha.STUDENT_NOT_FOUND.getDefaultMessage(),"{}", username);
+                    return SirhaException.of(ErrorCodeSirha.STUDENT_NOT_FOUND);
+                });
+
+            double percentage = student.getRejectionRequestPercentage();
+            log.info("Porcentaje de solicitudes rechazadas obtenido para {}: {}", username, percentage);
+            return percentage;
+        } catch ( SirhaException e) {
+            throw e;
+        } catch (Exception e) {
+            throw SirhaException.of(ErrorCodeSirha.INTERNAL_ERROR,"Error interno al consultar pensum académico: " + e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public double getPendingRequestPercentage(String username) throws SirhaException {
+        try {
+            Student student = studentRepository.findByUsername(username)
+                .orElseThrow(() -> {
+                    log.warn(ErrorCodeSirha.STUDENT_NOT_FOUND.getDefaultMessage(),"{}", username);
+                    return SirhaException.of(ErrorCodeSirha.STUDENT_NOT_FOUND);
+                });
+
+            double percentage = student.getPendingRequestPercentage();
+            log.info("Porcentaje de solicitudes pendientes obtenido para {}: {}", username, percentage);
+            return percentage;
+        } catch ( SirhaException e) {
+            throw e;
+        } catch (Exception e) {
+            throw SirhaException.of(ErrorCodeSirha.INTERNAL_ERROR,"Error interno al consultar pensum académico: " + e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public double getInReviewRequestPercentage(String username) throws SirhaException {
+        try {
+            Student student = studentRepository.findByUsername(username)
+                .orElseThrow(() -> {
+                    log.warn(ErrorCodeSirha.STUDENT_NOT_FOUND.getDefaultMessage(),"{}", username);
+                    return SirhaException.of(ErrorCodeSirha.STUDENT_NOT_FOUND);
+                });
+
+            double percentage = student.getInReviewRequestPercentage();
+            log.info("Porcentaje de solicitudes en revisión obtenido para {}: {}", username, percentage);
+            return percentage;
+        } catch ( SirhaException e) {
+            throw e;
+        } catch (Exception e) {
+            throw SirhaException.of(ErrorCodeSirha.INTERNAL_ERROR,"Error interno al consultar pensum académico: " + e.getMessage(), e);
+        }
+    }
+
+
 }

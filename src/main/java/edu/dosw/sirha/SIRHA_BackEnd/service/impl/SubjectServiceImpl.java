@@ -240,9 +240,7 @@ public class SubjectServiceImpl implements SubjectService {
                 log.warn("Grupo no encontrado con ID: {}", id);
                 throw SirhaException.of(ErrorCodeSirha.GROUP_NOT_FOUND,"Grupo no encontrado con ID: " + id);
             }
-            log.info("Grupo encontrado - ID: {}, Código: {}, Materia: {}", 
-                        id, group.getCode(), 
-                        group.getCurso() != null ? group.getCurso().getName() : "null");
+            log.info("Grupo encontrado - ID: {}, Código: {}", id, group.getCode());
             return group;
 
         } catch (SirhaException e) {
@@ -268,7 +266,7 @@ public class SubjectServiceImpl implements SubjectService {
             }
             
             log.info("Guardando grupo para la materia: {} - Capacidad: {}", 
-                    subjectName, group.getCapacidad());
+                    subjectName, group.getCapacity());
 
             Subject subject = subjectRepository.findByName(subjectName).orElse(null);
 
@@ -278,6 +276,8 @@ public class SubjectServiceImpl implements SubjectService {
             }
             
             Group savedGroup = groupService.saveGroup(subject, group);
+
+            subjectRepository.save(subject);
             
             log.info("Grupo guardado exitosamente para materia '{}' - ID: {}, Código: {}", 
                     subjectName, savedGroup.getId(), savedGroup.getCode());

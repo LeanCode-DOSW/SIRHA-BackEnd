@@ -1,9 +1,7 @@
 package edu.dosw.sirha.sirha_backend.domain.model;
 import java.util.*;
-import org.springframework.data.mongodb.core.mapping.Document;
 import edu.dosw.sirha.sirha_backend.domain.model.enums.Careers;
 
-@Document("planesDeEstudio")
 public class StudyPlan {
     private String name;
     private Careers career;

@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import edu.dosw.sirha.sirha_backend.domain.model.Student;
+import edu.dosw.sirha.sirha_backend.domain.model.enums.RequestStateEnum;
 import edu.dosw.sirha.sirha_backend.domain.model.staterequest.BaseRequest;
 import edu.dosw.sirha.sirha_backend.exception.ErrorCodeSirha;
 import edu.dosw.sirha.sirha_backend.exception.SirhaException;
@@ -42,7 +43,7 @@ public class RequestServiceImpl implements RequestService {
                 log.debug("Solicitud encontrada - ID: {}, Tipo: {}, Estado: {}",
                              request.getId(), 
                              request.getClass().getSimpleName(), 
-                             request.getEnumState()));
+                             request.getState()));
             
             return requests;
         } catch (Exception e) {
@@ -83,7 +84,7 @@ public class RequestServiceImpl implements RequestService {
             log.info("Solicitud guardada exitosamente - ID: {}, Tipo: {}, Estado: {}", 
                     savedRequest.getId(), 
                     savedRequest.getClass().getSimpleName(),
-                    savedRequest.getEnumState());
+                    savedRequest.getState());
 
             
             return savedRequest;
@@ -140,7 +141,7 @@ public class RequestServiceImpl implements RequestService {
             log.info("Solicitud encontrada - ID: {}, Tipo: {}, Estado: {}", 
                     request.getId(), 
                     request.getClass().getSimpleName(),
-                    request.getEnumState());
+                    request.getState());
             return request;
         } catch (SirhaException e) {
             throw e;
@@ -160,6 +161,18 @@ public class RequestServiceImpl implements RequestService {
             throw e;
         } catch (Exception e) {
             throw SirhaException.of(ErrorCodeSirha.INTERNAL_ERROR,"Error interno al consultar historial de solicitudes: " + e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public List<BaseRequest> getByStatus(RequestStateEnum status) throws SirhaException {
+        log.info("Consultando solicitudes con estado: {}", status);
+        try {
+            List<BaseRequest> requests = repository.findByActualState(status);
+            log.info("Se encontraron {} solicitudes con estado {}", requests.size(), status);
+            return requests;
+        } catch (Exception e) {
+            throw SirhaException.of(ErrorCodeSirha.INTERNAL_ERROR,"Error interno al consultar solicitudes por estado: " + e.getMessage(), e);
         }
     }
 }

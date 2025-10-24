@@ -16,10 +16,12 @@ import edu.dosw.sirha.sirha_backend.exception.SirhaException;
 public class Decanate implements RequestReceiver {
     private String name;
     private Careers career;
+    private List<StudyPlan> studyPlans;
     private List<BaseRequest> receivedRequests;
 
     public Decanate() {
         this.receivedRequests = new ArrayList<>();
+        this.studyPlans = new ArrayList<>();
     }
 
     public Decanate(Careers career) {
@@ -30,6 +32,19 @@ public class Decanate implements RequestReceiver {
     
     public String getName() {
         return name;
+    }
+
+    public Careers getCareer() {
+        return career;
+    }
+    public List<StudyPlan> getStudyPlans() {
+        return studyPlans;
+    }
+
+    public void addStudyPlan(StudyPlan studyPlan) {
+        if (studyPlan != null && !studyPlans.contains(studyPlan)) {
+            studyPlans.add(studyPlan);
+        }
     }
 
     @Override

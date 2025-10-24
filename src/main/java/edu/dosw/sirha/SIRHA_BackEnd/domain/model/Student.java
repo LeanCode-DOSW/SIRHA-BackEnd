@@ -663,6 +663,7 @@ public class Student extends User implements SolicitudFactory, ScheduleManager, 
         }
         return solicitudes.size();
     }
+
     @Override
     public boolean hasActiveRequests() {
         if (solicitudes == null) {
@@ -742,6 +743,7 @@ public class Student extends User implements SolicitudFactory, ScheduleManager, 
             .findFirst()
             .orElse(null);
     }
+    
     /*
      * Devuelve el historial de solicitudes resueltas: aprobadas o rechazadas.
      */

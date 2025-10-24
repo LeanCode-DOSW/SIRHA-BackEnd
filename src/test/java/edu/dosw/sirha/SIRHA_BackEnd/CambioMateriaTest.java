@@ -219,7 +219,7 @@ class CambioMateriaTest {
         assertTrue(grupoNuevo.isOpen());
         
         
-        assertFalse(scheduleConflict.seSolapaCon(scheduleNoConflict));
+        assertFalse(scheduleConflict.overlapsWith(scheduleNoConflict));
         
         assertTrue(studyPlan.hasSubject(materiaAntigua));
         assertTrue(studyPlan.hasSubject(materiaNueva));

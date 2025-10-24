@@ -132,7 +132,7 @@ class CambioGrupoTest {
     @Test
     void testCambioGrupoDifferentGroups() {
         assertNotEquals(grupoActual.getId(), grupoNuevo.getId());
-        assertNotEquals(grupoActual.getCapacidad(), grupoNuevo.getCapacidad());
+        assertNotEquals(grupoActual.getCapacity(), grupoNuevo.getCapacity());
     }
 
     @Test
@@ -187,7 +187,7 @@ class CambioGrupoTest {
         try {
             grupoActual.addSchedule(scheduleConflict);
             grupoNuevo.addSchedule(scheduleNoConflict);
-            assertFalse(scheduleConflict.seSolapaCon(scheduleNoConflict));
+            assertFalse(scheduleConflict.overlapsWith(scheduleNoConflict));
             student.enrollSubject(subject, grupoActual);
         } catch (Exception e) {
             fail("No se esperaba una excepción al inscribir el estudiante en el grupo actual: " + e.getMessage());

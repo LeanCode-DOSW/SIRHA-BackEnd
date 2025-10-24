@@ -144,7 +144,7 @@ class StudentAcademicReportsTest {
         assertEquals("2024001", basicInfo.getCode());
         assertEquals("juan@universidad.edu", basicInfo.getEmail());
         assertEquals(Careers.INGENIERIA_DE_SISTEMAS, basicInfo.getCareer());
-        assertEquals("Ingeniería de Sistemas", basicInfo.getCareer().getDisplayName());
+        assertEquals("Ingenieria de Sistemas", basicInfo.getCareer().getDisplayName());
     }
 
     @Test
@@ -220,7 +220,7 @@ class StudentAcademicReportsTest {
         String summary = student.getAcademicSummary();
 
         assertNotNull(summary);
-        assertTrue(summary.contains("Ingeniería de Sistemas"));
+        assertTrue(summary.contains("Ingenieria de Sistemas"));
         assertTrue(summary.contains("2")); // Materias aprobadas
         assertTrue(summary.contains("1")); // Materias cursando
         assertTrue(summary.contains("1")); // Materias reprobadas

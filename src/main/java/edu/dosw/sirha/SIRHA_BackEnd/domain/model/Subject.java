@@ -26,6 +26,11 @@ public class Subject {
     private List<Group> groups;
     private List<PrerequisiteRule> prerequisites;
 
+    public Subject() {
+        this.groups = new ArrayList<>();
+        this.prerequisites = new ArrayList<>();
+    }
+    
     public Subject(String id, String name, int credits) {
         this(name, credits);
         this.id = id;
@@ -58,7 +63,6 @@ public class Subject {
      * Elimina un grupo de la materia.
      */
     public boolean removeGroup(Group g) {
-        g.removeGroup();
         return groups.remove(g);
     }
     public boolean hasGroup(Group group){return groups.contains(group);}

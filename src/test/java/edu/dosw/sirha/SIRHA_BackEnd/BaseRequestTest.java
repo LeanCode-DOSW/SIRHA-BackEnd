@@ -92,7 +92,7 @@ class BaseRequestTest {
         
         
         assertEquals(RequestStateEnum.EN_REVISION, cambioGrupo.getActualState());
-        assertEquals(EstadoEnRevision.class, cambioGrupo.getEnumState().getClass());
+        assertEquals(EstadoEnRevision.class, cambioGrupo.getState().getClass());
         assertEquals(2, cambioGrupo.getProcesos().size());
 
         try {
@@ -166,7 +166,7 @@ class BaseRequestTest {
     void testMultipleProcesses() {
         CambioGrupo cambioGrupo = new CambioGrupo(student, subject1, group1, academicPeriod);
 
-        assertEquals(EstadoPendiente.class, cambioGrupo.getEnumState().getClass());
+        assertEquals(EstadoPendiente.class, cambioGrupo.getState().getClass());
 
         try{ 
             cambioGrupo.reviewRequest(new ResponseRequest("Iniciando revisión", RequestStateEnum.EN_REVISION));
@@ -175,7 +175,7 @@ class BaseRequestTest {
         }
 
         assertEquals(RequestStateEnum.EN_REVISION, cambioGrupo.getActualState());
-        assertEquals(EstadoEnRevision.class, cambioGrupo.getEnumState().getClass());
+        assertEquals(EstadoEnRevision.class, cambioGrupo.getState().getClass());
         assertEquals(2, cambioGrupo.getProcesos().size());
         
 

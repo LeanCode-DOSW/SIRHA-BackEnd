@@ -50,6 +50,7 @@ public class GroupServiceImpl implements GroupService {
             log.info("Guardando grupo {} para la materia: {}", group.getId(), subject.getName());
             Group savedGroup = groupRepository.save(group);
             subject.addGroup(savedGroup);
+            
             log.info("Grupo guardado exitosamente con ID: {}", savedGroup.getId());
             return savedGroup;
         } catch (SirhaException e) {
@@ -77,14 +78,10 @@ public class GroupServiceImpl implements GroupService {
 
             Group group = groupRepository.findById(id)
                     .orElseThrow(() -> SirhaException.of( ErrorCodeSirha.GROUP_NOT_FOUND, "Grupo no encontrado"));
-            log.info("Grupo encontrado - Código: {}, Materia: {}, Inscritos: {}", 
+            log.info("Grupo encontrado - Código: {}, Inscritos: {}", 
                     group.getCode(), 
-                    group.getCurso() != null ? group.getCurso().getName() : "null",
                     group.getInscritos());
 
-            Subject subject = group.getCurso();
-            subject.removeGroup(group);
-            log.info("Grupo removido de la materia: {}", subject.getName());
             groupRepository.deleteById(id);
             log.info("Grupo con ID {} eliminado exitosamente", id);
             return group;
@@ -107,7 +104,7 @@ public class GroupServiceImpl implements GroupService {
 
             log.info("Asignando profesor {} al grupo con ID: {}", professor.getUsername(), groupId);
             Group group = findById(groupId);
-            group.setProfesor(professor);
+            group.setProfessor(professor);
             Group updatedGroup = groupRepository.save(group);
             log.info("Profesor {} asignado exitosamente al grupo con ID: {}", professor.getUsername(), groupId);
 
@@ -257,7 +254,7 @@ public class GroupServiceImpl implements GroupService {
         log.info("Obteniendo profesor del grupo con ID: {}", groupId);
         try {
             Group group = findById(groupId);
-            Professor professor = group.getProfesor();
+            Professor professor = group.getProfessor();
             if (professor == null) {
                 log.warn("El grupo con ID {} no tiene un profesor asignado", groupId);
                 throw SirhaException.of( ErrorCodeSirha.PROFESSOR_NOT_FOUND, "El grupo con id " + groupId + " no tiene un profesor asignado");

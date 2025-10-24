@@ -20,14 +20,9 @@ import edu.dosw.sirha.sirha_backend.exception.SirhaException;
  */
 public class Schedule {
 
-    /** Día de la semana (ej: "Lunes", "Martes"). */
-    private DiasSemana dia;
-
-    /** Hora de inicio en formato 24h (ej: 8 para las 08:00). */
-    private LocalTime horaInicio;
-
-    /** Hora de fin en formato 24h (ej: 10 para las 10:00). */
-    private LocalTime horaFin;
+    private DiasSemana day;
+    private LocalTime startHour;
+    private LocalTime endHour;
 
     /**
      * Crea un nuevo horario.
@@ -37,14 +32,14 @@ public class Schedule {
      * @param horaFin    Hora de fin (en 24h, debe ser mayor que la hora de inicio).
      * @throws SirhaException 
      */
-    public Schedule(DiasSemana dia, LocalTime horaInicio, LocalTime horaFin) throws SirhaException {
-        if (horaInicio.isAfter(horaFin) || horaInicio.equals(horaFin)) {
+    public Schedule(DiasSemana day, LocalTime startHour, LocalTime endHour) throws SirhaException {
+        if (startHour.isAfter(endHour) || startHour.equals(endHour)) {
             throw SirhaException.of(ErrorCodeSirha.INVALID_DATE_RANGE,
                     "La hora de inicio debe ser menor que la hora de fin");
         }
-        this.dia = dia;
-        this.horaInicio = horaInicio;
-        this.horaFin = horaFin;
+        this.day = day;
+        this.startHour = startHour;
+        this.endHour = endHour;
     }
 
     /**
@@ -55,11 +50,11 @@ public class Schedule {
      * @param otro Otro horario a comparar.
      * @return {@code true} si los horarios se solapan, {@code false} en caso contrario.
      */
-    public boolean seSolapaCon(Schedule otro) {
-        if (!dia.equals(otro.dia)) {
+    public boolean overlapsWith(Schedule other) {
+        if (!day.equals(other.day)) {
             return false;
         }
-        return this.horaInicio.isBefore(otro.horaFin) && otro.horaInicio.isBefore(this.horaFin);
+        return this.startHour.isBefore(other.endHour) && other.startHour.isBefore(this.endHour);
     }
 
     /**
@@ -67,8 +62,8 @@ public class Schedule {
      *
      * @return Hora de fin en formato 24h.
      */
-    public LocalTime getHoraFin() {
-        return horaFin;
+    public LocalTime getEndHour() {
+        return endHour;
     }
 
     /**
@@ -76,8 +71,8 @@ public class Schedule {
      *
      * @return Hora de inicio en formato 24h.
      */
-    public LocalTime getHoraInicio() {
-        return horaInicio;
+    public LocalTime getStartHour() {
+        return startHour;
     }
 
     /**
@@ -85,8 +80,8 @@ public class Schedule {
      *
      * @return Día en texto (ej: "Lunes").
      */
-    public DiasSemana getDia() {
-        return dia;
+    public DiasSemana getDay() {
+        return day;
     }
 
     /**
@@ -101,13 +96,13 @@ public class Schedule {
         if (this == o) return true;
         if (!(o instanceof Schedule)) return false;
         Schedule that = (Schedule) o;
-        return horaInicio.equals(that.horaInicio) &&
-                horaFin.equals(that.horaFin) &&
-                dia.equals(that.dia);
+        return startHour.equals(that.startHour) &&
+                endHour.equals(that.endHour) &&
+                day.equals(that.day);
     }
     @Override
     public int hashCode() {
-        return Objects.hash(dia, horaInicio, horaFin);
+        return Objects.hash(day, startHour, endHour);
     }
 
     /**
@@ -118,9 +113,9 @@ public class Schedule {
     @Override
     public String toString() {
         return "Schedule{" +
-                "dia='" + dia + '\'' +
-                ", horaInicio=" + horaInicio +
-                ", horaFin=" + horaFin +
+                "day='" + day + '\'' +
+                ", startHour=" + startHour +
+                ", endHour=" + endHour +
                 '}';
     }
 }

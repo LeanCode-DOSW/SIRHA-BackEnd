@@ -94,7 +94,7 @@ class RequestTest {
             assertEquals(1, group1.getSchedules().size());
             assertEquals(1, group2.getSchedules().size());
             
-            assertTrue(schedule1.seSolapaCon(schedule2));
+            assertTrue(schedule1.overlapsWith(schedule2));
         } catch (Exception e) {
             fail("No se esperaba una excepción al crear los grupos o agregar horarios: " + e.getMessage());
         }

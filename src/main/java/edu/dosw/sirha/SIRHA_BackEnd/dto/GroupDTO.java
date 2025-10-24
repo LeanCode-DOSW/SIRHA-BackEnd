@@ -1,15 +1,14 @@
 package edu.dosw.sirha.sirha_backend.dto;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import edu.dosw.sirha.sirha_backend.domain.model.AcademicPeriod;
 import edu.dosw.sirha.sirha_backend.domain.model.Professor;
 import edu.dosw.sirha.sirha_backend.domain.model.Schedule;
 import edu.dosw.sirha.sirha_backend.domain.model.Student;
-import edu.dosw.sirha.sirha_backend.domain.model.Subject;
 
 public class GroupDTO {
-    private Subject subject;
     private int capacidad;
     private int inscritos;
     private Professor profesor;
@@ -18,12 +17,13 @@ public class GroupDTO {
     private String aula;
     private List<Student> estudiantes;
 
-    public GroupDTO(Subject subject, int capacidad, int inscritos, Professor profesor, AcademicPeriod currentPeriod) {
-        this.subject = subject;
+    public GroupDTO(int capacidad, int inscritos, Professor profesor, AcademicPeriod currentPeriod) {
         this.capacidad = capacidad;
         this.inscritos = inscritos;
         this.profesor = profesor;
         this.currentPeriod = currentPeriod;
+        this.schedules =  new ArrayList<>();
+        this.estudiantes = new ArrayList<>();
     }
 
     public int getCapacidad() {
@@ -34,9 +34,6 @@ public class GroupDTO {
     }
     public Professor getProfesor() {
         return profesor;
-    }
-    public Subject getSubject() {
-        return subject;
     }
     public List<Schedule> getSchedules() {
         return schedules;

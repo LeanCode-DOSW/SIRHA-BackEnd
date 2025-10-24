@@ -68,7 +68,7 @@ public abstract class BaseRequest implements RequestTo {
         this.priority = priority;
     }
 
-    public RequestState getEnumState() {return state;}
+    public RequestState getState() {return state;}
     public AcademicPeriod getCurrentPeriod() {return currentPeriod;}
     public void setCurrentPeriod(AcademicPeriod currentPeriod) {this.currentPeriod = currentPeriod;}
 

@@ -13,7 +13,9 @@ import edu.dosw.sirha.sirha_backend.domain.model.staterequest.BaseRequest;
 import edu.dosw.sirha.sirha_backend.dto.AuthResponse;
 import edu.dosw.sirha.sirha_backend.dto.LoginRequest;
 import edu.dosw.sirha.sirha_backend.dto.RegisterRequest;
+import edu.dosw.sirha.sirha_backend.dto.RequestApprovalRateDTO;
 import edu.dosw.sirha.sirha_backend.dto.StudentDTO;
+import edu.dosw.sirha.sirha_backend.dto.StudentReportDTO;
 import edu.dosw.sirha.sirha_backend.dto.SubjectDecoratorDTO;
 import edu.dosw.sirha.sirha_backend.exception.SirhaException;
 
@@ -47,5 +49,20 @@ public interface StudentService {
 
     CambioGrupo createRequestCambioGrupo(String studentName, String subjectName, String codeNewGroup) throws SirhaException;
     CambioMateria createRequestCambioMateria(String studentName, String subjectName, String newSubjectName, String codeNewGroup) throws SirhaException;
+
+    Map<SemaforoColores, Double> getPercentageByColor(String username) throws SirhaException;
+    StudentDTO getStudentBasicInfo(String username) throws SirhaException;
+    StudentReportDTO generateCompleteReport(String username) throws SirhaException;
+    String getAcademicSummary(String username) throws SirhaException;
+    RequestApprovalRateDTO getRequestApprovalRate(String username) throws SirhaException;
+    int getSubjectsByColorCount(String username, SemaforoColores color) throws SirhaException;
+
+    double getApprovalRequestPercentage(String username) throws SirhaException;
+    double getRejectionRequestPercentage(String username) throws SirhaException;
+    double getPendingRequestPercentage(String username) throws SirhaException;
+    double getInReviewRequestPercentage(String username) throws SirhaException;
+
+    //enrollSubject
+    //unenrollSubject
 
 }

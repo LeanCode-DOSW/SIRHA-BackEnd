@@ -24,8 +24,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 class SirhaBackEndApplicationTests {
-
-    // ============== OBJETOS DE PRUEBA COMUNES ==============
     
     private Student student;
     private Student student2;
@@ -73,14 +71,12 @@ class SirhaBackEndApplicationTests {
             grupo1 = new Group(matematicas,30, academicPeriod);
             grupo1.setId("1");
             grupo1.setAula("A101");
-            grupo1.setProfesor(professor);
-            grupo1.setCurso(matematicas);
+            grupo1.setProfessor(professor);
             
             grupo2 = new Group(fisica, 25, academicPeriod);
             grupo2.setId("2");
             grupo2.setAula("B202");
-            grupo2.setProfesor(professor);
-            grupo2.setCurso(fisica);
+            grupo2.setProfessor(professor);
             
             grupo3 = new Group(quimica, 35, academicPeriod);
             grupo3.setId("3");
@@ -425,7 +421,7 @@ class SirhaBackEndApplicationTests {
     @Test
     void testGroupBasics() {
         assertNotNull(grupo1);
-        assertEquals(30, grupo1.getCapacidad());
+        assertEquals(30, grupo1.getCapacity());
         assertEquals(30, grupo1.getCuposDisponibles());
         assertEquals(0, grupo1.getInscritos());
         assertNotNull(grupo1.getGroupState());
@@ -1762,15 +1758,15 @@ class SirhaBackEndApplicationTests {
         try {
             Schedule schedule = new Schedule(DiasSemana.LUNES, LocalTime.of(8, 0), LocalTime.of(10, 0));
             
-            assertEquals(DiasSemana.LUNES, schedule.getDia());
-            assertEquals(LocalTime.of(8, 0), schedule.getHoraInicio());
-            assertEquals(LocalTime.of(10, 0), schedule.getHoraFin());
+            assertEquals(DiasSemana.LUNES, schedule.getDay());
+            assertEquals(LocalTime.of(8, 0), schedule.getStartHour());
+            assertEquals(LocalTime.of(10, 0), schedule.getEndHour());
 
-            assertTrue(schedule.seSolapaCon(
+            assertTrue(schedule.overlapsWith(
                 new Schedule(DiasSemana.LUNES, LocalTime.of(9, 0), LocalTime.of(11, 0))
             ));
 
-            assertFalse(schedule.seSolapaCon(
+            assertFalse(schedule.overlapsWith(
                 new Schedule(DiasSemana.MARTES, LocalTime.of(9, 0), LocalTime.of(11, 0))
             ));
         } catch (Exception e) {

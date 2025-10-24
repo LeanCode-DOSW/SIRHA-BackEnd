@@ -17,9 +17,9 @@ class ScheduleTest {
         void constructorValido_creaObjeto() {
             try { 
                 Schedule s = new Schedule(DiasSemana.LUNES, LocalTime.of(8, 0), LocalTime.of(10, 0));
-                assertEquals(DiasSemana.LUNES, s.getDia());
-                assertEquals(LocalTime.of(8, 0), s.getHoraInicio());
-                assertEquals(LocalTime.of(10, 0), s.getHoraFin());
+                assertEquals(DiasSemana.LUNES, s.getDay());
+                assertEquals(LocalTime.of(8, 0), s.getStartHour());
+                assertEquals(LocalTime.of(10, 0), s.getEndHour());
             } catch (Exception e) {
                 fail("No se esperaba una excepción al crear un horario válido: " + e.getMessage());
             }
@@ -38,8 +38,8 @@ class ScheduleTest {
             try {
                 Schedule s1 = new Schedule(DiasSemana.LUNES, LocalTime.of(8, 0), LocalTime.of(10, 0));
                 Schedule s2 = new Schedule(DiasSemana.LUNES, LocalTime.of(9, 0), LocalTime.of(11, 0));
-                assertTrue(s1.seSolapaCon(s2));
-                assertTrue(s2.seSolapaCon(s1));
+                assertTrue(s1.overlapsWith(s2));
+                assertTrue(s2.overlapsWith(s1));
             } catch (Exception e) {
                 fail("No se esperaba una excepción al crear horarios válidos: " + e.getMessage());
             }
@@ -50,7 +50,7 @@ class ScheduleTest {
             try {
                 Schedule s1 = new Schedule(DiasSemana.LUNES, LocalTime.of(8, 0), LocalTime.of(10, 0));
                 Schedule s2 = new Schedule(DiasSemana.LUNES, LocalTime.of(10, 0), LocalTime.of(12, 0)); // justo al final
-                assertFalse(s1.seSolapaCon(s2));
+                assertFalse(s1.overlapsWith(s2));
             } catch (Exception e) {
                 fail("No se esperaba una excepción al crear horarios válidos: " + e.getMessage());
             }
@@ -61,7 +61,7 @@ class ScheduleTest {
             try {
                 Schedule s1 = new Schedule(DiasSemana.LUNES, LocalTime.of(8, 0), LocalTime.of(10, 0));
                 Schedule s2 = new Schedule(DiasSemana.MARTES, LocalTime.of(9, 0), LocalTime.of(11, 0));
-                assertFalse(s1.seSolapaCon(s2));
+                assertFalse(s1.overlapsWith(s2));
             } catch (Exception e) {
                 fail("No se esperaba una excepción al crear horarios válidos: " + e.getMessage());
             }
