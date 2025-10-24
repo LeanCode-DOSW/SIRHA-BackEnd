@@ -1,0 +1,53 @@
+name: CI - Pruebas, Build y Reporte de Cobertura
+
+on:
+  # Disparar en pushes y PRs a develop
+  push:
+    branches: [develop]
+  pull_request:
+    branches: [develop]
+
+jobs:
+
+  build-and-test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Java
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        cache: 'maven'
+
+    - name: Run tests with coverage
+      run: |
+        mvn clean test jacoco:report
+        # Ejecuta tests + genera reporte JaCoCo
+
+    - name: Verify coverage threshold
+      run: |
+        mvn jacoco:check
+        # Verifica que la cobertura mínima se cumple
+
+    - name: Build application package
+      run: |
+        mvn clean package -DskipTests
+        # Build .jar sin ejecutar tests again
+
+    - name: Upload build artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: spring-boot-app
+        path: target/*.jar
+        retention-days: 7
+
+    - name: Upload coverage report
+      uses: actions/upload-artifact@v4
+      with:
+        name: coverage-reports
+        path: target/site/jacoco/
+        retention-days: 30
