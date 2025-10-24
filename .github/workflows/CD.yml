@@ -1,0 +1,41 @@
+name: Deploy Backend to Azure
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+      - feature/*
+
+env:
+  AZURE_WEBAPP_NAME: sirha-backend      # Nombre del App Service
+  AZURE_WEBAPP_PACKAGE_PATH: '.'        # Carpeta del código backend
+  NODE_VERSION: '20.x'
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    environment: 
+      name: ${{ github.ref_name }}      # Usa el nombre de la rama como entorno
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build app
+        run: npm run build --if-present
+
+      - name: Deploy to Azure Web App
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ env.AZURE_WEBAPP_NAME }}
+          publish-profile: ${{ secrets.AZURE_PUBLISH_PROFILE }}
+          package: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
