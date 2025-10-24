@@ -1,87 +1,53 @@
-name: Java CI with Maven and JaCoCo
+name: CI - Pruebas, Build y Reporte de Cobertura
 
 on:
+  # Disparar en pushes y PRs a develop
   push:
     branches: [develop]
   pull_request:
     branches: [develop]
 
-env:
-  JAVA_VERSION: '17'
-  JACOCO_MIN_COVERAGE: '0.80' 
-
 jobs:
-  test-and-coverage:
-    name: Run Tests and Coverage
+
+  build-and-test:
     runs-on: ubuntu-latest
     
     steps:
-
-    - name: Checkout repository
+    - name: Checkout code
       uses: actions/checkout@v4
 
-    - name: Set up JDK ${{ env.JAVA_VERSION }}
+    - name: Setup Java
       uses: actions/setup-java@v4
       with:
-        java-version: ${{ env.JAVA_VERSION }}
+        java-version: '17'
         distribution: 'temurin'
         cache: 'maven'
 
-    - name: Build with Maven
+    - name: Run tests with coverage
       run: |
-        echo "🔨 Compilando el proyecto..."
-        mvn -B clean compile -q
+        mvn clean test jacoco:report
+        # Ejecuta tests + genera reporte JaCoCo
 
-    - name: Run unit tests with JaCoCo
+    - name: Verify coverage threshold
       run: |
-        echo "🧪 Ejecutando pruebas unitarias..."
-        mvn -B test -DskipTests=false
-      env:
-        SPRING_PROFILES_ACTIVE: test
+        mvn jacoco:check
+        # Verifica que la cobertura mínima se cumple
 
-
-    - name: Generate JaCoCo report
+    - name: Build application package
       run: |
-        echo "📊 Generando reporte de cobertura..."
-        mvn -B jacoco:report
+        mvn clean package -DskipTests
+        # Build .jar sin ejecutar tests again
 
-    - name: Check coverage thresholds
-      run: |
-        echo "✅ Verificando cobertura mínima del ${{ env.JACOCO_MIN_COVERAGE }}%..."
-        mvn -B jacoco:check
-      continue-on-error: false 
-
-    - name: Display coverage summary
-      run: |
-        echo "📈 RESUMEN DE COBERTURA:"
-        if [ -f target/site/jacoco/jacoco.xml ]; then
-          # Extraer información básica del reporte XML
-          echo "Reporte JaCoCo generado en: target/site/jacoco/"
-          echo "Para ver el reporte completo, descarga el artifact abajo ↓"
-        else
-          echo "❌ No se pudo generar el reporte de cobertura"
-          exit 1
-        fi
-
-    - name: Upload JaCoCo HTML report
+    - name: Upload build artifact
       uses: actions/upload-artifact@v4
       with:
-        name: jacoco-coverage-report
+        name: spring-boot-app
+        path: target/*.jar
+        retention-days: 7
+
+    - name: Upload coverage report
+      uses: actions/upload-artifact@v4
+      with:
+        name: coverage-reports
         path: target/site/jacoco/
-        retention-days: 7
-
-    - name: Upload JaCoCo XML report
-      uses: actions/upload-artifact@v4
-      with:
-        name: jacoco-xml-report
-        path: target/site/jacoco/jacoco.xml
-        retention-days: 7
-
-    - name: Publish coverage report to PR
-      uses: actions/upload-artifact@v4
-      with:
-        name: coverage-pr-report
-        path: |
-          target/site/jacoco/index.html
-          target/site/jacoco/jacoco.csv
-        retention-days: 3
+        retention-days: 30
