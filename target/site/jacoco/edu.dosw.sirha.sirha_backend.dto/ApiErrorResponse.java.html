@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ApiErrorResponse.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">SIRHA-BackEnd</a> &gt; <a href="index.source.html" class="el_package">edu.dosw.sirha.sirha_backend.dto</a> &gt; <span class="el_source">ApiErrorResponse.java</span></div><h1>ApiErrorResponse.java</h1><pre class="source lang-java linenums">package edu.dosw.sirha.sirha_backend.dto;
+
+import java.time.LocalDateTime;
+import java.util.UUID;
+import org.springframework.http.HttpStatus;
+
+public class ApiErrorResponse {
+    private String status; // &quot;error&quot;
+    private int statusCode;
+    private String code; // código interno, ej. &quot;RESOURCE_NOT_FOUND&quot;
+    private String message; // descripción
+    private String details; // más contexto
+    private String path; // endpoint
+    private LocalDateTime timestamp;
+    private String requestId; // UUID generado
+    private String suggestion; // sugerencia opcional
+
+<span class="nc" id="L18">    public ApiErrorResponse(HttpStatus status, String code, String message, String details, String path) {</span>
+<span class="nc" id="L19">        this.status = &quot;error&quot;;</span>
+<span class="nc" id="L20">        this.statusCode = status.value();</span>
+<span class="nc" id="L21">        this.code = code;</span>
+<span class="nc" id="L22">        this.message = message;</span>
+<span class="nc" id="L23">        this.details = details;</span>
+<span class="nc" id="L24">        this.path = path;</span>
+<span class="nc" id="L25">        this.timestamp = LocalDateTime.now();</span>
+<span class="nc" id="L26">        this.requestId = UUID.randomUUID().toString();</span>
+<span class="nc" id="L27">    }</span>
+
+    // Getters y setters
+<span class="nc" id="L30">    public String getStatus() { return status; }</span>
+<span class="nc" id="L31">    public int getStatusCode() { return statusCode; }</span>
+<span class="nc" id="L32">    public String getCode() { return code; }</span>
+<span class="nc" id="L33">    public String getMessage() { return message; }</span>
+<span class="nc" id="L34">    public String getDetails() { return details; }</span>
+<span class="nc" id="L35">    public String getPath() { return path; }</span>
+<span class="nc" id="L36">    public LocalDateTime getTimestamp() { return timestamp; }</span>
+<span class="nc" id="L37">    public String getRequestId() { return requestId; }</span>
+<span class="nc" id="L38">    public String getSuggestion() { return suggestion; }</span>
+    
+<span class="nc" id="L40">    public void setSuggestion(String suggestion) { this.suggestion = suggestion; }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

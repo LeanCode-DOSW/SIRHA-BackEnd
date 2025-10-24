@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>User.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">SIRHA-BackEnd</a> &gt; <a href="index.source.html" class="el_package">edu.dosw.sirha.sirha_backend.domain.model</a> &gt; <span class="el_source">User.java</span></div><h1>User.java</h1><pre class="source lang-java linenums">package edu.dosw.sirha.sirha_backend.domain.model;
+
+import org.springframework.data.annotation.*;
+import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.mapping.*;
+import edu.dosw.sirha.sirha_backend.domain.port.Authenticable;
+import edu.dosw.sirha.sirha_backend.domain.port.Schedulable;
+import edu.dosw.sirha.sirha_backend.exception.ErrorCodeSirha;
+import edu.dosw.sirha.sirha_backend.exception.SirhaException;
+import edu.dosw.sirha.sirha_backend.util.PasswordUtils;
+import jakarta.validation.constraints.Email;
+
+//@Document(collection = &quot;users&quot;)
+public abstract class User implements Authenticable, Schedulable {
+    @Id
+    private String id;
+    @Field(&quot;username&quot;)
+    private String username;
+
+    @Field(&quot;email&quot;)
+    @Email
+    @Indexed(unique = true)
+    private String email;
+    @Field(&quot;password&quot;)
+    private String password;
+
+<span class="fc" id="L27">    protected User() {}</span>
+
+<span class="fc" id="L29">    protected User(String username, String email, String password) throws SirhaException {</span>
+<span class="fc" id="L30">        this.username = username;</span>
+<span class="fc" id="L31">        setEmail(email);</span>
+<span class="pc bpc" id="L32" title="1 of 2 branches missed.">        this.password = password.startsWith(&quot;$2a$&quot;) ? password : PasswordUtils.hashPassword(password);</span>
+<span class="fc" id="L33">    }</span>
+    protected User(String id, String username, String email, String password) throws SirhaException {
+<span class="fc" id="L35">        this(username, email, password);</span>
+<span class="fc" id="L36">        this.id = id;</span>
+<span class="fc" id="L37">    }</span>
+    
+    public boolean verificarContrasena(String rawPassword) {
+<span class="nc" id="L40">        return PasswordUtils.verifyPassword(rawPassword, this.password);</span>
+    }
+
+<span class="fc" id="L43">    public void setId(String id){this.id = id;}</span>
+
+<span class="fc" id="L45">    public String getUsername(){return username;}</span>
+<span class="fc" id="L46">    public String getId(){return id;}</span>
+<span class="fc" id="L47">    public String getPasswordHash(){return password;}</span>
+<span class="fc" id="L48">    public String getEmail(){return email;}</span>
+
+    public void setEmail(String email) throws SirhaException {
+<span class="fc bfc" id="L51" title="All 2 branches covered.">        if (!isValidEmail(email)) {</span>
+<span class="fc" id="L52">            throw SirhaException.of(ErrorCodeSirha.INVALID_ARGUMENT, &quot;Invalid email format&quot;);</span>
+        }
+<span class="fc" id="L54">        this.email = email;</span>
+<span class="fc" id="L55">    }</span>
+    
+    private boolean isValidEmail(String email) {
+<span class="fc" id="L58">        String emailRegex = &quot;^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$&quot;;</span>
+<span class="fc" id="L59">        return email.matches(emailRegex);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

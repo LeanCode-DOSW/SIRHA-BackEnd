@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>RegisterRequest.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">SIRHA-BackEnd</a> &gt; <a href="index.source.html" class="el_package">edu.dosw.sirha.sirha_backend.dto</a> &gt; <span class="el_source">RegisterRequest.java</span></div><h1>RegisterRequest.java</h1><pre class="source lang-java linenums">package edu.dosw.sirha.sirha_backend.dto;
+
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
+
+
+/**
+ * DTO para solicitudes de registro de estudiantes.
+ */
+public class RegisterRequest {
+    @NotBlank(message = &quot;El username es obligatorio&quot;)
+    @Size(min = 3, max = 50, message = &quot;El username debe tener entre 3 y 50 caracteres&quot;)
+    private String username;
+    
+    @NotBlank(message = &quot;El email es obligatorio&quot;)
+    @Email(message = &quot;El email debe tener formato válido&quot;)
+    @Pattern(regexp = &quot;.*@universidad\\.edu\\.co$&quot;, 
+             message = &quot;Debe usar email institucional (@universidad.edu.co)&quot;)
+    private String email;
+    
+    @NotBlank(message = &quot;La contraseña es obligatoria&quot;)
+    @Size(min = 8, message = &quot;La contraseña debe tener al menos 8 caracteres&quot;)
+    private String password;
+    
+    @NotBlank(message = &quot;El código estudiantil es obligatorio&quot;)
+    @Pattern(regexp = &quot;\\d{4}-\\d{6}&quot;, 
+             message = &quot;Código estudiantil debe tener formato YYYY-NNNNNN&quot;)
+    private String codigo;
+
+<span class="nc" id="L32">    public RegisterRequest(String username, String email, String password, String codigo) {</span>
+<span class="nc" id="L33">        this.username = username;</span>
+<span class="nc" id="L34">        this.email = email;</span>
+<span class="nc" id="L35">        this.password = password;</span>
+<span class="nc" id="L36">        this.codigo = codigo;</span>
+<span class="nc" id="L37">    }</span>
+
+<span class="nc" id="L39">    public String getUsername() { return username; }</span>
+<span class="nc" id="L40">    public void setUsername(String username) { this.username = username; }</span>
+    
+<span class="nc" id="L42">    public String getEmail() { return email; }</span>
+<span class="nc" id="L43">    public void setEmail(String email) { this.email = email; }</span>
+    
+<span class="nc" id="L45">    public String getPassword() { return password; }</span>
+<span class="nc" id="L46">    public void setPassword(String password) { this.password = password; }</span>
+    
+<span class="nc" id="L48">    public String getCodigo() { return codigo; }</span>
+<span class="nc" id="L49">    public void setCodigo(String codigo) { this.codigo = codigo; }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

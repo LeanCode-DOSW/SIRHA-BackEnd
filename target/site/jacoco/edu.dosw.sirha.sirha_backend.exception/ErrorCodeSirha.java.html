@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ErrorCodeSirha.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">SIRHA-BackEnd</a> &gt; <a href="index.source.html" class="el_package">edu.dosw.sirha.sirha_backend.exception</a> &gt; <span class="el_source">ErrorCodeSirha.java</span></div><h1>ErrorCodeSirha.java</h1><pre class="source lang-java linenums">package edu.dosw.sirha.sirha_backend.exception;
+
+<span class="fc" id="L3">public enum ErrorCodeSirha {</span>
+    // ========== REQUEST STATE ERRORS ==========
+<span class="fc" id="L5">    REQUEST_ALREADY_APPROVED(&quot;La solicitud ya está aprobada&quot;),</span>
+<span class="fc" id="L6">    REQUEST_ALREADY_REJECTED(&quot;La solicitud ya está rechazada&quot;),</span>
+<span class="fc" id="L7">    REQUEST_ALREADY_PENDING(&quot;La solicitud ya está en estado pendiente&quot;),</span>
+<span class="fc" id="L8">    REQUEST_ALREADY_IN_REVIEW(&quot;La solicitud ya está en revisión&quot;),</span>
+<span class="fc" id="L9">    INVALID_STATE_TRANSITION(&quot;Transición de estado inválida&quot;),</span>
+<span class="fc" id="L10">    REQUEST_NOT_IN_REVIEW(&quot;La solicitud debe estar en revisión para esta operación&quot;),</span>
+    
+    // ========== RESOURCE NOT FOUND ERRORS ==========
+<span class="fc" id="L13">    STUDENT_NOT_FOUND(&quot;Estudiante no encontrado&quot;),</span>
+<span class="fc" id="L14">    SUBJECT_NOT_FOUND(&quot;Materia no encontrada&quot;),</span>
+<span class="fc" id="L15">    GROUP_NOT_FOUND(&quot;Grupo no encontrado&quot;),</span>
+<span class="fc" id="L16">    REQUEST_NOT_FOUND(&quot;Solicitud no encontrada&quot;),</span>
+<span class="fc" id="L17">    ACADEMIC_PERIOD_NOT_FOUND(&quot;Período académico no encontrado&quot;),</span>
+    
+    // ========== VALIDATION ERRORS ==========
+<span class="fc" id="L20">    INVALID_CREDENTIALS(&quot;Credenciales inválidas&quot;),</span>
+<span class="fc" id="L21">    VALIDATION_ERROR(&quot;Error de validación de datos&quot;),</span>
+<span class="fc" id="L22">    INVALID_ARGUMENT(&quot;Argumento inválido proporcionado&quot;),</span>
+<span class="fc" id="L23">    MISSING_REQUIRED_FIELD(&quot;Campo requerido faltante&quot;),</span>
+    
+    // ========== CONFLICT ERRORS ==========
+<span class="fc" id="L26">    EMAIL_ALREADY_EXISTS(&quot;El email ya está registrado&quot;),</span>
+<span class="fc" id="L27">    CODE_ALREADY_EXISTS(&quot;El código estudiantil ya está registrado&quot;),</span>
+<span class="fc" id="L28">    USERNAME_ALREADY_EXISTS(&quot;El nombre de usuario ya existe&quot;),</span>
+<span class="fc" id="L29">    DUPLICATE_REQUEST(&quot;Ya existe una solicitud similar&quot;),</span>
+    
+    // ========== BUSINESS LOGIC ERRORS ==========
+<span class="fc" id="L32">    INSUFFICIENT_PERMISSIONS(&quot;Permisos insuficientes para realizar esta operación&quot;),</span>
+<span class="fc" id="L33">    OPERATION_NOT_ALLOWED(&quot;Operación no permitida en el estado actual&quot;),</span>
+<span class="fc" id="L34">    SCHEDULE_CONFLICT(&quot;Conflicto de horarios detectado&quot;),</span>
+    
+    // ========== GROUP STATE ERRORS ==========
+<span class="fc" id="L37">    GROUP_CLOSED(&quot;El grupo está cerrado para inscripciones&quot;),</span>
+<span class="fc" id="L38">    GROUP_FULL(&quot;El grupo está lleno&quot;),</span>
+<span class="fc" id="L39">    STUDENT_ALREADY_IN_GROUP(&quot;El estudiante ya está inscrito en el grupo&quot;),</span>
+<span class="fc" id="L40">    STUDENT_NOT_IN_GROUP(&quot;El estudiante no está inscrito en el grupo&quot;),</span>
+<span class="fc" id="L41">    NO_STUDENTS_TO_REMOVE(&quot;No hay estudiantes para remover del grupo&quot;),</span>
+    
+    // ========== SYSTEM ERRORS ==========
+<span class="fc" id="L44">    INTERNAL_ERROR(&quot;Error interno del sistema&quot;),</span>
+<span class="fc" id="L45">    EXTERNAL_SERVICE_ERROR(&quot;Error en servicio externo&quot;),</span>
+<span class="fc" id="L46">    DATABASE_ERROR(&quot;Error de base de datos&quot;), </span>
+<span class="fc" id="L47">    INVALID_CAPACITY_GROUP(&quot;Capacidad del grupo inválida&quot;),</span>
+
+<span class="fc" id="L49">    INVALID_CAREER(&quot;Carrera inválida para esta operación&quot;);</span>
+    
+    private final String defaultMessage;
+    
+<span class="fc" id="L53">    ErrorCodeSirha(String defaultMessage) {</span>
+<span class="fc" id="L54">        this.defaultMessage = defaultMessage;</span>
+<span class="fc" id="L55">    }</span>
+    
+    public String getCode() { 
+<span class="nc" id="L58">        return this.name(); // Retorna el nombre del enum como código</span>
+    }
+    
+    public String getDefaultMessage() { 
+<span class="fc" id="L62">        return defaultMessage; </span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

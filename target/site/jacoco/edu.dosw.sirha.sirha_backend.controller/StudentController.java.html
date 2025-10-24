@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>StudentController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">SIRHA-BackEnd</a> &gt; <a href="index.source.html" class="el_package">edu.dosw.sirha.sirha_backend.controller</a> &gt; <span class="el_source">StudentController.java</span></div><h1>StudentController.java</h1><pre class="source lang-java linenums">package edu.dosw.sirha.sirha_backend.controller;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import edu.dosw.sirha.sirha_backend.domain.model.AcademicPeriod;
+import edu.dosw.sirha.sirha_backend.domain.model.CambioGrupo;
+import edu.dosw.sirha.sirha_backend.domain.model.CambioMateria;
+import edu.dosw.sirha.sirha_backend.domain.model.Schedule;
+import edu.dosw.sirha.sirha_backend.domain.model.Student;
+import edu.dosw.sirha.sirha_backend.domain.model.enums.SemaforoColores;
+import edu.dosw.sirha.sirha_backend.dto.StudentDTO;
+import edu.dosw.sirha.sirha_backend.dto.SubjectDecoratorDTO;
+import edu.dosw.sirha.sirha_backend.service.StudentService;
+import edu.dosw.sirha.sirha_backend.util.StudentMapper;
+
+import java.util.List;
+import java.util.Map;
+
+/**
+ * Controlador REST para la gestión de estudiantes en el sistema SIRHA.
+ * 
+ * Este controlador maneja todas las operaciones CRUD (Create, Read, Update, Delete)
+ * relacionadas con los estudiantes, incluyendo:
+ * - Consulta de todos los estudiantes registrados
+ * - Búsqueda de estudiantes por ID
+ * - Creación de nuevos estudiantes
+ * 
+ * Todos los endpoints trabajan con objetos StudentDTO para la transferencia de datos,
+ * proporcionando una capa de abstracción entre el modelo interno y la API pública.
+ * 
+ * Los endpoints están mapeados bajo la ruta base &quot;/api/students&quot; siguiendo
+ * las convenciones REST para recursos de colección.
+ * 
+ * @see StudentService
+ * @see StudentDTO
+ * @see Student
+ * @see StudentMapper
+ */
+@RestController
+@RequestMapping(&quot;/api/students&quot;)
+public class StudentController {
+
+    private final StudentService studentService;
+
+<span class="fc" id="L46">    public StudentController(StudentService studentService) {</span>
+<span class="fc" id="L47">        this.studentService = studentService;</span>
+<span class="fc" id="L48">    }</span>
+
+    /**
+     * Endpoint para obtener la lista completa de estudiantes registrados.
+     * 
+     * Recupera todos los estudiantes almacenados en la base de datos
+     * y los convierte a DTOs para su transmisión. La respuesta incluye
+     * información básica de cada estudiante sin datos sensibles.
+     * 
+     * Este endpoint es útil para:
+     * - Páginas de administración con listados de estudiantes
+     * - Reportes generales del sistema
+     * - Búsquedas y filtros en interfaces de usuario
+     * 
+     * @return Lista de StudentDTO con todos los estudiantes registrados.
+     *         Retorna lista vacía si no hay estudiantes registrados.
+     * 
+     * @example
+     * GET /api/students
+     * Accept: application/json
+     * 
+     * Respuesta:
+     * [
+     *   {
+     *     &quot;id&quot;: &quot;1&quot;,
+     *     &quot;username&quot;: &quot;juan.perez&quot;,
+     *     &quot;codigo&quot;: &quot;202112345&quot;,
+     *     &quot;solicitudesIds&quot;: [&quot;req1&quot;, &quot;req2&quot;]
+     *   },
+     *   {
+     *     &quot;id&quot;: &quot;2&quot;, 
+     *     &quot;username&quot;: &quot;maria.garcia&quot;,
+     *     &quot;codigo&quot;: &quot;202112346&quot;,
+     *     &quot;solicitudesIds&quot;: []
+     *   }
+     * ]
+     */
+    @GetMapping
+    public List&lt;StudentDTO&gt; getAll() {
+<span class="nc" id="L87">        return studentService.findAll()</span>
+<span class="nc" id="L88">                .stream()</span>
+<span class="nc" id="L89">                .map(StudentMapper::toDTO)</span>
+<span class="nc" id="L90">                .toList();</span>
+    }
+
+    /**
+     * Endpoint para obtener un estudiante específico por su ID.
+     * 
+     * Busca un estudiante en la base de datos usando su identificador único
+     * y retorna su información en formato DTO. Si el estudiante no existe,
+     * lanza una excepción que resulta en un error HTTP 500.
+     * 
+     * @param id el identificador único del estudiante a buscar.
+     *          No debe ser null o vacío.
+     * @return StudentDTO con la información del estudiante encontrado
+     * 
+     * @throws RuntimeException si no se encuentra un estudiante con el ID especificado
+     * 
+     * @example
+     * GET /api/students/12345
+     * Accept: application/json
+     * 
+     * Respuesta exitosa:
+     * {
+     *   &quot;id&quot;: &quot;12345&quot;,
+     *   &quot;username&quot;: &quot;juan.perez&quot;,
+     *   &quot;codigo&quot;: &quot;202112345&quot;,
+     *   &quot;solicitudesIds&quot;: [&quot;req1&quot;, &quot;req2&quot;]
+     * }
+     * 
+     * Respuesta de error (500):
+     * {
+     *   &quot;error&quot;: &quot;Estudiante no encontrado&quot;
+     * }
+     */
+    @GetMapping(&quot;/{id}&quot;)
+    public StudentDTO getById(@PathVariable String id) {
+<span class="nc" id="L125">        return studentService.findById(id)</span>
+<span class="nc" id="L126">                .map(StudentMapper::toDTO)</span>
+<span class="nc" id="L127">                .orElseThrow(() -&gt; new RuntimeException(&quot;Estudiante no encontrado&quot;));</span>
+    }
+
+    @GetMapping(&quot;/schedule/{username}&quot;)
+    public ResponseEntity&lt;List&lt;Schedule&gt;&gt; getCurrentSchedule(@PathVariable String username){
+        try {
+<span class="nc" id="L133">            List&lt;Schedule&gt; schedules = studentService.getCurrentSchedule(username);</span>
+<span class="nc" id="L134">            return ResponseEntity.ok(schedules);</span>
+<span class="nc" id="L135">        } catch (IllegalArgumentException e) {</span>
+            // Retornar 404 cuando el estudiante no existe
+<span class="nc" id="L137">            return ResponseEntity.notFound().build();</span>
+        }
+    }
+    @GetMapping(&quot;/schedule/{username}/period&quot;)
+    public ResponseEntity&lt;List&lt;Schedule&gt;&gt; getScheduleForPeriod(@PathVariable String username, @RequestParam String period){
+        try {
+<span class="nc" id="L143">            List&lt;Schedule&gt; schedules = studentService.getScheduleForPeriod(username, period);</span>
+<span class="nc" id="L144">            return ResponseEntity.ok(schedules);</span>
+<span class="nc" id="L145">        } catch (IllegalArgumentException e) {</span>
+            // Retornar 404 cuando el estudiante no existe
+<span class="nc" id="L147">            return ResponseEntity.notFound().build();</span>
+        }
+    }
+    @GetMapping(&quot;/schedules/{username}&quot;)
+    public ResponseEntity&lt;Map&lt;AcademicPeriod,List&lt;Schedule&gt;&gt;&gt; getAllSchedules(@PathVariable String username){
+        try {
+<span class="nc" id="L153">            Map&lt;AcademicPeriod,List&lt;Schedule&gt;&gt; schedules = studentService.getAllSchedules(username);</span>
+<span class="nc" id="L154">            return ResponseEntity.ok(schedules);</span>
+<span class="nc" id="L155">        } catch (IllegalArgumentException e) {</span>
+            // Retornar 404 cuando el estudiante no existe
+<span class="nc" id="L157">            return ResponseEntity.notFound().build();</span>
+        }
+    }
+
+    @GetMapping(&quot;/academicPensum/{username}&quot;)
+    public ResponseEntity&lt;Map&lt;SemaforoColores,List&lt;SubjectDecoratorDTO&gt;&gt;&gt; getAcademicPensum(@PathVariable String username){
+        try {
+<span class="nc" id="L164">            Map&lt;SemaforoColores,List&lt;SubjectDecoratorDTO&gt;&gt; pensum = studentService.getAcademicPensum(username);</span>
+<span class="nc" id="L165">            return ResponseEntity.ok(pensum);</span>
+<span class="nc" id="L166">        } catch (IllegalArgumentException e) {</span>
+            // Retornar 404 cuando el estudiante no existe
+<span class="nc" id="L168">            return ResponseEntity.notFound().build();</span>
+        }
+    }
+
+    @PostMapping(&quot;/{studentName}/solicitudes/cambio-grupo&quot;)
+    public ResponseEntity&lt;CambioGrupo&gt; createRequestCambioGrupo(
+            @PathVariable String studentName, 
+            @RequestParam String subjectName, 
+            @RequestParam String codeNewGroup) {
+        try {
+<span class="nc" id="L178">            CambioGrupo cambioGrupo = studentService.createRequestCambioGrupo(studentName, subjectName, codeNewGroup);</span>
+<span class="nc" id="L179">            return ResponseEntity.ok(cambioGrupo);</span>
+<span class="nc" id="L180">        } catch (IllegalArgumentException e) {</span>
+            // Retornar 404 cuando el estudiante no existe
+<span class="nc" id="L182">            return ResponseEntity.notFound().build();</span>
+        }
+    }
+
+    @PostMapping(&quot;/{studentName}/solicitudes/cambio-materia&quot;)
+    public ResponseEntity&lt;CambioMateria&gt; createRequestCambioMateria(
+            @PathVariable String studentName, 
+            @RequestParam String subjectName, 
+            @RequestParam String newSubjectName, 
+            @RequestParam String codeNewGroup) {
+        try {
+<span class="nc" id="L193">            CambioMateria cambioMateria = studentService.createRequestCambioMateria(studentName, subjectName, newSubjectName, codeNewGroup);</span>
+<span class="nc" id="L194">            return ResponseEntity.ok(cambioMateria);</span>
+<span class="nc" id="L195">        } catch (IllegalArgumentException e) {</span>
+            // Retornar 404 cuando el estudiante no existe
+<span class="nc" id="L197">            return ResponseEntity.notFound().build();</span>
+        }
+    }
+
+
+    /**
+     * Endpoint para crear un nuevo estudiante en el sistema.
+     * 
+     * Recibe los datos del estudiante a través de un DTO, los convierte
+     * a una entidad del dominio y los persiste en la base de datos.
+     * La contraseña se asigna temporalmente como &quot;defaultPass&quot; y debe
+     * ser actualizada por el administrador o el propio estudiante.
+     * 
+     * Validaciones automáticas:
+     * - El código de estudiante debe ser único
+     * - El username debe ser único en el sistema
+     * - Los campos obligatorios no deben estar vacíos
+     * 
+     */
+    @PostMapping
+    public StudentDTO create(@RequestBody StudentDTO dto) {
+<span class="nc" id="L218">        Student newStudent = new Student(</span>
+<span class="nc" id="L219">            dto.getUsername(), </span>
+<span class="nc" id="L220">            dto.getEmail(),  </span>
+            &quot;defaultPass&quot;, // Contraseña temporal - debe ser actualizada
+<span class="nc" id="L222">            dto.getCode()</span>
+        );
+        
+<span class="nc" id="L225">        Student savedStudent = studentService.save(newStudent);</span>
+<span class="nc" id="L226">        return StudentMapper.toDTO(savedStudent);</span>
+    }
+
+
+    
+
+    
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>
