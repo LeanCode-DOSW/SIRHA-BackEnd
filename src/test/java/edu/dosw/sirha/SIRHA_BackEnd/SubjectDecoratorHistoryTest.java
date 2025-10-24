@@ -1,4 +1,4 @@
-package edu.dosw.sirha.SIRHA_BackEnd;
+package edu.dosw.sirha.sirha_backend;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

@@ -9,9 +9,9 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>edu.dosw.sirha</groupId>
-	<artifactId>SIRHA-BackEnd</artifactId>
+	<artifactId>sirha_backend</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>SIRHA-BackEnd</name>
+	<name>sirha_backend</name>
 	<description>Proyecto #1</description>
 	<url/>
 	<licenses>

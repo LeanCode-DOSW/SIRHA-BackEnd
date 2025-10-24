@@ -1,4 +1,4 @@
-package edu.dosw.sirha.SIRHA_BackEnd;
+package edu.dosw.sirha.sirha_backend;
 
 import java.util.*;
 import java.time.LocalDate;
