@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Subject.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">SIRHA-BackEnd</a> &gt; <a href="index.source.html" class="el_package">edu.dosw.sirha.sirha_backend.domain.model</a> &gt; <span class="el_source">Subject.java</span></div><h1>Subject.java</h1><pre class="source lang-java linenums">package edu.dosw.sirha.sirha_backend.domain.model;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+
+import edu.dosw.sirha.sirha_backend.domain.model.stategroup.Group;
+import edu.dosw.sirha.sirha_backend.domain.port.AcademicProgress;
+import edu.dosw.sirha.sirha_backend.domain.port.PrerequisiteRule;
+
+/**
+ * Representa una materia o asignatura dentro del sistema académico.
+ *
+ * Reglas:
+ * - Una materia puede tener múltiples grupos.
+ * - Cada materia debe tener un nombre único y un identificador.
+ */
+@Document(collection = &quot;subjects&quot;)
+public class Subject {
+    @Id
+    private String id;
+    private String name;
+    private int credits;
+    private List&lt;Group&gt; groups;
+    private List&lt;PrerequisiteRule&gt; prerequisites;
+
+    public Subject(String id, String name, int credits) {
+<span class="fc" id="L30">        this(name, credits);</span>
+<span class="fc" id="L31">        this.id = id;</span>
+<span class="fc" id="L32">    }</span>
+<span class="fc" id="L33">    public Subject(String name, int credits) {</span>
+<span class="fc bfc" id="L34" title="All 4 branches covered.">        if (name == null || name.isBlank()) {</span>
+<span class="fc" id="L35">            throw new IllegalArgumentException(&quot;El nombre de la materia no puede estar vacío&quot;);</span>
+        }
+<span class="fc bfc" id="L37" title="All 2 branches covered.">        if (credits &lt;= 0) {</span>
+<span class="fc" id="L38">            throw new IllegalArgumentException(&quot;La materia debe tener al menos 1 crédito&quot;);</span>
+        }
+<span class="fc" id="L40">        this.name = name;</span>
+<span class="fc" id="L41">        this.credits = credits;</span>
+<span class="fc" id="L42">        this.groups = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L43">        this.prerequisites = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L44">    }</span>
+
+    /**
+     * Asocia un grupo a la materia.
+     */
+    public void addGroup(Group g) {
+<span class="fc bfc" id="L50" title="All 2 branches covered.">        if (g == null) {</span>
+<span class="fc" id="L51">            throw new IllegalArgumentException(&quot;El grupo no puede ser nulo&quot;);</span>
+        }
+<span class="fc" id="L53">        groups.add(g);</span>
+<span class="fc" id="L54">    }</span>
+<span class="fc" id="L55">    public int getGroupCount() {return groups.size();}</span>
+
+    /**
+     * Elimina un grupo de la materia.
+     */
+    public boolean removeGroup(Group g) {
+<span class="fc" id="L61">        g.removeGroup();</span>
+<span class="fc" id="L62">        return groups.remove(g);</span>
+    }
+<span class="fc" id="L64">    public boolean hasGroup(Group group){return groups.contains(group);}</span>
+
+    public Group getGroupByCode(String code) {
+<span class="pc bpc" id="L67" title="1 of 2 branches missed.">        for (Group g : groups) {</span>
+<span class="nc bnc" id="L68" title="All 2 branches missed.">            if (g.getCode().equals(code)) {</span>
+<span class="nc" id="L69">                return g;</span>
+            }
+        }
+<span class="fc" id="L72">        return null;</span>
+    }
+
+<span class="fc" id="L75">    public void setId(String id) {this.id = id;}</span>
+    public void setName(String name) {
+<span class="pc bpc" id="L77" title="2 of 4 branches missed.">        if (name == null || name.isBlank()) {throw new IllegalArgumentException(&quot;El nombre no puede estar vacío&quot;);}</span>
+<span class="fc" id="L78">        this.name = name;</span>
+<span class="fc" id="L79">    }</span>
+    public void setCredits(int credits) {
+<span class="fc bfc" id="L81" title="All 2 branches covered.">        if (credits &lt;= 0) {throw new IllegalArgumentException(&quot;La materia debe tener al menos 1 crédito&quot;);}</span>
+<span class="fc" id="L82">        this.credits = credits;</span>
+<span class="fc" id="L83">    }</span>
+<span class="nc" id="L84">    public void setPrerequisites(List&lt;PrerequisiteRule&gt; prerequisites) {this.prerequisites = prerequisites;}</span>
+
+<span class="nc" id="L86">    public void setGroups(List&lt;Group&gt; groups) {this.groups = groups;}</span>
+
+<span class="fc" id="L88">    public String getId() {return id;}</span>
+<span class="fc" id="L89">    public String getName() {return name;}</span>
+<span class="fc" id="L90">    public List&lt;PrerequisiteRule&gt; getPrerequisites() {return prerequisites;}</span>
+<span class="fc" id="L91">    public List&lt;Group&gt; getGroups() {return groups;}</span>
+<span class="nc" id="L92">    public void deleteGroups() {this.groups.clear();}</span>
+<span class="fc" id="L93">    public int getCredits() {return credits;}</span>
+
+    public boolean canEnroll(AcademicProgress progress) {
+<span class="pc bpc" id="L96" title="1 of 2 branches missed.">        if (prerequisites.isEmpty()) {</span>
+<span class="nc" id="L97">            return true;</span>
+        }
+<span class="fc" id="L99">        return prerequisites.stream().allMatch(rule -&gt; rule.canEnroll(this, progress));</span>
+    }
+<span class="fc bfc" id="L101" title="All 2 branches covered.">    public boolean hasPrerequisites() {return !prerequisites.isEmpty();}</span>
+<span class="fc" id="L102">    public void addPrerequisite(PrerequisiteRule prerequisite) {this.prerequisites.add(prerequisite);}</span>
+
+
+    @Override
+    public boolean equals(Object o) {
+<span class="fc bfc" id="L107" title="All 2 branches covered.">        if (this == o) return true;</span>
+<span class="fc bfc" id="L108" title="All 2 branches covered.">        if (!(o instanceof Subject)) return false;</span>
+<span class="fc" id="L109">        Subject subject = (Subject) o;</span>
+<span class="fc" id="L110">        return Objects.equals(id, subject.id);</span>
+    }
+
+    @Override
+    public int hashCode() {
+<span class="fc" id="L115">        return Objects.hash(id);</span>
+    }
+
+    @Override
+    public String toString() {
+<span class="fc" id="L120">        return &quot;Subject{&quot; +</span>
+<span class="fc" id="L121">                &quot;id='&quot; + id + '\'' +</span>
+<span class="fc" id="L122">                &quot;, name='&quot; + name + '\'' +</span>
+<span class="fc" id="L123">                &quot;, credits=&quot; + credits +</span>
+<span class="fc" id="L124">                &quot;, grupos=&quot; + groups.size() +</span>
+                '}';
+    }
+
+    public List&lt;Group&gt; getOpenGroups() {
+<span class="nc" id="L129">        List&lt;Group&gt; openGroups = new ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L130" title="All 2 branches missed.">        for (Group g : groups) {</span>
+<span class="nc bnc" id="L131" title="All 2 branches missed.">            if (g.isOpen()) {</span>
+<span class="nc" id="L132">                openGroups.add(g);</span>
+            }
+        }
+<span class="nc" id="L135">        return openGroups;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

@@ -1,0 +1,267 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GroupServiceImpl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">SIRHA-BackEnd</a> &gt; <a href="index.source.html" class="el_package">edu.dosw.sirha.sirha_backend.service.impl</a> &gt; <span class="el_source">GroupServiceImpl.java</span></div><h1>GroupServiceImpl.java</h1><pre class="source lang-java linenums">package edu.dosw.sirha.sirha_backend.service.impl;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import edu.dosw.sirha.sirha_backend.domain.model.*;
+import edu.dosw.sirha.sirha_backend.domain.model.stategroup.Group;
+import edu.dosw.sirha.sirha_backend.repository.mongo.GroupMongoRepository;
+import edu.dosw.sirha.sirha_backend.service.GroupService;
+
+import java.util.List;
+
+/**
+ * Implementación de {@link GroupService} enfocada en la gestión de materias y grupos.
+ */
+@Service
+public class GroupServiceImpl implements GroupService {
+
+<span class="fc" id="L21">    private static final Logger log = LoggerFactory.getLogger(GroupServiceImpl.class);</span>
+
+    private final GroupMongoRepository groupRepository;
+
+<span class="fc" id="L25">    public GroupServiceImpl(GroupMongoRepository groupRepository) {</span>
+<span class="fc" id="L26">        this.groupRepository = groupRepository;</span>
+<span class="fc" id="L27">        log.info(&quot;GroupServiceImpl inicializado correctamente&quot;);</span>
+<span class="fc" id="L28">    }</span>
+
+
+    /**
+     * Registra un grupo en una materia
+     */
+    @Transactional
+    @Override
+    public Group saveGroup(Subject subject, Group group) {
+        
+        try{
+<span class="nc bnc" id="L39" title="All 2 branches missed.">            if (subject == null) {</span>
+<span class="nc" id="L40">                log.error(&quot;Error: La materia no puede ser null&quot;);</span>
+<span class="nc" id="L41">                throw new IllegalArgumentException(&quot;La materia no puede ser null&quot;);</span>
+            }
+            
+<span class="nc bnc" id="L44" title="All 2 branches missed.">            if (group == null) {</span>
+<span class="nc" id="L45">                log.error(&quot;Error: El grupo no puede ser null&quot;);</span>
+<span class="nc" id="L46">                throw new IllegalArgumentException(&quot;El grupo no puede ser null&quot;);</span>
+            }
+<span class="nc" id="L48">            log.info(&quot;Guardando grupo {} para la materia: {}&quot;, group.getId(), subject.getName());</span>
+<span class="nc" id="L49">            Group savedGroup = groupRepository.save(group);</span>
+<span class="nc" id="L50">            subject.addGroup(savedGroup);</span>
+<span class="nc" id="L51">            log.info(&quot;Grupo guardado exitosamente con ID: {}&quot;, savedGroup.getId());</span>
+<span class="nc" id="L52">            return savedGroup;</span>
+<span class="nc" id="L53">        } catch (Exception e) {</span>
+<span class="nc bnc" id="L54" title="All 2 branches missed.">            String safeGroupId = group != null ? group.getId() : &quot;null&quot;;</span>
+<span class="nc bnc" id="L55" title="All 2 branches missed.">            String safeSubjectName = subject != null ? subject.getName() : &quot;null&quot;;</span>
+<span class="nc" id="L56">            log.error(&quot;Error al guardar el grupo {} para la materia {}: {}&quot;, safeGroupId, safeSubjectName, e.getMessage());</span>
+<span class="nc" id="L57">            throw new RuntimeException(&quot;Error interno al guardar grupo&quot;, e);</span>
+        }
+    }
+
+    @Transactional
+    @Override
+    public Group deleteGroupById(String id) { 
+<span class="nc" id="L64">        log.info(&quot;Eliminando grupo con ID: {}&quot;, id);</span>
+
+        try {
+<span class="nc bnc" id="L67" title="All 2 branches missed.">            if (id == null) {</span>
+<span class="nc" id="L68">                log.error(&quot;Error: ID del grupo no puede ser null&quot;);</span>
+<span class="nc" id="L69">                throw new IllegalArgumentException(&quot;El ID del grupo no puede ser null&quot;);    </span>
+            }
+
+<span class="nc bnc" id="L72" title="All 2 branches missed.">            if (!groupRepository.existsById(id)) {</span>
+<span class="nc" id="L73">                log.warn(&quot;Grupo con ID {} no existe&quot;, id);</span>
+<span class="nc" id="L74">                throw new RuntimeException(&quot;Grupo con id &quot; + id + &quot; no existe&quot;);</span>
+            }
+
+<span class="nc" id="L77">            Group group = groupRepository.findById(id)</span>
+<span class="nc" id="L78">                    .orElseThrow(() -&gt; new RuntimeException(&quot;Grupo con id &quot; + id + &quot; no encontrado&quot;));</span>
+<span class="nc" id="L79">            log.info(&quot;Grupo encontrado - Código: {}, Materia: {}, Inscritos: {}&quot;, </span>
+<span class="nc" id="L80">                    group.getCode(), </span>
+<span class="nc bnc" id="L81" title="All 2 branches missed.">                    group.getCurso() != null ? group.getCurso().getName() : &quot;null&quot;,</span>
+<span class="nc" id="L82">                    group.getInscritos());</span>
+
+<span class="nc" id="L84">            Subject subject = group.getCurso();</span>
+<span class="nc" id="L85">            subject.removeGroup(group);</span>
+<span class="nc" id="L86">            log.info(&quot;Grupo removido de la materia: {}&quot;, subject.getName());</span>
+<span class="nc" id="L87">            groupRepository.deleteById(id);</span>
+<span class="nc" id="L88">            log.info(&quot;Grupo con ID {} eliminado exitosamente&quot;, id);</span>
+<span class="nc" id="L89">            return group;</span>
+<span class="nc" id="L90">        } catch (Exception e) {</span>
+<span class="nc" id="L91">            log.error(&quot;Error al eliminar el grupo con ID {}: {}&quot;, id, e.getMessage());</span>
+<span class="nc" id="L92">            throw new RuntimeException(&quot;Error interno al eliminar grupo&quot;, e);</span>
+        }
+        
+    }
+    @Transactional
+    @Override
+    public Group assignProfessor(String groupId, Professor professor) {
+<span class="nc bnc" id="L99" title="All 2 branches missed.">        if (professor == null) {</span>
+<span class="nc" id="L100">            log.error(&quot;Error: El profesor no puede ser null&quot;);</span>
+<span class="nc" id="L101">            throw new IllegalArgumentException(&quot;El profesor no puede ser null&quot;);</span>
+        }
+
+        try {
+<span class="nc" id="L105">            log.info(&quot;Asignando profesor {} al grupo con ID: {}&quot;, professor.getUsername(), groupId);</span>
+<span class="nc" id="L106">            Group group = findById(groupId);</span>
+<span class="nc" id="L107">            group.setProfesor(professor);</span>
+<span class="nc" id="L108">            Group updatedGroup = groupRepository.save(group);</span>
+<span class="nc" id="L109">            log.info(&quot;Profesor {} asignado exitosamente al grupo con ID: {}&quot;, professor.getUsername(), groupId);</span>
+
+<span class="nc" id="L111">            return updatedGroup;</span>
+<span class="nc" id="L112">        } catch (Exception e) {</span>
+<span class="nc bnc" id="L113" title="All 2 branches missed.">            String safeProfessor = professor != null ? professor.getUsername() : &quot;null&quot;;</span>
+<span class="nc" id="L114">            log.error(&quot;Error al asignar el profesor {} al grupo con ID {}: {}&quot;, safeProfessor, groupId, e.getMessage());</span>
+<span class="nc" id="L115">            throw new RuntimeException(&quot;Error interno al asignar profesor&quot;, e);</span>
+        }
+    }
+    @Transactional
+    @Override
+    public Group addSchedule(String groupId, Schedule schedule) {
+<span class="nc" id="L121">        log.info(&quot;Agregando horario al grupo con ID: {}&quot;, groupId);</span>
+
+        try {
+<span class="nc bnc" id="L124" title="All 2 branches missed.">            if (schedule == null) {</span>
+<span class="nc" id="L125">                log.error(&quot;Error: El horario no puede ser null&quot;);</span>
+<span class="nc" id="L126">                throw new IllegalArgumentException(&quot;El horario no puede ser null&quot;);</span>
+            }
+<span class="nc" id="L128">            Group group = findById(groupId);</span>
+<span class="nc" id="L129">            group.addSchedule(schedule);</span>
+<span class="nc" id="L130">            log.info(&quot;Horario agregado exitosamente al grupo con ID: {}&quot;, groupId);</span>
+<span class="nc" id="L131">            Group updatedGroup = groupRepository.save(group);</span>
+<span class="nc" id="L132">            log.info(&quot;Grupo con ID {} actualizado con nuevo horario&quot;, groupId);</span>
+<span class="nc" id="L133">            return updatedGroup;</span>
+<span class="nc" id="L134">        } catch (Exception e) {</span>
+<span class="nc" id="L135">            log.error(&quot;Error al agregar horario al grupo con ID {}: {}&quot;, groupId, e.getMessage());</span>
+<span class="nc" id="L136">            throw new RuntimeException(&quot;Error interno al agregar horario&quot;, e);</span>
+        }
+    }
+    @Transactional
+    @Override
+    public Group closeGroup(String groupId) {
+<span class="nc" id="L142">        log.info(&quot;Cerrando grupo con ID: {}&quot;, groupId);</span>
+        try{
+<span class="nc" id="L144">            Group group = findById(groupId);</span>
+<span class="nc" id="L145">            log.info(&quot;Estado actual del grupo (antes de cerrar): {}&quot;, group.getGroupState().getClass().getSimpleName());</span>
+<span class="nc" id="L146">            group.closeGroup();</span>
+<span class="nc" id="L147">            log.info(&quot;Estado actual del grupo (después de cerrar): {}&quot;, group.getGroupState().getClass().getSimpleName());</span>
+<span class="nc" id="L148">            Group updatedGroup = groupRepository.save(group);</span>
+<span class="nc" id="L149">            log.info(&quot;Grupo con ID {} cerrado exitosamente&quot;, groupId);</span>
+<span class="nc" id="L150">            return updatedGroup;</span>
+<span class="nc" id="L151">        } catch (Exception e) {</span>
+<span class="nc" id="L152">            log.error(&quot;Error al cerrar el grupo con ID {}: {}&quot;, groupId, e.getMessage());</span>
+<span class="nc" id="L153">            throw new RuntimeException(&quot;Error interno al cerrar grupo&quot;, e);</span>
+        }
+    }
+    @Transactional
+    @Override
+    public Group openGroup(String groupId) {
+<span class="nc" id="L159">        log.info(&quot;Abriendo grupo con ID: {}&quot;, groupId);</span>
+        try{
+<span class="nc" id="L161">            Group group = findById(groupId);</span>
+<span class="nc" id="L162">            log.info(&quot;Estado actual del grupo (antes de abrir): {}&quot;, group.getGroupState().getClass().getSimpleName());</span>
+<span class="nc" id="L163">            group.openGroup();</span>
+<span class="nc" id="L164">            log.info(&quot;Estado actual del grupo (después de abrir): {}&quot;, group.getGroupState().getClass().getSimpleName());</span>
+<span class="nc" id="L165">            Group updatedGroup = groupRepository.save(group);</span>
+<span class="nc" id="L166">            log.info(&quot;Grupo con ID {} abierto exitosamente&quot;, groupId);</span>
+<span class="nc" id="L167">            return updatedGroup;</span>
+<span class="nc" id="L168">        } catch (Exception e) {</span>
+<span class="nc" id="L169">            log.error(&quot;Error al abrir el grupo con ID {}: {}&quot;, groupId, e.getMessage());</span>
+<span class="nc" id="L170">            throw new RuntimeException(&quot;Error interno al abrir grupo&quot;, e);</span>
+        }
+    }
+    @Transactional
+    @Override
+    public List&lt;Schedule&gt; getSchedules(String groupId) {
+<span class="nc" id="L176">        log.info(&quot;Obteniendo horarios del grupo con ID: {}&quot;, groupId);</span>
+        try {
+<span class="nc" id="L178">            Group group = findById(groupId);</span>
+<span class="nc" id="L179">            List&lt;Schedule&gt; schedules = group.getSchedules();</span>
+<span class="nc" id="L180">            log.info(&quot;Horarios obtenidos exitosamente para el grupo con ID: {}&quot;, groupId);</span>
+<span class="nc" id="L181">            return schedules;</span>
+<span class="nc" id="L182">        } catch (Exception e) {</span>
+<span class="nc" id="L183">            log.error(&quot;Error al obtener horarios del grupo con ID {}: {}&quot;, groupId, e.getMessage());</span>
+<span class="nc" id="L184">            throw new RuntimeException(&quot;Error interno al obtener horarios&quot;, e);</span>
+        }
+    }
+    @Transactional
+    @Override
+    public boolean isFull(String groupId) {
+<span class="nc" id="L190">        log.info(&quot;Verificando si el grupo con ID {} está lleno&quot;, groupId);</span>
+        try {
+<span class="nc" id="L192">            Group group = findById(groupId);</span>
+<span class="nc" id="L193">            boolean isFull = group.isFull();</span>
+<span class="nc bnc" id="L194" title="All 2 branches missed.">            log.info(&quot;El grupo con ID {} está {}&quot;, groupId, isFull ? &quot;lleno&quot; : &quot;disponible&quot;);</span>
+<span class="nc" id="L195">            return isFull;</span>
+<span class="nc" id="L196">        } catch (Exception e) {</span>
+<span class="nc" id="L197">            log.error(&quot;Error al verificar si el grupo con ID {} está lleno: {}&quot;, groupId, e.getMessage());</span>
+<span class="nc" id="L198">            throw new RuntimeException(&quot;Error interno al verificar estado de grupo&quot;, e);</span>
+        }
+    }
+    @Transactional
+    @Override
+    public int getAvailableSeats(String groupId) {
+<span class="nc" id="L204">        log.info(&quot;Obteniendo asientos disponibles del grupo con ID: {}&quot;, groupId);</span>
+        try {
+<span class="nc" id="L206">            Group group = findById(groupId);</span>
+<span class="nc" id="L207">            int availableSeats = group.getCuposDisponibles();</span>
+<span class="nc" id="L208">            log.info(&quot;El grupo con ID {} tiene {} asientos disponibles&quot;, groupId, availableSeats);</span>
+<span class="nc" id="L209">            return availableSeats;</span>
+<span class="nc" id="L210">        } catch (Exception e) {</span>
+<span class="nc" id="L211">            log.error(&quot;Error al obtener los asientos disponibles del grupo con ID {}: {}&quot;, groupId, e.getMessage());</span>
+<span class="nc" id="L212">            throw new RuntimeException(&quot;Error interno al obtener asientos disponibles&quot;, e);</span>
+        }
+    }
+
+    @Transactional
+    @Override
+    public Group findById(String id) {
+<span class="nc" id="L219">        log.info(&quot;Buscando grupo con ID: {}&quot;, id);</span>
+        try {
+<span class="nc" id="L221">            Group group = groupRepository.findById(id)</span>
+<span class="nc" id="L222">                    .orElseThrow(() -&gt; {</span>
+<span class="nc" id="L223">                        log.warn(&quot;Grupo con ID {} no encontrado&quot;, id);</span>
+<span class="nc" id="L224">                        return new RuntimeException(&quot;Grupo con id &quot; + id + &quot; no encontrado&quot;);</span>
+                    });
+<span class="nc" id="L226">            log.info(&quot;Grupo encontrado: {}&quot;, group);</span>
+<span class="nc" id="L227">            return group;</span>
+<span class="nc" id="L228">        } catch (Exception e) {</span>
+<span class="nc" id="L229">            log.error(&quot;Error al buscar grupo con ID {}: {}&quot;, id, e.getMessage());</span>
+<span class="nc" id="L230">            throw new RuntimeException(&quot;Error interno al buscar grupo&quot;, e);</span>
+        }
+    }
+
+    @Transactional
+    @Override
+    public Professor getProfessor(String groupId) {
+<span class="nc" id="L237">        log.info(&quot;Obteniendo profesor del grupo con ID: {}&quot;, groupId);</span>
+        try {
+<span class="nc" id="L239">            Group group = findById(groupId);</span>
+<span class="nc" id="L240">            Professor professor = group.getProfesor();</span>
+<span class="nc bnc" id="L241" title="All 2 branches missed.">            if (professor == null) {</span>
+<span class="nc" id="L242">                log.warn(&quot;El grupo con ID {} no tiene un profesor asignado&quot;, groupId);</span>
+<span class="nc" id="L243">                throw new RuntimeException(&quot;El grupo con id &quot; + groupId + &quot; no tiene un profesor asignado&quot;);</span>
+            }
+<span class="nc" id="L245">            log.info(&quot;Profesor del grupo con ID {}: {}&quot;, groupId, professor.getUsername());</span>
+<span class="nc" id="L246">            return professor;</span>
+<span class="nc" id="L247">        } catch (Exception e) {</span>
+<span class="nc" id="L248">            log.error(&quot;Error al obtener el profesor del grupo con ID {}: {}&quot;, groupId, e.getMessage());</span>
+<span class="nc" id="L249">            throw new RuntimeException(&quot;Error interno al obtener profesor&quot;, e);</span>
+        }
+    }
+    @Transactional
+    @Override
+    public List&lt;Group&gt; findAllGroups() {
+<span class="nc" id="L255">        log.info(&quot;Obteniendo todos los grupos&quot;);</span>
+        try {
+<span class="nc" id="L257">            List&lt;Group&gt; groups = groupRepository.findAll();</span>
+<span class="nc" id="L258">            log.info(&quot;Total de grupos encontrados: {}&quot;, groups.size());</span>
+<span class="nc" id="L259">            return groups;</span>
+<span class="nc" id="L260">        } catch (Exception e) {</span>
+<span class="nc" id="L261">            log.error(&quot;Error al obtener todos los grupos: {}&quot;, e.getMessage());</span>
+<span class="nc" id="L262">            throw new RuntimeException(&quot;Error interno al obtener grupos&quot;, e);</span>
+        }
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

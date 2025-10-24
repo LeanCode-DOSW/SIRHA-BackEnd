@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SubjectDecoratorDTO.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">SIRHA-BackEnd</a> &gt; <a href="index.source.html" class="el_package">edu.dosw.sirha.sirha_backend.dto</a> &gt; <span class="el_source">SubjectDecoratorDTO.java</span></div><h1>SubjectDecoratorDTO.java</h1><pre class="source lang-java linenums">package edu.dosw.sirha.sirha_backend.dto;
+
+import edu.dosw.sirha.sirha_backend.domain.model.enums.SemaforoColores;
+
+public class SubjectDecoratorDTO {
+    
+    private String id;
+    private String name;    
+    private int credits;
+    private int semester;
+    private SemaforoColores semaforoColor;
+    private int grade; 
+
+<span class="nc" id="L14">    public SubjectDecoratorDTO() {}</span>
+    
+    public SubjectDecoratorDTO(String id, String name, int credits, 
+                              int semester, SemaforoColores semaforoColor, 
+<span class="fc" id="L18">                              int grade) {</span>
+<span class="fc" id="L19">        this.id = id;</span>
+<span class="fc" id="L20">        this.name = name;</span>
+<span class="fc" id="L21">        this.credits = credits;</span>
+<span class="fc" id="L22">        this.semester = semester;</span>
+<span class="fc" id="L23">        this.semaforoColor = semaforoColor;</span>
+<span class="fc" id="L24">        this.grade = grade;</span>
+<span class="fc" id="L25">    }</span>
+    
+    // Getters y Setters
+    public String getId() {
+<span class="nc" id="L29">        return id;</span>
+    }
+    
+    public void setId(String id) {
+<span class="nc" id="L33">        this.id = id;</span>
+<span class="nc" id="L34">    }</span>
+    
+    public String getName() {
+<span class="fc" id="L37">        return name;</span>
+    }
+    
+    public void setName(String name) {
+<span class="nc" id="L41">        this.name = name;</span>
+<span class="nc" id="L42">    }</span>
+    
+    public int getCredits() {
+<span class="nc" id="L45">        return credits;</span>
+    }
+    
+    public void setCredits(int credits) {
+<span class="nc" id="L49">        this.credits = credits;</span>
+<span class="nc" id="L50">    }</span>
+    
+    public int getSemester() {
+<span class="nc" id="L53">        return semester;</span>
+    }
+    
+    public void setSemester(int semester) {
+<span class="nc" id="L57">        this.semester = semester;</span>
+<span class="nc" id="L58">    }</span>
+    
+    public SemaforoColores getSemaforoColor() {
+<span class="nc" id="L61">        return semaforoColor;</span>
+    }
+    
+    public void setSemaforoColor(SemaforoColores semaforoColor) {
+<span class="nc" id="L65">        this.semaforoColor = semaforoColor;</span>
+<span class="nc" id="L66">    }</span>
+
+    public int getGrade() {
+<span class="nc" id="L69">        return grade;</span>
+    }
+    
+    public void setGrade(int grade) {
+<span class="nc" id="L73">        this.grade = grade;</span>
+<span class="nc" id="L74">    }</span>
+
+    
+    @Override
+    public String toString() {
+<span class="nc" id="L79">        return &quot;SubjectDecoratorDTO{&quot; +</span>
+                &quot;id='&quot; + id + '\'' +
+                &quot;, name='&quot; + name + '\'' +
+                &quot;, credits=&quot; + credits +
+                &quot;, semester=&quot; + semester +
+                &quot;, semaforoColor=&quot; + semaforoColor +
+                &quot;, grade=&quot; + grade +
+                '}';
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

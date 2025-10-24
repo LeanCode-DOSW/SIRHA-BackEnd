@@ -1,0 +1,581 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>StudentServiceImpl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">SIRHA-BackEnd</a> &gt; <a href="index.source.html" class="el_package">edu.dosw.sirha.sirha_backend.service.impl</a> &gt; <span class="el_source">StudentServiceImpl.java</span></div><h1>StudentServiceImpl.java</h1><pre class="source lang-java linenums">package edu.dosw.sirha.sirha_backend.service.impl;
+
+import java.util.Map;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import edu.dosw.sirha.sirha_backend.domain.model.AcademicPeriod;
+import edu.dosw.sirha.sirha_backend.domain.model.CambioGrupo;
+import edu.dosw.sirha.sirha_backend.domain.model.CambioMateria;
+import edu.dosw.sirha.sirha_backend.domain.model.Schedule;
+import edu.dosw.sirha.sirha_backend.domain.model.Student;
+import edu.dosw.sirha.sirha_backend.domain.model.Subject;
+import edu.dosw.sirha.sirha_backend.domain.model.enums.SemaforoColores;
+import edu.dosw.sirha.sirha_backend.domain.model.stategroup.Group;
+import edu.dosw.sirha.sirha_backend.domain.model.staterequest.BaseRequest;
+import edu.dosw.sirha.sirha_backend.dto.AuthResponse;
+import edu.dosw.sirha.sirha_backend.dto.LoginRequest;
+import edu.dosw.sirha.sirha_backend.dto.RegisterRequest;
+import edu.dosw.sirha.sirha_backend.dto.SubjectDecoratorDTO;
+import edu.dosw.sirha.sirha_backend.repository.mongo.AcademicPeriodMongoRepository;
+import edu.dosw.sirha.sirha_backend.repository.mongo.GroupMongoRepository;
+import edu.dosw.sirha.sirha_backend.repository.mongo.StudentMongoRepository;
+import edu.dosw.sirha.sirha_backend.repository.mongo.SubjectMongoRepository;
+import edu.dosw.sirha.sirha_backend.service.StudentService;
+import edu.dosw.sirha.sirha_backend.util.ValidationUtil;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.List;
+import java.util.Optional;
+
+@Service
+public class StudentServiceImpl implements StudentService {
+    
+<span class="fc" id="L37">    private static final Logger log = LoggerFactory.getLogger(StudentServiceImpl.class);</span>
+    
+    private final StudentMongoRepository studentRepository;
+    private final AcademicPeriodMongoRepository academicPeriodRepository;
+    private final SubjectMongoRepository subjectRepository;
+    private final GroupMongoRepository groupRepository;
+
+    public StudentServiceImpl(StudentMongoRepository studentRepository, 
+                            AcademicPeriodMongoRepository academicPeriodRepository, 
+                            SubjectMongoRepository subjectRepository, 
+<span class="fc" id="L47">                            GroupMongoRepository groupRepository) {</span>
+<span class="fc" id="L48">        this.studentRepository = studentRepository;</span>
+<span class="fc" id="L49">        this.academicPeriodRepository = academicPeriodRepository;</span>
+<span class="fc" id="L50">        this.subjectRepository = subjectRepository;</span>
+<span class="fc" id="L51">        this.groupRepository = groupRepository;</span>
+        
+<span class="fc" id="L53">        log.info(&quot;StudentServiceImpl inicializado correctamente&quot;);</span>
+<span class="fc" id="L54">    }</span>
+    @Transactional
+    @Override
+    public Student save(Student student) {
+<span class="nc" id="L58">        log.info(&quot;Guardando estudiante: {}&quot;, student.getUsername());</span>
+        try {
+<span class="nc" id="L60">            Student savedStudent = studentRepository.save(student);</span>
+<span class="nc" id="L61">            log.debug(&quot;Estudiante guardado exitosamente con ID: {}&quot;, savedStudent.getId());</span>
+<span class="nc" id="L62">            return savedStudent;</span>
+<span class="nc" id="L63">        } catch (Exception e) {</span>
+<span class="nc" id="L64">            log.error(&quot;Error al guardar estudiante {}: {}&quot;, student.getUsername(), e.getMessage(), e);</span>
+<span class="nc" id="L65">            throw e;</span>
+        }
+    }
+    @Transactional    
+    @Override
+    public List&lt;Student&gt; findAll() {
+<span class="nc" id="L71">        log.info(&quot;Consultando todos los estudiantes&quot;);</span>
+        try {
+<span class="nc" id="L73">            List&lt;Student&gt; students = studentRepository.findAll();</span>
+<span class="nc" id="L74">            log.info(&quot;Se encontraron {} estudiantes&quot;, students.size());</span>
+<span class="nc" id="L75">            return students;</span>
+<span class="nc" id="L76">        } catch (Exception e) {</span>
+<span class="nc" id="L77">            log.error(&quot;Error al consultar todos los estudiantes: {}&quot;, e.getMessage(), e);</span>
+<span class="nc" id="L78">            throw e;</span>
+        }
+    }
+    @Transactional
+    @Override
+    public Optional&lt;Student&gt; findById(String id) {
+<span class="nc" id="L84">        log.debug(&quot;Buscando estudiante por ID: {}&quot;, id);</span>
+        try {
+<span class="nc" id="L86">            Optional&lt;Student&gt; student = studentRepository.findById(id);</span>
+<span class="nc bnc" id="L87" title="All 2 branches missed.">            if (student.isPresent()) {</span>
+<span class="nc" id="L88">                log.debug(&quot;Estudiante encontrado por ID: {}&quot;, id);</span>
+            } else {
+<span class="nc" id="L90">                log.debug(&quot;No se encontró estudiante con ID: {}&quot;, id);</span>
+            }
+<span class="nc" id="L92">            return student;</span>
+<span class="nc" id="L93">        } catch (Exception e) {</span>
+<span class="nc" id="L94">            log.error(&quot;Error al buscar estudiante por ID {}: {}&quot;, id, e.getMessage(), e);</span>
+<span class="nc" id="L95">            throw e;</span>
+        }
+    }
+    @Transactional
+    @Override
+    public Optional&lt;Student&gt; findByUsername(String username) {
+<span class="nc" id="L101">        log.debug(&quot;Buscando estudiante por username: {}&quot;, username);</span>
+        try {
+<span class="nc" id="L103">            Optional&lt;Student&gt; student = studentRepository.findByUsername(username);</span>
+<span class="nc bnc" id="L104" title="All 2 branches missed.">            if (student.isPresent()) {</span>
+<span class="nc" id="L105">                log.debug(&quot;Estudiante encontrado por username: {}&quot;, username);</span>
+            } else {
+<span class="nc" id="L107">                log.debug(&quot;No se encontró estudiante con username: {}&quot;, username);</span>
+            }
+<span class="nc" id="L109">            return student;</span>
+<span class="nc" id="L110">        } catch (Exception e) {</span>
+<span class="nc" id="L111">            log.error(&quot;Error al buscar estudiante por username {}: {}&quot;, username, e.getMessage(), e);</span>
+<span class="nc" id="L112">            throw e;</span>
+        }
+    }
+    @Transactional
+    @Override
+    public Optional&lt;Student&gt; findByEmail(String email) {
+<span class="nc" id="L118">        log.debug(&quot;Buscando estudiante por email: {}&quot;, email);</span>
+        try {
+<span class="nc" id="L120">            Optional&lt;Student&gt; student = studentRepository.findByEmail(email);</span>
+<span class="nc bnc" id="L121" title="All 2 branches missed.">            if (student.isPresent()) {</span>
+<span class="nc" id="L122">                log.debug(&quot;Estudiante encontrado por email: {}&quot;, email);</span>
+            } else {
+<span class="nc" id="L124">                log.debug(&quot;No se encontró estudiante con email: {}&quot;, email);</span>
+            }
+<span class="nc" id="L126">            return student;</span>
+<span class="nc" id="L127">        } catch (Exception e) {</span>
+<span class="nc" id="L128">            log.error(&quot;Error al buscar estudiante por email {}: {}&quot;, email, e.getMessage(), e);</span>
+<span class="nc" id="L129">            throw e;</span>
+        }
+    }
+    @Transactional
+    @Override
+    public boolean existsByCode(String code) {
+<span class="nc" id="L135">        log.debug(&quot;Verificando existencia de código: {}&quot;, code);</span>
+        try {
+<span class="nc" id="L137">            boolean exists = studentRepository.existsByCodigo(code);</span>
+<span class="nc" id="L138">            log.debug(&quot;Código {} existe: {}&quot;, code, exists);</span>
+<span class="nc" id="L139">            return exists;</span>
+<span class="nc" id="L140">        } catch (Exception e) {</span>
+<span class="nc" id="L141">            log.error(&quot;Error al verificar código {}: {}&quot;, code, e.getMessage(), e);</span>
+<span class="nc" id="L142">            throw e;</span>
+        }
+    }
+    @Transactional
+    @Override
+    public boolean existsByEmail(String email) {
+<span class="nc" id="L148">        log.debug(&quot;Verificando existencia de email: {}&quot;, email);</span>
+        try {
+<span class="nc" id="L150">            boolean exists = studentRepository.findByEmail(email).isPresent();</span>
+<span class="nc" id="L151">            log.debug(&quot;Email {} existe: {}&quot;, email, exists);</span>
+<span class="nc" id="L152">            return exists;</span>
+<span class="nc" id="L153">        } catch (Exception e) {</span>
+<span class="nc" id="L154">            log.error(&quot;Error al verificar email {}: {}&quot;, email, e.getMessage(), e);</span>
+<span class="nc" id="L155">            throw e;</span>
+        }
+    }
+
+
+
+    
+    private Student registerStudent(Student student) {
+<span class="nc" id="L163">        log.info(&quot;Registrando estudiante: {}&quot;, student.getUsername());</span>
+        try {
+<span class="nc" id="L165">            Student registeredStudent = studentRepository.save(student);</span>
+<span class="nc" id="L166">            log.info(&quot;Estudiante registrado exitosamente: {} con ID: {}&quot;, </span>
+<span class="nc" id="L167">                    registeredStudent.getUsername(), registeredStudent.getId());</span>
+<span class="nc" id="L168">            return registeredStudent;</span>
+<span class="nc" id="L169">        } catch (Exception e) {</span>
+<span class="nc" id="L170">            log.error(&quot;Error al registrar estudiante {}: {}&quot;, student.getUsername(), e.getMessage(), e);</span>
+<span class="nc" id="L171">            throw e;</span>
+        }
+    }
+
+
+    @Transactional
+    @Override
+    public AuthResponse registerStudent(RegisterRequest request) {
+<span class="nc" id="L179">        log.info(&quot;Iniciando proceso de registro para usuario: {}&quot;, request.getUsername());</span>
+        
+        try {
+<span class="nc" id="L182">            log.debug(&quot;Validando datos de registro para: {}&quot;, request.getUsername());</span>
+<span class="nc" id="L183">            ValidationUtil.validateStudentRegistration(</span>
+<span class="nc" id="L184">                request.getUsername(), </span>
+<span class="nc" id="L185">                request.getEmail(), </span>
+<span class="nc" id="L186">                request.getPassword(), </span>
+<span class="nc" id="L187">                request.getCodigo()</span>
+            );
+<span class="nc" id="L189">            log.debug(&quot;Validación exitosa para: {}&quot;, request.getUsername());</span>
+            
+<span class="nc bnc" id="L191" title="All 2 branches missed.">            if (existsByCode(request.getCodigo())) {</span>
+<span class="nc" id="L192">                log.warn(&quot;Intento de registro con código duplicado: {} para usuario: {}&quot;, </span>
+<span class="nc" id="L193">                        request.getCodigo(), request.getUsername());</span>
+<span class="nc" id="L194">                throw new IllegalArgumentException(&quot;El código estudiantil ya está registrado&quot;);</span>
+            }
+            
+<span class="nc bnc" id="L197" title="All 2 branches missed.">            if (existsByEmail(request.getEmail())) {</span>
+<span class="nc" id="L198">                log.warn(&quot;Intento de registro con email duplicado: {} para usuario: {}&quot;, </span>
+<span class="nc" id="L199">                        request.getEmail(), request.getUsername());</span>
+<span class="nc" id="L200">                throw new IllegalArgumentException(&quot;El email ya está registrado&quot;);</span>
+            }
+            
+<span class="nc" id="L203">            log.debug(&quot;Creando nuevo estudiante: {}&quot;, request.getUsername());</span>
+<span class="nc" id="L204">            Student student = new Student(</span>
+<span class="nc" id="L205">                request.getUsername(),</span>
+<span class="nc" id="L206">                request.getEmail(),</span>
+<span class="nc" id="L207">                request.getPassword(),</span>
+<span class="nc" id="L208">                request.getCodigo()</span>
+            );
+            
+<span class="nc" id="L211">            Student savedStudent = registerStudent(student);</span>
+            
+<span class="nc" id="L213">            log.info(&quot;Registro completado exitosamente para usuario: {} con código: {}&quot;, </span>
+<span class="nc" id="L214">                    savedStudent.getUsername(), savedStudent.getCodigo());</span>
+            
+<span class="nc" id="L216">            return new AuthResponse(</span>
+<span class="nc" id="L217">                savedStudent.getId(),</span>
+<span class="nc" id="L218">                savedStudent.getUsername(),</span>
+<span class="nc" id="L219">                savedStudent.getEmail(),</span>
+<span class="nc" id="L220">                savedStudent.getCodigo(),</span>
+                &quot;Registro exitoso&quot;
+            );
+            
+<span class="nc" id="L224">        } catch (IllegalArgumentException e) {</span>
+<span class="nc" id="L225">            log.warn(&quot;Error de validación en registro para {}: {}&quot;, request.getUsername(), e.getMessage());</span>
+<span class="nc" id="L226">            throw e;</span>
+<span class="nc" id="L227">        } catch (Exception e) {</span>
+<span class="nc" id="L228">            log.error(&quot;Error inesperado durante registro para {}: {}&quot;, request.getUsername(), e.getMessage(), e);</span>
+<span class="nc" id="L229">            throw new RuntimeException(&quot;Error interno durante el registro&quot;, e);</span>
+        }
+    }
+
+
+
+    private Optional&lt;Student&gt; loginStudent(String username, String password) {
+<span class="nc" id="L236">        log.info(&quot;Intento de login para usuario: {}&quot;, username);</span>
+        try {
+<span class="nc" id="L238">            Optional&lt;Student&gt; student = studentRepository.findByUsername(username)</span>
+<span class="nc" id="L239">                    .filter(s -&gt; s.verificarContrasena(password));</span>
+            
+<span class="nc bnc" id="L241" title="All 2 branches missed.">            if (student.isPresent()) {</span>
+<span class="nc" id="L242">                log.info(&quot;Login exitoso para usuario: {}&quot;, username);</span>
+            } else {
+<span class="nc" id="L244">                log.warn(&quot;Login fallido para usuario: {} - credenciales incorrectas&quot;, username);</span>
+            }
+            
+<span class="nc" id="L247">            return student;</span>
+<span class="nc" id="L248">        } catch (Exception e) {</span>
+<span class="nc" id="L249">            log.error(&quot;Error durante login para usuario {}: {}&quot;, username, e.getMessage(), e);</span>
+<span class="nc" id="L250">            throw e;</span>
+        }
+    }
+    @Transactional
+    @Override
+    public AuthResponse loginStudent(LoginRequest request) {
+<span class="nc" id="L256">        log.info(&quot;Iniciando proceso de login para usuario: {}&quot;, request.getUsername());</span>
+        
+        try {
+<span class="nc" id="L259">            Optional&lt;Student&gt; userOpt = loginStudent(request.getUsername(), request.getPassword());</span>
+            
+<span class="nc bnc" id="L261" title="All 2 branches missed.">            if (userOpt.isEmpty()) {</span>
+<span class="nc" id="L262">                log.warn(&quot;Login fallido para usuario: {} - credenciales inválidas&quot;, request.getUsername());</span>
+<span class="nc" id="L263">                throw new IllegalArgumentException(&quot;Credenciales inválidas&quot;);</span>
+            }
+            
+<span class="nc" id="L266">            Student student = userOpt.get();</span>
+            
+<span class="nc" id="L268">            log.info(&quot;Login completado exitosamente para usuario: {}&quot;, student.getUsername());</span>
+            
+<span class="nc" id="L270">            return new AuthResponse(</span>
+<span class="nc" id="L271">                student.getId(),</span>
+<span class="nc" id="L272">                student.getUsername(),</span>
+<span class="nc" id="L273">                student.getEmail(),</span>
+<span class="nc" id="L274">                student.getCodigo(),</span>
+                &quot;Login exitoso&quot;
+            );
+            
+<span class="nc" id="L278">        } catch (IllegalArgumentException e) {</span>
+<span class="nc" id="L279">            log.warn(&quot;Error de autenticación para {}: {}&quot;, request.getUsername(), e.getMessage());</span>
+<span class="nc" id="L280">            throw e;</span>
+<span class="nc" id="L281">        } catch (Exception e) {</span>
+<span class="nc" id="L282">            log.error(&quot;Error inesperado durante login para {}: {}&quot;, request.getUsername(), e.getMessage(), e);</span>
+<span class="nc" id="L283">            throw new RuntimeException(&quot;Error interno durante el login&quot;, e);</span>
+        }
+    }
+    @Transactional
+    @Override
+    public List&lt;Schedule&gt; getCurrentSchedule(String username) {
+<span class="nc" id="L289">        log.info(&quot;Consultando horario actual para usuario: {}&quot;, username);</span>
+        
+        try {
+<span class="nc" id="L292">            Student student = studentRepository.findByUsername(username)</span>
+<span class="nc" id="L293">                .orElseThrow(() -&gt; {</span>
+<span class="nc" id="L294">                    log.warn(&quot;Estudiante no encontrado para consulta de horario: {}&quot;, username);</span>
+<span class="nc" id="L295">                    return new IllegalArgumentException(&quot;Estudiante no encontrado&quot;);</span>
+                });
+                
+<span class="nc" id="L298">            List&lt;Schedule&gt; schedule = student.getCurrentSchedule();</span>
+<span class="nc" id="L299">            log.info(&quot;Horario actual obtenido exitosamente para {}: {} materias&quot;, username, schedule.size());</span>
+<span class="nc" id="L300">            return schedule;</span>
+            
+<span class="nc" id="L302">        } catch (IllegalArgumentException e) {</span>
+<span class="nc" id="L303">            log.warn(&quot;Error al consultar horario para {}: {}&quot;, username, e.getMessage());</span>
+<span class="nc" id="L304">            throw e;</span>
+<span class="nc" id="L305">        } catch (Exception e) {</span>
+<span class="nc" id="L306">            log.error(&quot;Error inesperado al consultar horario para {}: {}&quot;, username, e.getMessage(), e);</span>
+<span class="nc" id="L307">            throw new RuntimeException(&quot;Error interno al consultar horario&quot;, e);</span>
+        }
+    }
+    @Transactional
+    @Override
+    public List&lt;Schedule&gt; getScheduleForPeriod(String username, String period) {
+<span class="nc" id="L313">        log.info(&quot;Consultando horario para usuario: {} en período: {}&quot;, username, period);</span>
+        
+        try {
+<span class="nc" id="L316">            Student student = studentRepository.findByUsername(username)</span>
+<span class="nc" id="L317">                .orElseThrow(() -&gt; {</span>
+<span class="nc" id="L318">                    log.warn(&quot;Estudiante no encontrado: {}&quot;, username);</span>
+<span class="nc" id="L319">                    return new IllegalArgumentException(&quot;Estudiante no encontrado&quot;);</span>
+                });
+                
+<span class="nc" id="L322">            AcademicPeriod academicPeriod = academicPeriodRepository.findByPeriod(period)</span>
+<span class="nc" id="L323">                .orElseThrow(() -&gt; {</span>
+<span class="nc" id="L324">                    log.warn(&quot;Período académico no encontrado: {}&quot;, period);</span>
+<span class="nc" id="L325">                    return new IllegalArgumentException(&quot;Periodo académico no encontrado&quot;);</span>
+                });
+                
+<span class="nc" id="L328">            List&lt;Schedule&gt; schedule = student.getScheduleForPeriod(academicPeriod);</span>
+<span class="nc" id="L329">            log.info(&quot;Horario del período {} obtenido para {}: {} materias&quot;, period, username, schedule.size());</span>
+<span class="nc" id="L330">            return schedule;</span>
+            
+<span class="nc" id="L332">        } catch (IllegalArgumentException e) {</span>
+<span class="nc" id="L333">            log.warn(&quot;Error al consultar horario del período {} para {}: {}&quot;, period, username, e.getMessage());</span>
+<span class="nc" id="L334">            throw e;</span>
+<span class="nc" id="L335">        } catch (Exception e) {</span>
+<span class="nc" id="L336">            log.error(&quot;Error inesperado al consultar horario del período {} para {}: {}&quot;, </span>
+<span class="nc" id="L337">                     period, username, e.getMessage(), e);</span>
+<span class="nc" id="L338">            throw new RuntimeException(&quot;Error interno al consultar horario del período&quot;, e);</span>
+        }
+    }
+    @Transactional
+    @Override
+    public Map&lt;AcademicPeriod, List&lt;Schedule&gt;&gt; getAllSchedules(String username) {
+<span class="nc" id="L344">        log.info(&quot;Consultando todos los horarios para usuario: {}&quot;, username);</span>
+        
+        try {
+<span class="nc" id="L347">            Student student = studentRepository.findByUsername(username)</span>
+<span class="nc" id="L348">                .orElseThrow(() -&gt; {</span>
+<span class="nc" id="L349">                    log.warn(&quot;Estudiante no encontrado: {}&quot;, username);</span>
+<span class="nc" id="L350">                    return new IllegalArgumentException(&quot;Estudiante no encontrado&quot;);</span>
+                });
+                
+<span class="nc" id="L353">            Map&lt;AcademicPeriod, List&lt;Schedule&gt;&gt; allSchedules = student.getAllSchedules();</span>
+<span class="nc" id="L354">            log.info(&quot;Todos los horarios obtenidos para {}: {} períodos&quot;, username, allSchedules.size());</span>
+<span class="nc" id="L355">            return allSchedules;</span>
+            
+<span class="nc" id="L357">        } catch (IllegalArgumentException e) {</span>
+<span class="nc" id="L358">            log.warn(&quot;Error al consultar todos los horarios para {}: {}&quot;, username, e.getMessage());</span>
+<span class="nc" id="L359">            throw e;</span>
+<span class="nc" id="L360">        } catch (Exception e) {</span>
+<span class="nc" id="L361">            log.error(&quot;Error inesperado al consultar todos los horarios para {}: {}&quot;, username, e.getMessage(), e);</span>
+<span class="nc" id="L362">            throw new RuntimeException(&quot;Error interno al consultar todos los horarios&quot;, e);</span>
+        }
+    }
+    @Transactional
+    @Override
+    public Map&lt;SemaforoColores, List&lt;SubjectDecoratorDTO&gt;&gt; getAcademicPensum(String username) {
+<span class="nc" id="L368">        log.info(&quot;Consultando pensum académico para usuario: {}&quot;, username);</span>
+        
+        try {
+<span class="nc" id="L371">            Student student = studentRepository.findByUsername(username)</span>
+<span class="nc" id="L372">                .orElseThrow(() -&gt; {</span>
+<span class="nc" id="L373">                    log.warn(&quot;Estudiante no encontrado: {}&quot;, username);</span>
+<span class="nc" id="L374">                    return new IllegalArgumentException(&quot;Estudiante no encontrado&quot;);</span>
+                });
+                
+<span class="nc" id="L377">            Map&lt;SemaforoColores, List&lt;SubjectDecoratorDTO&gt;&gt; pensum = student.getAcademicPensum();</span>
+<span class="nc" id="L378">            log.info(&quot;Pensum académico obtenido para {}: {} categorías&quot;, username, pensum.size());</span>
+            
+            // Log detallado del pensum
+<span class="nc" id="L381">            pensum.forEach((color, subjects) -&gt; </span>
+<span class="nc" id="L382">                log.debug(&quot;Pensum {} para {}: {} materias - {}&quot;, color, username, subjects.size(), subjects));</span>
+                
+<span class="nc" id="L384">            return pensum;</span>
+            
+<span class="nc" id="L386">        } catch (IllegalArgumentException e) {</span>
+<span class="nc" id="L387">            log.warn(&quot;Error al consultar pensum para {}: {}&quot;, username, e.getMessage());</span>
+<span class="nc" id="L388">            throw e;</span>
+<span class="nc" id="L389">        } catch (Exception e) {</span>
+<span class="nc" id="L390">            log.error(&quot;Error inesperado al consultar pensum para {}: {}&quot;, username, e.getMessage(), e);</span>
+<span class="nc" id="L391">            throw new RuntimeException(&quot;Error interno al consultar pensum académico&quot;, e);</span>
+        }
+    }
+    @Transactional
+    @Override
+    public CambioGrupo createRequestCambioGrupo(String studentName, String subjectName, String codeNewGroup) {
+<span class="nc" id="L397">        log.info(&quot;Creando solicitud de cambio de grupo - Usuario: {}, Materia: {}, Nuevo Grupo: {}&quot;, </span>
+                studentName, subjectName, codeNewGroup);
+        
+        try {
+<span class="nc" id="L401">            Student student = studentRepository.findByUsername(studentName)</span>
+<span class="nc" id="L402">                .orElseThrow(() -&gt; {</span>
+<span class="nc" id="L403">                    log.warn(&quot;Estudiante no encontrado para cambio de grupo: {}&quot;, studentName);</span>
+<span class="nc" id="L404">                    return new IllegalArgumentException(&quot;Estudiante no encontrado&quot;);</span>
+                });
+            
+<span class="nc" id="L407">            Subject subject = subjectRepository.findByName(subjectName)</span>
+<span class="nc" id="L408">                .orElseThrow(() -&gt; {</span>
+<span class="nc" id="L409">                    log.warn(&quot;Materia no encontrada: {}&quot;, subjectName);</span>
+<span class="nc" id="L410">                    return new IllegalArgumentException(&quot;Materia no encontrada&quot;);</span>
+                });
+
+<span class="nc" id="L413">            Group group = groupRepository.findByCode(codeNewGroup)</span>
+<span class="nc" id="L414">                .orElseThrow(() -&gt; {</span>
+<span class="nc" id="L415">                    log.warn(&quot;Grupo no encontrado: {}&quot;, codeNewGroup);</span>
+<span class="nc" id="L416">                    return new IllegalArgumentException(&quot;Grupo no encontrado&quot;);</span>
+                });
+
+<span class="nc" id="L419">            log.debug(&quot;Creando solicitud de cambio de grupo para {}: {} -&gt; {}&quot;, </span>
+                     studentName, subjectName, codeNewGroup);
+                     
+<span class="nc" id="L422">            CambioGrupo cambio = student.createGroupChangeRequest(subject, group);</span>
+            
+<span class="nc" id="L424">            log.info(&quot;Solicitud de cambio de grupo creada exitosamente - ID: {} para usuario: {}&quot;, </span>
+<span class="nc" id="L425">                    cambio.getId(), studentName);</span>
+            
+<span class="nc" id="L427">            return cambio;</span>
+            
+<span class="nc" id="L429">        } catch (IllegalArgumentException e) {</span>
+<span class="nc" id="L430">            log.warn(&quot;Error al crear solicitud de cambio de grupo para {}: {}&quot;, studentName, e.getMessage());</span>
+<span class="nc" id="L431">            throw e;</span>
+<span class="nc" id="L432">        } catch (Exception e) {</span>
+<span class="nc" id="L433">            log.error(&quot;Error inesperado al crear solicitud de cambio de grupo para {}: {}&quot;, </span>
+<span class="nc" id="L434">                     studentName, e.getMessage(), e);</span>
+<span class="nc" id="L435">            throw new RuntimeException(&quot;Error interno al crear solicitud de cambio de grupo&quot;, e);</span>
+        }
+    }
+    @Transactional
+    @Override
+    public CambioMateria createRequestCambioMateria(String studentName, String subjectName, 
+                                                   String newSubjectName, String codeNewGroup) {
+<span class="nc" id="L442">        log.info(&quot;Creando solicitud de cambio de materia - Usuario: {}, De: {} -&gt; A: {}, Grupo: {}&quot;, </span>
+                studentName, subjectName, newSubjectName, codeNewGroup);
+        
+        try {
+<span class="nc" id="L446">            Student student = studentRepository.findByUsername(studentName)</span>
+<span class="nc" id="L447">                .orElseThrow(() -&gt; {</span>
+<span class="nc" id="L448">                    log.warn(&quot;Estudiante no encontrado para cambio de materia: {}&quot;, studentName);</span>
+<span class="nc" id="L449">                    return new IllegalArgumentException(&quot;Estudiante no encontrado&quot;);</span>
+                });
+
+<span class="nc" id="L452">            Subject subjectOld = subjectRepository.findByName(subjectName)</span>
+<span class="nc" id="L453">                .orElseThrow(() -&gt; {</span>
+<span class="nc" id="L454">                    log.warn(&quot;Materia antigua no encontrada: {}&quot;, subjectName);</span>
+<span class="nc" id="L455">                    return new IllegalArgumentException(&quot;Materia antigua no encontrada&quot;);</span>
+                });
+
+<span class="nc" id="L458">            Subject subjectNew = subjectRepository.findByName(newSubjectName)</span>
+<span class="nc" id="L459">                .orElseThrow(() -&gt; {</span>
+<span class="nc" id="L460">                    log.warn(&quot;Materia nueva no encontrada: {}&quot;, newSubjectName);</span>
+<span class="nc" id="L461">                    return new IllegalArgumentException(&quot;Materia nueva no encontrada&quot;);</span>
+                });
+
+<span class="nc" id="L464">            Group group = groupRepository.findByCode(codeNewGroup)</span>
+<span class="nc" id="L465">                .orElseThrow(() -&gt; {</span>
+<span class="nc" id="L466">                    log.warn(&quot;Grupo no encontrado: {}&quot;, codeNewGroup);</span>
+<span class="nc" id="L467">                    return new IllegalArgumentException(&quot;Grupo no encontrado&quot;);</span>
+                });
+
+<span class="nc" id="L470">            log.debug(&quot;Creando solicitud de cambio de materia para {}: {} -&gt; {} en grupo {}&quot;, </span>
+                     studentName, subjectName, newSubjectName, codeNewGroup);
+                     
+<span class="nc" id="L473">            CambioMateria cambio = student.createSubjectChangeRequest(subjectOld, subjectNew, group);</span>
+            
+<span class="nc" id="L475">            log.info(&quot;Solicitud de cambio de materia creada exitosamente - ID: {} para usuario: {}&quot;, </span>
+<span class="nc" id="L476">                    cambio.getId(), studentName);</span>
+            
+<span class="nc" id="L478">            return cambio;</span>
+            
+<span class="nc" id="L480">        } catch (IllegalArgumentException e) {</span>
+<span class="nc" id="L481">            log.warn(&quot;Error al crear solicitud de cambio de materia para {}: {}&quot;, studentName, e.getMessage());</span>
+<span class="nc" id="L482">            throw e;</span>
+<span class="nc" id="L483">        } catch (Exception e) {</span>
+<span class="nc" id="L484">            log.error(&quot;Error inesperado al crear solicitud de cambio de materia para {}: {}&quot;, </span>
+<span class="nc" id="L485">                     studentName, e.getMessage(), e);</span>
+<span class="nc" id="L486">            throw new RuntimeException(&quot;Error interno al crear solicitud de cambio de materia&quot;, e);</span>
+        }
+    }
+    @Transactional
+    @Override
+    public Student deleteById(String id) {
+<span class="nc" id="L492">        log.info(&quot;Eliminando estudiante por ID: {}&quot;, id);</span>
+        try {
+<span class="nc" id="L494">            Optional&lt;Student&gt; existingStudent = studentRepository.findById(id);</span>
+<span class="nc bnc" id="L495" title="All 2 branches missed.">            if (existingStudent.isEmpty()) {</span>
+<span class="nc" id="L496">                log.warn(&quot;No se encontró estudiante con ID: {} para eliminar&quot;, id);</span>
+<span class="nc" id="L497">                throw new IllegalArgumentException(&quot;Estudiante no encontrado&quot;);</span>
+            }
+<span class="nc" id="L499">            studentRepository.deleteById(id);</span>
+<span class="nc" id="L500">            log.info(&quot;Estudiante eliminado exitosamente - ID: {}&quot;, id);</span>
+<span class="nc" id="L501">            return existingStudent.get();</span>
+<span class="nc" id="L502">        } catch (IllegalArgumentException e) {</span>
+<span class="nc" id="L503">            log.warn(&quot;Error al eliminar estudiante por ID {}: {}&quot;, id, e.getMessage());</span>
+<span class="nc" id="L504">            throw e;</span>
+<span class="nc" id="L505">        } catch (Exception e) {</span>
+<span class="nc" id="L506">            log.error(&quot;Error al eliminar estudiante por ID {}: {}&quot;, id, e.getMessage(), e);</span>
+<span class="nc" id="L507">            throw new RuntimeException(&quot;Error interno al eliminar estudiante&quot;, e);</span>
+        }
+    }
+    @Transactional
+    @Override
+    public List&lt;BaseRequest&gt; getAllRequests(String username) {
+<span class="nc" id="L513">        log.info(&quot;Consultando todas las solicitudes para usuario: {}&quot;, username);</span>
+        try {
+<span class="nc" id="L515">            Student student = studentRepository.findByUsername(username)</span>
+<span class="nc" id="L516">                .orElseThrow(() -&gt; {</span>
+<span class="nc" id="L517">                    log.warn(&quot;Estudiante no encontrado: {}&quot;, username);</span>
+<span class="nc" id="L518">                    return new IllegalArgumentException(&quot;Estudiante no encontrado&quot;);</span>
+                });
+                
+<span class="nc" id="L521">            List&lt;BaseRequest&gt; requests = student.getSolicitudes();</span>
+<span class="nc" id="L522">            log.info(&quot;Se encontraron {} solicitudes para {}&quot;, requests.size(), username);</span>
+<span class="nc" id="L523">            return requests;</span>
+            
+<span class="nc" id="L525">        } catch (IllegalArgumentException e) {</span>
+<span class="nc" id="L526">            log.warn(&quot;Error al consultar solicitudes para {}: {}&quot;, username, e.getMessage());</span>
+<span class="nc" id="L527">            throw e;</span>
+<span class="nc" id="L528">        } catch (Exception e) {</span>
+<span class="nc" id="L529">            log.error(&quot;Error inesperado al consultar solicitudes para {}: {}&quot;, username, e.getMessage(), e);</span>
+<span class="nc" id="L530">            throw new RuntimeException(&quot;Error interno al consultar solicitudes&quot;, e);</span>
+        }
+    }
+    @Transactional
+    @Override
+    public BaseRequest getRequestById(String username, String requestId) {
+<span class="nc" id="L536">        log.info(&quot;Consultando solicitud por ID: {} para usuario: {}&quot;, requestId, username);</span>
+        try {
+<span class="nc" id="L538">            Student student = studentRepository.findByUsername(username)</span>
+<span class="nc" id="L539">                .orElseThrow(() -&gt; {</span>
+<span class="nc" id="L540">                    log.warn(&quot;Estudiante no encontrado: {}&quot;, username);</span>
+<span class="nc" id="L541">                    return new IllegalArgumentException(&quot;Estudiante no encontrado&quot;);</span>
+                });
+
+<span class="nc" id="L544">            BaseRequest request = student.getRequestById(requestId);</span>
+
+<span class="nc" id="L546">            log.info(&quot;Solicitud encontrada - ID: {} para usuario: {}&quot;, requestId, username);</span>
+<span class="nc" id="L547">            return request;</span>
+
+<span class="nc" id="L549">        } catch (IllegalArgumentException e) {</span>
+<span class="nc" id="L550">            log.warn(&quot;Error al consultar solicitud por ID {} para {}: {}&quot;, requestId, username, e.getMessage());</span>
+<span class="nc" id="L551">            throw e;</span>
+<span class="nc" id="L552">        } catch (Exception e) {</span>
+<span class="nc" id="L553">            log.error(&quot;Error inesperado al consultar solicitud por ID {} para {}: {}&quot;, requestId, username, e.getMessage(), e);</span>
+<span class="nc" id="L554">            throw new RuntimeException(&quot;Error interno al consultar solicitud&quot;, e);</span>
+        }
+    }
+    @Transactional
+    @Override
+    public List&lt;BaseRequest&gt; getRequestsHistory(String username) {
+<span class="nc" id="L560">        log.info(&quot;Consultando historial de solicitudes para usuario: {}&quot;, username);</span>
+        try {
+<span class="nc" id="L562">            Student student = studentRepository.findByUsername(username)</span>
+<span class="nc" id="L563">                .orElseThrow(() -&gt; {</span>
+<span class="nc" id="L564">                    log.warn(&quot;Estudiante no encontrado: {}&quot;, username);</span>
+<span class="nc" id="L565">                    return new IllegalArgumentException(&quot;Estudiante no encontrado&quot;);</span>
+                });
+
+<span class="nc" id="L568">            List&lt;BaseRequest&gt; requests = student.getRequestsHistory();</span>
+<span class="nc" id="L569">            log.info(&quot;Se encontraron {} solicitudes en el historial para {}&quot;, requests.size(), username);</span>
+<span class="nc" id="L570">            return requests;</span>
+
+<span class="nc" id="L572">        } catch (IllegalArgumentException e) {</span>
+<span class="nc" id="L573">            log.warn(&quot;Error al consultar historial de solicitudes para {}: {}&quot;, username, e.getMessage());</span>
+<span class="nc" id="L574">            throw e;</span>
+<span class="nc" id="L575">        } catch (Exception e) {</span>
+<span class="nc" id="L576">            log.error(&quot;Error inesperado al consultar historial de solicitudes para {}: {}&quot;, username, e.getMessage(), e);</span>
+<span class="nc" id="L577">            throw new RuntimeException(&quot;Error interno al consultar historial de solicitudes&quot;, e);</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>
