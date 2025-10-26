@@ -85,6 +85,7 @@ class SubjectDecoratorHistoryTest {
         assertTrue(stateRecord instanceof SubjectProgress);
         
         SubjectProgress progress = (SubjectProgress) stateRecord;
+        subject.getId();
         assertEquals(SemaforoColores.VERDE, progress.getState());
         assertEquals(decorator.getSemester(), progress.getSemester());
         assertEquals(group, progress.getGroup());

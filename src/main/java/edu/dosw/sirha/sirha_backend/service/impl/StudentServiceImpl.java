@@ -585,7 +585,7 @@ public class StudentServiceImpl implements StudentService {
         } catch ( SirhaException e) {
             throw e;
         } catch (Exception e) {
-            throw SirhaException.of(ErrorCodeSirha.INTERNAL_ERROR,"Error interno al consultar pensum académico: " + e.getMessage(), e);
+            throw SirhaException.of(ErrorCodeSirha.INTERNAL_ERROR,"Error interno al consultar : " + e.getMessage(), e);
         }
     }
 
@@ -604,7 +604,7 @@ public class StudentServiceImpl implements StudentService {
         } catch ( SirhaException e) {
             throw e;
         } catch (Exception e) {
-            throw SirhaException.of(ErrorCodeSirha.INTERNAL_ERROR,"Error interno al consultar pensum académico: " + e.getMessage(), e);
+            throw SirhaException.of(ErrorCodeSirha.INTERNAL_ERROR,"Error interno al consultar informacion del estudiante: " + e.getMessage(), e);
         }
     }
 
@@ -623,7 +623,7 @@ public class StudentServiceImpl implements StudentService {
         } catch ( SirhaException e) {
             throw e;
         } catch (Exception e) {
-            throw SirhaException.of(ErrorCodeSirha.INTERNAL_ERROR,"Error interno al consultar pensum académico: " + e.getMessage(), e);
+            throw SirhaException.of(ErrorCodeSirha.INTERNAL_ERROR,"Error interno al generar el reporte: " + e.getMessage(), e);
         }
     }
 
@@ -642,7 +642,7 @@ public class StudentServiceImpl implements StudentService {
         } catch ( SirhaException e) {
             throw e;
         } catch (Exception e) {
-            throw SirhaException.of(ErrorCodeSirha.INTERNAL_ERROR,"Error interno al consultar pensum académico: " + e.getMessage(), e);
+            throw SirhaException.of(ErrorCodeSirha.INTERNAL_ERROR,"Error interno al consultar el resumen académico: " + e.getMessage(), e);
         }
     }
 
@@ -661,7 +661,7 @@ public class StudentServiceImpl implements StudentService {
         } catch ( SirhaException e) {
             throw e;
         } catch (Exception e) {
-            throw SirhaException.of(ErrorCodeSirha.INTERNAL_ERROR,"Error interno al consultar pensum académico: " + e.getMessage(), e);
+            throw SirhaException.of(ErrorCodeSirha.INTERNAL_ERROR,"Error interno al consultar el estado de las solicitudes: " + e.getMessage(), e);
         }
     }
 
@@ -680,7 +680,7 @@ public class StudentServiceImpl implements StudentService {
         } catch ( SirhaException e) {
             throw e;
         } catch (Exception e) {
-            throw SirhaException.of(ErrorCodeSirha.INTERNAL_ERROR,"Error interno al consultar pensum académico: " + e.getMessage(), e);
+            throw SirhaException.of(ErrorCodeSirha.INTERNAL_ERROR,"Error interno al consultar información del pensum: " + e.getMessage(), e);
         }
     }
 
@@ -718,7 +718,7 @@ public class StudentServiceImpl implements StudentService {
         } catch ( SirhaException e) {
             throw e;
         } catch (Exception e) {
-            throw SirhaException.of(ErrorCodeSirha.INTERNAL_ERROR,"Error interno al consultar pensum académico: " + e.getMessage(), e);
+            throw SirhaException.of(ErrorCodeSirha.INTERNAL_ERROR,"Error interno al consultar información de las solicitudes rechazadas: " + e.getMessage(), e);
         }
     }
 
@@ -737,7 +737,7 @@ public class StudentServiceImpl implements StudentService {
         } catch ( SirhaException e) {
             throw e;
         } catch (Exception e) {
-            throw SirhaException.of(ErrorCodeSirha.INTERNAL_ERROR,"Error interno al consultar pensum académico: " + e.getMessage(), e);
+            throw SirhaException.of(ErrorCodeSirha.INTERNAL_ERROR,"Error interno al consultar información de las solicitudes pendientes: " + e.getMessage(), e);
         }
     }
 
@@ -756,7 +756,7 @@ public class StudentServiceImpl implements StudentService {
         } catch ( SirhaException e) {
             throw e;
         } catch (Exception e) {
-            throw SirhaException.of(ErrorCodeSirha.INTERNAL_ERROR,"Error interno al consultar pensum académico: " + e.getMessage(), e);
+            throw SirhaException.of(ErrorCodeSirha.INTERNAL_ERROR,"Error interno al consultar información de las solicitudes en revisión: " + e.getMessage(), e);
         }
     }
 

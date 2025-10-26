@@ -176,20 +176,6 @@ public class SubjectAndGroupController {
         Group savedGroup = subjectService.saveGroup(subjectName, group);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedGroup);
     }
-
-    @PostMapping("/{subjectName}/groups/add")
-    @Operation(summary = "Agregar grupo a materia", description = "Agrega un grupo existente a una materia específica")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Grupo agregado exitosamente"),
-        @ApiResponse(responseCode = "400", description = "Datos del grupo inválidos"),
-        @ApiResponse(responseCode = "404", description = "Materia no encontrada"),
-        @ApiResponse(responseCode = "500", description = "Error interno del servidor")
-    })
-    public Group addGroupToSubject(@PathVariable String subjectName, @RequestBody GroupDTO groupDTO) throws SirhaException {
-        Subject subject = subjectService.findByName(subjectName);
-        Group group = GroupMapper.toEntity(subject, groupDTO);
-        return subjectService.saveGroup(subjectName, group);
-    }
     
     @DeleteMapping("/groups/{id}")
     @Operation(summary = "Eliminar grupo", description = "Elimina un grupo del sistema por su ID")
@@ -310,7 +296,7 @@ public class SubjectAndGroupController {
         @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
     public ResponseEntity<Group> closeGroup(@PathVariable String groupId) throws SirhaException {
-        Group closedGroup = subjectService.cerrarGrupo(groupId);
+        Group closedGroup = subjectService.closeGroup(groupId);
         return ResponseEntity.ok(closedGroup);
     }
 
@@ -323,7 +309,7 @@ public class SubjectAndGroupController {
         @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
     public ResponseEntity<Group> openGroup(@PathVariable String groupId) throws SirhaException {
-        Group openedGroup = subjectService.abrirGrupo(groupId);
+        Group openedGroup = subjectService.openGroup(groupId);
         return ResponseEntity.ok(openedGroup);
     }
 }

@@ -5,10 +5,13 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import edu.dosw.sirha.sirha_backend.domain.model.*;
+import edu.dosw.sirha.sirha_backend.domain.model.enums.Careers;
 import edu.dosw.sirha.sirha_backend.domain.model.enums.DiasSemana;
+import edu.dosw.sirha.sirha_backend.domain.model.enums.SemaforoColores;
 import edu.dosw.sirha.sirha_backend.domain.model.stategroup.Group;
 import edu.dosw.sirha.sirha_backend.domain.model.stategroup.StatusClosed;
 import edu.dosw.sirha.sirha_backend.domain.model.stategroup.StatusOpen;
+import edu.dosw.sirha.sirha_backend.exception.ErrorCodeSirha;
 import edu.dosw.sirha.sirha_backend.exception.SirhaException;
 
 import java.time.LocalDate;
@@ -42,9 +45,9 @@ class GroupTests {
         } catch (Exception e) {
             fail("No se esperaba una excepción al crear los usuarios: " + e.getMessage());
         }
-        subject = new Subject("101", "Cálculo I", 4);
         
         try {
+            subject = new Subject("101", "Cálculo I", 4);
             group = new Group(subject, 5, academicPeriod);
         } catch (Exception e) {
             fail("No se esperaba una excepción al crear el grupo: " + e.getMessage());
@@ -110,18 +113,53 @@ class GroupTests {
     @Test
     void testGroupStatusClosedWhenFull() {
         try {
-            Group smallGroup = new Group(subject, 2, academicPeriod);
+            student1.generateCompleteReport();
+            student1.getTotalSubjectsCount();
+            student1.getCurrentSchedule();
+            assertFalse(student1.isSubjectApproved(subject.getName()));
+            assertFalse(student1.isSubjectCursando(subject.getName()));
+            assertFalse(student1.isSubjectNoCursada(subject.getName()));
+            assertFalse(student1.isSubjectReprobada(subject.getName()));
 
-            smallGroup.inscribirEstudiante(student1);
+            StudyPlan studyPlan = new StudyPlan(Careers.INGENIERIA_AMBIENTAL);
+            Group smallGroup = new Group(subject, 2, academicPeriod);
+            assertThrows(SirhaException.class, () -> subject.addGroup(smallGroup));
+            smallGroup.addSchedule(schedule1);
+            smallGroup.addSchedule(schedule2);
+
+            studyPlan.addSubject(subject);
+
+            Semaforo semaforo = new Semaforo(studyPlan);
+            semaforo.setCurrentAcademicPeriod(academicPeriod);
+            student1.setAcademicProgress(semaforo);
+
+            assertFalse(student1.isSubjectApproved(subject.getName()));
+            assertFalse(student1.isSubjectCursando(subject.getName()));
+            assertTrue(student1.isSubjectNoCursada(subject.getName()));
+            assertFalse(student1.isSubjectReprobada(subject.getName()));
+            
+            student1.enrollSubject(subject, smallGroup);
+
             smallGroup.inscribirEstudiante(student2);
             assertTrue(smallGroup.getGroupState() instanceof StatusClosed);
             assertTrue(smallGroup.isFull());
             assertEquals(0, smallGroup.getCuposDisponibles());
-            student1.getAllSchedules();
             
+            student1.getAllSchedules();
+            student1.getScheduleForPeriod(academicPeriod);
+            student1.getRequestsHistory();
+            student1.getRequestApprovalRate();
+            student1.getRequestById("nonexistent-id");
+            student1.getSubjectsByColorCount(SemaforoColores.AMARILLO);
+            student1.hasActiveRequests();
+
             assertThrows(SirhaException.class, () -> 
                 smallGroup.inscribirEstudiante(student3));
 
+            assertFalse(student1.isSubjectApproved(subject.getName()));
+            assertTrue(student1.isSubjectCursando(subject.getName()));
+            assertFalse(student1.isSubjectNoCursada(subject.getName()));
+            assertFalse(student1.isSubjectReprobada(subject.getName()));
         } catch (Exception e) {
             fail("No se esperaba una excepción al inscribir estudiante: " + e.getMessage());
         }
@@ -169,6 +207,14 @@ class GroupTests {
             assertTrue(group.contieneEstudiante(student1));
             assertEquals(1, group.getInscritos());
             assertEquals(4, group.getCuposDisponibles());
+
+            group.inscribirEstudiante(student2);
+
+            assertTrue(group.contieneEstudiante(student2));
+            assertEquals(2, group.getInscritos());
+            assertEquals(3, group.getCuposDisponibles());
+
+            assertThrows(SirhaException.class, () -> group.setCapacidad(1));
         } catch (Exception e) {
             fail("No se esperaba una excepción al inscribir estudiante: " + e.getMessage());
         }
@@ -322,10 +368,15 @@ class GroupTests {
             Group group2 = new Group(subject, 10, academicPeriod);
             
             group1.addSchedule(schedule1);
+
+            assertTrue(group1.hasSchedule(schedule1));
             group2.addSchedule(scheduleConflict); // Se solapa con schedule1
             
             assertTrue(group1.conflictoConHorario(group2));
             assertTrue(group2.conflictoConHorario(group1));
+
+            assertThrows(SirhaException.class, () -> group1.addSchedule(scheduleConflict));
+            assertFalse(group1.hasSchedule(scheduleConflict));
         } catch (Exception e) {
             fail("No se esperaba una excepción al crear los grupos: " + e.getMessage());
         }
@@ -419,5 +470,150 @@ class GroupTests {
         assertNotNull(group.getEstudiantes());
         assertTrue(group.getEstudiantes().isEmpty());
         assertEquals(0, group.getInscritos());
+    }
+
+
+    @Test
+    void canEnrollInGroup_success() {
+        try {
+            AcademicPeriod period = academicPeriod;
+            StudyPlan plan = new StudyPlan(Careers.INGENIERIA_AMBIENTAL);
+            Subject subj = new Subject("MAT101", "Matematicas I", 4);
+            plan.addSubject(subj);
+
+            Student s = new Student("alumno", "a@test.edu", "pwd", "2025001");
+            Semaforo sem = new Semaforo(plan);
+            sem.setCurrentAcademicPeriod(period);
+            s.setAcademicProgress(sem);
+            s.setCurrentPeriod(period);
+
+            Group g = new Group(subj, 30, period); // abierto por defecto
+            assertTrue(s.canEnrollInGroup(subj, g));
+        } catch (Exception e) {
+            fail("No se esperaba excepción: " + e.getMessage());
+        }
+    }
+    
+    @Test
+    void canEnrollInGroup_subjectNotInPlan_throws() {
+        try {
+            AcademicPeriod period = academicPeriod;
+            StudyPlan plan = new StudyPlan(Careers.INGENIERIA_AMBIENTAL);
+            Subject subjInPlan = new Subject("MAT101", "Matematicas I", 4);
+            plan.addSubject(subjInPlan);
+            Subject subjNotInPlan = new Subject("HIS101", "Historia I", 3);
+
+            Student s = new Student("alumno2", "b@test.edu", "pwd", "2025002");
+            Semaforo sem = new Semaforo(plan);
+            sem.setCurrentAcademicPeriod(period);
+            s.setAcademicProgress(sem);
+            s.setCurrentPeriod(period);
+
+            Group g = new Group(subjNotInPlan, 30, period);
+            SirhaException ex = assertThrows(SirhaException.class, () -> s.canEnrollInGroup(subjNotInPlan, g));
+            assertEquals(ErrorCodeSirha.INVALID_ARGUMENT, ex.getErrorCode());
+        } catch (Exception e) {
+            fail("Error en la preparación del test: " + e.getMessage());
+        }
+    }
+    
+    @Test
+    void canEnrollInGroup_alreadyEnrolled_throws() {
+        try {
+            AcademicPeriod period = academicPeriod;
+            StudyPlan plan = new StudyPlan(Careers.INGENIERIA_AMBIENTAL);
+            Subject subj = new Subject("MAT101", "Matematicas I", 4);
+            plan.addSubject(subj);
+
+            Student s = new Student("alumno3", "c@test.edu", "pwd", "2025003");
+            Semaforo sem = new Semaforo(plan);
+            sem.setCurrentAcademicPeriod(period);
+            s.setAcademicProgress(sem);
+            s.setCurrentPeriod(period);
+
+            Group g = new Group(subj, 30, period);
+            // inscribir primero
+            s.enrollSubject(subj, g);
+
+            SirhaException ex = assertThrows(SirhaException.class, () -> s.canEnrollInGroup(subj, g));
+            assertEquals(ErrorCodeSirha.OPERATION_NOT_ALLOWED, ex.getErrorCode());
+        } catch (Exception e) {
+            fail("No se esperaba excepción: " + e.getMessage());
+        }
+    }
+    
+    @Test
+    void canEnrollInGroup_groupClosed_throws() {
+        try {
+            AcademicPeriod period = academicPeriod;
+            StudyPlan plan = new StudyPlan(Careers.INGENIERIA_AMBIENTAL);
+            Subject subj = new Subject("MAT101", "Matematicas I", 4);
+            plan.addSubject(subj);
+
+            Student s = new Student("alumno4", "d@test.edu", "pwd", "2025004");
+            Semaforo sem = new Semaforo(plan);
+            sem.setCurrentAcademicPeriod(period);
+            s.setAcademicProgress(sem);
+            s.setCurrentPeriod(period);
+
+            Group closed = new Group(subj, 30, period);
+            closed.closeGroup();
+
+            SirhaException ex = assertThrows(SirhaException.class, () -> s.canEnrollInGroup(subj, closed));
+            assertEquals(ErrorCodeSirha.GROUP_CLOSED, ex.getErrorCode());
+        } catch (Exception e) {
+            fail("No se esperaba excepción: " + e.getMessage());
+        }
+    }
+    
+    @Test
+    void canEnrollInGroup_academicPeriodMismatch_throws() {
+        try {
+            AcademicPeriod wrongPeriod = new AcademicPeriod("2023-2", LocalDate.now().minusYears(1), LocalDate.now().minusMonths(6));
+            StudyPlan plan = new StudyPlan(Careers.INGENIERIA_AMBIENTAL);
+            Subject subj = new Subject("MAT101", "Matematicas I", 4);
+            plan.addSubject(subj);
+
+            Student s = new Student("alumno5", "e@test.edu", "pwd", "2025005");
+            Semaforo sem = new Semaforo(plan);
+            sem.setCurrentAcademicPeriod(academicPeriod); // el alumno tiene otro periodo válido
+            s.setAcademicProgress(sem);
+            s.setCurrentPeriod(academicPeriod);
+
+            Group otherPeriodGroup = new Group(subj, 30, wrongPeriod);
+            SirhaException ex = assertThrows(SirhaException.class, () -> s.canEnrollInGroup(subj, otherPeriodGroup));
+            assertEquals(ErrorCodeSirha.ACADEMIC_PERIOD_NOT_VALID, ex.getErrorCode());
+        } catch (Exception e) {
+            fail("No se esperaba excepción: " + e.getMessage());
+        }
+    }
+    
+    @Test
+    void canEnrollInGroup_scheduleConflict_throws() {
+        try {
+            StudyPlan plan = new StudyPlan(Careers.INGENIERIA_AMBIENTAL);
+            Subject other = new Subject("QUI101", "Quimica I", 4);
+            plan.addSubject(other);
+            Group conflicto = new Group(other, 30, academicPeriod);
+            conflicto.addSchedule(scheduleConflict); // LUNES 9-11
+            Subject subjEnrolled = new Subject("MAT101", "Matematicas I", 4);
+            plan.addSubject(subjEnrolled);
+
+            Student s = new Student("alumno6", "f@test.edu", "pwd", "2025006");
+            Semaforo sem = new Semaforo(plan);
+            sem.setCurrentAcademicPeriod(academicPeriod);
+            s.setAcademicProgress(sem);
+            s.setCurrentPeriod(academicPeriod);
+
+            Group enrolledGroup = new Group(subjEnrolled, 30, academicPeriod);
+            enrolledGroup.addSchedule(schedule1); // LUNES 8-10
+            s.enrollSubject(subjEnrolled, enrolledGroup);
+
+
+            SirhaException ex = assertThrows(SirhaException.class, () -> s.canEnrollInGroup(other, conflicto));
+            assertEquals(ErrorCodeSirha.SCHEDULE_CONFLICT, ex.getErrorCode());
+        } catch (Exception e) {
+            fail("No se esperaba excepción: " + e.getMessage());
+        }
     }
 }

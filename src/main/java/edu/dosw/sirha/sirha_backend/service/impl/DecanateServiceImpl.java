@@ -16,6 +16,7 @@ import edu.dosw.sirha.sirha_backend.exception.SirhaException;
 import edu.dosw.sirha.sirha_backend.service.DecanateService;
 import edu.dosw.sirha.sirha_backend.service.RequestService;
 import edu.dosw.sirha.sirha_backend.service.StudentService;
+import edu.dosw.sirha.sirha_backend.service.StudyPlanService;
 import edu.dosw.sirha.sirha_backend.repository.mongo.DecanateMongoRepository;
 
 @Service
@@ -24,11 +25,13 @@ public class DecanateServiceImpl implements DecanateService {
     private final DecanateMongoRepository decanateRepository;
     private final StudentService studentService;
     private final RequestService requestService;
+    private final StudyPlanService studyPlanService;
 
-    public DecanateServiceImpl(DecanateMongoRepository decanateRepository, StudentService studentService, RequestService requestService) {
+    public DecanateServiceImpl(DecanateMongoRepository decanateRepository, StudentService studentService, RequestService requestService, StudyPlanService studyPlanService) {
         this.decanateRepository = decanateRepository;
         this.studentService = studentService;
         this.requestService = requestService;
+        this.studyPlanService = studyPlanService;
     }
 
     @Transactional
@@ -216,23 +219,19 @@ public class DecanateServiceImpl implements DecanateService {
 
     @Transactional
     @Override
-    public List<StudyPlan> addPlanToDecanate(String decanateName, StudyPlan studyPlan) throws SirhaException {
-        // Validar parámetros
+    public List<StudyPlan> addPlanToDecanate(String decanateName, String studyPlanName) throws SirhaException {
         if (decanateName == null || decanateName.trim().isEmpty()) {
             throw new SirhaException(ErrorCodeSirha.INVALID_ARGUMENT, "El nombre de la decanatura no puede estar vacío");
         }
-        if (studyPlan == null) {
-            throw new SirhaException(ErrorCodeSirha.INVALID_ARGUMENT, "El plan de estudio no puede ser nulo");
-        }
-        if (studyPlan.getName() == null || studyPlan.getName().trim().isEmpty()) {
+        if (studyPlanName == null || studyPlanName.trim().isEmpty()) {
             throw new SirhaException(ErrorCodeSirha.INVALID_ARGUMENT, "El nombre del plan de estudio no puede estar vacío");
         }
+
+        StudyPlan studyPlan = studyPlanService.getStudyPlanByName(studyPlanName);
         
-        // Buscar decanatura
         Decanate decanate = decanateRepository.findByName(decanateName)
                 .orElseThrow(() -> new SirhaException(ErrorCodeSirha.DECANATE_NOT_FOUND, "Decanatura no encontrada: %s", decanateName));
         
-        // Verificar que el plan no exista ya
         boolean planExists = decanate.getStudyPlans().stream()
                 .anyMatch(plan -> plan.getName().equals(studyPlan.getName()));
         
@@ -248,4 +247,24 @@ public class DecanateServiceImpl implements DecanateService {
             throw new SirhaException(ErrorCodeSirha.DATABASE_ERROR, "Error al agregar el plan de estudio", e);
         }
     }
+
+    @Transactional
+    @Override
+    public StudyPlan addSubjectToStudyPlan(String studyPlanName, String subjectName) throws SirhaException {
+        return studyPlanService.addSubjectToStudyPlan(studyPlanName, subjectName);
+    }
+    
+    @Override
+    @Transactional
+    public StudyPlan saveStudyPlan(Careers career) throws SirhaException {
+        StudyPlan studyPlan = new StudyPlan(career);
+        return studyPlanService.saveStudyPlan(studyPlan);
+    }
+
+    @Transactional
+    @Override
+    public List<StudyPlan> getStudyPlansByCareer(Careers career) throws SirhaException {
+        return studyPlanService.getStudyPlansByCareer(career);
+    }
+
 }

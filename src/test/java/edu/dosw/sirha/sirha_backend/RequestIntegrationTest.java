@@ -46,23 +46,19 @@ class RequestIntegrationTest {
         }
         academicPeriod = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
         
-        mathematics = new Subject("101", "Matemáticas", 4);
-        physics = new Subject("102", "Física", 3);
-        chemistry = new Subject("103", "Química", 4);
 
         try {
+            mathematics = new Subject("101", "Matemáticas", 4);
+            physics = new Subject("102", "Física", 3);
+            chemistry = new Subject("103", "Química", 4);
+
             mathGroup1 = new Group(mathematics, 30, academicPeriod);
             mathGroup2 = new Group(mathematics, 10, academicPeriod);
             physicsGroup = new Group(physics, 20, academicPeriod);
-        } catch (Exception e) {
-            fail("No se esperaba una excepción al crear los grupos: " + e.getMessage());
-        }
-
         
-        mathGroup1.setId("1001");
-        mathGroup2.setId("1002");
-        physicsGroup.setId("1003");
-        try {
+            mathGroup1.setId("1001");
+            mathGroup2.setId("1002");
+            physicsGroup.setId("1003");
             mathSchedule1 = new Schedule(DiasSemana.LUNES, LocalTime.of(8, 0), LocalTime.of(10, 0));
             mathSchedule2 = new Schedule(DiasSemana.MARTES, LocalTime.of(10, 0), LocalTime.of(12, 0));
             physicsSchedule = new Schedule(DiasSemana.MIERCOLES, LocalTime.of(14, 0), LocalTime.of(16, 0));
@@ -73,7 +69,7 @@ class RequestIntegrationTest {
             fail("No se esperaba una excepción al agregar horarios: " + e.getMessage());
         }
         
-        studyPlan = new StudyPlan("Ingeniería de Sistemas", Careers.INGENIERIA_DE_SISTEMAS);
+        studyPlan = new StudyPlan(Careers.INGENIERIA_DE_SISTEMAS);
         studyPlan.addSubject(mathematics);
         studyPlan.addSubject(physics);
         studyPlan.addSubject(chemistry);
@@ -215,49 +211,33 @@ class RequestIntegrationTest {
 
     @Test
     void testSubjectWithPrerequisitesWorkflow() {
-        Subject calculus = new Subject("201", "Cálculo", 4);
-        studyPlan.addSubject(calculus);
+        try {
+            Subject calculus = new Subject("201", "Cálculo", 4);
+            studyPlan.addSubject(calculus);
+            
+            MustHaveApprovedSubject prerequisiteRule = new MustHaveApprovedSubject(mathematics);
+            calculus.addPrerequisite(prerequisiteRule);
+            
+            assertTrue(calculus.hasPrerequisites());
+            
+            CambioMateria solicitudSinPrerequisito = new CambioMateria(student, physics, calculus, mathGroup2, academicPeriod);
         
-        MustHaveApprovedSubject prerequisiteRule = new MustHaveApprovedSubject(mathematics);
-        calculus.addPrerequisite(prerequisiteRule);
-        
-        assertTrue(calculus.hasPrerequisites());
-        
-        CambioMateria solicitudSinPrerequisito = new CambioMateria(student, physics, calculus, mathGroup2, academicPeriod);
-        
-        try{
             solicitudSinPrerequisito.reviewRequest(new ResponseRequest("Revisando sin prerequisitos", RequestStateEnum.EN_REVISION));
-        } catch (Exception e) {
-            fail("No se esperaba una excepción aquí");
-        }
-
-        try {
-            solicitudSinPrerequisito.rejectRequest(new ResponseRequest("No cumple con los prerequisitos", RequestStateEnum.RECHAZADA));
-        } catch (Exception e) {
-            fail("No se esperaba una excepción aquí");
-        }
-        assertEquals(RequestStateEnum.RECHAZADA, solicitudSinPrerequisito.getActualState());
         
-        try { 
+            solicitudSinPrerequisito.rejectRequest(new ResponseRequest("No cumple con los prerequisitos", RequestStateEnum.RECHAZADA));
+            assertEquals(RequestStateEnum.RECHAZADA, solicitudSinPrerequisito.getActualState());
+        
             student.enrollSubject(mathematics, mathGroup1);
-        } catch (Exception e) {
-            fail("No se esperaba una excepción al inscribir la materia requerida: " + e.getMessage());
-        }
-        CambioMateria solicitudConPrerequisito = new CambioMateria(student, physics, calculus, mathGroup2, academicPeriod);
 
-        try{ 
+            CambioMateria solicitudConPrerequisito = new CambioMateria(student, physics, calculus, mathGroup2, academicPeriod);
+        
             solicitudConPrerequisito.reviewRequest(new ResponseRequest("Revisando con prerequisitos", RequestStateEnum.EN_REVISION));
-        } catch (Exception e) {
-            fail("No se esperaba una excepción aquí");
-        }
-
-        try {
+        
             solicitudConPrerequisito.approveRequest(new ResponseRequest("Cumple con los prerequisitos", RequestStateEnum.APROBADA));
+            assertEquals(RequestStateEnum.APROBADA, solicitudConPrerequisito.getActualState());
         } catch (Exception e) {
             fail("No se esperaba una excepción aquí");
         }
-
-        assertEquals(RequestStateEnum.APROBADA, solicitudConPrerequisito.getActualState());
     }
 
     @Test

@@ -63,4 +63,9 @@ public interface AcademicProgressViewer {
     double getAcademicSuccessRate();
     double getCompletedCreditsPercentage();
     AcademicIndicatorsDTO getAcademicIndicators();
+
+    boolean isSubjectApproved(String subject);
+    boolean isSubjectCursando(String subject);
+    boolean isSubjectReprobada(String subject);
+    boolean isSubjectNoCursada(String subject);
 }

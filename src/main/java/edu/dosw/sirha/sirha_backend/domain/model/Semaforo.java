@@ -49,10 +49,6 @@ public class Semaforo implements AcademicProgress {
     public StudyPlan getStudyPlan() {
         return studyPlan;
     }
-
-    public int getStudyPlanSubjectsCount() {
-        return studyPlan.getSubjects().size();
-    }
     
     public List<SubjectDecorator> getPassedSubjects() {
         return subjects.values().stream()
@@ -76,10 +72,6 @@ public class Semaforo implements AcademicProgress {
         return subjects.values().stream()
             .filter(s -> s.getEstadoColor() == SemaforoColores.GRIS)
             .toList();
-    }
-
-    public int getSubjectsCount() {
-        return subjects.size();
     }
 
     public int getPassedSubjectsCount() {
@@ -137,41 +129,41 @@ public class Semaforo implements AcademicProgress {
     }
 
     @Override
-    public boolean isSubjectApproved(Subject subject) {
+    public boolean isSubjectApproved(String subject) {
         if (subject == null) {
             return false;
         }
-        if (!subjects.containsKey(subject.getName())) {
+        if (!subjects.containsKey(subject)) {
             return false;
         }
-        SubjectDecorator decorator = subjects.get(subject.getName());
+        SubjectDecorator decorator = subjects.get(subject);
         return decorator.getEstadoColor() == SemaforoColores.VERDE;
     }
     @Override
-    public boolean isSubjectCursando(Subject subject) {
+    public boolean isSubjectCursando(String subject) {
 
-        if (!subjects.containsKey(subject.getName())) {
+        if (!subjects.containsKey(subject)) {
             return false;
         }
-        SubjectDecorator decorator = subjects.get(subject.getName());
+        SubjectDecorator decorator = subjects.get(subject);
         return decorator != null && decorator.getEstadoColor() == SemaforoColores.AMARILLO;
     }
     @Override
-    public boolean isSubjectReprobada(Subject subject) {
+    public boolean isSubjectReprobada(String subject) {
 
-        if (!subjects.containsKey(subject.getName())) {
+        if (!subjects.containsKey(subject)) {
             return false;
         }
-        SubjectDecorator decorator = subjects.get(subject.getName());
+        SubjectDecorator decorator = subjects.get(subject);
         return decorator != null && decorator.getEstadoColor() == SemaforoColores.ROJO;
     }
     @Override
-    public boolean isSubjectNoCursada(Subject subject) {
+    public boolean isSubjectNoCursada(String subject) {
 
-        if (!subjects.containsKey(subject.getName())) {
+        if (!subjects.containsKey(subject)) {
             return false;
         }
-        SubjectDecorator decorator = subjects.get(subject.getName());
+        SubjectDecorator decorator = subjects.get(subject);
         return decorator != null && decorator.getEstadoColor() == SemaforoColores.GRIS;
     }
 
@@ -182,7 +174,7 @@ public class Semaforo implements AcademicProgress {
         if (decorator == null) {
             throw SirhaException.of(ErrorCodeSirha.SUBJECT_NOT_FOUND, "La materia no está en el semáforo");
         }
-        if (!isSubjectCursando(subject)) {
+        if (!isSubjectCursando(subject.getName())) {
             throw SirhaException.of(ErrorCodeSirha.SUBJECT_NOT_IN_PROGRESS, "La materia no está en curso");
         }
 

@@ -23,15 +23,10 @@ jobs:
         distribution: 'temurin'
         cache: 'maven'
 
-    - name: Run tests with coverage
+    - name: Run tests with coverage and verify
       run: |
-        mvn clean test jacoco:report
-        # Ejecuta tests + genera reporte JaCoCo
-
-    - name: Verify coverage threshold
-      run: |
-        mvn jacoco:check
-        # Verifica que la cobertura mínima se cumple
+        mvn clean test jacoco:report jacoco:check
+        # Ejecuta tests, genera reporte JaCoCo y verifica umbral en la misma invocación
 
     - name: Build application package
       run: |

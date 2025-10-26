@@ -35,7 +35,7 @@ class RequestTest {
             Subject subject = new Subject("101", "Matemáticas", 4);
 
             Group group = new Group(subject, 30, period);
-            StudyPlan studyPlan = new StudyPlan("Ingeniería de Sistemas", Careers.INGENIERIA_DE_SISTEMAS);
+            StudyPlan studyPlan = new StudyPlan(Careers.INGENIERIA_DE_SISTEMAS);
             studyPlan.addSubject(subject);
             
             Semaforo semaforo = new Semaforo(studyPlan);
@@ -60,8 +60,8 @@ class RequestTest {
     @Test
     void testGroupStateValidation() {
         AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
-        Subject subject = new Subject("101", "Matemáticas", 4);
         try {
+            Subject subject = new Subject("101", "Matemáticas", 4);
             Group group = new Group(subject, 30, period);
         
             assertTrue(group.getGroupState() instanceof StatusOpen);
@@ -78,9 +78,9 @@ class RequestTest {
     @Test
     void testScheduleConflictDetection() {
         AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
-        Subject subject = new Subject("101", "Matemáticas", 4);
         
         try {
+            Subject subject = new Subject("101", "Matemáticas", 4);
             Schedule schedule1 = new Schedule(DiasSemana.LUNES, LocalTime.of(8, 0), LocalTime.of(10, 0));
             Group group1 = new Group(subject, 30, period);
             group1.addSchedule(schedule1);
@@ -104,12 +104,13 @@ class RequestTest {
     void testPrerequisiteValidation() {
         AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
 
-        StudyPlan studyPlan = new StudyPlan("Ingenieria de Sistemas", Careers.INGENIERIA_DE_SISTEMAS);
-        Subject prerequisite = new Subject("100", "Algebra", 3);
-        MustHaveApprovedSubject rule = new MustHaveApprovedSubject(prerequisite);
-        Subject mainSubject = new Subject("101", "Calculo", 4);
+        StudyPlan studyPlan = new StudyPlan(Careers.INGENIERIA_DE_SISTEMAS);
+       
 
-        try {
+        try { 
+            Subject prerequisite = new Subject("100", "Algebra", 3);
+            MustHaveApprovedSubject rule = new MustHaveApprovedSubject(prerequisite);
+            Subject mainSubject = new Subject("101", "Calculo", 4);
             Group group1 = new Group(prerequisite, 30, period);
             Group group2 = new Group(mainSubject, 25, period);
 
@@ -166,21 +167,23 @@ class RequestTest {
 
     @Test
     void testStudyPlanConfiguration() {
-        StudyPlan studyPlan = new StudyPlan("Ingeniería de Sistemas", Careers.INGENIERIA_DE_SISTEMAS); // Constructor con nombre
-        Subject subject1 = new Subject("101", "Matemáticas", 4);
-        Subject subject2 = new Subject("102", "Física", 3);
-        Subject subject3 = new Subject("103", "Química", 4);
+        try {
+            StudyPlan studyPlan = new StudyPlan(Careers.INGENIERIA_DE_SISTEMAS); // Constructor con nombre
+            Subject subject1 = new Subject("101", "Matemáticas", 4);
+            Subject subject2 = new Subject("102", "Física", 3);
+            Subject subject3 = new Subject("103", "Química", 4);
 
-        // Agregar materias al plan
-        studyPlan.addSubject(subject1);
-        studyPlan.addSubject(subject2);
-        studyPlan.addSubject(subject3);
-        
-        // Verificar configuración
-        assertEquals(3, studyPlan.getSubjects().size());
-        assertTrue(studyPlan.hasSubject(subject1));
-        assertTrue(studyPlan.hasSubject(subject2));
-        assertTrue(studyPlan.hasSubject(subject3));
+            studyPlan.addSubject(subject1);
+            studyPlan.addSubject(subject2);
+            studyPlan.addSubject(subject3);
+            
+            assertEquals(3, studyPlan.getSubjects().size());
+            assertTrue(studyPlan.hasSubject(subject1));
+            assertTrue(studyPlan.hasSubject(subject2));
+            assertTrue(studyPlan.hasSubject(subject3));
+        } catch (Exception e) {
+            fail("No se esperaba una excepción al crear el plan de estudios: " + e.getMessage());
+        }
     }
 
     @Test

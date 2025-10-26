@@ -67,8 +67,8 @@ class DecanateTest {
         
         grupoQuimicaY = new Group(quimica, 30, currentPeriod);
 
-        StudyPlan studyPlan1 = new StudyPlan("Ingeniería de Sistemas", Careers.INGENIERIA_DE_SISTEMAS);
-        StudyPlan studyPlan2 = new StudyPlan("Ingeniería Industrial", Careers.INGENIERIA_INDUSTRIAL);
+        StudyPlan studyPlan1 = new StudyPlan(Careers.INGENIERIA_DE_SISTEMAS);
+        StudyPlan studyPlan2 = new StudyPlan(Careers.INGENIERIA_INDUSTRIAL);
 
         studentSistemas = new Student(
             "juan.perez",
@@ -90,6 +90,16 @@ class DecanateTest {
         requestSistemas2 = new CambioGrupo(studentSistemas, fisica, grupoFisicaD, currentPeriod);
 
         requestIndustrial1 = new CambioGrupo(studentIndustrial, quimica, grupoQuimicaY, currentPeriod);
+    }
+    @Test
+    void testEqualsAcademicPeriod() {
+        AcademicPeriod period1 = new AcademicPeriod("2024-1", LocalDate.of(2024, 1, 1), LocalDate.of(2024, 6, 30));
+        AcademicPeriod period2 = new AcademicPeriod("2024-1", LocalDate.of(2024, 1, 1), LocalDate.of(2024, 6, 30));
+        AcademicPeriod period3 = new AcademicPeriod("2024-2", LocalDate.of(2024, 7, 1), LocalDate.of(2024, 12, 31));
+
+        assertEquals(period1, period2);
+        assertNotEquals(period1, period3);
+        assertNotEquals(null, period1);
     }
 
     @Test
@@ -141,7 +151,9 @@ class DecanateTest {
     void testReceiveValidRequest() throws SirhaException {
         
         decanateSistemas.receiveRequest(requestSistemas1);
-
+        decanateIndustrial.getCareer();
+        decanateIndustrial.getStudyPlans();
+        
         List<BaseRequest> pendingRequests = decanateSistemas.getPendingRequests();
         assertEquals(1, pendingRequests.size());
         assertEquals(requestSistemas1, pendingRequests.get(0));

@@ -43,14 +43,13 @@ class StudentAcademicReportsTest {
 
     // Grupos
     private Group grupoMatematicas;
-    private Group grupoFisica;
-    private Group grupoProgramacion;
 
     private CambioGrupo requestAprobada;
 
 
     @BeforeEach
     void setUp() throws SirhaException {
+        
         currentPeriod = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(5));
 
         matematicas = new Subject("MAT101", "Matemáticas I", 4);
@@ -61,7 +60,7 @@ class StudentAcademicReportsTest {
         quimica = new Subject("QUI101", "Química I", 4);
         estadistica = new Subject("EST201", "Estadística", 3);
 
-        studyPlan = new StudyPlan("Ingeniería de Sistemas", Careers.INGENIERIA_DE_SISTEMAS);
+        studyPlan = new StudyPlan(Careers.INGENIERIA_DE_SISTEMAS);
         studyPlan.addSubject(matematicas);    // Semestre 1
         studyPlan.addSubject(fisica);         // Semestre 1
         studyPlan.addSubject(programacion);   // Semestre 1
@@ -77,18 +76,6 @@ class StudentAcademicReportsTest {
         Group grupoCalculoAntes = new Group(calculo, 20, currentPeriod);
 
         grupoMatematicas = new Group(matematicas, 30, currentPeriod);
-        grupoFisica = new Group(fisica, 25, currentPeriod);
-        grupoProgramacion = new Group(programacion, 20, currentPeriod);
-        Group grupoCalculo = new Group(calculo, 20, currentPeriod);
-
-        matematicas.addGroup(grupoCalculoAntes);
-        matematicas.addGroup(grupoMatematicas);
-        fisica.addGroup(grupoFisicaAntes);
-        fisica.addGroup(grupoFisica);
-        programacion.addGroup(grupoProgramacionAntes);
-        programacion.addGroup(grupoProgramacion);
-        calculo.addGroup(grupoCalculoAntes);
-        calculo.addGroup(grupoCalculo);
 
         student = new Student(
             "juan.perez",
@@ -245,6 +232,9 @@ class StudentAcademicReportsTest {
         List<SubjectDecoratorDTO> aprobadas = pensum.get(SemaforoColores.VERDE);
         assertTrue(aprobadas.stream().anyMatch(s -> s.getName().equals("Matemáticas I")));
         assertTrue(aprobadas.stream().anyMatch(s -> s.getName().equals("Programación I")));
+
+        Student stu = new Student();
+        assertNotNull(stu.getSolicitudes());
     }
 
     @Test

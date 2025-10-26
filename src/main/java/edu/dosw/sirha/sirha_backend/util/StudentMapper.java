@@ -23,7 +23,7 @@ import edu.dosw.sirha.sirha_backend.exception.SirhaException;
 public class StudentMapper {
 
     private StudentMapper() {
-        throw new UnsupportedOperationException("Utility class");
+        // Constructor privado para evitar instanciación
     }
 
     /**

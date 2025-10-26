@@ -9,6 +9,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import edu.dosw.sirha.sirha_backend.domain.model.stategroup.Group;
 import edu.dosw.sirha.sirha_backend.domain.port.AcademicProgress;
 import edu.dosw.sirha.sirha_backend.domain.port.PrerequisiteRule;
+import edu.dosw.sirha.sirha_backend.exception.ErrorCodeSirha;
+import edu.dosw.sirha.sirha_backend.exception.SirhaException;
 
 /**
  * Representa una materia o asignatura dentro del sistema académico.
@@ -31,16 +33,17 @@ public class Subject {
         this.prerequisites = new ArrayList<>();
     }
     
-    public Subject(String id, String name, int credits) {
+    public Subject(String id, String name, int credits) throws SirhaException {
         this(name, credits);
         this.id = id;
     }
-    public Subject(String name, int credits) {
+
+    public Subject(String name, int credits) throws SirhaException {
         if (name == null || name.isBlank()) {
-            throw new IllegalArgumentException("El nombre de la materia no puede estar vacío");
+            throw SirhaException.of(ErrorCodeSirha.INVALID_ARGUMENT, "El nombre no puede estar vacío");
         }
         if (credits <= 0) {
-            throw new IllegalArgumentException("La materia debe tener al menos 1 crédito");
+            throw SirhaException.of(ErrorCodeSirha.INVALID_ARGUMENT, "La materia debe tener al menos 1 crédito");
         }
         this.name = name;
         this.credits = credits;
@@ -48,15 +51,38 @@ public class Subject {
         this.prerequisites = new ArrayList<>();
     }
 
+    public int getNextGroupSequence() {
+        int maxSeq = 0;
+        for (Group g : groups) {
+            String[] parts = g.getCode().split("-");
+            if (parts.length == 2) {
+                try {
+                    int seq = Integer.parseInt(parts[1]);
+                    if (seq > maxSeq) {
+                        maxSeq = seq;
+                    }
+                } catch (NumberFormatException e) {
+                    // Ignorar códigos no conformes
+                }
+            }
+        }
+        return maxSeq + 1;
+    }
+
     /**
      * Asocia un grupo a la materia.
+     * @throws SirhaException 
      */
-    public void addGroup(Group g) {
+    public void addGroup(Group g) throws SirhaException {
         if (g == null) {
-            throw new IllegalArgumentException("El grupo no puede ser nulo");
+            throw SirhaException.of(ErrorCodeSirha.INVALID_ARGUMENT, "El grupo no puede ser nulo");
+        }
+        if (groups.contains(g)) {
+            throw SirhaException.of(ErrorCodeSirha.INVALID_ARGUMENT, "El grupo ya está asociado a la materia");
         }
         groups.add(g);
     }
+    
     public int getGroupCount() {return groups.size();}
 
     /**
@@ -77,16 +103,16 @@ public class Subject {
     }
 
     public void setId(String id) {this.id = id;}
-    public void setName(String name) {
-        if (name == null || name.isBlank()) {throw new IllegalArgumentException("El nombre no puede estar vacío");}
+    public void setName(String name) throws SirhaException {
+        if (name == null || name.isBlank()) {throw SirhaException.of(ErrorCodeSirha.INVALID_ARGUMENT, "El nombre no puede estar vacío");}
         this.name = name;
     }
-    public void setCredits(int credits) {
-        if (credits <= 0) {throw new IllegalArgumentException("La materia debe tener al menos 1 crédito");}
+    public void setCredits(int credits) throws SirhaException {
+        if (credits <= 0) {throw SirhaException.of(ErrorCodeSirha.INVALID_ARGUMENT, "La materia debe tener al menos 1 crédito");}
         this.credits = credits;
     }
-    public void setPrerequisites(List<PrerequisiteRule> prerequisites) {this.prerequisites = prerequisites;}
 
+    public void setPrerequisites(List<PrerequisiteRule> prerequisites) {this.prerequisites = prerequisites;}
     public void setGroups(List<Group> groups) {this.groups = groups;}
 
     public String getId() {return id;}
@@ -111,12 +137,13 @@ public class Subject {
         if (this == o) return true;
         if (!(o instanceof Subject)) return false;
         Subject subject = (Subject) o;
-        return Objects.equals(id, subject.id);
+        return this.id.equals(subject.id) && this.name.equals(subject.name)
+                && this.credits == subject.credits;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id);
+        return Objects.hash(id, name, credits);
     }
 
     @Override

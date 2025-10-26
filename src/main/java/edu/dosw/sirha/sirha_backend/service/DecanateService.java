@@ -22,10 +22,17 @@ public interface DecanateService {
     BaseRequest rejectRequest(String decanateName, String requestId) throws SirhaException;
     StudentDTO getStudentBasicInfo(String username) throws SirhaException;
     List<StudyPlan> getStudyPlansByDecanateName(String decanateName) throws SirhaException;
-    List<StudyPlan> addPlanToDecanate(String decanateName, StudyPlan studyPlan) throws SirhaException;
+    List<StudyPlan> addPlanToDecanate(String decanateName, String studyPlan) throws SirhaException;
+
     //configurar academic periods
 
     //abrir o cerrar un grupo
     //approveSubject //metodos que la decanatura puede hacer 
     //failSubject
+
+
+    //De StudyPlanService
+    List<StudyPlan> getStudyPlansByCareer(Careers career) throws SirhaException;
+    StudyPlan saveStudyPlan(Careers career) throws SirhaException;
+    StudyPlan addSubjectToStudyPlan(String studyPlanName, String subjectName) throws SirhaException;
 }

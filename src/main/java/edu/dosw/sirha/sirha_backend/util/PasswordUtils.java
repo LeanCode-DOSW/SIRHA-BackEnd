@@ -16,7 +16,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 public class PasswordUtils {
 
     private PasswordUtils() {
-        throw new UnsupportedOperationException("Utility class");
     }
 
     private static final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();

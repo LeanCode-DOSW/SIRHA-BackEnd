@@ -51,7 +51,7 @@ class CambioMateriaTest {
             fail("No se esperaba una excepción al crear los grupos: " + e.getMessage());
         }
 
-        studyPlan = new StudyPlan("Ingeniería de Sistemas", Careers.INGENIERIA_DE_SISTEMAS);
+        studyPlan = new StudyPlan(Careers.INGENIERIA_DE_SISTEMAS);
         studyPlan.addSubject(materiaAntigua);
         studyPlan.addSubject(materiaNueva);
         studyPlan.addSubject(prerequisito);
@@ -192,9 +192,8 @@ class CambioMateriaTest {
 
     @Test
     void testCambioMateriaSubjectNotInStudyPlan() {
-        Subject materiaFueraPlan = new Subject("999", "Materia Externa", 2);
         try{
-
+            Subject materiaFueraPlan = new Subject("999", "Materia Externa", 2);
             assertFalse(studyPlan.hasSubject(materiaFueraPlan));
 
         } catch (Exception e) {
@@ -247,9 +246,9 @@ class CambioMateriaTest {
         }
 
         assertTrue(student.hasSubject(materiaAntigua));
-        assertTrue(student.getAcademicProgress().isSubjectCursando(materiaAntigua));
+        assertTrue(student.getAcademicProgress().isSubjectCursando(materiaAntigua.getName()));
         assertNotEquals(materiaAntigua, materiaNueva);
-        assertTrue(student.getAcademicProgress().isSubjectNoCursada(materiaNueva));
+        assertTrue(student.getAcademicProgress().isSubjectNoCursada(materiaNueva.getName()));
         assertTrue(student.getAcademicProgress().getStudyPlan().hasSubject(materiaNueva));
         assertTrue(materiaNueva.hasGroup(grupoNuevo));
         assertTrue(grupoNuevo.isOpen());
@@ -267,9 +266,9 @@ class CambioMateriaTest {
 
     @Test
     void testCambioMateriaComplexPrerequisiteScenario() {
-        // Crear cadena de prerequisitos: Básicas -> Álgebra -> Cálculo
-        Subject matematicasBasicas = new Subject("90", "Matemáticas Básicas", 2);
         try {
+            Subject matematicasBasicas = new Subject("90", "Matemáticas Básicas", 2);
+        
             Group grupoBasicas = new Group(matematicasBasicas, 40, academicPeriod);
 
             studyPlan.addSubject(matematicasBasicas);
@@ -281,29 +280,32 @@ class CambioMateriaTest {
             materiaNueva.addPrerequisite(ruleAlgebra);
             
             student.enrollSubject(matematicasBasicas, grupoBasicas);
+            assertThrows(SirhaException.class, () -> student.enrollSubject(materiaAntigua, grupoAntiguo));
+
+            assertTrue(student.hasSubject(matematicasBasicas));
+            assertTrue(student.hasSubject(materiaAntigua));
+
+            assertTrue(materiaNueva.hasPrerequisites());
         } catch (Exception e) {
             fail("No se esperaba una excepción al crear el grupo de matemáticas básicas: " + e.getMessage());
         }
 
-
-        assertThrows(SirhaException.class, () -> student.enrollSubject(materiaAntigua, grupoAntiguo));
-
-        assertTrue(student.hasSubject(matematicasBasicas));
-        assertTrue(student.hasSubject(materiaAntigua));
-
-        assertTrue(materiaNueva.hasPrerequisites());
     }
 
 
     @Test
     void testError1_EstudianteNoTieneMateriaAntigua() {
-        Subject materiaNoInscrita = new Subject("999", "Materia No Inscrita", 3);
-        studyPlan.addSubject(materiaNoInscrita);
+        try {
+                Subject materiaNoInscrita = new Subject("999", "Materia No Inscrita", 3);
+            studyPlan.addSubject(materiaNoInscrita);
 
-        SirhaException exception = assertThrows(SirhaException.class, () -> {
-            student.validateChangeSubject(materiaNoInscrita, materiaNueva, grupoNuevo);
-        });
-        assertEquals("Materia no encontrada - El estudiante no tiene la materia antigua especificada", exception.getMessage());
+            SirhaException exception = assertThrows(SirhaException.class, () -> {
+                student.validateChangeSubject(materiaNoInscrita, materiaNueva, grupoNuevo);
+            });
+            assertEquals("Materia no encontrada - El estudiante no tiene la materia antigua especificada", exception.getMessage());
+        } catch (Exception e) {
+            fail("No se esperaba una excepción al crear la materia no inscrita: " + e.getMessage());
+        }
     }
 
     @Test
@@ -348,9 +350,9 @@ class CambioMateriaTest {
         } catch (Exception e) {
             fail("No se esperaba una excepción al inscribir la materia antigua: " + e.getMessage());
         }
-
-        Subject materiaFueraPlan = new Subject("888", "Materia Externa", 2);
+ 
         try {
+            Subject materiaFueraPlan = new Subject("888", "Materia Externa", 2);
             Group grupoExterno = new Group(materiaFueraPlan, 15, academicPeriod);
 
             SirhaException exception = assertThrows(SirhaException.class, () -> {
@@ -493,9 +495,9 @@ class CambioMateriaTest {
         }
         
         assertTrue(student.hasSubject(materiaAntigua));
-        assertTrue(student.getAcademicProgress().isSubjectCursando(materiaAntigua));
+        assertTrue(student.getAcademicProgress().isSubjectCursando(materiaAntigua.getName()));
         assertNotEquals(materiaAntigua, materiaNueva);
-        assertTrue(student.getAcademicProgress().isSubjectNoCursada(materiaNueva));
+        assertTrue(student.getAcademicProgress().isSubjectNoCursada(materiaNueva.getName()));
         assertTrue(student.getAcademicProgress().getStudyPlan().hasSubject(materiaNueva));
         assertTrue(materiaNueva.hasGroup(grupoNuevo));
         assertTrue(grupoNuevo.isOpen());
