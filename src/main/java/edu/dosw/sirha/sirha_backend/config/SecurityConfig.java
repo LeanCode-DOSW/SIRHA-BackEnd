@@ -60,41 +60,104 @@ public class SecurityConfig {
             }))
             .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers(
-                    "/api/auth/**",
-                    "/v3/api-docs/**",
-                    "/swagger-ui/**",
-                    "/swagger-ui.html",
-                    "/actuator/health"
-                ).permitAll()
+            // AUTH & DOCS 
+            .requestMatchers(
+                "/api/auth/**",
+                "/v3/api-docs/**",
+                "/swagger-ui/**",
+                "/swagger-ui.html",
+                "/actuator/health"
+            ).permitAll()
 
-                .requestMatchers(HttpMethod.GET,
-                    "/api/students/schedule/**",
-                    "/api/students/academicPensum/**",
-                    "/api/requests/student/**",
-                    "/api/requests/status/**",
-                    "/api/requests/**",
-                    "/api/subjects/**"
-                ).hasAnyRole("STUDENT","DEAN","ADMIN") 
-                .requestMatchers(HttpMethod.POST,
-                    "/api/students/*/solicitudes/cambio-materia",
-                    "/api/students/*/solicitudes/cambio-grupo",
-                    "/api/requests"
-                ).hasRole("STUDENT")
+            // StudentController  (/api/students/**)
+            // STUDENT 
+            .requestMatchers(HttpMethod.POST,
+                "/api/students/*/solicitudes/cambio-grupo",
+                "/api/students/*/solicitudes/cambio-materia"
+            ).hasRole("STUDENT")
+            // STUDENT / DEAN / ADMIN
+            .requestMatchers(HttpMethod.GET,
+                "/api/students/schedule/**",
+                "/api/students/schedules/**",
+                "/api/students/academicPensum/**",
+                "/api/students/*/percentage-by-color",
+                "/api/students/*/subjects/color/**",
+                "/api/students/*/requests/**"
+            ).hasAnyRole("STUDENT","DEAN","ADMIN")
+            // DEAN / ADMIN
+            .requestMatchers(HttpMethod.GET,
+                "/api/students",
+                "/api/students/*",
+                "/api/students/username/*",
+                "/api/students/email/*",
+                "/api/students/*/basic-info"
+            ).hasAnyRole("DEAN","ADMIN")
 
-                .requestMatchers(
-                    "/api/students/**",
-                    "/api/subjects/**",
-                    "/api/requests/**"
-                ).hasAnyRole("DEAN","ADMIN")
+            // RequestController  (/api/requests/**)
+            // DEAN / ADMIN
+            .requestMatchers(
+                "/api/requests/**"
+            ).hasAnyRole("DEAN","ADMIN")
 
-                .requestMatchers(
-                    "/api/subjects/**",
-                    "/api/students"
-                ).hasRole("ADMIN")
+            // DecanateController  (/api/decanates/**)
+            // DEAN / ADMIN
+            .requestMatchers(
+                "/api/decanates/requests",
+                "/api/decanates/requests/*",
+                "/api/decanates/*/requests",
+                "/api/decanates/*/requests/*/receive",
+                "/api/decanates/*/requests/*/approve",
+                "/api/decanates/*/requests/*/reject",
+                "/api/decanates/*/study-plans",
+                "/api/decanates/*/statistics/**"
+            ).hasAnyRole("DEAN","ADMIN")
+            .requestMatchers(HttpMethod.GET,
+                "/api/decanates",
+                "/api/decanates/*",
+                "/api/decanates/students/*/basic-info"
+            ).hasAnyRole("DEAN","ADMIN")
 
-                .anyRequest().authenticated()
-            )
+            // ADMIN
+            .requestMatchers(HttpMethod.POST, "/api/decanates").hasRole("ADMIN")
+
+            // SubjectAndGroupController  (/api/subjects/**)
+
+            // STUDENT / DEAN / ADMIN 
+            .requestMatchers(HttpMethod.GET,
+                "/api/subjects",
+                "/api/subjects/*",
+                "/api/subjects/*/exists",
+                "/api/subjects/groups",
+                "/api/subjects/*/groups",
+                "/api/subjects/*/groups/open",
+                "/api/subjects/groups/*",
+                "/api/subjects/groups/*/professor",
+                "/api/subjects/groups/*/schedules",
+                "/api/subjects/groups/*/full",
+                "/api/subjects/groups/*/available-seats"
+            ).hasAnyRole("STUDENT","DEAN","ADMIN")
+            // DEAN / ADMIN 
+            .requestMatchers(HttpMethod.POST,
+                "/api/subjects/*/groups",
+                "/api/subjects/*/groups/add",
+                "/api/subjects/groups/*/schedules"
+            ).hasAnyRole("DEAN","ADMIN")
+            .requestMatchers(HttpMethod.PUT,
+                "/api/subjects/groups/*/professor",
+                "/api/subjects/groups/*/close",
+                "/api/subjects/groups/*/open"
+            ).hasAnyRole("DEAN","ADMIN")
+            .requestMatchers(HttpMethod.DELETE,
+                "/api/subjects/groups/*",
+                "/api/subjects/*/groups"
+            ).hasAnyRole("DEAN","ADMIN")
+            // ADMIN
+            .requestMatchers(HttpMethod.POST, "/api/subjects").hasRole("ADMIN")
+            .requestMatchers(HttpMethod.DELETE, "/api/subjects/*").hasRole("ADMIN")
+
+            // any other request
+            .anyRequest().authenticated()
+        )
             .httpBasic(Customizer.withDefaults())
             .addFilterBefore(new JwtAuthenticationFilter(jwtService), UsernamePasswordAuthenticationFilter.class);
 

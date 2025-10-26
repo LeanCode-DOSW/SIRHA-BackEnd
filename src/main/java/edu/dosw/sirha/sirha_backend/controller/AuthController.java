@@ -40,7 +40,7 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<AuthResponse> registerStudent(@RequestBody RegisterRequest req) throws SirhaException {
-        var studentAuth = studentService.registerStudent(req); 
+        var studentAuth = studentService.registerStudent(req);
 
         if (accounts.existsByUsername(req.getUsername())) {
             return ResponseEntity.badRequest()
@@ -85,12 +85,11 @@ public class AuthController {
         return ResponseEntity.ok().build();
     }
 
-    // -- Crear DEAN
     public static class DeanRegisterRequest {
         public String username;
         public String email;
         public String password;
-        public String linkedDecanateId; 
+        public String linkedDecanateId;
     }
     @PostMapping("/register-dean")
     public ResponseEntity<?> registerDean(@RequestBody DeanRegisterRequest req) {
