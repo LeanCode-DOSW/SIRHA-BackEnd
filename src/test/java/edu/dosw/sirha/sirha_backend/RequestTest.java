@@ -35,7 +35,7 @@ class RequestTest {
             Subject subject = new Subject("101", "Matemáticas", 4);
 
             Group group = new Group(subject, 30, period);
-            StudyPlan studyPlan = new StudyPlan("Ingeniería de Sistemas", Careers.INGENIERIA_DE_SISTEMAS);
+            StudyPlan studyPlan = new StudyPlan(Careers.INGENIERIA_DE_SISTEMAS);
             studyPlan.addSubject(subject);
             
             Semaforo semaforo = new Semaforo(studyPlan);
@@ -104,7 +104,7 @@ class RequestTest {
     void testPrerequisiteValidation() {
         AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
 
-        StudyPlan studyPlan = new StudyPlan("Ingenieria de Sistemas", Careers.INGENIERIA_DE_SISTEMAS);
+        StudyPlan studyPlan = new StudyPlan(Careers.INGENIERIA_DE_SISTEMAS);
        
 
         try { 
@@ -168,7 +168,7 @@ class RequestTest {
     @Test
     void testStudyPlanConfiguration() {
         try {
-            StudyPlan studyPlan = new StudyPlan("Ingeniería de Sistemas", Careers.INGENIERIA_DE_SISTEMAS); // Constructor con nombre
+            StudyPlan studyPlan = new StudyPlan(Careers.INGENIERIA_DE_SISTEMAS); // Constructor con nombre
             Subject subject1 = new Subject("101", "Matemáticas", 4);
             Subject subject2 = new Subject("102", "Física", 3);
             Subject subject3 = new Subject("103", "Química", 4);

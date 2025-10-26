@@ -541,30 +541,48 @@ public class SubjectServiceImpl implements SubjectService {
             throw SirhaException.of(ErrorCodeSirha.INTERNAL_ERROR,"Error interno al eliminar grupos por materia: " + e.getMessage(), e);
         }
     }
-    
+    @Transactional
     @Override
-    public Group cerrarGrupo(String groupId) throws SirhaException {
+    public Group closeGroup(String groupId) throws SirhaException {
         try {
-            Group group = groupService.findById(groupId);
-            group.closeGroup();
-            return group;
+            return groupService.closeGroup(groupId);
         } catch (SirhaException e) {
             throw e;
         } catch (Exception e) {
             throw SirhaException.of(ErrorCodeSirha.INTERNAL_ERROR,"Error interno al cerrar el grupo: " + e.getMessage(), e);
         }
     }
-    
+    @Transactional
     @Override
-    public Group abrirGrupo(String groupId) throws SirhaException {
+    public Group openGroup(String groupId) throws SirhaException {
         try {
-            Group group = groupService.findById(groupId);
-            group.openGroup();
-            return group;
+            return groupService.openGroup(groupId);
         } catch (SirhaException e) {
             throw e;
         } catch (Exception e) {
             throw SirhaException.of(ErrorCodeSirha.INTERNAL_ERROR,"Error interno al abrir el grupo: " + e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public Group saveGroup(Subject subject, Group group) throws SirhaException {
+        try {
+            return groupService.saveGroup(subject, group);
+        } catch (SirhaException e) {
+            throw e;
+        } catch (Exception e) {
+            throw SirhaException.of(ErrorCodeSirha.INTERNAL_ERROR,"Error interno al guardar grupo: " + e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public Group findById(String id) throws SirhaException {
+        try {
+            return groupService.findById(id);
+        } catch (SirhaException e) {
+            throw e;
+        } catch (Exception e) {
+            throw SirhaException.of(ErrorCodeSirha.INTERNAL_ERROR,"Error interno al buscar grupo por ID: " + e.getMessage(), e);
         }
     }
 

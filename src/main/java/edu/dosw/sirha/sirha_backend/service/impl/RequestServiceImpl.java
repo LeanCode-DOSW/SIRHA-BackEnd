@@ -71,27 +71,6 @@ public class RequestServiceImpl implements RequestService {
         }
     }
 
-    @Transactional
-    @Override
-    public BaseRequest save(BaseRequest request) throws SirhaException {
-        log.info("Guardando solicitud - ID: {}, Tipo: {}", 
-                request.getId() != null ? request.getId() : "NUEVO", 
-                request.getClass().getSimpleName());
-        
-        try {
-            BaseRequest savedRequest = repository.save(request);
-            
-            log.info("Solicitud guardada exitosamente - ID: {}, Tipo: {}, Estado: {}", 
-                    savedRequest.getId(), 
-                    savedRequest.getClass().getSimpleName(),
-                    savedRequest.getState());
-
-            
-            return savedRequest;
-        } catch (Exception e) {
-            throw SirhaException.of(ErrorCodeSirha.INTERNAL_ERROR,"Error interno al guardar solicitud: " + e.getMessage(), e);
-        }
-    }
 
     @Transactional
     @Override

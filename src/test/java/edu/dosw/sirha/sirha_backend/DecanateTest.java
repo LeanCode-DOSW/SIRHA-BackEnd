@@ -67,8 +67,8 @@ class DecanateTest {
         
         grupoQuimicaY = new Group(quimica, 30, currentPeriod);
 
-        StudyPlan studyPlan1 = new StudyPlan("Ingeniería de Sistemas", Careers.INGENIERIA_DE_SISTEMAS);
-        StudyPlan studyPlan2 = new StudyPlan("Ingeniería Industrial", Careers.INGENIERIA_INDUSTRIAL);
+        StudyPlan studyPlan1 = new StudyPlan(Careers.INGENIERIA_DE_SISTEMAS);
+        StudyPlan studyPlan2 = new StudyPlan(Careers.INGENIERIA_INDUSTRIAL);
 
         studentSistemas = new Student(
             "juan.perez",

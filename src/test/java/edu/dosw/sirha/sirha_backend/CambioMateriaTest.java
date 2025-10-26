@@ -51,7 +51,7 @@ class CambioMateriaTest {
             fail("No se esperaba una excepción al crear los grupos: " + e.getMessage());
         }
 
-        studyPlan = new StudyPlan("Ingeniería de Sistemas", Careers.INGENIERIA_DE_SISTEMAS);
+        studyPlan = new StudyPlan(Careers.INGENIERIA_DE_SISTEMAS);
         studyPlan.addSubject(materiaAntigua);
         studyPlan.addSubject(materiaNueva);
         studyPlan.addSubject(prerequisito);

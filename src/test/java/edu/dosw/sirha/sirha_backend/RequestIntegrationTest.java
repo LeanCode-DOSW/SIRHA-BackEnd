@@ -69,7 +69,7 @@ class RequestIntegrationTest {
             fail("No se esperaba una excepción al agregar horarios: " + e.getMessage());
         }
         
-        studyPlan = new StudyPlan("Ingeniería de Sistemas", Careers.INGENIERIA_DE_SISTEMAS);
+        studyPlan = new StudyPlan(Careers.INGENIERIA_DE_SISTEMAS);
         studyPlan.addSubject(mathematics);
         studyPlan.addSubject(physics);
         studyPlan.addSubject(chemistry);

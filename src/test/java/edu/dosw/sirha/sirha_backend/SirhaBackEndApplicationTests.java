@@ -89,7 +89,7 @@ class SirhaBackEndApplicationTests {
             grupo1.addSchedule(schedule1);
             grupo2.addSchedule(schedule2);
         
-            studyPlan = new StudyPlan("Ingeniería de Sistemas", Careers.INGENIERIA_DE_SISTEMAS);
+            studyPlan = new StudyPlan(Careers.INGENIERIA_DE_SISTEMAS);
             studyPlan.addSubject(matematicas);
             studyPlan.addSubject(fisica);
             studyPlan.addSubject(quimica);
@@ -379,13 +379,10 @@ class SirhaBackEndApplicationTests {
     @Test
     void testStudyPlanBasics() {
         assertNotNull(studyPlan);
-        assertEquals("Ingeniería de Sistemas", studyPlan.getName());
+        assertEquals(Careers.INGENIERIA_DE_SISTEMAS.getDisplayName(), studyPlan.getName());
         assertNotNull(studyPlan.getSubjects());
 
         assertTrue(studyPlan.getSubjects().containsKey(matematicas.getName()));
-
-        studyPlan.setName("Ingeniería de Software");
-        assertEquals("Ingeniería de Software", studyPlan.getName());
     }
     @Test
     void testSubjectStates() {
@@ -1695,7 +1692,7 @@ class SirhaBackEndApplicationTests {
     void testStudentAcademicValidations() {
         try {
             Student student1 = new Student("test.user", "test@example.com", "password", "T001");
-            StudyPlan plan = new StudyPlan("Test Plan", Careers.INGENIERIA_DE_SISTEMAS);
+            StudyPlan plan = new StudyPlan(Careers.INGENIERIA_DE_SISTEMAS);
             Subject subject = new Subject("101", "Test Subject", 3);
             plan.addSubject(subject);
             
@@ -1715,7 +1712,7 @@ class SirhaBackEndApplicationTests {
         
         try {
             Student student1 = new Student("test.user", "test@example.com", "password", "T001");
-            StudyPlan plan = new StudyPlan("Test Plan", Careers.INGENIERIA_DE_SISTEMAS);
+            StudyPlan plan = new StudyPlan(Careers.INGENIERIA_DE_SISTEMAS);
             Subject subject = new Subject("101", "Test Subject", 3);
             plan.addSubject(subject);
             
@@ -1820,7 +1817,7 @@ class SirhaBackEndApplicationTests {
 
     @Test
     void testStudyPlanSubjectManagement() {
-        StudyPlan plan = new StudyPlan("Computer Science", Careers.INGENIERIA_DE_SISTEMAS);
+        StudyPlan plan = new StudyPlan(Careers.INGENIERIA_DE_SISTEMAS);
         try {
             Subject cs101 = new Subject("CS101", "Programming I", 4);
             Subject cs102 = new Subject("CS102", "Programming II", 4);
@@ -1962,7 +1959,7 @@ class SirhaBackEndApplicationTests {
         
         try {
             Student student1 = new Student("integration.test", "int@test.com", "password", "INT001");
-            StudyPlan plan = new StudyPlan("Integration Test Plan", Careers.INGENIERIA_DE_SISTEMAS);
+            StudyPlan plan = new StudyPlan(Careers.INGENIERIA_DE_SISTEMAS);
             
             Subject math = new Subject("MATH101", "Mathematics", 4);
             Subject physics = new Subject("PHYS101", "Physics", 3);

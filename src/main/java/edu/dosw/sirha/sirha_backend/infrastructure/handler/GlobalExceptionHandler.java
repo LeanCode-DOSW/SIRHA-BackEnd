@@ -331,6 +331,8 @@ public class GlobalExceptionHandler {
                 "El profesor especificado no fue encontrado. Verifique el ID o la información del profesor.";
             case DECANATE_NOT_FOUND ->
                 "La decanatura especificada no fue encontrada. Verifique el nombre o la información de la decanatura.";
+            case STUDY_PLAN_NOT_FOUND ->
+                "El plan de estudios especificado no fue encontrado. Verifique el nombre o la información del plan de estudios.";
         };
         error.setSuggestion(suggestion);
     }

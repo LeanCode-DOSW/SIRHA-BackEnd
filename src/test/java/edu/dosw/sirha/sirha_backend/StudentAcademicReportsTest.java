@@ -60,7 +60,7 @@ class StudentAcademicReportsTest {
         quimica = new Subject("QUI101", "Química I", 4);
         estadistica = new Subject("EST201", "Estadística", 3);
 
-        studyPlan = new StudyPlan("Ingeniería de Sistemas", Careers.INGENIERIA_DE_SISTEMAS);
+        studyPlan = new StudyPlan(Careers.INGENIERIA_DE_SISTEMAS);
         studyPlan.addSubject(matematicas);    // Semestre 1
         studyPlan.addSubject(fisica);         // Semestre 1
         studyPlan.addSubject(programacion);   // Semestre 1

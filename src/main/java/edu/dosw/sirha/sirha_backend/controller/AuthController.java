@@ -55,6 +55,7 @@ public class AuthController {
      * @return ResponseEntity con AuthResponse conteniendo token y datos del usuario
      * @throws SirhaException si las credenciales son inválidas o hay error en el proceso
      */
+    
     @PostMapping("/login")
     @Operation(summary = "Autenticar usuario", description = "Autentica un usuario con sus credenciales y retorna un token de acceso")
     @ApiResponses(value = {

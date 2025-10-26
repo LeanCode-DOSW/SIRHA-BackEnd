@@ -121,7 +121,7 @@ class GroupTests {
             assertFalse(student1.isSubjectNoCursada(subject.getName()));
             assertFalse(student1.isSubjectReprobada(subject.getName()));
 
-            StudyPlan studyPlan = new StudyPlan("Ingeniería de Sistemas", Careers.INGENIERIA_AMBIENTAL);
+            StudyPlan studyPlan = new StudyPlan(Careers.INGENIERIA_AMBIENTAL);
             Group smallGroup = new Group(subject, 2, academicPeriod);
             assertThrows(SirhaException.class, () -> subject.addGroup(smallGroup));
             smallGroup.addSchedule(schedule1);
@@ -477,7 +477,7 @@ class GroupTests {
     void canEnrollInGroup_success() {
         try {
             AcademicPeriod period = academicPeriod;
-            StudyPlan plan = new StudyPlan("Plan Test", Careers.INGENIERIA_AMBIENTAL);
+            StudyPlan plan = new StudyPlan(Careers.INGENIERIA_AMBIENTAL);
             Subject subj = new Subject("MAT101", "Matematicas I", 4);
             plan.addSubject(subj);
 
@@ -498,7 +498,7 @@ class GroupTests {
     void canEnrollInGroup_subjectNotInPlan_throws() {
         try {
             AcademicPeriod period = academicPeriod;
-            StudyPlan plan = new StudyPlan("Plan Test", Careers.INGENIERIA_AMBIENTAL);
+            StudyPlan plan = new StudyPlan(Careers.INGENIERIA_AMBIENTAL);
             Subject subjInPlan = new Subject("MAT101", "Matematicas I", 4);
             plan.addSubject(subjInPlan);
             Subject subjNotInPlan = new Subject("HIS101", "Historia I", 3);
@@ -521,7 +521,7 @@ class GroupTests {
     void canEnrollInGroup_alreadyEnrolled_throws() {
         try {
             AcademicPeriod period = academicPeriod;
-            StudyPlan plan = new StudyPlan("Plan Test", Careers.INGENIERIA_AMBIENTAL);
+            StudyPlan plan = new StudyPlan(Careers.INGENIERIA_AMBIENTAL);
             Subject subj = new Subject("MAT101", "Matematicas I", 4);
             plan.addSubject(subj);
 
@@ -546,7 +546,7 @@ class GroupTests {
     void canEnrollInGroup_groupClosed_throws() {
         try {
             AcademicPeriod period = academicPeriod;
-            StudyPlan plan = new StudyPlan("Plan Test", Careers.INGENIERIA_AMBIENTAL);
+            StudyPlan plan = new StudyPlan(Careers.INGENIERIA_AMBIENTAL);
             Subject subj = new Subject("MAT101", "Matematicas I", 4);
             plan.addSubject(subj);
 
@@ -570,7 +570,7 @@ class GroupTests {
     void canEnrollInGroup_academicPeriodMismatch_throws() {
         try {
             AcademicPeriod wrongPeriod = new AcademicPeriod("2023-2", LocalDate.now().minusYears(1), LocalDate.now().minusMonths(6));
-            StudyPlan plan = new StudyPlan("Plan Test", Careers.INGENIERIA_AMBIENTAL);
+            StudyPlan plan = new StudyPlan(Careers.INGENIERIA_AMBIENTAL);
             Subject subj = new Subject("MAT101", "Matematicas I", 4);
             plan.addSubject(subj);
 
@@ -591,7 +591,7 @@ class GroupTests {
     @Test
     void canEnrollInGroup_scheduleConflict_throws() {
         try {
-            StudyPlan plan = new StudyPlan("Plan Test", Careers.INGENIERIA_AMBIENTAL);
+            StudyPlan plan = new StudyPlan(Careers.INGENIERIA_AMBIENTAL);
             Subject other = new Subject("QUI101", "Quimica I", 4);
             plan.addSubject(other);
             Group conflicto = new Group(other, 30, academicPeriod);

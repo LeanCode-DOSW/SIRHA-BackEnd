@@ -10,7 +10,6 @@ import edu.dosw.sirha.sirha_backend.exception.SirhaException;
 public interface RequestService {
     List<BaseRequest> findAll() throws SirhaException;
     Optional<BaseRequest> findById(String id) throws SirhaException;
-    BaseRequest save(BaseRequest request) throws SirhaException;
     BaseRequest deleteById(String id) throws SirhaException;
 
     List<BaseRequest> getAllRequests(String username) throws SirhaException;

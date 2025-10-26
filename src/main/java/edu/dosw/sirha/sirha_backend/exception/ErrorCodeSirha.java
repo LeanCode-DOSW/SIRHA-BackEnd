@@ -65,7 +65,8 @@ public enum ErrorCodeSirha {
     CANNOT_DROP_SUBJECT("No se puede retirar la materia"),
     SUBJECT_ALREADY_EXISTS("La materia ya existe"),
     PROFESSOR_NOT_FOUND("Profesor no encontrado"), 
-    DECANATE_NOT_FOUND("Decanatura no encontrada")
+    DECANATE_NOT_FOUND("Decanatura no encontrada"), 
+    STUDY_PLAN_NOT_FOUND("Plan de estudios no encontrado")
     ;
     private final String defaultMessage;
     

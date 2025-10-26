@@ -1,7 +1,5 @@
 package edu.dosw.sirha.sirha_backend.controller;
-
 import java.util.List;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -58,10 +56,12 @@ public class DecanateController {
         @ApiResponse(responseCode = "409", description = "Decanatura ya existe"),
         @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
-    public ResponseEntity<Decanate> createDecanate(@RequestBody Careers careers) throws SirhaException {
-        Decanate createdDecanate = decanateService.saveDecanate(careers);
+    public ResponseEntity<Decanate> createDecanate(@RequestBody Careers career) throws SirhaException {
+        Decanate createdDecanate = decanateService.saveDecanate(career);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdDecanate);
     }
+
+
 
     @GetMapping
     @Operation(summary = "Obtener todas las decanaturas", description = "Retorna una lista completa de todas las decanaturas registradas en el sistema")
@@ -193,8 +193,8 @@ public class DecanateController {
         @ApiResponse(responseCode = "409", description = "Plan de estudio ya existe"),
         @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
-    public ResponseEntity<List<StudyPlan>> addPlanToDecanate(@PathVariable String decanateName, @RequestBody StudyPlan studyPlan) throws SirhaException {
-        List<StudyPlan> updatedPlans = decanateService.addPlanToDecanate(decanateName, studyPlan);
+    public ResponseEntity<List<StudyPlan>> addPlanToDecanate(@PathVariable String decanateName, @RequestBody String studyPlanName) throws SirhaException {
+        List<StudyPlan> updatedPlans = decanateService.addPlanToDecanate(decanateName, studyPlanName);
         return ResponseEntity.status(HttpStatus.CREATED).body(updatedPlans);
     }
 
@@ -222,14 +222,41 @@ public class DecanateController {
         return ResponseEntity.ok(studyPlans.size());
     }
 
-    @GetMapping("/{decanateName}/exists")
-    @Operation(summary = "Verificar existencia de decanatura", description = "Verifica si existe una decanatura con el nombre especificado")
+    @PostMapping("/study-plans/{studyPlanName}/subjects/{subjectName}")
+    @Operation(summary = "Agregar materia a plan de estudio", description = "Agrega una materia a un plan de estudio existente")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Verificación completada"),
+        @ApiResponse(responseCode = "200", description = "Materia agregada exitosamente"),
+        @ApiResponse(responseCode = "404", description = "Plan o materia no encontrada"),
+        @ApiResponse(responseCode = "400", description = "Datos inválidos"),
         @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
-    public ResponseEntity<Boolean> decanateExists(@PathVariable String decanateName) throws SirhaException {
-        Decanate decanate = decanateService.getDecanateByName(decanateName);
-        return ResponseEntity.ok(decanate != null);
+    public ResponseEntity<StudyPlan> addSubjectToStudyPlan(@PathVariable String studyPlanName,
+                                                           @PathVariable String subjectName) throws SirhaException {
+        StudyPlan updated = decanateService.addSubjectToStudyPlan(studyPlanName, subjectName);
+        return ResponseEntity.ok(updated);
+    }
+
+    @PostMapping("/study-plans")
+    @Operation(summary = "Crear/guardar plan de estudio", description = "Crea o actualiza un plan de estudio")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "201", description = "Plan de estudio guardado"),
+        @ApiResponse(responseCode = "400", description = "Datos inválidos"),
+        @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    })
+    public ResponseEntity<StudyPlan> saveStudyPlan(@RequestBody Careers career) throws SirhaException {
+        StudyPlan saved = decanateService.saveStudyPlan(career);
+        return ResponseEntity.status(HttpStatus.CREATED).body(saved);
+    }
+
+    @GetMapping("/study-plans/career/{career}")
+    @Operation(summary = "Obtener planes por carrera", description = "Obtiene los planes de estudio filtrados por carrera")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Planes obtenidos exitosamente"),
+        @ApiResponse(responseCode = "404", description = "Planes no encontrados"),
+        @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    })
+    public ResponseEntity<List<StudyPlan>> getStudyPlansByCareer(@PathVariable Careers career) throws SirhaException {
+        List<StudyPlan> plans = decanateService.getStudyPlansByCareer(career);
+        return ResponseEntity.ok(plans);
     }
 }

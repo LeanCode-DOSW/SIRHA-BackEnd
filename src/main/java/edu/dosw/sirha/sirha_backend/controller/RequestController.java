@@ -2,12 +2,10 @@ package edu.dosw.sirha.sirha_backend.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-
 import edu.dosw.sirha.sirha_backend.dto.ResponseRequest;
 import edu.dosw.sirha.sirha_backend.domain.model.enums.RequestStateEnum;
 import edu.dosw.sirha.sirha_backend.domain.model.staterequest.BaseRequest;
@@ -92,7 +90,7 @@ public class RequestController {
         @ApiResponse(responseCode = "404", description = "Estudiante no encontrado"),
         @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
-    public ResponseEntity<List<BaseRequest>> getByStudentUsername(@PathVariable String studentUsername) throws SirhaException {
+    public ResponseEntity<List<BaseRequest>> getAllRequestsByStudentUsername(@PathVariable String studentUsername) throws SirhaException {
         List<BaseRequest> requests = requestService.getAllRequests(studentUsername);
         return ResponseEntity.ok(requests);
     }
@@ -134,4 +132,5 @@ public class RequestController {
         BaseRequest deletedRequest = requestService.deleteById(requestId);
         return ResponseEntity.ok(deletedRequest);
     }
+
 }
