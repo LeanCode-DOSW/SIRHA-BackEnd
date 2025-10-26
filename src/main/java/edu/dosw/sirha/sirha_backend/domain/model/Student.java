@@ -391,9 +391,10 @@ public class Student extends User implements SolicitudFactory, ScheduleManager, 
         if (currentPeriod == null || !currentPeriod.isActive() || !group.sameAcademicPeriod(currentPeriod)) {
             throw SirhaException.of(ErrorCodeSirha.ACADEMIC_PERIOD_NOT_VALID, "El período académico no es válido para el grupo especificado");
         }
-
-        group.unenrollStudent(this);
+        
         academicProgress.unenrollSubjectFromGroup(subject.getName(), group);
+        group.unenrollStudent(this);
+        
     }
 
     @Override

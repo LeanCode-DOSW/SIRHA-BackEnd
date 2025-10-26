@@ -1980,11 +1980,19 @@ class SirhaBackEndApplicationTests {
             
             student1.enrollSubject(math, mathGroup);
             assertTrue(student1.hasSubject(math));
-            assertTrue(student1.getAcademicProgress().isSubjectCursando(math.getName()));
+            assertTrue(student1.isSubjectCursando(math.getName()));
+
+            assertEquals(1, student1.getSubjectsByColorCount(SemaforoColores.AMARILLO));
 
             student1.enrollSubject(physics, physicsGroup);
             assertTrue(student1.hasSubject(physics));
+            assertTrue(student1.isSubjectCursando(physics.getName()));
+            assertEquals(2, student1.getSubjectsByColorCount(SemaforoColores.AMARILLO));
 
+
+            student1.unenrollSubject(physics, physicsGroup);
+            assertEquals(1, student1.getSubjectsByColorCount(SemaforoColores.AMARILLO));
+            assertFalse(student1.isSubjectCursando(physics.getName()));
         } catch (Exception e) {
             fail("No se esperaba una excepción en el flujo de integración: " + e.getMessage());
         }
