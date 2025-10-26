@@ -74,6 +74,7 @@ class CambioGrupoTest {
         student.getAcademicSummary();
         student.getAcademicPensum();
     }
+    
 
     @Test
     void testCambioGrupoCapacityValidation() {
@@ -212,8 +213,8 @@ class CambioGrupoTest {
     }
     @Test
     void testValidateChangeGroup_Error1_EstudianteNoTieneMateria() {
-        Subject materiaNoInscrita = new Subject("999", "Materia No Inscrita", 3);
         try {
+            Subject materiaNoInscrita = new Subject("999", "Materia No Inscrita", 3);
             Group grupoNoInscrito = new Group(materiaNoInscrita, 20, academicPeriod);
             studyPlan.addSubject(materiaNoInscrita);
 
@@ -262,12 +263,11 @@ class CambioGrupoTest {
     void testValidateChangeGroup_Error5_GrupoNuevoEstaCerrado() {
         try {
             student.enrollSubject(subject, grupoActual);
+            grupoNuevo.openGroup();
             grupoNuevo.closeGroup();
         } catch (Exception e) {
             fail("No se esperaba una excepción al inscribir el estudiante en el grupo actual: " + e.getMessage());
         }
-
-
 
         SirhaException exception = assertThrows(SirhaException.class, () -> {
             student.validateChangeGroup(subject, grupoNuevo);
@@ -327,7 +327,7 @@ class CambioGrupoTest {
 
             student.enrollSubject(subject, grupoActual);
             assertTrue(student.hasSubject(subject));
-            assertTrue(student.getAcademicProgress().isSubjectCursando(subject));
+            assertTrue(student.getAcademicProgress().isSubjectCursando(subject.getName()));
             assertNotEquals(grupoActual.getId(), grupoNuevo.getId());
             assertTrue(subject.hasGroup(grupoNuevo));
             assertTrue(grupoNuevo.isOpen());

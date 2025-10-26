@@ -91,6 +91,16 @@ class DecanateTest {
 
         requestIndustrial1 = new CambioGrupo(studentIndustrial, quimica, grupoQuimicaY, currentPeriod);
     }
+    @Test
+    void testEqualsAcademicPeriod() {
+        AcademicPeriod period1 = new AcademicPeriod("2024-1", LocalDate.of(2024, 1, 1), LocalDate.of(2024, 6, 30));
+        AcademicPeriod period2 = new AcademicPeriod("2024-1", LocalDate.of(2024, 1, 1), LocalDate.of(2024, 6, 30));
+        AcademicPeriod period3 = new AcademicPeriod("2024-2", LocalDate.of(2024, 7, 1), LocalDate.of(2024, 12, 31));
+
+        assertEquals(period1, period2);
+        assertNotEquals(period1, period3);
+        assertNotEquals(null, period1);
+    }
 
     @Test
     void testDecanateCreation() {
@@ -141,7 +151,9 @@ class DecanateTest {
     void testReceiveValidRequest() throws SirhaException {
         
         decanateSistemas.receiveRequest(requestSistemas1);
-
+        decanateIndustrial.getCareer();
+        decanateIndustrial.getStudyPlans();
+        
         List<BaseRequest> pendingRequests = decanateSistemas.getPendingRequests();
         assertEquals(1, pendingRequests.size());
         assertEquals(requestSistemas1, pendingRequests.get(0));

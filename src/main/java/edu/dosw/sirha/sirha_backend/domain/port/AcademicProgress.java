@@ -82,10 +82,10 @@ public interface AcademicProgress {
 
     boolean hasSubject(Subject subject);
 
-    boolean isSubjectApproved(Subject subject);
-    boolean isSubjectCursando(Subject subject);
-    boolean isSubjectReprobada(Subject subject);
-    boolean isSubjectNoCursada(Subject subject);
+    boolean isSubjectApproved(String subject);
+    boolean isSubjectCursando(String subject);
+    boolean isSubjectReprobada(String subject);
+    boolean isSubjectNoCursada(String subject);
 
     int getTotalSubjectsCount();
     int getPassedSubjectsCount();

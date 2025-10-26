@@ -62,12 +62,13 @@ class SirhaBackEndApplicationTests {
         } catch (Exception e) {
             fail("No se esperaba una excepción al crear los usuarios: " + e.getMessage());
         }
-        matematicas = new Subject("101", "Matemáticas I", 4);
-        fisica = new Subject("102", "Física I", 3);
-        quimica = new Subject("103", "Química I", 4);
-        programacion = new Subject("CS101", "Programación I", 5);
-        
+
         try {
+            matematicas = new Subject("101", "Matemáticas I", 4);
+            fisica = new Subject("102", "Física I", 3);
+            quimica = new Subject("103", "Química I", 4);
+            programacion = new Subject("CS101", "Programación I", 5);
+                        
             grupo1 = new Group(matematicas,30, academicPeriod);
             grupo1.setId("1");
             grupo1.setAula("A101");
@@ -81,31 +82,22 @@ class SirhaBackEndApplicationTests {
             grupo3 = new Group(quimica, 35, academicPeriod);
             grupo3.setId("3");
             grupo3.setAula("C303");
-        } catch (Exception e) {
-            fail("No se esperaba una excepción al crear los grupos: " + e.getMessage());
-        }
-        try {
+
             schedule1 = new Schedule(DiasSemana.LUNES, LocalTime.of(8, 0), LocalTime.of(10, 0));
             schedule2 = new Schedule(DiasSemana.MARTES, LocalTime.of(10, 0), LocalTime.of(12, 0));
-        } catch (Exception e) {
-            fail("No se esperaba una excepción al crear los horarios: " + e.getMessage());
-        }
-        try {
+
             grupo1.addSchedule(schedule1);
             grupo2.addSchedule(schedule2);
-        } catch (Exception e) {
+        
+            studyPlan = new StudyPlan("Ingeniería de Sistemas", Careers.INGENIERIA_DE_SISTEMAS);
+            studyPlan.addSubject(matematicas);
+            studyPlan.addSubject(fisica);
+            studyPlan.addSubject(quimica);
+            studyPlan.addSubject(programacion);
+            
+            } catch (Exception e) {
             fail("No se esperaba una excepción al agregar horarios: " + e.getMessage());
-        }        
-        studyPlan = new StudyPlan("Ingeniería de Sistemas", Careers.INGENIERIA_DE_SISTEMAS);
-        studyPlan.addSubject(matematicas);
-        studyPlan.addSubject(fisica);
-        studyPlan.addSubject(quimica);
-        studyPlan.addSubject(programacion);
-        
-        matematicas.addGroup(grupo1);
-        fisica.addGroup(grupo2);
-        quimica.addGroup(grupo3);
-        
+        }  
         
         try {
             semaforo = new Semaforo(studyPlan);
@@ -691,11 +683,12 @@ class SirhaBackEndApplicationTests {
 
     @Test
     void testMultipleSubjectsIndependentStates() {
-        Subject math = new Subject("101", "Matemáticas", 4);
-        Subject physics = new Subject("102", "Física", 3);
-        Subject chemistry = new Subject("103", "Química", 4);
+
 
         try {
+            Subject math = new Subject("101", "Matemáticas", 4);
+            Subject physics = new Subject("102", "Física", 3);
+            Subject chemistry = new Subject("103", "Química", 4);
             SubjectDecorator mathDecorator = new SubjectDecorator(math);
             SubjectDecorator physicsDecorator = new SubjectDecorator(physics);
             SubjectDecorator chemistryDecorator = new SubjectDecorator(chemistry);
@@ -747,11 +740,9 @@ class SirhaBackEndApplicationTests {
 
     @Test
     void testStateInstanceUniqueness() {
-        Subject subject1 = new Subject("101", "Matemáticas", 4);
-        Subject subject2 = new Subject("102", "Física", 3);
-
-
         try { 
+            Subject subject1 = new Subject("101", "Matemáticas", 4);
+            Subject subject2 = new Subject("102", "Física", 3);
             SubjectDecorator decorator1 = new SubjectDecorator(subject1);
             SubjectDecorator decorator2 = new SubjectDecorator(subject2);
             
@@ -1438,7 +1429,6 @@ class SirhaBackEndApplicationTests {
             Group newGroup = new Group(matematicas, 25, academicPeriod);
             Schedule newSchedule = new Schedule(DiasSemana.MARTES, LocalTime.of(10, 0), LocalTime.of(12, 0));
             newGroup.addSchedule(newSchedule);
-            matematicas.addGroup(newGroup);
             assertNotEquals(newGroup, grupo1);
 
             CambioGrupo solicitud = student.createGroupChangeRequest(matematicas, newGroup);
@@ -1461,18 +1451,14 @@ class SirhaBackEndApplicationTests {
     @Test
     void testSubjectContainsDifferentGroupsWithSameProperties() {
         try {
-            Group grupoA = new Group(matematicas, 25, academicPeriod);
-            Group grupoB = new Group(matematicas, 25, academicPeriod);
-            Group grupoC = new Group(matematicas, 25, academicPeriod);
+            Group grupoA = new Group(programacion, 25, academicPeriod);
+            Group grupoB = new Group(programacion, 25, academicPeriod);
+            Group grupoC = new Group(programacion, 25, academicPeriod);
 
             Schedule horario = new Schedule(DiasSemana.MIERCOLES, LocalTime.of(14, 0), LocalTime.of(16, 0));
             grupoA.addSchedule(horario);
             grupoB.addSchedule(new Schedule(DiasSemana.MIERCOLES, LocalTime.of(14, 0), LocalTime.of(16, 0)));
             grupoC.addSchedule(new Schedule(DiasSemana.MIERCOLES, LocalTime.of(14, 0), LocalTime.of(16, 0)));
-            
-            programacion.addGroup(grupoA);
-            programacion.addGroup(grupoB);
-            programacion.addGroup(grupoC);
             
             assertEquals(3, programacion.getGroups().size());
             assertNotSame(grupoA, grupoB);
@@ -1504,7 +1490,6 @@ class SirhaBackEndApplicationTests {
             Group newGroup = new Group(matematicas, 25, academicPeriod);
             Schedule newSchedule = new Schedule(DiasSemana.MARTES, LocalTime.of(10, 0), LocalTime.of(12, 0));
             newGroup.addSchedule(newSchedule);
-            matematicas.addGroup(newGroup);
             assertNotEquals(newGroup, grupo1);
 
             CambioGrupo solicitud = student.createGroupChangeRequest(matematicas, newGroup);
@@ -1527,18 +1512,16 @@ class SirhaBackEndApplicationTests {
     @Test
     void testSubjectContainsDifferentGroupsWithSameProperties2() {
         try {
-            Group grupoA = new Group(matematicas, 25, academicPeriod);
-            Group grupoB = new Group(matematicas, 25, academicPeriod);
-            Group grupoC = new Group(matematicas, 25, academicPeriod);
+            Group grupoA = new Group(programacion, 25, academicPeriod);
+            Group grupoB = new Group(programacion, 25, academicPeriod);
+            Group grupoC = new Group(programacion, 25, academicPeriod);
 
             Schedule horario = new Schedule(DiasSemana.MIERCOLES, LocalTime.of(14, 0), LocalTime.of(16, 0));
             grupoA.addSchedule(horario);
             grupoB.addSchedule(new Schedule(DiasSemana.MIERCOLES, LocalTime.of(14, 0), LocalTime.of(16, 0)));
             grupoC.addSchedule(new Schedule(DiasSemana.MIERCOLES, LocalTime.of(14, 0), LocalTime.of(16, 0)));
             
-            programacion.addGroup(grupoA);
-            programacion.addGroup(grupoB);
-            programacion.addGroup(grupoC);
+
             
             assertEquals(3, programacion.getGroups().size(), "La materia debe tener 3 grupos diferentes");
             assertNotSame(grupoA, grupoB);
@@ -1719,9 +1702,9 @@ class SirhaBackEndApplicationTests {
             Semaforo semaforo1 = new Semaforo(plan);
             student1.setAcademicProgress(semaforo1);
             
-            assertTrue(student1.getAcademicProgress().isSubjectNoCursada(subject));
-            assertFalse(student1.getAcademicProgress().isSubjectCursando(subject));
-            assertFalse(student1.getAcademicProgress().isSubjectApproved(subject));
+            assertTrue(student1.getAcademicProgress().isSubjectNoCursada(subject.getName()));
+            assertFalse(student1.getAcademicProgress().isSubjectCursando(subject.getName()));
+            assertFalse(student1.getAcademicProgress().isSubjectApproved(subject.getName()));
         } catch (Exception e) {
             fail("No se esperaba una excepción al crear el estudiante o plan de estudios: " + e.getMessage());
         }
@@ -1737,8 +1720,7 @@ class SirhaBackEndApplicationTests {
             plan.addSubject(subject);
             
             AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
-            Group group = new Group(matematicas, 30, period);
-            subject.addGroup(group);
+            Group group = new Group(subject, 30, period);
             
             Semaforo semaforo1 = new Semaforo(plan);
             student1.setAcademicProgress(semaforo1);
@@ -1747,7 +1729,7 @@ class SirhaBackEndApplicationTests {
             student1.enrollSubject(subject, group);
             
             assertTrue(student1.hasSubject(subject));
-            assertTrue(student1.getAcademicProgress().isSubjectCursando(subject));
+            assertTrue(student1.getAcademicProgress().isSubjectCursando(subject.getName()));
         } catch (Exception e) {
             fail("No se esperaba una excepción al crear el grupo o inscribir la materia: " + e.getMessage());
         }
@@ -1776,19 +1758,19 @@ class SirhaBackEndApplicationTests {
 
     @Test
     void testSubjectBasicFunctionalities() {
-        Subject subject = new Subject("CS101", "Programming I", 4);
         
-        assertEquals("CS101", subject.getId());
-        assertEquals("Programming I", subject.getName());
-        assertEquals(4, subject.getCredits());
-        assertNotNull(subject.getGroups());
-        assertTrue(subject.getGroups().isEmpty());
-        
-        AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
         try {
-            Group group = new Group(matematicas, 30, period);
+            Subject subject = new Subject("CS101", "Programming I", 4);
+            
+            assertEquals("CS101", subject.getId());
+            assertEquals("Programming I", subject.getName());
+            assertEquals(4, subject.getCredits());
+            assertNotNull(subject.getGroups());
+            assertTrue(subject.getGroups().isEmpty());
+            
+            AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
+            Group group = new Group(subject, 30, period);
         
-            subject.addGroup(group);
             assertEquals(1, subject.getGroups().size());
             assertTrue(subject.hasGroup(group));
         } catch (Exception e) {
@@ -1839,20 +1821,22 @@ class SirhaBackEndApplicationTests {
     @Test
     void testStudyPlanSubjectManagement() {
         StudyPlan plan = new StudyPlan("Computer Science", Careers.INGENIERIA_DE_SISTEMAS);
-        
-        Subject cs101 = new Subject("CS101", "Programming I", 4);
-        Subject cs102 = new Subject("CS102", "Programming II", 4);
-        Subject math101 = new Subject("MATH101", "Calculus I", 4);
-        
-        plan.addSubject(cs101);
-        plan.addSubject(cs102);
-        plan.addSubject(math101);
-        
-        assertEquals(3, plan.getSubjects().size());
-        assertTrue(plan.hasSubject(cs101));
-        assertTrue(plan.hasSubject(cs102));
-        assertTrue(plan.hasSubject(math101));
-    
+        try {
+            Subject cs101 = new Subject("CS101", "Programming I", 4);
+            Subject cs102 = new Subject("CS102", "Programming II", 4);
+            Subject math101 = new Subject("MATH101", "Calculus I", 4);
+            
+            plan.addSubject(cs101);
+            plan.addSubject(cs102);
+            plan.addSubject(math101);
+            
+            assertEquals(3, plan.getSubjects().size());
+            assertTrue(plan.hasSubject(cs101));
+            assertTrue(plan.hasSubject(cs102));
+            assertTrue(plan.hasSubject(math101));
+        } catch (Exception e) {
+            fail("No se esperaba una excepción al agregar materias al plan de estudios: " + e.getMessage());
+        }
     }
 
     @Test
@@ -1987,19 +1971,16 @@ class SirhaBackEndApplicationTests {
             
             AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
             
-            Group mathGroup = new Group(matematicas, 30, period);
+            Group mathGroup = new Group(math, 30, period);
             Group physicsGroup = new Group(physics, 25, period);
-            
-            math.addGroup(mathGroup);
-            physics.addGroup(physicsGroup);
-            
+
             Semaforo semaforo1 = new Semaforo(plan);
             student1.setAcademicProgress(semaforo1);
             student1.setCurrentPeriod(period);
             
             student1.enrollSubject(math, mathGroup);
             assertTrue(student1.hasSubject(math));
-            assertTrue(student1.getAcademicProgress().isSubjectCursando(math));
+            assertTrue(student1.getAcademicProgress().isSubjectCursando(math.getName()));
 
             student1.enrollSubject(physics, physicsGroup);
             assertTrue(student1.hasSubject(physics));

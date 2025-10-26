@@ -217,7 +217,6 @@ public class DecanateServiceImpl implements DecanateService {
     @Transactional
     @Override
     public List<StudyPlan> addPlanToDecanate(String decanateName, StudyPlan studyPlan) throws SirhaException {
-        // Validar parámetros
         if (decanateName == null || decanateName.trim().isEmpty()) {
             throw new SirhaException(ErrorCodeSirha.INVALID_ARGUMENT, "El nombre de la decanatura no puede estar vacío");
         }
@@ -228,11 +227,9 @@ public class DecanateServiceImpl implements DecanateService {
             throw new SirhaException(ErrorCodeSirha.INVALID_ARGUMENT, "El nombre del plan de estudio no puede estar vacío");
         }
         
-        // Buscar decanatura
         Decanate decanate = decanateRepository.findByName(decanateName)
                 .orElseThrow(() -> new SirhaException(ErrorCodeSirha.DECANATE_NOT_FOUND, "Decanatura no encontrada: %s", decanateName));
         
-        // Verificar que el plan no exista ya
         boolean planExists = decanate.getStudyPlans().stream()
                 .anyMatch(plan -> plan.getName().equals(studyPlan.getName()));
         

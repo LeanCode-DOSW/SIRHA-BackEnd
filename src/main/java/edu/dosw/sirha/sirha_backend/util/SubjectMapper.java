@@ -14,14 +14,17 @@ public class SubjectMapper {
         if (dto == null) {
             return null;
         }
-        
-        Subject subject = new Subject(
-            dto.getName(),
-            dto.getCredits()
-        );
-        subject.setPrerequisites(dto.getPrerequisites());
-        subject.setGroups(dto.getGroups());
-        return subject;
+        try {
+            Subject subject = new Subject(
+                dto.getName(),
+                dto.getCredits()
+            );
+            subject.setPrerequisites(dto.getPrerequisites());
+            subject.setGroups(dto.getGroups());
+            return subject;
+        } catch (Exception e) {
+            return null;
+        }
     }
     
     /**

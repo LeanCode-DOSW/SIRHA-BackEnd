@@ -8,10 +8,8 @@ import java.util.regex.Pattern;
 public class ValidationUtil {
 
     private ValidationUtil() {
-        throw new UnsupportedOperationException("Utility class");
     }
     
-    // Patrones de validación
     private static final Pattern EMAIL_INSTITUCIONAL = 
         Pattern.compile("^[a-zA-Z0-9._%+-]+@universidad\\.edu\\.co$");
     

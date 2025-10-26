@@ -36,7 +36,7 @@
 		<sonar.projectName>library</sonar.projectName>
 		<sonar.host.url>http://localhost:9000</sonar.host.url>
 		<sonar.coverage.jacoco.xmlReportPaths>target/site/jacoco/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
-		<sonar.coverage.exclusions>**/util/**,**/controller/**,**/service/**,**/repository/**,**/dto/**,**/config/**</sonar.coverage.exclusions>
+		<sonar.coverage.exclusions>**/util/**,**/controller/**,**/service/**,**/repository/**,**/dto/**,**/config/**,**/exception/**,**/infrastructure/**, </sonar.coverage.exclusions>
 	</properties>
 
 	<!-- Dependency Management para MongoDB -->

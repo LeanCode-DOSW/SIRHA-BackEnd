@@ -36,6 +36,7 @@ public class AcademicPeriod {
                !hoy.isBefore(startDateInscripciones) && 
                !hoy.isAfter(endDateInscripciones);
     }
+
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
 
@@ -51,8 +52,6 @@ public class AcademicPeriod {
         this.startDateInscripciones = startDateInscripciones; 
         this.endDateInscripciones = endDateInscripciones;
     }
-
-    
     
     public boolean isActivo() { 
         return !startDate.isAfter(LocalDate.now()) && !endDate.isBefore(LocalDate.now());
@@ -60,12 +59,11 @@ public class AcademicPeriod {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == null || getClass() != obj.getClass()) return false;
+        if (obj == null) return false;
+        if (getClass() != obj.getClass()) return false;
         if (this == obj) return true;
         AcademicPeriod that = (AcademicPeriod) obj;
-        return Objects.equals(period, that.period) &&
-               Objects.equals(startDate, that.startDate) &&
-               Objects.equals(endDate, that.endDate);
+        return Objects.equals(period, that.period) && Objects.equals(startDate, that.startDate) && Objects.equals(endDate, that.endDate);
     }
 
     @Override
