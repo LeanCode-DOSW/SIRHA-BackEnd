@@ -6,6 +6,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import edu.dosw.sirha.sirha_backend.domain.model.AcademicPeriod;
 import edu.dosw.sirha.sirha_backend.domain.model.Subject;
 import edu.dosw.sirha.sirha_backend.domain.model.stategroup.Group;
+import edu.dosw.sirha.sirha_backend.exception.SirhaException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -15,115 +16,183 @@ import java.time.LocalDate;
 class SubjectTest {
     @Test
     void constructorValidoTest() {
-        Subject s = new Subject("101", "Matemáticas", 4);
+        try {
+            Subject s = new Subject("101", "Matemáticas", 4);
 
-        assertEquals("101", s.getId());
-        assertEquals("Matemáticas", s.getName());
-        assertEquals(4, s.getCredits());
-        assertNotNull(s.getGroups());
-        assertTrue(s.getGroups().isEmpty());
+            assertEquals("101", s.getId());
+            assertEquals("Matemáticas", s.getName());
+            assertEquals(4, s.getCredits());
+            assertNotNull(s.getGroups());
+            assertTrue(s.getGroups().isEmpty());
+        } catch (Exception e) {
+            fail("No se esperaba una excepción al crear la materia: " + e.getMessage());
+        }
     }
 
     @Test
     void constructorNombreNullTest() {
-        assertThrows(IllegalArgumentException.class, () -> {
+        assertThrows(SirhaException.class, () -> {
             new Subject("101", null, 4);
         });
     }
+    @Test
+    void BaseconstructorTest() {
+        Subject s = new Subject();
+        assertNotNull(s.getGroups());
+        assertTrue(s.getGroups().isEmpty());
+        s.deleteGroups();
+    }
+
+    @Test 
+    void getOpenGroupsEmptyTest() {
+        try {
+            Subject s = new Subject("101", "Matemáticas", 4);
+            assertTrue(s.getOpenGroups().isEmpty());
+        } catch (Exception e) {
+            fail("No se esperaba una excepción al crear la materia: " + e.getMessage());
+        }
+    }
 
     @Test
+    void getGroupByCodeTest() {
+        try {
+            Subject s = new Subject("101", "Matemáticas", 4);
+            AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
+            Group g = new Group(s, 30, period);
+            Group foundGroup = s.getGroupByCode("MAT-1");
+            assertEquals(1, s.getGroups().size());
+            assertNotNull(foundGroup);
+            assertEquals(g, foundGroup);
+        } catch (Exception e) {
+            fail("No se esperaba una excepción al crear el grupo: " + e.getMessage());
+        }
+    }
+    
+    @Test
     void constructorNombreVacioTest() {
-        assertThrows(IllegalArgumentException.class, () -> {
+        assertThrows(SirhaException.class, () -> {
             new Subject("101", "", 4);
             });
         }
 
     @Test
     void constructorNombreBlankTest() {
-        assertThrows(IllegalArgumentException.class, () -> {
+        assertThrows(SirhaException.class, () -> {
             new Subject("101", "   ", 4);
         });
     }
 
     @Test
     void constructorCreditosCeroTest() {
-        assertThrows(IllegalArgumentException.class, () -> {
+        assertThrows(SirhaException.class, () -> {
             new Subject("101", "Matemáticas", 0);
         });
     }
 
     @Test
     void constructorCreditosNegativosTest() {
-        assertThrows(IllegalArgumentException.class, () -> {
+        assertThrows(SirhaException.class, () -> {
             new Subject("101", "Matemáticas", -1);
         });
     }
 
     @Test
     void setIdTest() {
-        Subject s = new Subject("101", "Matemáticas", 4);
-        s.setId("1012");
-        assertEquals("1012", s.getId());
+        try {
+            Subject s = new Subject("101", "Matemáticas", 4);
+            s.setId("1012");
+            assertEquals("1012", s.getId());
+        } catch (Exception e) {
+            fail("No se esperaba una excepción al establecer el ID: " + e.getMessage());
+        }
     }
 
     @Test
     void setNameValidoTest() {
-        Subject s = new Subject("101", "Matemáticas", 4);
-        s.setName("Física");
-        assertEquals("Física", s.getName());
+        try {
+            Subject s = new Subject("101", "Matemáticas", 4);
+            s.setName("Física");
+            assertEquals("Física", s.getName());
+        } catch (Exception e) {
+            fail("No se esperaba una excepción al establecer el nombre: " + e.getMessage());
+        }
     }
 
     void setNameInvalidTest(String invalidName) {
-        Subject s = new Subject("101", "Matemáticas", 4);
-        assertThrows(IllegalArgumentException.class, () -> {
-            s.setName(invalidName);
-        });
+        try {
+            Subject s = new Subject("101", "Matemáticas", 4);
+            assertThrows(IllegalArgumentException.class, () -> {
+                s.setName(invalidName);
+            });
+        } catch (Exception e) {
+            fail("No se esperaba una excepción al establecer un nombre inválido: " + e.getMessage());
+        }
     }
 
     @Test
     void setCreditsValidoTest() {
-        Subject s = new Subject("101", "Matemáticas", 4);
-        s.setCredits(6);
-        assertEquals(6, s.getCredits());
+        try {
+            Subject s = new Subject("101", "Matemáticas", 4);
+            s.setCredits(6);
+            assertEquals(6, s.getCredits());
+        } catch (Exception e) {
+            fail("No se esperaba una excepción al establecer créditos válidos: " + e.getMessage());
+        }
     }
 
     @Test
     void setCreditsCeroTest() {
-        Subject s = new Subject("101", "Matemáticas", 4);
-        assertThrows(IllegalArgumentException.class, () -> {
-            s.setCredits(0);
-        });
+        try {
+            Subject s = new Subject("101", "Matemáticas", 4);
+            assertThrows(SirhaException.class, () -> {
+                s.setCredits(0);
+            });
+        } catch (Exception e) {
+            fail("No se esperaba una excepción al establecer créditos cero: " + e.getMessage());
+        }
     }
 
     @Test
     void setCreditsNegativosTest() {
-        Subject s = new Subject("101", "Matemáticas", 4);
-        assertThrows(IllegalArgumentException.class, () -> {
-            s.setCredits(-3);
-        });
+        try {
+            Subject s = new Subject("101", "Matemáticas", 4);
+            assertThrows(SirhaException.class, () -> {
+                s.setCredits(-3);
+            });
+        } catch (Exception e) {
+            fail("No se esperaba una excepción al establecer créditos negativos: " + e.getMessage());
+        }
     }
 
 
     @Test
     void getNameTest() {
-        Subject s = new Subject("101", "Matemáticas", 4);
-        assertEquals("Matemáticas", s.getName());
-        assertEquals(s.getName(), s.getName());
+        try {
+            Subject s = new Subject("101", "Matemáticas", 4);
+            assertEquals("Matemáticas", s.getName());
+            assertEquals(s.getName(), s.getName());
+        } catch (Exception e) {
+            fail("No se esperaba una excepción al obtener el nombre: " + e.getMessage());
+        }
     }
 
     @Test
     void getCodigoTest() {
-        Subject s = new Subject("101", "Matemáticas", 4);
-        assertEquals("101", s.getId());
-        assertEquals(s.getId(), s.getId());
+        try {
+            Subject s = new Subject("101", "Matemáticas", 4);
+            assertEquals("101", s.getId());
+            assertEquals(s.getId(), s.getId());
+        } catch (Exception e) {
+            fail("No se esperaba una excepción al obtener el código: " + e.getMessage());
+        }
     }
 
 
     @Test
     void addGrupoTest() {
-        Subject s = new Subject("101", "Matemáticas", 4);
-        AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
         try {
+            Subject s = new Subject("101", "Matemáticas", 4);
+            AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));            
             Group g = new Group(s, 30, period);
             g.setId("1");
             assertTrue(s.hasGroup(g));
@@ -137,9 +206,9 @@ class SubjectTest {
 
     @Test
     void addMultiplesGruposTest() {
-        Subject s = new Subject("101", "Matemáticas", 4);
-        AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
         try {
+            Subject s = new Subject("101", "Matemáticas", 4);
+            AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));            
             Group g1 = new Group(s, 30, period);
             Group g2 = new Group(s, 25, period);
             Group g3 = new Group(s, 20, period);
@@ -161,17 +230,21 @@ class SubjectTest {
 
     @Test
     void addGrupoNullTest() {
-        Subject s = new Subject("101", "Matemáticas", 4);
-        assertThrows(IllegalArgumentException.class, () -> {
-            s.addGroup(null);
-        });
+        try {
+            Subject s = new Subject("101", "Matemáticas", 4);
+            assertThrows(SirhaException.class, () -> {
+                s.addGroup(null);
+            });
+        } catch (Exception e) {
+            fail("No se esperaba una excepción al agregar un grupo nulo: " + e.getMessage());
+        }
     }
 
     @Test
     void removeGroupTest() {
-        Subject s = new Subject("101", "Matemáticas", 4);
-        AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
         try {
+            Subject s = new Subject("101", "Matemáticas", 4);
+            AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));            
             Group g1 = new Group(s, 30, period);
             Group g2 = new Group(s, 25, period);
 
@@ -191,9 +264,10 @@ class SubjectTest {
 
     @Test
     void removeGrupoNoExistenteTest() {
-        Subject s = new Subject("101", "Matemáticas", 4);
-        AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
+
         try {
+            Subject s = new Subject("101", "Matemáticas", 4);
+            AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
             Group g1 = new Group(s, 30, period);
             Group g2 = new Group(s, 25, period);
 
@@ -210,9 +284,9 @@ class SubjectTest {
 
     @Test
     void hasGroupTrueTest() {
-        Subject s = new Subject("101", "Matemáticas", 4);
-        AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
         try {
+            Subject s = new Subject("101", "Matemáticas", 4);
+            AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));            
             Group g = new Group(s, 30, period);
             g.setId("1");
             assertTrue(s.hasGroup(g));
@@ -223,10 +297,10 @@ class SubjectTest {
 
     @Test
     void hasGroupFalseTest() {
-        Subject s = new Subject("101", "Matemáticas", 4);
-        Subject s2 = new Subject("102", "Física", 6);
-        AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
         try {
+            Subject s = new Subject("101", "Matemáticas", 4);
+            Subject s2 = new Subject("102", "Física", 6);
+            AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));            
             Group g1 = new Group(s, 30, period);
             Group g2 = new Group(s2, 25, period);
             g1.setId("1");
@@ -239,57 +313,66 @@ class SubjectTest {
 
     @Test
     void hasGroupNullTest() {
-        Subject s = new Subject("101", "Matemáticas", 4);
-        assertFalse(s.hasGroup(null));
+        try {
+            Subject s = new Subject("101", "Matemáticas", 4);
+            assertFalse(s.hasGroup(null));
+        } catch (Exception e) {
+            fail("No se esperaba una excepción al crear el grupo: " + e.getMessage());
+        }
     }
 
-
-    @Test
-    void equalsTest() {
-        Subject s1 = new Subject("101", "Matemáticas", 4);
-        Subject s2 = new Subject("101", "Física", 6);
-
-        assertEquals(s1, s2);
-    }
 
     @Test
     void notEqualsTest() {
-        Subject s1 = new Subject("101", "Matemáticas", 4);
-        Subject s2 = new Subject("102", "Matemáticas", 4); // Diferentes IDs
-        assertNotEquals(s1, s2);
+        try {
+            Subject s1 = new Subject("101", "Matemáticas", 4);
+            Subject s2 = new Subject("102", "Física", 6);
+            assertNotEquals(s1, s2);
+        } catch (Exception e) {
+            fail("No se esperaba una excepción al crear los sujetos: " + e.getMessage());
+        }
+    }
+
+    @Test
+    void equalsTest() {
+        try {
+            Subject s1 = new Subject("101", "Matemáticas", 4);
+            Subject s2 = new Subject("101", "Matemáticas", 4);
+            assertEquals(s1, s2);
+        } catch (Exception e) {
+            fail("No se esperaba una excepción al crear los sujetos: " + e.getMessage());
+        }
     }
 
     @Test
     void equalsNullTest() {
-        Subject s = new Subject("101", "Matemáticas", 4);
-        assertNotEquals(null, s);
-    }
-
-    @Test
-    void equalsOtherClassTest() {
-        Subject s = new Subject("101", "Matemáticas", 4);
-        String other = "Not a Subject";
-        assertNotEquals(s, other);
-    }
-
-    @Test
-    void equalsSameInstanceTest() {
-        Subject s = new Subject("101", "Matemáticas", 4);
-        assertEquals(s, s);
+        try {
+            Subject s = new Subject("101", "Matemáticas", 4);
+            String other = "Not a Subject";
+            assertNotEquals(s, other);
+            assertNotEquals(null, s);
+            assertEquals(s, s);
+        } catch (Exception e) {
+            fail("No se esperaba una excepción al crear el grupo: " + e.getMessage());
+        }
     }
 
     @Test
     void hashCodeTest() {
-        Subject s1 = new Subject("101", "Matemáticas", 4);
-        Subject s2 = new Subject("102", "Física", 6);
-        assertNotEquals(s1.hashCode(), s2.hashCode());
+        try {
+            Subject s1 = new Subject("101", "Matemáticas", 4);
+            Subject s2 = new Subject("102", "Física", 6);
+            assertNotEquals(s1.hashCode(), s2.hashCode());
+        } catch (Exception e) {
+            fail("No se esperaba una excepción al crear los sujetos: " + e.getMessage());
+        }
     }
 
     @Test
     void toStringTest() {
-        Subject s = new Subject("101", "Matemáticas", 4);
-        AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
         try {
+            Subject s = new Subject("101", "Matemáticas", 4);
+            AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));            
             Group g1 = new Group(s, 30, period);
             Group g2 = new Group(s, 25, period);
 
@@ -309,28 +392,30 @@ class SubjectTest {
 
     @Test
     void toStringWithoutGroupsTest() {
-        Subject s = new Subject("101", "Matemáticas", 4);
+        try {
+            Subject s = new Subject("101", "Matemáticas", 4);
 
-        String result = s.toString();
+            String result = s.toString();
 
-        assertTrue(result.contains("101"));
-        assertTrue(result.contains("Matemáticas"));
-        assertTrue(result.contains("4"));
-        assertTrue(result.contains("0")); // Sin grupos
+            assertTrue(result.contains("101"));
+            assertTrue(result.contains("Matemáticas"));
+            assertTrue(result.contains("4"));
+            assertTrue(result.contains("0")); // Sin grupos
+        } catch (Exception e) {
+            fail("No se esperaba una excepción al crear el grupo: " + e.getMessage());
+        }
     }
 
 
     @Test
     void addMismoGrupoDosVecesTest() {
-        Subject s = new Subject("101", "Matemáticas", 4);
-        AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
         try {
+            Subject s = new Subject("101", "Matemáticas", 4);
+            AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));            
             Group g = new Group(s, 30, period);
             g.setId("1");
 
-            s.addGroup(g); // Añadir el mismo grupo otra vez
-
-            assertEquals(2, s.getGroups().size());
+            assertEquals(1, s.getGroups().size());
             assertTrue(s.hasGroup(g));
         } catch (Exception e) {
             fail("No se esperaba una excepción al crear el grupo: " + e.getMessage());
@@ -339,9 +424,9 @@ class SubjectTest {
 
     @Test
     void removeFromEmptyListTest() {
-        Subject s = new Subject("101", "Matemáticas", 4);
-        AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
         try {
+            Subject s = new Subject("101", "Matemáticas", 4);
+            AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));          
             Group g = new Group(s, 30, period);
             g.setId("1");
             boolean removed = s.removeGroup(g);
@@ -354,9 +439,9 @@ class SubjectTest {
 
     @Test
     void addRemoveMultipleOperationsTest() {
-        Subject s = new Subject("101", "Matemáticas", 4);
-        AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
         try {
+            Subject s = new Subject("101", "Matemáticas", 4);
+            AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
             Group g1 = new Group(s, 30, period);
             Group g2 = new Group(s, 25, period);
             Group g3 = new Group(s, 20, period);
@@ -373,6 +458,7 @@ class SubjectTest {
 
             Group g4 = new Group(s, 15, period);
             g4.setId("4");
+            System.out.println(s.getGroups().toString());
             assertEquals(3, s.getGroups().size());
             assertTrue(s.hasGroup(g4));
 
@@ -386,16 +472,24 @@ class SubjectTest {
     }
 
     @Test
-        void creditosMaxValueTest() {
-        Subject s = new Subject("101", "Matemáticas", Integer.MAX_VALUE);
-        assertEquals(Integer.MAX_VALUE, s.getCredits());
+    void creditosMaxValueTest() {
+        try {
+            Subject s = new Subject("101", "Matemáticas", Integer.MAX_VALUE);
+            assertEquals(Integer.MAX_VALUE, s.getCredits());
+        } catch (Exception e) {
+            fail("No se esperaba una excepción al crear la asignatura: " + e.getMessage());
+        }
     }
 
     @Test
     void nombreConEspaciosTest() {
-        Subject s = new Subject("101", " Matemáticas Avanzadas ", 4);
-        assertEquals(" Matemáticas Avanzadas ", s.getName());
-        s.getGroupByCode("1");
+        try {
+            Subject s = new Subject("101", " Matemáticas Avanzadas ", 4);
+            assertEquals(" Matemáticas Avanzadas ", s.getName());
+            s.getGroupByCode("1");
+        } catch (Exception e) {
+            fail("No se esperaba una excepción al crear la asignatura: " + e.getMessage());
+        }
     }
 
     

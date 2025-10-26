@@ -16,7 +16,6 @@ public class AprobadaState implements SubjectState {
     public void setSemester(SubjectDecorator materia, int semestre) throws SirhaException {throw SirhaException.of(ErrorCodeSirha.CANNOT_CHANGE_SEMESTER,"No se puede cambiar semestre de materia aprobada");}
     public void setGroup(SubjectDecorator materia, Group grupo) throws SirhaException {throw SirhaException.of(ErrorCodeSirha.CANNOT_CHANGE_GROUP,"No se puede asignar grupo a materia aprobada");}
     public void setGrade(SubjectDecorator materia, int grade) throws SirhaException {throw SirhaException.of(ErrorCodeSirha.CANNOT_CHANGE_GRADE,"No se puede cambiar la nota de una materia aprobada");}
-    public void setInscripcion(SubjectDecorator materia, Group grupo) throws SirhaException {throw SirhaException.of(ErrorCodeSirha.CANNOT_ENROLL,"No se puede inscribir una materia ya aprobada");}
     public void inscribir(SubjectDecorator materia, Group grupo) throws SirhaException {throw SirhaException.of(ErrorCodeSirha.CANNOT_ENROLL,"No se puede inscribir una materia ya aprobada");}
     public void aprobar(SubjectDecorator materia) throws SirhaException {throw SirhaException.of(ErrorCodeSirha.CANNOT_APPROVE,"No se puede aprobar una materia ya aprobada");}
     public void reprobar(SubjectDecorator materia) throws SirhaException {throw SirhaException.of(ErrorCodeSirha.CANNOT_FAIL,"No se puede reprobar una materia aprobada");}

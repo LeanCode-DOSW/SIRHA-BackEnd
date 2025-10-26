@@ -76,24 +76,12 @@ public class Student extends User implements SolicitudFactory, ScheduleManager, 
      * a la lista de solicitudes del estudiante. La solicitud debe estar
      * completamente inicializada antes de agregarla.
      */
-    public void addRequest(BaseRequest solicitud) throws SirhaException {
-        if (solicitud == null) {
-            throw SirhaException.of(ErrorCodeSirha.REQUEST_NOT_FOUND, "La solicitud no puede ser null");
-        }
-        
-        if (this.solicitudes == null) {
-            this.solicitudes = new ArrayList<>();
-        }
-        
+    public void addRequest(BaseRequest solicitud){
         this.solicitudes.add(solicitud);
     }
 
     public void removeRequest(BaseRequest solicitud) throws SirhaException {
-        if (solicitud == null) {
-            throw SirhaException.of(ErrorCodeSirha.REQUEST_NOT_FOUND, "La solicitud no puede ser null");
-        }
-
-        if (this.solicitudes == null || !this.solicitudes.contains(solicitud)) {
+        if (!this.solicitudes.contains(solicitud)) {
             throw SirhaException.of(ErrorCodeSirha.REQUEST_NOT_FOUND, "La solicitud no existe en la lista del estudiante");
         }
 
@@ -145,9 +133,6 @@ public class Student extends User implements SolicitudFactory, ScheduleManager, 
      * @return lista de solicitudes, nunca null (inicializada como lista vacía)
      */
     public List<BaseRequest> getSolicitudes() {
-        if (solicitudes == null) {
-            solicitudes = new ArrayList<>();
-        }
         return new ArrayList<>(solicitudes);
     }
     
@@ -247,11 +232,7 @@ public class Student extends User implements SolicitudFactory, ScheduleManager, 
         }
         return academicProgress.getCreditsByColor(color);
     }
- 
-   
-    
- 
- 
+
     public boolean hasScheduleConflictWith(Group nuevoGrupo) {
         if (nuevoGrupo == null || academicProgress == null) {
             return false;
@@ -351,7 +332,7 @@ public class Student extends User implements SolicitudFactory, ScheduleManager, 
         
         // 2. Verificar que la materia no esté ya inscrita
 
-        if (!academicProgress.isSubjectNoCursada(subject)) {
+        if (!isSubjectNoCursada(subject.getName())) {
             throw SirhaException.of(ErrorCodeSirha.OPERATION_NOT_ALLOWED, "La materia ya está inscrita");
         }
         
@@ -365,9 +346,7 @@ public class Student extends User implements SolicitudFactory, ScheduleManager, 
     
     public boolean canEnrollInGroup(Subject subject, Group group) throws SirhaException {
         // Primero verificar las validaciones básicas de la materia
-        if (!canEnroll(subject)) {
-            throw SirhaException.of(ErrorCodeSirha.OPERATION_NOT_ALLOWED, "La materia no se puede inscribir");
-        }
+        canEnroll(subject);
         
         // 4. Verificar que el grupo esté abierto
         if (!group.isOpen()) {
@@ -394,7 +373,6 @@ public class Student extends User implements SolicitudFactory, ScheduleManager, 
         if (!canEnrollInGroup(subject, group)) {
             throw SirhaException.of(ErrorCodeSirha.OPERATION_NOT_ALLOWED, "No se puede inscribir en la materia o grupo especificado");
         }
-        
         group.enrollStudent(this);
         academicProgress.enrollSubjectInGroup(subject, group);
 
@@ -440,7 +418,7 @@ public class Student extends User implements SolicitudFactory, ScheduleManager, 
         if (!hasSubject(subject)) {
             throw SirhaException.of(ErrorCodeSirha.SUBJECT_NOT_FOUND, "El estudiante no tiene la materia especificada");
         }
-        if (!academicProgress.isSubjectCursando(subject)) {
+        if (!isSubjectCursando(subject.getName())) {
             throw SirhaException.of(ErrorCodeSirha.SUBJECT_NOT_IN_PROGRESS, "La materia no está en curso");
         }
 
@@ -467,13 +445,13 @@ public class Student extends User implements SolicitudFactory, ScheduleManager, 
         if (!hasSubject(oldSubject)) {
             throw SirhaException.of(ErrorCodeSirha.SUBJECT_NOT_FOUND, "El estudiante no tiene la materia antigua especificada");
         }
-        if (!academicProgress.isSubjectCursando(oldSubject)) {
+        if (!isSubjectCursando(oldSubject.getName())) {
             throw SirhaException.of(ErrorCodeSirha.SUBJECT_NOT_IN_PROGRESS, "La materia antigua no está en curso");
         }
         if (oldSubject.equals(newSubject)) {
             throw SirhaException.of(ErrorCodeSirha.SAME_SUBJECT, "La materia nueva es la misma que la antigua");
         }
-        if (academicProgress.hasSubject(newSubject) && !academicProgress.isSubjectNoCursada(newSubject)) {
+        if (academicProgress.hasSubject(newSubject) && !isSubjectNoCursada(newSubject.getName())) {
             throw SirhaException.of(ErrorCodeSirha.SUBJECT_ALREADY_ENROLLED, "El estudiante ya tiene la materia nueva inscrita o aprobada");
         }
         if (!academicProgress.getStudyPlan().hasSubject(newSubject)) {
@@ -629,56 +607,36 @@ public class Student extends User implements SolicitudFactory, ScheduleManager, 
 
     @Override
     public double getApprovalRequestPercentage() {
-        if (solicitudes == null || solicitudes.isEmpty()) {
-            return 0.0;
-        }
         return getRequestApprovalRate().getApprovalRatePercentage();
     }
     @Override
     public double getRejectionRequestPercentage(){
-        if (solicitudes == null || solicitudes.isEmpty()) {
-            return 0.0;
-        }
         return getRequestApprovalRate().getRejectionRatePercentage();
     }
     @Override
     public double getPendingRequestPercentage(){
-        if (solicitudes == null || solicitudes.isEmpty()) {
-            return 0.0;
-        }
         return getRequestApprovalRate().getPendingRatePercentage();
     }
     @Override
     public double getInReviewRequestPercentage(){
-        if (solicitudes == null || solicitudes.isEmpty()) {
-            return 0.0;
-        }
         return getRequestApprovalRate().getInReviewRatePercentage();
     }
 
     @Override
     public int getTotalRequestsMade(){
-        if (solicitudes == null) {
-            return 0;
-        }
         return solicitudes.size();
     }
 
     @Override
     public boolean hasActiveRequests() {
-        if (solicitudes == null) {
-            return false;
-        }
         return solicitudes.stream().anyMatch(s -> s.getActualState() == RequestStateEnum.PENDIENTE || s.getActualState() == RequestStateEnum.EN_REVISION);
     }
 
 
     @Override
     public RequestApprovalRateDTO getRequestApprovalRate() {
-        if (solicitudes == null || solicitudes.isEmpty()) {
-            return new RequestApprovalRateDTO(0, 
-            0, 0,
-            0, 0);
+        if (solicitudes.isEmpty()) {
+            return new RequestApprovalRateDTO(0, 0, 0, 0, 0);
         }
         int totalRequests = getTotalRequestsMade();
         int approvedRequests = getTotalApprovedRequests();
@@ -697,33 +655,21 @@ public class Student extends User implements SolicitudFactory, ScheduleManager, 
 
     @Override
     public int getTotalApprovedRequests() {
-        if (solicitudes == null) {
-            return 0;
-        }
         return (int) solicitudes.stream().filter(s -> s.getActualState() == RequestStateEnum.APROBADA).count();
     }
 
     @Override
     public int getTotalRejectedRequests() {
-        if (solicitudes == null) {
-            return 0;
-        }
         return (int) solicitudes.stream().filter(s -> s.getActualState() == RequestStateEnum.RECHAZADA).count();
     }
 
     @Override
     public int getTotalPendingRequests() {
-        if (solicitudes == null) {
-            return 0;
-        }
         return (int) solicitudes.stream().filter(s -> s.getActualState() == RequestStateEnum.PENDIENTE).count();
     }
 
     @Override
     public int getTotalInReviewRequests() {
-        if (solicitudes == null) {
-            return 0;
-        }
         return (int) solicitudes.stream().filter(s -> s.getActualState() == RequestStateEnum.EN_REVISION).count();
     }
     @Override
@@ -735,9 +681,6 @@ public class Student extends User implements SolicitudFactory, ScheduleManager, 
     }
     
     public BaseRequest getRequestById(String requestId) {
-        if (solicitudes == null || solicitudes.isEmpty()) {
-            return null;
-        }
         return solicitudes.stream()
             .filter(s -> s.getId().equals(requestId))
             .findFirst()
@@ -748,12 +691,41 @@ public class Student extends User implements SolicitudFactory, ScheduleManager, 
      * Devuelve el historial de solicitudes resueltas: aprobadas o rechazadas.
      */
     public List<BaseRequest> getRequestsHistory() {
-        if (solicitudes == null) {
-            return new ArrayList<>();
-        }
         return solicitudes.stream()
             .filter(s -> s.getActualState() == RequestStateEnum.APROBADA || s.getActualState() == RequestStateEnum.RECHAZADA)
             .toList();
+    }
+
+    @Override
+    public boolean isSubjectApproved(String subject) {
+        if (academicProgress == null) {
+            return false;
+        }
+        return academicProgress.isSubjectApproved(subject);
+    }
+
+    @Override
+    public boolean isSubjectCursando(String subject) {
+        if (academicProgress == null) {
+            return false;
+        }
+        return academicProgress.isSubjectCursando(subject);
+    }
+
+    @Override
+    public boolean isSubjectReprobada(String subject) {
+        if (academicProgress == null) {
+            return false;
+        }
+        return academicProgress.isSubjectReprobada(subject);
+    }
+
+    @Override
+    public boolean isSubjectNoCursada(String subject) {
+        if (academicProgress == null) {
+            return false;
+        }
+        return academicProgress.isSubjectNoCursada(subject);
     }
 
 }

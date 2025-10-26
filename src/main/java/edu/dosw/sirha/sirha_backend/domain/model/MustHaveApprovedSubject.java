@@ -12,7 +12,7 @@ public class MustHaveApprovedSubject implements PrerequisiteRule {
 
     @Override
     public boolean canEnroll(Subject subject, AcademicProgress progress) {
-        return progress.isSubjectApproved(requiredSubject);
+        return progress.isSubjectApproved(requiredSubject.getName());
     }
     
 }

@@ -5,15 +5,15 @@ import java.util.UUID;
 import org.springframework.http.HttpStatus;
 
 public class ApiErrorResponse {
-    private String status; // "error"
+    private String status;
     private int statusCode;
-    private String code; // código interno, ej. "RESOURCE_NOT_FOUND"
-    private String message; // descripción
-    private String details; // más contexto
-    private String path; // endpoint
+    private String code;
+    private String message;
+    private String details;
+    private String path;
     private LocalDateTime timestamp;
-    private String requestId; // UUID generado
-    private String suggestion; // sugerencia opcional
+    private String requestId;
+    private String suggestion;
 
     public ApiErrorResponse(HttpStatus status, String code, String message, String details, String path) {
         this.status = "error";

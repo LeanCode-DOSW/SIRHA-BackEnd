@@ -26,7 +26,6 @@ class BaseRequestTest {
     private Subject subject1;
     private Subject subject2;
     private Group group1;
-    private Group group2;
 
     @BeforeEach
     void setUp() {
@@ -38,13 +37,12 @@ class BaseRequestTest {
             subject1 = new Subject("101", "Matemáticas", 4);
             subject2 = new Subject("102", "Física", 3);
             group1 = new Group(subject1, 30, academicPeriod);
-            group2 = new Group(subject2, 25, academicPeriod);
+
         } catch (Exception e) {
             fail("No se esperaba una excepción al crear los grupos: " + e.getMessage());
         }
 
-        subject1.addGroup(group1);
-        subject2.addGroup(group2);
+        
     }
 
     @Test
