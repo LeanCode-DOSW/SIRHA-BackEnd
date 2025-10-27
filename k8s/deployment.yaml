@@ -29,8 +29,8 @@ spec:
     spec:
       containers:
         - name: sirha-backend
-          image: sirha-backend:dev
-          imagePullPolicy: Never
+          image: LeanCode-DOSW/SIRHA-BackEnd:dev
+          imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8080
               name: http
