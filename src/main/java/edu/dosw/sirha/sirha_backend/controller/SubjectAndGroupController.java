@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -86,6 +87,7 @@ public class SubjectAndGroupController {
         @ApiResponse(responseCode = "409", description = "La materia ya existe"),
         @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
+    @PreAuthorize("hasAnyRole('DEAN','ADMIN')")
     public ResponseEntity<Subject> saveSubject(@RequestBody SubjectDTO subjectDTO) throws SirhaException {
         Subject subject = SubjectMapper.toEntity(subjectDTO);
         Subject savedSubject = subjectService.save(subject);
@@ -99,6 +101,7 @@ public class SubjectAndGroupController {
         @ApiResponse(responseCode = "404", description = "Materia no encontrada"),
         @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
+    @PreAuthorize("hasAnyRole('DEAN','ADMIN')")
     public ResponseEntity<Subject> deleteSubjectByName(@PathVariable String name) throws SirhaException {
         Subject deletedSubject = subjectService.deleteByName(name);
         return ResponseEntity.ok(deletedSubject);
@@ -170,6 +173,7 @@ public class SubjectAndGroupController {
         @ApiResponse(responseCode = "404", description = "Materia no encontrada"),
         @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
+    @PreAuthorize("hasAnyRole('DEAN','ADMIN')")
     public ResponseEntity<Group> saveGroup(@PathVariable String subjectName, @RequestBody GroupDTO groupDTO) throws SirhaException {
         Subject subject = subjectService.findByName(subjectName);
         Group group = GroupMapper.toEntity(subject, groupDTO);
@@ -184,6 +188,7 @@ public class SubjectAndGroupController {
         @ApiResponse(responseCode = "404", description = "Grupo no encontrado"),
         @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
+    @PreAuthorize("hasAnyRole('DEAN','ADMIN')")
     public ResponseEntity<Group> deleteGroupById(@PathVariable String id) throws SirhaException {
         Group deletedGroup = subjectService.deleteGroupById(id);
         return ResponseEntity.ok(deletedGroup);
@@ -207,6 +212,7 @@ public class SubjectAndGroupController {
         @ApiResponse(responseCode = "404", description = "Materia no encontrada"),
         @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
+    @PreAuthorize("hasAnyRole('DEAN','ADMIN')")
     public ResponseEntity<List<Group>> deleteGroupsBySubjectName(@PathVariable String subjectName) throws SirhaException {
         List<Group> deletedGroups = subjectService.deleteGroupsBySubjectName(subjectName);
         return ResponseEntity.ok(deletedGroups);
@@ -220,6 +226,7 @@ public class SubjectAndGroupController {
         @ApiResponse(responseCode = "400", description = "Datos del profesor inválidos"),
         @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
+    @PreAuthorize("hasAnyRole('DEAN','ADMIN')")
     public ResponseEntity<Group> assignProfessor(@PathVariable String groupId, @RequestBody Professor professor) throws SirhaException {
         Group updatedGroup = subjectService.assignProfessor(groupId, professor);
         return ResponseEntity.ok(updatedGroup);
@@ -234,6 +241,7 @@ public class SubjectAndGroupController {
         @ApiResponse(responseCode = "409", description = "Conflicto de horarios"),
         @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
+    @PreAuthorize("hasAnyRole('DEAN','ADMIN')")
     public ResponseEntity<Group> addSchedule(@PathVariable String groupId, @RequestBody Schedule schedule) throws SirhaException {
         Group updatedGroup = subjectService.addSchedule(groupId, schedule);
         return ResponseEntity.ok(updatedGroup);
@@ -295,6 +303,7 @@ public class SubjectAndGroupController {
         @ApiResponse(responseCode = "400", description = "El grupo ya está cerrado"),
         @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
+    @PreAuthorize("hasAnyRole('DEAN','ADMIN')")
     public ResponseEntity<Group> closeGroup(@PathVariable String groupId) throws SirhaException {
         Group closedGroup = subjectService.closeGroup(groupId);
         return ResponseEntity.ok(closedGroup);
@@ -308,6 +317,7 @@ public class SubjectAndGroupController {
         @ApiResponse(responseCode = "400", description = "El grupo ya está abierto"),
         @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
+    @PreAuthorize("hasAnyRole('DEAN','ADMIN')")
     public ResponseEntity<Group> openGroup(@PathVariable String groupId) throws SirhaException {
         Group openedGroup = subjectService.openGroup(groupId);
         return ResponseEntity.ok(openedGroup);

@@ -47,7 +47,7 @@ public class AuthController {
         this.decanateService = decanateService;
     }
 
-    @PostMapping("/register")
+    @PostMapping("/register-student")
     @PreAuthorize("hasAnyRole('ADMIN', 'DEAN')")
     public ResponseEntity<AuthResponse> registerStudent(@RequestBody RegisterRequestStudent req) throws SirhaException {
         studentService.registerStudent(req);
@@ -67,7 +67,7 @@ public class AuthController {
 
 
     @PostMapping("/register-dean")
-    @PreAuthorize("hasAnyRole('ADMIN', 'DEAN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<AuthResponse> registerDean(@RequestBody RegisterRequestDecanate req) throws SirhaException {
         decanateService.registerDecanate(req);
 
@@ -86,6 +86,7 @@ public class AuthController {
 
 
     @PostMapping("/register-admin")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<AuthResponse> registerAdmin(@RequestBody RegisterRequestStudent req) {
         if (accounts.existsByUsername(req.getUsername())) return ResponseEntity.badRequest().body(new AuthResponse(req.getUsername(), req.getEmail(), ErrorCodeSirha.USERNAME_ALREADY_EXISTS.getDefaultMessage()));
         var acc = new Account(req.getUsername(), req.getEmail(), passwordEncoder.encode(req.getPassword()), Role.ADMIN);

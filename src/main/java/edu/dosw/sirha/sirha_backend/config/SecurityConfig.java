@@ -31,6 +31,8 @@ import java.util.List;
 @EnableMethodSecurity
 public class SecurityConfig {
 
+    private static final String SUBJECT_GROUPS_ENDPOINT = "/api/subjects/*/groups";
+
     @Bean
     public PasswordEncoder passwordEncoder(){ return new BCryptPasswordEncoder(); }
 
@@ -63,12 +65,27 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
             // AUTH & DOCS 
             .requestMatchers(
-                "/api/auth/**",
                 "/v3/api-docs/**",
                 "/swagger-ui/**",
                 "/swagger-ui.html",
-                "/actuator/health"
+                "/actuator/health",
+                "/api/auth/register-student"
             ).permitAll()
+            .requestMatchers(
+                HttpMethod.POST,
+                "/api/auth/login",
+                "/api/auth/refresh-token"
+            ).permitAll()
+            .requestMatchers(
+                HttpMethod.GET,
+                "/api/auth/me"
+            ).authenticated()
+            .requestMatchers(
+                "/api/auth/register-dean"
+            ).hasAnyRole(Role.DEAN.name(),Role.ADMIN.name())
+            .requestMatchers(
+                "/api/auth/register-admin"
+            ).hasRole(Role.ADMIN.name())
 
             // StudentController  (/api/students/**)
             // STUDENT 
@@ -91,6 +108,7 @@ public class SecurityConfig {
                 "/api/students/*",
                 "/api/students/username/*",
                 "/api/students/email/*",
+                "/api/students/exists/**",
                 "/api/students/*/basic-info"
             ).hasAnyRole(Role.DEAN.name(),Role.ADMIN.name())
 
@@ -110,7 +128,10 @@ public class SecurityConfig {
                 "/api/decanates/*/requests/*/approve",
                 "/api/decanates/*/requests/*/reject",
                 "/api/decanates/*/study-plans",
-                "/api/decanates/*/statistics/**"
+                "/api/decanates/*/statistics/**",
+                "/api/decanates/study-plans",
+                "/api/decanates/study-plans/*/subjects/*",
+                "/api/decanates/study-plans/career/*"
             ).hasAnyRole(Role.DEAN.name(),Role.ADMIN.name())
             .requestMatchers(HttpMethod.GET,
                 "/api/decanates",
@@ -129,7 +150,8 @@ public class SecurityConfig {
                 "/api/subjects/*",
                 "/api/subjects/*/exists",
                 "/api/subjects/groups",
-                "/api/subjects/*/groups",
+                SUBJECT_GROUPS_ENDPOINT,
+                "/api/subjects/groups/*/exists",
                 "/api/subjects/*/groups/open",
                 "/api/subjects/groups/*",
                 "/api/subjects/groups/*/professor",
@@ -139,7 +161,7 @@ public class SecurityConfig {
             ).hasAnyRole(Role.STUDENT.name(),Role.DEAN.name(),Role.ADMIN.name())
             // DEAN / ADMIN 
             .requestMatchers(HttpMethod.POST,
-                "/api/subjects/*/groups",
+                SUBJECT_GROUPS_ENDPOINT,
                 "/api/subjects/*/groups/add",
                 "/api/subjects/groups/*/schedules"
             ).hasAnyRole(Role.DEAN.name(),Role.ADMIN.name())
@@ -150,7 +172,7 @@ public class SecurityConfig {
             ).hasAnyRole(Role.DEAN.name(),Role.ADMIN.name())
             .requestMatchers(HttpMethod.DELETE,
                 "/api/subjects/groups/*",
-                "/api/subjects/*/groups"
+                SUBJECT_GROUPS_ENDPOINT
             ).hasAnyRole(Role.DEAN.name(),Role.ADMIN.name())
             // ADMIN
             .requestMatchers(HttpMethod.POST, "/api/subjects").hasRole(Role.ADMIN.name())

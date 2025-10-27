@@ -2,6 +2,7 @@ package edu.dosw.sirha.sirha_backend.controller;
 import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -216,6 +217,7 @@ public class DecanateController {
         @ApiResponse(responseCode = "400", description = "Datos inválidos"),
         @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
+    @PreAuthorize("hasAnyRole('DEAN','ADMIN')")
     public ResponseEntity<StudyPlan> addSubjectToStudyPlan(@PathVariable String studyPlanName,
                                                            @PathVariable String subjectName) throws SirhaException {
         StudyPlan updated = decanateService.addSubjectToStudyPlan(studyPlanName, subjectName);

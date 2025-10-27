@@ -1,5 +1,6 @@
 package edu.dosw.sirha.sirha_backend.controller;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -138,6 +139,7 @@ public class StudentController {
         @ApiResponse(responseCode = "404", description = "Estudiante no encontrado"),
         @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deleteById(@PathVariable String id) throws SirhaException {
         studentService.deleteById(id);
         return ResponseEntity.noContent().build();
@@ -150,6 +152,7 @@ public class StudentController {
         @ApiResponse(responseCode = "404", description = "Estudiante no encontrado"),
         @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
+    @PreAuthorize("#username == authentication.name or hasAnyRole('DEAN','ADMIN')")
     public ResponseEntity<List<Schedule>> getCurrentSchedule(@PathVariable String username) throws SirhaException {
         List<Schedule> schedules = studentService.getCurrentSchedule(username);
         return ResponseEntity.ok(schedules);
@@ -163,6 +166,7 @@ public class StudentController {
         @ApiResponse(responseCode = "400", description = "Parámetros inválidos"),
         @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
+    @PreAuthorize("#username == authentication.name or hasAnyRole('DEAN','ADMIN')")
     public ResponseEntity<List<Schedule>> getScheduleForPeriod(@PathVariable String username, @RequestParam String period) throws SirhaException {
         List<Schedule> schedules = studentService.getScheduleForPeriod(username, period);
         return ResponseEntity.ok(schedules);
@@ -175,6 +179,7 @@ public class StudentController {
         @ApiResponse(responseCode = "404", description = "Estudiante no encontrado"),
         @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
+    @PreAuthorize("#username == authentication.name or hasAnyRole('DEAN','ADMIN')")
     public ResponseEntity<Map<AcademicPeriod,List<Schedule>>> getAllSchedules(@PathVariable String username) throws SirhaException {
         Map<AcademicPeriod,List<Schedule>> schedules = studentService.getAllSchedules(username);
         return ResponseEntity.ok(schedules);
@@ -187,6 +192,7 @@ public class StudentController {
         @ApiResponse(responseCode = "404", description = "Estudiante no encontrado"),
         @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
+    @PreAuthorize("#username == authentication.name or hasAnyRole('DEAN','ADMIN')")
     public ResponseEntity<Map<SemaforoColores,List<SubjectDecoratorDTO>>> getAcademicPensum(@PathVariable String username) throws SirhaException {
         Map<SemaforoColores,List<SubjectDecoratorDTO>> pensum = studentService.getAcademicPensum(username);
         return ResponseEntity.ok(pensum);
@@ -199,6 +205,7 @@ public class StudentController {
         @ApiResponse(responseCode = "404", description = "Estudiante no encontrado"),
         @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
+    @PreAuthorize("#username == authentication.name or hasAnyRole('DEAN','ADMIN')")
     public ResponseEntity<Map<SemaforoColores, Double>> getPercentageByColor(@PathVariable String username) throws SirhaException {
         Map<SemaforoColores, Double> percentages = studentService.getPercentageByColor(username);
         return ResponseEntity.ok(percentages);
@@ -211,6 +218,7 @@ public class StudentController {
         @ApiResponse(responseCode = "404", description = "Estudiante no encontrado"),
         @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
+    @PreAuthorize("#username == authentication.name or hasAnyRole('DEAN','ADMIN')")
     public ResponseEntity<StudentDTO> getStudentBasicInfo(@PathVariable String username) throws SirhaException {
         StudentDTO basicInfo = studentService.getStudentBasicInfo(username);
         return ResponseEntity.ok(basicInfo);
@@ -224,6 +232,7 @@ public class StudentController {
         @ApiResponse(responseCode = "400", description = "Color de semáforo inválido"),
         @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
+    @PreAuthorize("#username == authentication.name or hasAnyRole('DEAN','ADMIN')")
     public ResponseEntity<Integer> getSubjectsByColorCount(@PathVariable String username, @PathVariable SemaforoColores color) throws SirhaException {
         int count = studentService.getSubjectsByColorCount(username, color);
         return ResponseEntity.ok(count);
@@ -238,6 +247,7 @@ public class StudentController {
         @ApiResponse(responseCode = "409", description = "Conflicto - no se puede realizar el cambio"),
         @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
+    @PreAuthorize("hasRole('STUDENT') and authentication.name == #studentName")
     public ResponseEntity<CambioGrupo> createRequestCambioGrupo(
             @PathVariable String studentName, 
             @RequestParam String subjectName, 
@@ -255,6 +265,7 @@ public class StudentController {
         @ApiResponse(responseCode = "409", description = "Conflicto - prerrequisitos no cumplidos o conflictos de horario"),
         @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
+    @PreAuthorize("hasRole('STUDENT') and authentication.name == #studentName")
     public ResponseEntity<CambioMateria> createRequestCambioMateria(
             @PathVariable String studentName, 
             @RequestParam String subjectName, 
@@ -271,6 +282,7 @@ public class StudentController {
         @ApiResponse(responseCode = "404", description = "Estudiante no encontrado"),
         @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
+    @PreAuthorize("#username == authentication.name or hasAnyRole('DEAN','ADMIN')")
     public ResponseEntity<List<BaseRequest>> getAllRequests(@PathVariable String username) throws SirhaException {
         List<BaseRequest> requests = studentService.getAllRequests(username);
         return ResponseEntity.ok(requests);
@@ -283,6 +295,7 @@ public class StudentController {
         @ApiResponse(responseCode = "404", description = "Estudiante o solicitud no encontrada"),
         @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
+    @PreAuthorize("#username == authentication.name or hasAnyRole('DEAN','ADMIN')")
     public ResponseEntity<BaseRequest> getRequestById(@PathVariable String username, @PathVariable String requestId) throws SirhaException {
         BaseRequest request = studentService.getRequestById(username, requestId);
         return ResponseEntity.ok(request);
@@ -295,11 +308,11 @@ public class StudentController {
         @ApiResponse(responseCode = "404", description = "Estudiante no encontrado"),
         @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
+    @PreAuthorize("#username == authentication.name or hasAnyRole('DEAN','ADMIN')")
     public ResponseEntity<List<BaseRequest>> getRequestsHistory(@PathVariable String username) throws SirhaException {
         List<BaseRequest> history = studentService.getRequestsHistory(username);
         return ResponseEntity.ok(history);
     }
-
 
     @GetMapping("/{username}/complete-report")
     @Operation(summary = "Generar reporte completo", description = "Genera un reporte académico completo del estudiante con todas sus estadísticas")
@@ -308,6 +321,7 @@ public class StudentController {
         @ApiResponse(responseCode = "404", description = "Estudiante no encontrado"),
         @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
+    @PreAuthorize("#username == authentication.name or hasAnyRole('DEAN','ADMIN')")
     public ResponseEntity<StudentReportDTO> generateCompleteReport(@PathVariable String username) throws SirhaException {
         StudentReportDTO report = studentService.generateCompleteReport(username);
         return ResponseEntity.ok(report);
@@ -320,6 +334,7 @@ public class StudentController {
         @ApiResponse(responseCode = "404", description = "Estudiante no encontrado"),
         @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
+    @PreAuthorize("#username == authentication.name or hasAnyRole('DEAN','ADMIN')")
     public ResponseEntity<String> getAcademicSummary(@PathVariable String username) throws SirhaException {
         String summary = studentService.getAcademicSummary(username);
         return ResponseEntity.ok(summary);
@@ -332,6 +347,7 @@ public class StudentController {
         @ApiResponse(responseCode = "404", description = "Estudiante no encontrado"),
         @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
+    @PreAuthorize("#username == authentication.name or hasAnyRole('DEAN','ADMIN')")
     public ResponseEntity<RequestApprovalRateDTO> getRequestApprovalRate(@PathVariable String username) throws SirhaException {
         RequestApprovalRateDTO approvalRate = studentService.getRequestApprovalRate(username);
         return ResponseEntity.ok(approvalRate);
@@ -344,6 +360,7 @@ public class StudentController {
         @ApiResponse(responseCode = "404", description = "Estudiante no encontrado"),
         @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
+    @PreAuthorize("#username == authentication.name or hasAnyRole('DEAN','ADMIN')")
     public ResponseEntity<Double> getApprovalRequestPercentage(@PathVariable String username) throws SirhaException {
         Double percentage = studentService.getApprovalRequestPercentage(username);
         return ResponseEntity.ok(percentage);
@@ -356,6 +373,7 @@ public class StudentController {
         @ApiResponse(responseCode = "404", description = "Estudiante no encontrado"),
         @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
+    @PreAuthorize("#username == authentication.name or hasAnyRole('DEAN','ADMIN')")
     public ResponseEntity<Double> getRejectionRequestPercentage(@PathVariable String username) throws SirhaException {
         Double percentage = studentService.getRejectionRequestPercentage(username);
         return ResponseEntity.ok(percentage);
@@ -368,6 +386,7 @@ public class StudentController {
         @ApiResponse(responseCode = "404", description = "Estudiante no encontrado"),
         @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
+    @PreAuthorize("#username == authentication.name or hasAnyRole('DEAN','ADMIN')")
     public ResponseEntity<Double> getPendingRequestPercentage(@PathVariable String username) throws SirhaException {
         Double percentage = studentService.getPendingRequestPercentage(username);
         return ResponseEntity.ok(percentage);
@@ -380,6 +399,7 @@ public class StudentController {
         @ApiResponse(responseCode = "404", description = "Estudiante no encontrado"),
         @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
+    @PreAuthorize("#username == authentication.name or hasAnyRole('DEAN','ADMIN')")
     public ResponseEntity<Double> getInReviewRequestPercentage(@PathVariable String username) throws SirhaException {
         Double percentage = studentService.getInReviewRequestPercentage(username);
         return ResponseEntity.ok(percentage);
