@@ -14,6 +14,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 
 import edu.dosw.sirha.sirha_backend.util.GroupMapper;
 import edu.dosw.sirha.sirha_backend.util.SubjectMapper;
+import edu.dosw.sirha.sirha_backend.domain.model.MustHaveApprovedSubject;
 import edu.dosw.sirha.sirha_backend.domain.model.Professor;
 import edu.dosw.sirha.sirha_backend.domain.model.Schedule;
 import edu.dosw.sirha.sirha_backend.domain.model.Subject;
@@ -334,4 +335,20 @@ public class SubjectAndGroupController {
         Group openedGroup = subjectService.openGroup(groupId);
         return ResponseEntity.ok(openedGroup);
     }
+
+    @PostMapping("/{subjectName}/prerequisites")
+    @PreAuthorize("hasAnyRole('DEAN','ADMIN')")
+    @Operation(summary = "Agregar prerrequisito", description = "Agrega una regla de prerrequisito a una materia")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "201", description = "Prerrequisito agregado"),
+        @ApiResponse(responseCode = "404", description = "Materia no encontrada"),
+        @ApiResponse(responseCode = "400", description = "Datos inválidos"),
+        @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    })
+    public ResponseEntity<Subject> addPrerequisite(@PathVariable String subjectName,
+                                                   @RequestBody MustHaveApprovedSubject prerequisite) throws SirhaException {
+        Subject updated = subjectService.addPrerequisite(subjectName, prerequisite);
+        return ResponseEntity.status(HttpStatus.CREATED).body(updated);
+    }
+    
 }

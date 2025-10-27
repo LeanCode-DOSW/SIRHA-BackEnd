@@ -204,8 +204,16 @@ public class Semaforo implements AcademicProgress {
     @Override
     public Map<AcademicPeriod, List<Schedule>> getAllSchedules() {
         Map<AcademicPeriod, List<Schedule>> schedules = new HashMap<>();
-
-        subjects.values().forEach(sd -> schedules.putIfAbsent(sd.getAcademicPeriod(), sd.getSchedules()));
+        for (SubjectDecorator sd : subjects.values()) {
+            try {
+                AcademicPeriod period = sd.getAcademicPeriod();
+                List<Schedule> subjectSchedules = sd.getSchedules();
+                schedules.putIfAbsent(period, new ArrayList<>());
+                schedules.get(period).addAll(subjectSchedules);
+            } catch (SirhaException e) {
+                // ignorar materias sin grupo asignado
+            }
+        }
         return schedules;
     }
 
@@ -305,7 +313,7 @@ public class Semaforo implements AcademicProgress {
 
         double academicSuccessRate = getAcademicSuccessRate();
         double creditsCompletionPercentage = getCompletedCreditsPercentage();
-        boolean academicRisk = globalIndicator == SemaforoColores.ROJO || globalIndicator == SemaforoColores.GRIS;
+        boolean academicRisk = globalIndicator == SemaforoColores.ROJO;
 
         String academicStatus;
         if (overallProgress >= 90.0) {

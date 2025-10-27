@@ -137,9 +137,7 @@ public class Decanate implements RequestReceiver {
         List<BaseRequest> pendingRequests = getPendingRequests();
         for (int i = 0; i < pendingRequests.size(); i++) {
             BaseRequest req = pendingRequests.get(i);
-            req.setPriority(i + 1); // Reasigna prioridades secuencialmente
+            req.setPriority(i + 1);
         }
     }
-
-
 }

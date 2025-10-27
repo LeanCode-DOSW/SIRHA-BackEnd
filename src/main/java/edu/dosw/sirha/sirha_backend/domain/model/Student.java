@@ -242,9 +242,17 @@ public class Student extends User implements SolicitudFactory, ScheduleManager, 
             return false;
         }
 
-        return getSubjectsInProgress().stream()
-            .filter(materia -> materia.getGroup() != null)
-            .anyMatch(materia -> materia.getGroup().conflictoConHorario(nuevoGrupo));
+        for (SubjectDecorator materia : getSubjectsInProgress()) {
+            try {
+                Group g = materia.getGroup();
+                if (g != null && g.conflictoConHorario(nuevoGrupo)) {
+                    return true;
+                }
+            } catch (SirhaException e) {
+                // materia sin grupo asignado -> no puede haber conflicto, saltar
+            }
+        }
+        return false;
     }
     
     
@@ -257,10 +265,19 @@ public class Student extends User implements SolicitudFactory, ScheduleManager, 
         if (academicProgress == null) {
             return new ArrayList<>();
         }
-        return getSubjectsInProgress().stream()
-            .filter(materia -> materia.getGroup() != null)
-            .flatMap(materia -> materia.getGroup().getSchedules().stream())
-            .toList();
+
+        List<Schedule> result = new ArrayList<>();
+        for (SubjectDecorator materia : getSubjectsInProgress()) {
+            try {
+                List<Schedule> schedules = materia.getSchedules();
+                if (schedules != null && !schedules.isEmpty()) {
+                    result.addAll(schedules);
+                }
+            } catch (SirhaException e) {
+                // materia sin grupo asignado -> no hay horarios, saltar
+            }
+        }
+        return result;
     }
     
     /**

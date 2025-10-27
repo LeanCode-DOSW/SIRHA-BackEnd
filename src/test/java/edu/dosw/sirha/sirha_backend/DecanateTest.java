@@ -50,7 +50,7 @@ class DecanateTest {
     void setUp() throws SirhaException {
         currentPeriod = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(5));
 
-        decanateSistemas = new Decanate(Careers.INGENIERIA_DE_SISTEMAS);
+        decanateSistemas = new Decanate("Ingenieria de Sistemas",Careers.INGENIERIA_DE_SISTEMAS);
         decanateIndustrial = new Decanate(Careers.INGENIERIA_INDUSTRIAL);
 
         matematicas = new Subject("Matemáticas I", "MAT101", 4);

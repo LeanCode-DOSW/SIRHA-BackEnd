@@ -19,6 +19,7 @@ import edu.dosw.sirha.sirha_backend.dto.StudentDTO;
 import edu.dosw.sirha.sirha_backend.dto.SubjectDecoratorDTO;
 import edu.dosw.sirha.sirha_backend.dto.StudentReportDTO;
 import edu.dosw.sirha.sirha_backend.dto.RequestApprovalRateDTO;
+import edu.dosw.sirha.sirha_backend.exception.ErrorCodeSirha;
 import edu.dosw.sirha.sirha_backend.exception.SirhaException;
 import edu.dosw.sirha.sirha_backend.service.StudentService;
 import edu.dosw.sirha.sirha_backend.util.StudentMapper;
@@ -82,7 +83,7 @@ public class StudentController {
     })
     public ResponseEntity<StudentDTO> getById(@PathVariable String id) throws SirhaException {
         Student student = studentService.findById(id)
-                .orElseThrow(() -> SirhaException.studentNotFound(id));
+                .orElseThrow(() -> SirhaException.of(ErrorCodeSirha.STUDENT_NOT_FOUND, id));
         return ResponseEntity.ok(StudentMapper.toDTO(student));
     }
 
@@ -96,7 +97,7 @@ public class StudentController {
     })
     public ResponseEntity<StudentDTO> getByUsername(@PathVariable String username) throws SirhaException {
         Student student = studentService.findByUsername(username)
-                .orElseThrow(() -> SirhaException.studentNotFound(username));
+                .orElseThrow(() -> SirhaException.of(ErrorCodeSirha.STUDENT_NOT_FOUND, username));
         return ResponseEntity.ok(StudentMapper.toDTO(student));
     }
 
@@ -110,7 +111,7 @@ public class StudentController {
     })
     public ResponseEntity<StudentDTO> getByEmail(@PathVariable String email) throws SirhaException {
         Student student = studentService.findByEmail(email)
-                .orElseThrow(() -> SirhaException.studentNotFound(email));
+                .orElseThrow(() -> SirhaException.of(ErrorCodeSirha.STUDENT_NOT_FOUND, email));
         return ResponseEntity.ok(StudentMapper.toDTO(student));
     }
 

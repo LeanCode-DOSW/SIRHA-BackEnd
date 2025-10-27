@@ -8,6 +8,7 @@ import edu.dosw.sirha.sirha_backend.domain.model.SubjectProgress;
 import edu.dosw.sirha.sirha_backend.domain.model.enums.SemaforoColores;
 import edu.dosw.sirha.sirha_backend.domain.model.stategroup.Group;
 import edu.dosw.sirha.sirha_backend.domain.port.*;
+import edu.dosw.sirha.sirha_backend.exception.ErrorCodeSirha;
 import edu.dosw.sirha.sirha_backend.exception.SirhaException;
 
 public class SubjectDecorator {
@@ -53,8 +54,18 @@ public class SubjectDecorator {
     private void recordChangeState(SubjectStateProcess stateProcess){
         addState(stateProcess);
     }
-    public List<Schedule> getSchedules() {return group.getSchedules();}
-    public AcademicPeriod getAcademicPeriod() {return group.getCurrentPeriod();}
+    public List<Schedule> getSchedules() throws SirhaException {
+        if (group == null) {
+            throw SirhaException.of(ErrorCodeSirha.GROUP_NOT_FOUND);
+        }
+        return group.getSchedules();
+    }
+    public AcademicPeriod getAcademicPeriod() throws SirhaException {
+        if (group == null) {
+            throw SirhaException.of(ErrorCodeSirha.GROUP_NOT_FOUND);
+        }
+        return group.getCurrentPeriod();
+    }
 
     public boolean canEnroll() {return state.canEnroll();}
     public boolean estaCursando() {return estadoColor == SemaforoColores.AMARILLO;}
@@ -72,7 +83,12 @@ public class SubjectDecorator {
     public int getSemester() {return semestre;}
     public Subject getSubject() {return subject;}
     public SubjectState getState() {return state;}
-    public Group getGroup() { return group; }
+    public Group getGroup() throws SirhaException { 
+        if (group == null) {
+            throw SirhaException.of(ErrorCodeSirha.GROUP_NOT_FOUND);
+        }
+        return group;
+    }
     public int getGrade() { return grade; }
     public List<SubjectStateProcess> getHistory() { return new ArrayList<>(history); }
 }
