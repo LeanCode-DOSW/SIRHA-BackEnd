@@ -11,6 +11,7 @@ import edu.dosw.sirha.sirha_backend.domain.model.Professor;
 import edu.dosw.sirha.sirha_backend.domain.model.Schedule;
 import edu.dosw.sirha.sirha_backend.domain.model.Subject;
 import edu.dosw.sirha.sirha_backend.domain.model.stategroup.Group;
+import edu.dosw.sirha.sirha_backend.domain.port.PrerequisiteRule;
 import edu.dosw.sirha.sirha_backend.exception.ErrorCodeSirha;
 import edu.dosw.sirha.sirha_backend.exception.SirhaException;
 import edu.dosw.sirha.sirha_backend.repository.mongo.SubjectMongoRepository;
@@ -271,8 +272,8 @@ public class SubjectServiceImpl implements SubjectService {
             Subject subject = subjectRepository.findByName(subjectName).orElse(null);
 
             if (subject == null) {
-                log.error("No se encontró la materia con nombre: {}", subjectName);
-                throw SirhaException.of(ErrorCodeSirha.SUBJECT_NOT_FOUND,"Materia no encontrada: " + subjectName);
+                log.error("No se encontró la materia para save con nombre: {}", subjectName);
+                throw SirhaException.of(ErrorCodeSirha.SUBJECT_NOT_FOUND,"Materia para save no encontrada: " + subjectName);
             }
             
             Group savedGroup = groupService.saveGroup(subject, group);
@@ -591,6 +592,36 @@ public class SubjectServiceImpl implements SubjectService {
         } catch (Exception e) {
             throw SirhaException.of(ErrorCodeSirha.INTERNAL_ERROR,"Error interno al buscar grupo por ID: " + e.getMessage(), e);
         }
+    }
+
+    @Override
+    public Subject addPrerequisite(String subjectName, PrerequisiteRule prerequisite) throws SirhaException {
+        log.info("Agregando prerrequisito a la materia: {}", subjectName);
+        try {
+            if (subjectName == null || subjectName.isEmpty()) {
+                log.error("Error: El nombre de la materia no puede ser null o vacío");
+                throw SirhaException.of(ErrorCodeSirha.SUBJECT_NOT_FOUND,"El nombre de la materia no puede ser null o vacío");
+            }
+            if (prerequisite == null) {
+                log.error("Error: El prerrequisito no puede ser null");
+                throw SirhaException.of(ErrorCodeSirha.INVALID_ARGUMENT,"El prerrequisito no puede ser null");
+            }
+            Subject subject = subjectRepository.findByName(subjectName).orElse(null);
+
+            if (subject == null) {
+                log.warn("No se encontró la materia con nombre: {}", subjectName);
+                throw SirhaException.of(ErrorCodeSirha.SUBJECT_NOT_FOUND,"Materia no encontrada: " + subjectName);
+            }
+
+            subject.addPrerequisite(prerequisite);
+            Subject updatedSubject = subjectRepository.save(subject);
+            log.info("Prerrequisito agregado exitosamente a la materia: {}", subjectName);
+            return updatedSubject;
+        } catch (SirhaException e) {
+            throw e;
+        } catch (Exception e) {
+            throw SirhaException.of(ErrorCodeSirha.INTERNAL_ERROR,"Error interno al agregar prerrequisito: " + e.getMessage(), e);
+        }   
     }
 
 }

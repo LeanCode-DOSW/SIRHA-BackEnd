@@ -6,6 +6,7 @@ import edu.dosw.sirha.sirha_backend.domain.model.Professor;
 import edu.dosw.sirha.sirha_backend.domain.model.Schedule;
 import edu.dosw.sirha.sirha_backend.domain.model.Subject;
 import edu.dosw.sirha.sirha_backend.domain.model.stategroup.Group;
+import edu.dosw.sirha.sirha_backend.domain.port.PrerequisiteRule;
 import edu.dosw.sirha.sirha_backend.exception.SirhaException;
 
 public interface SubjectService {
@@ -22,6 +23,7 @@ public interface SubjectService {
     boolean existsGroupById(String id) throws SirhaException;
     List<Group> deleteGroupsBySubjectName(String subjectName) throws SirhaException;   
 
+    Subject addPrerequisite(String subjectName, PrerequisiteRule prerequisite) throws SirhaException;
 
     //de GroupService
     List<Group> findAllGroups() throws SirhaException;
@@ -39,5 +41,6 @@ public interface SubjectService {
 
     Group closeGroup(String groupId) throws SirhaException;
     Group openGroup(String groupId) throws SirhaException;
+
 
 }   
