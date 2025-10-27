@@ -53,9 +53,9 @@ class BaseRequestTest {
         assertNotNull(cambioGrupo.getCreadoEn());
         assertEquals(student, cambioGrupo.getStudent());
         assertEquals(academicPeriod, cambioGrupo.getCurrentPeriod());
-        assertNotNull(cambioGrupo.getProcesos());
-        assertFalse(cambioGrupo.getProcesos().isEmpty());
-        assertEquals(1, cambioGrupo.getProcesos().size());
+        assertNotNull(cambioGrupo.getProcesses());
+        assertFalse(cambioGrupo.getProcesses().isEmpty());
+        assertEquals(1, cambioGrupo.getProcesses().size());
     }
 
 
@@ -91,7 +91,7 @@ class BaseRequestTest {
         
         assertEquals(RequestStateEnum.EN_REVISION, cambioGrupo.getActualState());
         assertEquals(EstadoEnRevision.class, cambioGrupo.getState().getClass());
-        assertEquals(2, cambioGrupo.getProcesos().size());
+        assertEquals(2, cambioGrupo.getProcesses().size());
 
         try {
             cambioGrupo.approveRequest(new ResponseRequest("Solicitud aprobada por disponibilidad de cupos", RequestStateEnum.APROBADA));
@@ -100,7 +100,7 @@ class BaseRequestTest {
         }
 
         assertEquals(RequestStateEnum.APROBADA, cambioGrupo.getActualState());
-        assertEquals(3, cambioGrupo.getProcesos().size());
+        assertEquals(3, cambioGrupo.getProcesses().size());
         
         RequestProcess proceso = cambioGrupo.getActualProcess();
         assertEquals(RequestStateEnum.APROBADA, proceso.getStatus());
@@ -123,7 +123,7 @@ class BaseRequestTest {
         }
 
         assertEquals(RequestStateEnum.RECHAZADA, cambioMateria.getActualState());
-        assertEquals(3, cambioMateria.getProcesos().size());
+        assertEquals(3, cambioMateria.getProcesses().size());
         
         RequestProcess proceso = cambioMateria.getActualProcess();
         assertEquals(RequestStateEnum.RECHAZADA, proceso.getStatus());
@@ -141,7 +141,7 @@ class BaseRequestTest {
         }
 
         assertEquals(RequestStateEnum.EN_REVISION, cambioGrupo.getActualState());
-        assertEquals(2, cambioGrupo.getProcesos().size());
+        assertEquals(2, cambioGrupo.getProcesses().size());
         
         RequestProcess proceso = cambioGrupo.getActualProcess();
         assertEquals(RequestStateEnum.EN_REVISION, proceso.getStatus());
@@ -174,7 +174,7 @@ class BaseRequestTest {
 
         assertEquals(RequestStateEnum.EN_REVISION, cambioGrupo.getActualState());
         assertEquals(EstadoEnRevision.class, cambioGrupo.getState().getClass());
-        assertEquals(2, cambioGrupo.getProcesos().size());
+        assertEquals(2, cambioGrupo.getProcesses().size());
         
 
         try{ 
@@ -183,11 +183,11 @@ class BaseRequestTest {
             fail("No se esperaba una excepción aquí");
         }
         assertEquals(RequestStateEnum.APROBADA, cambioGrupo.getActualState());
-        assertEquals(3, cambioGrupo.getProcesos().size());
+        assertEquals(3, cambioGrupo.getProcesses().size());
         
-        assertEquals(RequestStateEnum.PENDIENTE, cambioGrupo.getProcesos().get(0).getStatus());
-        assertEquals(RequestStateEnum.EN_REVISION, cambioGrupo.getProcesos().get(1).getStatus());
-        assertEquals(RequestStateEnum.APROBADA, cambioGrupo.getProcesos().get(2).getStatus());
+        assertEquals(RequestStateEnum.PENDIENTE, cambioGrupo.getProcesses().get(0).getStatus());
+        assertEquals(RequestStateEnum.EN_REVISION, cambioGrupo.getProcesses().get(1).getStatus());
+        assertEquals(RequestStateEnum.APROBADA, cambioGrupo.getProcesses().get(2).getStatus());
     }
 
     @Test

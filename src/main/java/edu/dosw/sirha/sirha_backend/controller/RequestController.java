@@ -2,6 +2,7 @@ package edu.dosw.sirha.sirha_backend.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.access.prepost.PreAuthorize;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -9,6 +10,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import edu.dosw.sirha.sirha_backend.dto.ResponseRequest;
 import edu.dosw.sirha.sirha_backend.domain.model.enums.RequestStateEnum;
 import edu.dosw.sirha.sirha_backend.domain.model.staterequest.BaseRequest;
+import edu.dosw.sirha.sirha_backend.domain.port.RequestProcess;
 import edu.dosw.sirha.sirha_backend.exception.SirhaException;
 import edu.dosw.sirha.sirha_backend.service.RequestService;
 
@@ -47,6 +49,7 @@ public class RequestController {
     }
 
     @GetMapping
+    @PreAuthorize("hasAnyRole('DEAN','ADMIN')")
     @Operation(summary = "Obtener todas las solicitudes", description = "Retorna una lista completa de todas las solicitudes registradas en el sistema")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Lista de solicitudes obtenida exitosamente"),
@@ -58,6 +61,7 @@ public class RequestController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('DEAN','ADMIN') or @requestService.isRequestOwner(authentication.name, #id)")
     @Operation(summary = "Buscar solicitud por ID", description = "Obtiene una solicitud específica por su identificador único")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Solicitud encontrada"),
@@ -71,6 +75,7 @@ public class RequestController {
     }
 
     @GetMapping("/status/{status}")
+    @PreAuthorize("hasAnyRole('DEAN','ADMIN')")
     @Operation(summary = "Buscar solicitudes por estado", description = "Obtiene todas las solicitudes que se encuentran en un estado específico")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Solicitudes filtradas por estado obtenidas exitosamente"),
@@ -84,6 +89,7 @@ public class RequestController {
 
 
     @GetMapping("/student/{studentUsername}")
+    @PreAuthorize("hasAnyRole('DEAN','ADMIN') or (hasRole('STUDENT') and authentication.name == #studentUsername)")
     @Operation(summary = "Obtener solicitudes por estudiante", description = "Obtiene todas las solicitudes activas de un estudiante específico")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Solicitudes del estudiante obtenidas exitosamente"),
@@ -96,6 +102,7 @@ public class RequestController {
     }
 
     @GetMapping("/student/{studentUsername}/history")
+    @PreAuthorize("hasAnyRole('DEAN','ADMIN') or (hasRole('STUDENT') and authentication.name == #studentUsername)")
     @Operation(summary = "Obtener historial de solicitudes", description = "Obtiene el historial completo de solicitudes de un estudiante, incluyendo aprobadas, rechazadas y pendientes")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Historial de solicitudes obtenido exitosamente"),
@@ -108,6 +115,7 @@ public class RequestController {
     }
 
     @GetMapping("/student/{studentUsername}/{requestId}")
+    @PreAuthorize("hasAnyRole('DEAN','ADMIN') or @requestService.isRequestOwner(authentication.name, #requestId)")
     @Operation(summary = "Obtener solicitud específica de estudiante", description = "Obtiene una solicitud específica de un estudiante por su ID")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Solicitud obtenida exitosamente"),
@@ -121,6 +129,7 @@ public class RequestController {
     }
 
     @DeleteMapping("/{requestId}")
+    @PreAuthorize("hasAnyRole('DEAN','ADMIN') or (hasRole('STUDENT') and @requestService.isRequestOwner(authentication.name, #requestId))")
     @Operation(summary = "Eliminar solicitud", description = "Elimina una solicitud del sistema (solo si está en estado PENDIENTE)")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Solicitud eliminada exitosamente"),
@@ -131,6 +140,19 @@ public class RequestController {
     public ResponseEntity<BaseRequest> deleteRequest(@PathVariable String requestId) throws SirhaException {
         BaseRequest deletedRequest = requestService.deleteById(requestId);
         return ResponseEntity.ok(deletedRequest);
+    }
+
+    @GetMapping("/{requestId}/processes")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Obtener procesos de una solicitud", description = "Devuelve la lista de procesos (historial de estados) asociados a una solicitud")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Procesos obtenidos correctamente"),
+        @ApiResponse(responseCode = "404", description = "Solicitud no encontrada"),
+        @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    })
+    public ResponseEntity<List<RequestProcess>> getRequestProcesses(@PathVariable String requestId) throws SirhaException {
+        List<RequestProcess> processes = requestService.getRequestProcesses(requestId);
+        return ResponseEntity.ok(processes);
     }
 
 }

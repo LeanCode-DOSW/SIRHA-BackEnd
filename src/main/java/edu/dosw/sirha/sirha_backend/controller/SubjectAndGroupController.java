@@ -57,6 +57,7 @@ public class SubjectAndGroupController {
     }
         
     @GetMapping
+    @PreAuthorize("hasAnyRole('STUDENT','DEAN','ADMIN')")
     @Operation(summary = "Obtener todas las materias", description = "Retorna una lista de todas las materias disponibles")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Lista de materias obtenida exitosamente"),
@@ -68,6 +69,7 @@ public class SubjectAndGroupController {
     }
     
     @GetMapping("/{name}")
+    @PreAuthorize("hasAnyRole('STUDENT','DEAN','ADMIN')")
     @Operation(summary = "Buscar materia por nombre", description = "Obtiene una materia específica por su nombre")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Materia encontrada"),
@@ -95,19 +97,20 @@ public class SubjectAndGroupController {
     }
     
     @DeleteMapping("/{name}")
+    @PreAuthorize("hasAnyRole('DEAN','ADMIN')")
     @Operation(summary = "Eliminar materia", description = "Elimina una materia del sistema por su nombre")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Materia eliminada exitosamente"),
         @ApiResponse(responseCode = "404", description = "Materia no encontrada"),
         @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
-    @PreAuthorize("hasAnyRole('DEAN','ADMIN')")
     public ResponseEntity<Subject> deleteSubjectByName(@PathVariable String name) throws SirhaException {
         Subject deletedSubject = subjectService.deleteByName(name);
         return ResponseEntity.ok(deletedSubject);
     }
     
     @GetMapping("/{name}/exists")
+    @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Verificar existencia de materia", description = "Verifica si una materia existe por su nombre")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Verificación realizada exitosamente"),
@@ -119,6 +122,7 @@ public class SubjectAndGroupController {
     }
     
     @GetMapping("/groups")
+    @PreAuthorize("hasAnyRole('STUDENT','DEAN','ADMIN')")
     @Operation(summary = "Obtener todos los grupos", description = "Retorna una lista de todos los grupos disponibles")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Lista de grupos obtenida exitosamente"),
@@ -130,6 +134,7 @@ public class SubjectAndGroupController {
     }
     
     @GetMapping("/{subjectName}/groups")
+    @PreAuthorize("hasAnyRole('STUDENT','DEAN','ADMIN')")
     @Operation(summary = "Obtener grupos de una materia", description = "Obtiene todos los grupos de una materia específica")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Grupos obtenidos exitosamente"),
@@ -142,6 +147,7 @@ public class SubjectAndGroupController {
     }
     
     @GetMapping("/{subjectName}/groups/open")
+    @PreAuthorize("hasAnyRole('STUDENT','DEAN','ADMIN')")
     @Operation(summary = "Obtener grupos abiertos de una materia", description = "Obtiene los grupos abiertos para inscripción de una materia específica")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Grupos abiertos obtenidos exitosamente"),
@@ -154,6 +160,7 @@ public class SubjectAndGroupController {
     }
     
     @GetMapping("/groups/{id}")
+    @PreAuthorize("hasAnyRole('STUDENT','DEAN','ADMIN')")
     @Operation(summary = "Buscar grupo por ID", description = "Obtiene un grupo específico por su identificador")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Grupo encontrado"),
@@ -182,19 +189,20 @@ public class SubjectAndGroupController {
     }
     
     @DeleteMapping("/groups/{id}")
+    @PreAuthorize("hasAnyRole('DEAN','ADMIN')")
     @Operation(summary = "Eliminar grupo", description = "Elimina un grupo del sistema por su ID")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Grupo eliminado exitosamente"),
         @ApiResponse(responseCode = "404", description = "Grupo no encontrado"),
         @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
-    @PreAuthorize("hasAnyRole('DEAN','ADMIN')")
     public ResponseEntity<Group> deleteGroupById(@PathVariable String id) throws SirhaException {
         Group deletedGroup = subjectService.deleteGroupById(id);
         return ResponseEntity.ok(deletedGroup);
     }
     
     @GetMapping("/groups/{id}/exists")
+    @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Verificar existencia de grupo", description = "Verifica si un grupo existe por su ID")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Verificación realizada exitosamente"),
@@ -206,19 +214,20 @@ public class SubjectAndGroupController {
     }
     
     @DeleteMapping("/{subjectName}/groups")
+    @PreAuthorize("hasAnyRole('DEAN','ADMIN')")
     @Operation(summary = "Eliminar todos los grupos de una materia", description = "Elimina todos los grupos asociados a una materia específica")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Grupos eliminados exitosamente"),
         @ApiResponse(responseCode = "404", description = "Materia no encontrada"),
         @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
-    @PreAuthorize("hasAnyRole('DEAN','ADMIN')")
     public ResponseEntity<List<Group>> deleteGroupsBySubjectName(@PathVariable String subjectName) throws SirhaException {
         List<Group> deletedGroups = subjectService.deleteGroupsBySubjectName(subjectName);
         return ResponseEntity.ok(deletedGroups);
     }
     
     @PutMapping("/groups/{groupId}/professor")
+    @PreAuthorize("hasAnyRole('DEAN','ADMIN')")
     @Operation(summary = "Asignar profesor a grupo", description = "Asigna un profesor a un grupo específico")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Profesor asignado exitosamente"),
@@ -226,13 +235,13 @@ public class SubjectAndGroupController {
         @ApiResponse(responseCode = "400", description = "Datos del profesor inválidos"),
         @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
-    @PreAuthorize("hasAnyRole('DEAN','ADMIN')")
     public ResponseEntity<Group> assignProfessor(@PathVariable String groupId, @RequestBody Professor professor) throws SirhaException {
         Group updatedGroup = subjectService.assignProfessor(groupId, professor);
         return ResponseEntity.ok(updatedGroup);
     }
     
     @PostMapping("/groups/{groupId}/schedules")
+    @PreAuthorize("hasAnyRole('DEAN','ADMIN')")
     @Operation(summary = "Agregar horario a grupo", description = "Agrega un nuevo horario a un grupo específico")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Horario agregado exitosamente"),
@@ -241,13 +250,13 @@ public class SubjectAndGroupController {
         @ApiResponse(responseCode = "409", description = "Conflicto de horarios"),
         @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
-    @PreAuthorize("hasAnyRole('DEAN','ADMIN')")
     public ResponseEntity<Group> addSchedule(@PathVariable String groupId, @RequestBody Schedule schedule) throws SirhaException {
         Group updatedGroup = subjectService.addSchedule(groupId, schedule);
         return ResponseEntity.ok(updatedGroup);
     }
     
     @GetMapping("/groups/{groupId}/professor")
+    @PreAuthorize("hasAnyRole('STUDENT','DEAN','ADMIN')")
     @Operation(summary = "Obtener profesor de grupo", description = "Obtiene el profesor asignado a un grupo específico")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Profesor obtenido exitosamente"),
@@ -260,6 +269,7 @@ public class SubjectAndGroupController {
     }
     
     @GetMapping("/groups/{groupId}/schedules")
+    @PreAuthorize("hasAnyRole('STUDENT','DEAN','ADMIN')")
     @Operation(summary = "Obtener horarios de grupo", description = "Obtiene todos los horarios de un grupo específico")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Horarios obtenidos exitosamente"),
@@ -272,6 +282,7 @@ public class SubjectAndGroupController {
     }
     
     @GetMapping("/groups/{groupId}/full")
+    @PreAuthorize("hasAnyRole('STUDENT','DEAN','ADMIN')")
     @Operation(summary = "Verificar si grupo está lleno", description = "Verifica si un grupo ha alcanzado su capacidad máxima")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Verificación realizada exitosamente"),
@@ -282,8 +293,9 @@ public class SubjectAndGroupController {
         boolean isFull = subjectService.isFull(groupId);
         return ResponseEntity.ok(isFull);
     }
-    
+
     @GetMapping("/groups/{groupId}/available-seats")
+    @PreAuthorize("hasAnyRole('STUDENT','DEAN','ADMIN')")
     @Operation(summary = "Obtener cupos disponibles", description = "Obtiene el número de cupos disponibles en un grupo")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Cupos disponibles obtenidos exitosamente"),
@@ -296,6 +308,7 @@ public class SubjectAndGroupController {
     }
     
     @PutMapping("/groups/{groupId}/close")
+    @PreAuthorize("hasAnyRole('DEAN','ADMIN')")
     @Operation(summary = "Cerrar grupo", description = "Cierra un grupo para que no se puedan realizar más inscripciones")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Grupo cerrado exitosamente"),
@@ -303,13 +316,13 @@ public class SubjectAndGroupController {
         @ApiResponse(responseCode = "400", description = "El grupo ya está cerrado"),
         @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
-    @PreAuthorize("hasAnyRole('DEAN','ADMIN')")
     public ResponseEntity<Group> closeGroup(@PathVariable String groupId) throws SirhaException {
         Group closedGroup = subjectService.closeGroup(groupId);
         return ResponseEntity.ok(closedGroup);
     }
 
     @PutMapping("/groups/{groupId}/open")
+    @PreAuthorize("hasAnyRole('DEAN','ADMIN')")
     @Operation(summary = "Abrir grupo", description = "Abre un grupo para permitir inscripciones")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Grupo abierto exitosamente"),
@@ -317,7 +330,6 @@ public class SubjectAndGroupController {
         @ApiResponse(responseCode = "400", description = "El grupo ya está abierto"),
         @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
-    @PreAuthorize("hasAnyRole('DEAN','ADMIN')")
     public ResponseEntity<Group> openGroup(@PathVariable String groupId) throws SirhaException {
         Group openedGroup = subjectService.openGroup(groupId);
         return ResponseEntity.ok(openedGroup);

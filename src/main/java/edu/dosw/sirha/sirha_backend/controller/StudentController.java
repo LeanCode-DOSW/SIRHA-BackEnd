@@ -58,6 +58,7 @@ public class StudentController {
     }
 
     @GetMapping
+    @PreAuthorize("hasAnyRole('DEAN','ADMIN')")
     @Operation(summary = "Obtener todos los estudiantes", description = "Retorna una lista completa de todos los estudiantes registrados en el sistema")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Lista de estudiantes obtenida exitosamente"),
@@ -72,6 +73,7 @@ public class StudentController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('DEAN','ADMIN')")
     @Operation(summary = "Buscar estudiante por ID", description = "Obtiene un estudiante específico por su identificador único")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Estudiante encontrado"),
@@ -85,6 +87,7 @@ public class StudentController {
     }
 
     @GetMapping("/username/{username}")
+    @PreAuthorize("hasAnyRole('DEAN','ADMIN') or (hasRole('STUDENT') and authentication.name == #username)")
     @Operation(summary = "Buscar estudiante por username", description = "Obtiene un estudiante específico por su nombre de usuario")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Estudiante encontrado"),
@@ -98,6 +101,7 @@ public class StudentController {
     }
 
     @GetMapping("/email/{email}")
+    @PreAuthorize("hasAnyRole('DEAN','ADMIN')")
     @Operation(summary = "Buscar estudiante por email", description = "Obtiene un estudiante específico por su dirección de correo electrónico")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Estudiante encontrado"),
@@ -111,6 +115,7 @@ public class StudentController {
     }
 
     @GetMapping("/exists/code/{code}")
+    @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Verificar existencia por código", description = "Verifica si existe un estudiante con el código especificado")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Verificación completada"),
@@ -122,6 +127,7 @@ public class StudentController {
     }
 
     @GetMapping("/exists/email/{email}")
+    @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Verificar existencia por email", description = "Verifica si existe un estudiante con el email especificado")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Verificación completada"),
@@ -403,5 +409,39 @@ public class StudentController {
     public ResponseEntity<Double> getInReviewRequestPercentage(@PathVariable String username) throws SirhaException {
         Double percentage = studentService.getInReviewRequestPercentage(username);
         return ResponseEntity.ok(percentage);
+    }
+
+    @PostMapping("/{studentName}/enroll")
+    @Operation(summary = "Inscribir materia", description = "Inscribe una materia en un grupo para el estudiante autenticado")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Materia inscrita exitosamente"),
+        @ApiResponse(responseCode = "404", description = "Estudiante, materia o grupo no encontrado"),
+        @ApiResponse(responseCode = "400", description = "Parámetros inválidos o conflicto de inscripción"),
+        @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    })
+    @PreAuthorize("hasRole('STUDENT') and authentication.name == #studentName")
+    public ResponseEntity<Void> enrollSubject(
+            @PathVariable String studentName,
+            @RequestParam String subjectName,
+            @RequestParam String groupCode) throws SirhaException {
+        studentService.enrollSubject(studentName, subjectName, groupCode);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/{studentName}/unenroll")
+    @Operation(summary = "Desinscribir materia", description = "Desinscribe una materia de un grupo para el estudiante autenticado")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Materia desinscrita exitosamente"),
+        @ApiResponse(responseCode = "404", description = "Estudiante, materia o grupo no encontrado"),
+        @ApiResponse(responseCode = "400", description = "Parámetros inválidos o no es posible desinscribir"),
+        @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    })
+    @PreAuthorize("hasRole('STUDENT') and authentication.name == #studentName")
+    public ResponseEntity<Void> unenrollSubject(
+            @PathVariable String studentName,
+            @RequestParam String subjectName,
+            @RequestParam String groupCode) throws SirhaException {
+        studentService.unenrollSubject(studentName, subjectName, groupCode);
+        return ResponseEntity.ok().build();
     }
 }

@@ -12,8 +12,7 @@ import edu.dosw.sirha.sirha_backend.domain.model.enums.Role;
 import edu.dosw.sirha.sirha_backend.dto.AuthResponse;
 import edu.dosw.sirha.sirha_backend.dto.LoginRequest;
 import edu.dosw.sirha.sirha_backend.dto.MeResponse;
-import edu.dosw.sirha.sirha_backend.dto.RegisterRequestDecanate;
-import edu.dosw.sirha.sirha_backend.dto.RegisterRequestStudent;
+import edu.dosw.sirha.sirha_backend.dto.RegisterRequest;
 import edu.dosw.sirha.sirha_backend.exception.ErrorCodeSirha;
 import edu.dosw.sirha.sirha_backend.exception.SirhaException;
 import edu.dosw.sirha.sirha_backend.repository.mongo.AccountMongoRepository;
@@ -49,12 +48,12 @@ public class AuthController {
 
     @PostMapping("/register-student")
     @PreAuthorize("hasAnyRole('ADMIN', 'DEAN')")
-    public ResponseEntity<AuthResponse> registerStudent(@RequestBody RegisterRequestStudent req) throws SirhaException {
-        studentService.registerStudent(req);
-
+    public ResponseEntity<AuthResponse> registerStudent(@RequestBody RegisterRequest req) throws SirhaException {
         if (accounts.existsByUsername(req.getUsername())) {
             return ResponseEntity.badRequest().body(new AuthResponse(req.getUsername(), req.getEmail(), ErrorCodeSirha.USERNAME_ALREADY_EXISTS.getDefaultMessage()));
         }
+
+        studentService.registerStudent(req);
 
         var acc = new Account(req.getUsername(), req.getEmail(), passwordEncoder.encode(req.getPassword()), Role.STUDENT);
         accounts.save(acc);
@@ -68,12 +67,12 @@ public class AuthController {
 
     @PostMapping("/register-dean")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<AuthResponse> registerDean(@RequestBody RegisterRequestDecanate req) throws SirhaException {
-        decanateService.registerDecanate(req);
-
+    public ResponseEntity<AuthResponse> registerDean(@RequestBody RegisterRequest req) throws SirhaException {
         if (accounts.existsByUsername(req.getUsername())) {
             return ResponseEntity.badRequest().body(new AuthResponse(req.getUsername(), req.getEmail(), ErrorCodeSirha.USERNAME_ALREADY_EXISTS.getDefaultMessage()));
         } 
+
+        decanateService.registerDecanate(req);
 
         var acc = new Account(req.getUsername(), req.getEmail(), passwordEncoder.encode(req.getPassword()), Role.DEAN, req.getCareer());
         accounts.save(acc);
@@ -87,8 +86,10 @@ public class AuthController {
 
     @PostMapping("/register-admin")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<AuthResponse> registerAdmin(@RequestBody RegisterRequestStudent req) {
-        if (accounts.existsByUsername(req.getUsername())) return ResponseEntity.badRequest().body(new AuthResponse(req.getUsername(), req.getEmail(), ErrorCodeSirha.USERNAME_ALREADY_EXISTS.getDefaultMessage()));
+    public ResponseEntity<AuthResponse> registerAdmin(@RequestBody RegisterRequest req) {
+        if (accounts.existsByUsername(req.getUsername())) {
+            return ResponseEntity.badRequest().body(new AuthResponse(req.getUsername(), req.getEmail(), ErrorCodeSirha.USERNAME_ALREADY_EXISTS.getDefaultMessage()));
+        }
         var acc = new Account(req.getUsername(), req.getEmail(), passwordEncoder.encode(req.getPassword()), Role.ADMIN);
         accounts.save(acc);
         String token = jwt.generateAccessToken(acc.getUsername(), acc.getRole());

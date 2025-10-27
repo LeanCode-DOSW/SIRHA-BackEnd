@@ -10,7 +10,7 @@ import jakarta.validation.constraints.Size;
 /**
  * DTO para solicitudes de registro de estudiantes.
  */
-public class RegisterRequestDecanate{
+public class RegisterRequest {
     @NotBlank(message = "El username es obligatorio")
     @Size(min = 3, max = 50, message = "El username debe tener entre 3 y 50 caracteres")
     private String username;
@@ -25,9 +25,20 @@ public class RegisterRequestDecanate{
     @Size(min = 8, message = "La contraseña debe tener al menos 8 caracteres")
     private String password;
     
+    @NotBlank(message = "El código estudiantil es obligatorio")
+    @Pattern(regexp = "\\d{4}-\\d{6}", 
+             message = "Código estudiantil debe tener formato YYYY-NNNNNN")
+    private String codigo;
+    
     private Careers career;
 
-    public RegisterRequestDecanate(String username, String email, String password, Careers career) {
+    public RegisterRequest(String username, String email, String password, String codigo) {
+        this.username = username;
+        this.email = email;
+        this.password = password;
+        this.codigo = codigo;
+    }
+    public RegisterRequest(String username, String email, String password, Careers career) {
         this.username = username;
         this.email = email;
         this.password = password;
@@ -43,6 +54,9 @@ public class RegisterRequestDecanate{
     public String getPassword() { return password; }
     public void setPassword(String password) { this.password = password; }
     
+    public String getCodigo() { return codigo; }
+    public void setCodigo(String codigo) { this.codigo = codigo; }
+
     public Careers getCareer() { return career; }
     public void setCareer(Careers career) { this.career = career; }
 

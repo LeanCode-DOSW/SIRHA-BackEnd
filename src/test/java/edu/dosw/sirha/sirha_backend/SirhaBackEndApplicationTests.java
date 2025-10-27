@@ -10,6 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import edu.dosw.sirha.sirha_backend.domain.model.*;
 import edu.dosw.sirha.sirha_backend.domain.model.enums.Careers;
 import edu.dosw.sirha.sirha_backend.domain.model.enums.DiasSemana;
+import edu.dosw.sirha.sirha_backend.domain.model.enums.Role;
 import edu.dosw.sirha.sirha_backend.domain.model.enums.SemaforoColores;
 import edu.dosw.sirha.sirha_backend.domain.model.stategroup.Group;
 import edu.dosw.sirha.sirha_backend.domain.model.stategroup.StatusClosed;
@@ -1950,6 +1951,20 @@ class SirhaBackEndApplicationTests {
             assertEquals(0, student1.getAllSchedules().size());
         } catch (Exception e) {
             fail("No se esperaba una excepción al crear el estudiante: " + e.getMessage());
+        }
+    }
+    @Test 
+    void testAccountBasicFunctionalities() {
+        try {
+            new Account();
+            Account account = new Account("user123", "user123@example.com", "password", Role.STUDENT, Careers.INGENIERIA_DE_SISTEMAS);
+            assertEquals("user123", account.getUsername());
+            assertEquals("user123@example.com", account.getEmail());
+            assertEquals("password", account.getPasswordHash());
+            assertEquals(Role.STUDENT,  account.getRole());
+            assertEquals(Careers.INGENIERIA_DE_SISTEMAS, account.getCareer());
+        } catch (Exception e) {
+            fail("No se esperaba una excepción al crear la cuenta: " + e.getMessage());
         }
     }
 

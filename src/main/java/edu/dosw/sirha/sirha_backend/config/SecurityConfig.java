@@ -52,7 +52,6 @@ public class SecurityConfig {
     ) throws Exception {
 
         http
-            .csrf(csrf -> csrf.disable())
             .cors(cors -> cors.configurationSource(req -> {
                 var c = new CorsConfiguration();
                 c.setAllowedOrigins(List.of(frontendUrl, "http://localhost:3000", "http://localhost:5173"));
@@ -91,8 +90,10 @@ public class SecurityConfig {
             // STUDENT 
             .requestMatchers(HttpMethod.POST,
                 "/api/students/*/solicitudes/cambio-grupo",
-                "/api/students/*/solicitudes/cambio-materia"
+                "/api/students/*/solicitudes/cambio-materia",
+                "/api/students/*/enroll"
             ).hasRole(Role.STUDENT.name())
+            .requestMatchers(HttpMethod.DELETE, "/api/students/*/unenroll").hasRole(Role.STUDENT.name())
             // STUDENT / DEAN / ADMIN
             .requestMatchers(HttpMethod.GET,
                 "/api/students/schedule/**",
@@ -114,6 +115,9 @@ public class SecurityConfig {
 
             // RequestController  (/api/requests/**)
             // DEAN / ADMIN
+            .requestMatchers(
+                "/api/requests/student/{requestId}/processes"
+            ).hasAnyRole(Role.STUDENT.name(),Role.DEAN.name(),Role.ADMIN.name())
             .requestMatchers(
                 "/api/requests/**"
             ).hasAnyRole(Role.DEAN.name(),Role.ADMIN.name())

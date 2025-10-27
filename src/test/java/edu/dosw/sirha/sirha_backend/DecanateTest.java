@@ -70,6 +70,9 @@ class DecanateTest {
         StudyPlan studyPlan1 = new StudyPlan(Careers.INGENIERIA_DE_SISTEMAS);
         StudyPlan studyPlan2 = new StudyPlan(Careers.INGENIERIA_INDUSTRIAL);
 
+        decanateIndustrial.addStudyPlan(studyPlan2);
+        decanateSistemas.addStudyPlan(studyPlan1);
+
         studentSistemas = new Student(
             "juan.perez",
             "juan@universidad.edu",
@@ -105,6 +108,7 @@ class DecanateTest {
     @Test
     void testDecanateCreation() {
         assertEquals(Careers.INGENIERIA_DE_SISTEMAS.getDisplayName(), decanateSistemas.getName());
+        decanateSistemas.getId();
         assertNotNull(decanateSistemas.getPendingRequests());
         assertTrue(decanateSistemas.getPendingRequests().isEmpty());
         assertEquals(0, decanateSistemas.getPendingRequests().size());

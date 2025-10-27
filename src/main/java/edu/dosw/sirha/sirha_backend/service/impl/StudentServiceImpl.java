@@ -12,7 +12,7 @@ import edu.dosw.sirha.sirha_backend.domain.model.Subject;
 import edu.dosw.sirha.sirha_backend.domain.model.enums.SemaforoColores;
 import edu.dosw.sirha.sirha_backend.domain.model.stategroup.Group;
 import edu.dosw.sirha.sirha_backend.domain.model.staterequest.BaseRequest;
-import edu.dosw.sirha.sirha_backend.dto.RegisterRequestStudent;
+import edu.dosw.sirha.sirha_backend.dto.RegisterRequest;
 import edu.dosw.sirha.sirha_backend.dto.RequestApprovalRateDTO;
 import edu.dosw.sirha.sirha_backend.dto.StudentDTO;
 import edu.dosw.sirha.sirha_backend.dto.StudentReportDTO;
@@ -184,7 +184,7 @@ public class StudentServiceImpl implements StudentService {
 
     @Transactional
     @Override
-    public Student registerStudent(RegisterRequestStudent request) throws SirhaException {
+    public Student registerStudent(RegisterRequest request) throws SirhaException {
         log.info("Iniciando proceso de registro para usuario: {}", request.getUsername());
         
         try {
@@ -519,6 +519,7 @@ public class StudentServiceImpl implements StudentService {
 
     @Override
     public Map<SemaforoColores, Double> getPercentageByColor(String username) throws SirhaException {
+        log.info("Consultando porcentajes por color para usuario: {}", username);
         try {
             Student student = studentRepository.findByUsername(username)
                 .orElseThrow(() -> {
@@ -538,6 +539,7 @@ public class StudentServiceImpl implements StudentService {
 
     @Override
     public StudentDTO getStudentBasicInfo(String username) throws SirhaException {
+        log.info("Consultando información básica del estudiante: {}", username);
         try {
             Student student = studentRepository.findByUsername(username)
                 .orElseThrow(() -> {
@@ -557,6 +559,7 @@ public class StudentServiceImpl implements StudentService {
 
     @Override
     public StudentReportDTO generateCompleteReport(String username) throws SirhaException {
+        log.info("Generando reporte completo para usuario: {}", username);
         try {
             Student student = studentRepository.findByUsername(username)
                 .orElseThrow(() -> {
@@ -576,6 +579,7 @@ public class StudentServiceImpl implements StudentService {
 
     @Override
     public String getAcademicSummary(String username) throws SirhaException {
+        log.info("Consultando resumen académico para usuario: {}", username);
         try {
             Student student = studentRepository.findByUsername(username)
                 .orElseThrow(() -> {
@@ -595,6 +599,7 @@ public class StudentServiceImpl implements StudentService {
 
     @Override
     public RequestApprovalRateDTO getRequestApprovalRate(String username) throws SirhaException {
+        log.info("Consultando tasa de aprobación de solicitudes para usuario: {}", username);
         try {
             Student student = studentRepository.findByUsername(username)
                 .orElseThrow(() -> {
@@ -614,6 +619,7 @@ public class StudentServiceImpl implements StudentService {
 
     @Override
     public int getSubjectsByColorCount(String username, SemaforoColores color) throws SirhaException {
+        log.info("Consultando cantidad de materias por color '{}' para usuario: {}", color, username);
         try {
             Student student = studentRepository.findByUsername(username)
                 .orElseThrow(() -> {
@@ -633,6 +639,7 @@ public class StudentServiceImpl implements StudentService {
 
     @Override
     public double getApprovalRequestPercentage(String username) throws SirhaException {
+        log.info("Consultando porcentaje de solicitudes aprobadas para usuario: {}", username);
         try {
             Student student = studentRepository.findByUsername(username)
                 .orElseThrow(() -> {
@@ -652,6 +659,7 @@ public class StudentServiceImpl implements StudentService {
 
     @Override
     public double getRejectionRequestPercentage(String username) throws SirhaException {
+        log.info("Consultando porcentaje de solicitudes rechazadas para usuario: {}", username);
         try {
             Student student = studentRepository.findByUsername(username)
                 .orElseThrow(() -> {
@@ -671,6 +679,7 @@ public class StudentServiceImpl implements StudentService {
 
     @Override
     public double getPendingRequestPercentage(String username) throws SirhaException {
+        log.info("Consultando porcentaje de solicitudes pendientes para usuario: {}", username);
         try {
             Student student = studentRepository.findByUsername(username)
                 .orElseThrow(() -> {
@@ -690,6 +699,7 @@ public class StudentServiceImpl implements StudentService {
 
     @Override
     public double getInReviewRequestPercentage(String username) throws SirhaException {
+        log.info("Consultando porcentaje de solicitudes en revisión para usuario: {}", username);
         try {
             Student student = studentRepository.findByUsername(username)
                 .orElseThrow(() -> {
@@ -704,6 +714,76 @@ public class StudentServiceImpl implements StudentService {
             throw e;
         } catch (Exception e) {
             throw SirhaException.of(ErrorCodeSirha.INTERNAL_ERROR,"Error interno al consultar información de las solicitudes en revisión: " + e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public void enrollSubject(String username, String subjectName, String groupCode) throws SirhaException {
+        log.info("Inscribiendo materia para usuario: {}, Materia: {}, Grupo: {}", username, subjectName, groupCode);
+        
+        try {
+            Student student = studentRepository.findByUsername(username)
+                .orElseThrow(() -> {
+                    log.warn("Estudiante no encontrado para inscripción de materia: {}", username);
+                    return SirhaException.of(ErrorCodeSirha.STUDENT_NOT_FOUND);
+                });
+
+            Subject subject = subjectRepository.findByName(subjectName)
+                .orElseThrow(() -> {
+                    log.warn("Materia no encontrada para inscripción: {}", subjectName);
+                    return SirhaException.of(ErrorCodeSirha.SUBJECT_NOT_FOUND);
+                });
+
+            Group group = groupRepository.findByCode(groupCode)
+                .orElseThrow(() -> {
+                    log.warn("Grupo no encontrado para inscripción: {}", groupCode);
+                    return SirhaException.of(ErrorCodeSirha.GROUP_NOT_FOUND);
+                });
+
+            student.enrollSubject(subject, group);
+            studentRepository.save(student);
+            
+            log.info("Materia inscrita exitosamente para usuario: {}, Materia: {}, Grupo: {}", username, subjectName, groupCode);
+
+        } catch (SirhaException e) {
+            throw e;
+        } catch (Exception e) {
+            throw SirhaException.of(ErrorCodeSirha.INTERNAL_ERROR,"Error interno al inscribir materia: " + e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public void unenrollSubject(String username, String subjectName, String groupCode) throws SirhaException {
+        log.info("Desinscribiendo materia para usuario: {}, Materia: {}, Grupo: {}", username, subjectName, groupCode);
+        
+        try {
+            Student student = studentRepository.findByUsername(username)
+                .orElseThrow(() -> {
+                    log.warn("Estudiante no encontrado para desinscripción de materia: {}", username);
+                    return SirhaException.of(ErrorCodeSirha.STUDENT_NOT_FOUND);
+                });
+
+            Subject subject = subjectRepository.findByName(subjectName)
+                .orElseThrow(() -> {
+                    log.warn("Materia no encontrada para desinscripción: {}", subjectName);
+                    return SirhaException.of(ErrorCodeSirha.SUBJECT_NOT_FOUND);
+                });
+
+            Group group = groupRepository.findByCode(groupCode)
+                .orElseThrow(() -> {
+                    log.warn("Grupo no encontrado para desinscripción: {}", groupCode);
+                    return SirhaException.of(ErrorCodeSirha.GROUP_NOT_FOUND);
+                });
+
+            student.unenrollSubject(subject, group);
+            studentRepository.save(student);
+            
+            log.info("Materia desinscrita exitosamente para usuario: {}, Materia: {}, Grupo: {}", username, subjectName, groupCode);
+
+        } catch (SirhaException e) {
+            throw e;
+        } catch (Exception e) {
+            throw SirhaException.of(ErrorCodeSirha.INTERNAL_ERROR,"Error interno al desinscribir materia: " + e.getMessage(), e);
         }
     }
 

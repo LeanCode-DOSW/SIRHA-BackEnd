@@ -113,6 +113,8 @@ class RequestTest {
             Subject mainSubject = new Subject("101", "Calculo", 4);
             Group group1 = new Group(prerequisite, 30, period);
             Group group2 = new Group(mainSubject, 25, period);
+            new Group(mainSubject, 20, period);
+            new Group(mainSubject, 15, period);
 
             studyPlan.addSubject(prerequisite);
             studyPlan.addSubject(mainSubject);
@@ -143,6 +145,8 @@ class RequestTest {
             student.approveSubject(prerequisite);
             student.enrollSubject(mainSubject, group2);
             student.approveSubject(mainSubject);
+
+            assertEquals(3, mainSubject.getOpenGroups().size());
 
             assertTrue(student.hasSubject(prerequisite));
             assertTrue(student.hasSubject(mainSubject));

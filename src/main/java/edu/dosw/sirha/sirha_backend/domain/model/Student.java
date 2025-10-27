@@ -17,6 +17,7 @@ import edu.dosw.sirha.sirha_backend.domain.model.statesubjectdec.SubjectDecorato
 import edu.dosw.sirha.sirha_backend.domain.port.AcademicOperations;
 import edu.dosw.sirha.sirha_backend.domain.port.AcademicProgress;
 import edu.dosw.sirha.sirha_backend.domain.port.AcademicProgressViewer;
+import edu.dosw.sirha.sirha_backend.domain.port.RequestManager;
 import edu.dosw.sirha.sirha_backend.domain.port.ScheduleManager;
 import edu.dosw.sirha.sirha_backend.domain.port.SolicitudFactory;
 import edu.dosw.sirha.sirha_backend.dto.AcademicIndicatorsDTO;
@@ -40,7 +41,7 @@ import edu.dosw.sirha.sirha_backend.exception.SirhaException;
  *
  */
 @Document(collection = "students")
-public class Student extends User implements SolicitudFactory, ScheduleManager, AcademicProgressViewer, AcademicOperations {
+public class Student extends User implements SolicitudFactory, ScheduleManager, AcademicProgressViewer, AcademicOperations, RequestManager {
     private String codigo;
     private AcademicProgress academicProgress;
     private List<BaseRequest> solicitudes;
@@ -76,10 +77,12 @@ public class Student extends User implements SolicitudFactory, ScheduleManager, 
      * a la lista de solicitudes del estudiante. La solicitud debe estar
      * completamente inicializada antes de agregarla.
      */
+    @Override
     public void addRequest(BaseRequest solicitud){
         this.solicitudes.add(solicitud);
     }
 
+    @Override
     public void removeRequest(BaseRequest solicitud) throws SirhaException {
         if (!this.solicitudes.contains(solicitud)) {
             throw SirhaException.of(ErrorCodeSirha.REQUEST_NOT_FOUND, "La solicitud no existe en la lista del estudiante");
@@ -132,6 +135,7 @@ public class Student extends User implements SolicitudFactory, ScheduleManager, 
      * Obtiene la lista de solicitudes del estudiante.
      * @return lista de solicitudes, nunca null (inicializada como lista vacía)
      */
+    @Override
     public List<BaseRequest> getSolicitudes() {
         return new ArrayList<>(solicitudes);
     }
@@ -483,6 +487,7 @@ public class Student extends User implements SolicitudFactory, ScheduleManager, 
         addRequest(solicitud);
         return solicitud;
     }
+    @Override
     public CambioMateria createSubjectChangeRequest(Subject oldSubject, Subject newSubject, Group newGroup) throws SirhaException {
         validateChangeSubject(oldSubject, newSubject, newGroup) ;
         CambioMateria solicitud = new CambioMateria(this, oldSubject, newSubject, newGroup, getCurrentPeriod());
@@ -681,6 +686,7 @@ public class Student extends User implements SolicitudFactory, ScheduleManager, 
         return academicProgress.getSubjectsByColorCount(color);
     }
     
+    @Override
     public BaseRequest getRequestById(String requestId) {
         return solicitudes.stream()
             .filter(s -> s.getId().equals(requestId))
@@ -691,6 +697,7 @@ public class Student extends User implements SolicitudFactory, ScheduleManager, 
     /*
      * Devuelve el historial de solicitudes resueltas: aprobadas o rechazadas.
      */
+    @Override
     public List<BaseRequest> getRequestsHistory() {
         return solicitudes.stream()
             .filter(s -> s.getActualState() == RequestStateEnum.APROBADA || s.getActualState() == RequestStateEnum.RECHAZADA)
@@ -728,6 +735,7 @@ public class Student extends User implements SolicitudFactory, ScheduleManager, 
         }
         return academicProgress.isSubjectNoCursada(subject);
     }
+    
 
 }
- 
+

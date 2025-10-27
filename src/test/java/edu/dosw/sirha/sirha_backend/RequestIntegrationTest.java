@@ -107,7 +107,7 @@ class RequestIntegrationTest {
             fail("No se esperaba una excepción aquí");
         }
         assertEquals(RequestStateEnum.EN_REVISION, solicitudCambio.getActualState());
-        assertEquals(2, solicitudCambio.getProcesos().size());
+        assertEquals(2, solicitudCambio.getProcesses().size());
         
         assertTrue(mathGroup2.getCuposDisponibles() > 0);
         assertFalse(mathGroup2.isFull());
@@ -121,11 +121,11 @@ class RequestIntegrationTest {
             fail("No se esperaba una excepción aquí");
         }
         assertEquals(RequestStateEnum.APROBADA, solicitudCambio.getActualState());
-        assertEquals(3, solicitudCambio.getProcesos().size());
+        assertEquals(3, solicitudCambio.getProcesses().size());
         
-        assertEquals(RequestStateEnum.PENDIENTE, solicitudCambio.getProcesos().get(0).getStatus());
-        assertEquals(RequestStateEnum.EN_REVISION, solicitudCambio.getProcesos().get(1).getStatus());
-        assertEquals(RequestStateEnum.APROBADA, solicitudCambio.getProcesos().get(2).getStatus());
+        assertEquals(RequestStateEnum.PENDIENTE, solicitudCambio.getProcesses().get(0).getStatus());
+        assertEquals(RequestStateEnum.EN_REVISION, solicitudCambio.getProcesses().get(1).getStatus());
+        assertEquals(RequestStateEnum.APROBADA, solicitudCambio.getProcesses().get(2).getStatus());
     }
 
     @Test
@@ -165,7 +165,7 @@ class RequestIntegrationTest {
         }
         assertEquals(RequestStateEnum.APROBADA, solicitudCambio.getActualState());
         
-        assertEquals(3, solicitudCambio.getProcesos().size());
+        assertEquals(3, solicitudCambio.getProcesses().size());
     }
 
     @Test
@@ -285,8 +285,8 @@ class RequestIntegrationTest {
         assertEquals(RequestStateEnum.APROBADA, solicitud1.getActualState());
         assertEquals(RequestStateEnum.APROBADA, solicitud2.getActualState());
         
-        assertEquals(3, solicitud1.getProcesos().size());
-        assertEquals(3, solicitud2.getProcesos().size());
+        assertEquals(3, solicitud1.getProcesses().size());
+        assertEquals(3, solicitud2.getProcesses().size());
     }
 
     @Test

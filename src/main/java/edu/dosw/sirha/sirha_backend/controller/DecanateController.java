@@ -51,6 +51,7 @@ public class DecanateController {
 
 
     @GetMapping
+    @PreAuthorize("hasAnyRole('DEAN','ADMIN')")
     @Operation(summary = "Obtener todas las decanaturas", description = "Retorna una lista completa de todas las decanaturas registradas en el sistema")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Lista de decanaturas obtenida exitosamente"),
@@ -62,6 +63,7 @@ public class DecanateController {
     }
 
     @GetMapping("/{name}")
+    @PreAuthorize("hasAnyRole('DEAN','ADMIN')")
     @Operation(summary = "Obtener decanatura por nombre", description = "Obtiene una decanatura específica por su nombre")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Decanatura encontrada"),
@@ -74,6 +76,7 @@ public class DecanateController {
     }
 
     @GetMapping("/requests")
+    @PreAuthorize("hasAnyRole('DEAN','ADMIN')")
     @Operation(summary = "Obtener todas las solicitudes", description = "Obtiene todas las solicitudes pendientes de todas las decanaturas del sistema")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Solicitudes obtenidas exitosamente"),
@@ -85,6 +88,7 @@ public class DecanateController {
     }
 
     @GetMapping("/requests/{requestId}")
+    @PreAuthorize("hasAnyRole('DEAN','ADMIN')")
     @Operation(summary = "Obtener solicitud por ID", description = "Obtiene una solicitud específica por su identificador único")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Solicitud encontrada"),
@@ -97,6 +101,7 @@ public class DecanateController {
     }
 
     @GetMapping("/{decanateName}/requests")
+    @PreAuthorize("hasRole('ADMIN') or (hasRole('DEAN') and authentication.name == #decanateName)")
     @Operation(summary = "Obtener solicitudes de una decanatura", description = "Obtiene todas las solicitudes pendientes de una decanatura específica")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Solicitudes de la decanatura obtenidas exitosamente"),
@@ -109,6 +114,7 @@ public class DecanateController {
     }
 
     @PostMapping("/{decanateName}/requests/{requestId}/receive")
+    @PreAuthorize("hasRole('ADMIN') or (hasRole('DEAN') and authentication.name == #decanateName)")
     @Operation(summary = "Recibir solicitud", description = "Registra que una decanatura ha recibido una solicitud específica")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Solicitud recibida exitosamente"),
@@ -122,6 +128,7 @@ public class DecanateController {
     }
 
     @PostMapping("/{decanateName}/requests/{requestId}/approve")
+    @PreAuthorize("hasRole('ADMIN') or (hasRole('DEAN') and authentication.name == #decanateName)")
     @Operation(summary = "Aprobar solicitud", description = "Aprueba una solicitud académica específica")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Solicitud aprobada exitosamente"),
@@ -135,6 +142,7 @@ public class DecanateController {
     }
 
     @PostMapping("/{decanateName}/requests/{requestId}/reject")
+    @PreAuthorize("hasRole('ADMIN') or (hasRole('DEAN') and authentication.name == #decanateName)")
     @Operation(summary = "Rechazar solicitud", description = "Rechaza una solicitud académica específica")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Solicitud rechazada exitosamente"),
@@ -148,6 +156,7 @@ public class DecanateController {
     }
 
     @GetMapping("/students/{username}/basic-info")
+    @PreAuthorize("hasAnyRole('DEAN','ADMIN')")
     @Operation(summary = "Obtener información básica de estudiante", description = "Obtiene la información básica de un estudiante específico")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Información del estudiante obtenida exitosamente"),
@@ -160,6 +169,7 @@ public class DecanateController {
     }
 
     @GetMapping("/{decanateName}/study-plans")
+    @PreAuthorize("hasAnyRole('DEAN','ADMIN')")
     @Operation(summary = "Obtener planes de estudio", description = "Obtiene todos los planes de estudio de una decanatura específica")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Planes de estudio obtenidos exitosamente"),
@@ -172,6 +182,7 @@ public class DecanateController {
     }
 
     @PostMapping("/{decanateName}/study-plans")
+    @PreAuthorize("hasAnyRole('DEAN','ADMIN')")
     @Operation(summary = "Agregar plan de estudio", description = "Agrega un nuevo plan de estudio a una decanatura específica")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "201", description = "Plan de estudio agregado exitosamente"),
@@ -186,6 +197,7 @@ public class DecanateController {
     }
 
     @GetMapping("/{decanateName}/statistics/requests-count")
+    @PreAuthorize("hasAnyRole('DEAN','ADMIN')")
     @Operation(summary = "Contar solicitudes pendientes", description = "Obtiene el número de solicitudes pendientes de una decanatura")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Conteo obtenido exitosamente"),
@@ -198,6 +210,7 @@ public class DecanateController {
     }
 
     @GetMapping("/{decanateName}/statistics/study-plans-count")
+    @PreAuthorize("hasAnyRole('DEAN','ADMIN')")
     @Operation(summary = "Contar planes de estudio", description = "Obtiene el número de planes de estudio de una decanatura")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Conteo obtenido exitosamente"),

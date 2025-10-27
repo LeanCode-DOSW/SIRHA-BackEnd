@@ -29,8 +29,6 @@ public class ResponseProcess implements RequestProcess {
     }
 
     public String getComment() {return comentario;}
-    public void setComment(String comentario) {this.comentario = comentario;}
-    public String getId() {return id;}
     public RequestStateEnum getStatus() {return estado;}
     public LocalDateTime getCreatedAt() {return creadoEn;}
     public void setStatus(RequestStateEnum estado) {this.estado = estado;}

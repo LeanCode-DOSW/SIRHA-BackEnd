@@ -545,6 +545,7 @@ public class SubjectServiceImpl implements SubjectService {
     @Override
     public Group closeGroup(String groupId) throws SirhaException {
         try {
+            log.info("Cerrando grupo con ID: {}", groupId);
             return groupService.closeGroup(groupId);
         } catch (SirhaException e) {
             throw e;
@@ -556,6 +557,7 @@ public class SubjectServiceImpl implements SubjectService {
     @Override
     public Group openGroup(String groupId) throws SirhaException {
         try {
+            log.info("Abriendo grupo con ID: {}", groupId);
             return groupService.openGroup(groupId);
         } catch (SirhaException e) {
             throw e;
@@ -567,6 +569,10 @@ public class SubjectServiceImpl implements SubjectService {
     @Override
     public Group saveGroup(Subject subject, Group group) throws SirhaException {
         try {
+            log.info("Guardando grupo (overload) para materia: {} - Grupo ID/capacidad: {}/{}", 
+                     subject != null ? subject.getName() : "null",
+                     group != null ? group.getId() : "null",
+                     group != null ? group.getCapacity() : 0);
             return groupService.saveGroup(subject, group);
         } catch (SirhaException e) {
             throw e;
@@ -578,6 +584,7 @@ public class SubjectServiceImpl implements SubjectService {
     @Override
     public Group findById(String id) throws SirhaException {
         try {
+            log.info("Buscando grupo por ID (delegado): {}", id);
             return groupService.findById(id);
         } catch (SirhaException e) {
             throw e;

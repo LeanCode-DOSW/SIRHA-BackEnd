@@ -5,12 +5,12 @@ import edu.dosw.sirha.sirha_backend.domain.model.Decanate;
 import edu.dosw.sirha.sirha_backend.domain.model.StudyPlan;
 import edu.dosw.sirha.sirha_backend.domain.model.enums.Careers;
 import edu.dosw.sirha.sirha_backend.domain.model.staterequest.BaseRequest;
-import edu.dosw.sirha.sirha_backend.dto.RegisterRequestDecanate;
+import edu.dosw.sirha.sirha_backend.dto.RegisterRequest;
 import edu.dosw.sirha.sirha_backend.dto.StudentDTO;
 import edu.dosw.sirha.sirha_backend.exception.SirhaException;
 
 public interface DecanateService {
-    Decanate registerDecanate(RegisterRequestDecanate request) throws SirhaException;
+    Decanate registerDecanate(RegisterRequest request) throws SirhaException;
 
     Decanate saveDecanate(Careers decanate) throws SirhaException;
     Decanate getDecanateByName(String name) throws SirhaException;
