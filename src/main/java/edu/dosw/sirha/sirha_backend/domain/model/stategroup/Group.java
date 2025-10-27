@@ -113,7 +113,9 @@ public class Group {
     }
 
     private void setCode(Subject subject){
-        this.code = subject.getName().substring(0,3).toUpperCase() + "-" + (subject.getNextGroupSequence());
+        String name = subject.getName() == null ? "" : subject.getName();
+        String prefix = name.length() >= 3 ? name.substring(0,3).toUpperCase() : name.toUpperCase();
+        this.code = prefix + "-" + (subject.getNextGroupSequence());
     }
 
     /**

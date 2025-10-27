@@ -20,10 +20,6 @@ public class SirhaException extends Exception {
         this.errorCode = errorCode;
     }
     
-    public SirhaException(ErrorCodeSirha errorCode, String customMessage, Throwable cause) {
-        super(customMessage, cause);
-        this.errorCode = errorCode;
-    }
     
     public ErrorCodeSirha getErrorCode() {
         return errorCode;
@@ -37,22 +33,6 @@ public class SirhaException extends Exception {
         return new SirhaException(ErrorCodeSirha.INVALID_STATE_TRANSITION, 
             "Solicitud %s: transición %s → %s no permitida", requestId, currentState, targetState);
     }
-
-    public static SirhaException studentNotFound(String username) {
-        return new SirhaException(ErrorCodeSirha.STUDENT_NOT_FOUND, 
-            "Estudiante: %s", username);
-    }
-
-    public static SirhaException subjectNotFound(String subjectName) {
-        return new SirhaException(ErrorCodeSirha.SUBJECT_NOT_FOUND, 
-            "Materia: %s", subjectName);
-    }
-
-    public static SirhaException groupNotFound(String groupCode) {
-        return new SirhaException(ErrorCodeSirha.GROUP_NOT_FOUND, 
-            "Grupo: %s", groupCode);
-    }
-
 
     public static SirhaException of(ErrorCodeSirha errorCode) {
         return new SirhaException(errorCode);

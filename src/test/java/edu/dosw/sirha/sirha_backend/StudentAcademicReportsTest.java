@@ -292,7 +292,7 @@ class StudentAcademicReportsTest {
     @Test
     void testGenerateCompleteReport() {
         StudentReportDTO report = student.generateCompleteReport();
-
+        report.getRequestIds();
         assertNotNull(report);
         assertEquals("juan.perez", report.getUsername());
 

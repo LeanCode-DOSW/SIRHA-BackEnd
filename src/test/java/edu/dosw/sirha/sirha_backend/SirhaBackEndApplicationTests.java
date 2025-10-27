@@ -115,6 +115,8 @@ class SirhaBackEndApplicationTests {
             "EST002",
             Careers.INGENIERIA_DE_SISTEMAS
         );
+        studentDTO.getId();
+        studentDTO.getRequestIds();
     }
 
     @Test
@@ -1133,10 +1135,10 @@ class SirhaBackEndApplicationTests {
             AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));
             Group grupo = new Group(matematicas, 30, period);
             assertTrue(decorator.getState() instanceof NoCursadaState);
-            assertNull(decorator.getGroup());
+            assertThrows(SirhaException.class, decorator::getGroup);
 
             assertThrows(SirhaException.class, () -> decorator.setGroup(grupo));
-            assertNull(decorator.getGroup());
+            assertThrows(SirhaException.class, decorator::getGroup);
         } catch (Exception e) {
             fail("No se esperaba una excepción al crear el grupo: " + e.getMessage());
         }
@@ -1887,7 +1889,7 @@ class SirhaBackEndApplicationTests {
             
             assertEquals(0, decorator.getSemester());
             assertEquals(0, decorator.getGrade());
-            assertNull(decorator.getGroup());
+            assertThrows(SirhaException.class, decorator::getGroup);
             
             AcademicPeriod period = new AcademicPeriod("2024-1", LocalDate.now(), LocalDate.now().plusMonths(4));            
             Group group = new Group(matematicas, 20, period);
