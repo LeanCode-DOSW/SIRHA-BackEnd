@@ -1,104 +1,120 @@
 package edu.dosw.sirha.sirha_backend.controller;
 
-import jakarta.validation.Valid;
-
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import edu.dosw.sirha.sirha_backend.domain.model.Account;
+import edu.dosw.sirha.sirha_backend.domain.model.enums.Role;
 import edu.dosw.sirha.sirha_backend.dto.AuthResponse;
 import edu.dosw.sirha.sirha_backend.dto.LoginRequest;
+import edu.dosw.sirha.sirha_backend.dto.MeResponse;
 import edu.dosw.sirha.sirha_backend.dto.RegisterRequest;
+import edu.dosw.sirha.sirha_backend.exception.ErrorCodeSirha;
 import edu.dosw.sirha.sirha_backend.exception.SirhaException;
-import edu.dosw.sirha.sirha_backend.service.AuthService;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.v3.oas.annotations.tags.Tag;
+import edu.dosw.sirha.sirha_backend.repository.mongo.AccountMongoRepository;
+import edu.dosw.sirha.sirha_backend.service.DecanateService;
+import edu.dosw.sirha.sirha_backend.service.StudentService;
+import edu.dosw.sirha.sirha_backend.util.JwtUtil;
 
-/**
- * Controlador REST para el manejo de autenticación y registro de usuarios en el sistema SIRHA.
- * 
- * Este controlador proporciona endpoints para:
- * - Autenticación de usuarios existentes (login)
- * - Registro de nuevos usuarios en el sistema
- * 
- * Todos los endpoints están mapeados bajo la ruta base "/api/auth" y manejan
- * peticiones HTTP con formato JSON para el intercambio de datos.
- * 
- * @see AuthService
- * @see AuthResponse
- * @see LoginRequest
- * @see RegisterRequest
- */
 @RestController
 @RequestMapping("/api/auth")
-@CrossOrigin(origins = "*")
-@Tag(name = "Authentication", description = "API para autenticación y registro de usuarios")
 public class AuthController {
 
-    private final AuthService authService;
+    private final AccountMongoRepository accounts;
+    private final PasswordEncoder passwordEncoder;
+    private final AuthenticationManager authManager;
+    private final JwtUtil jwt;
+    private final StudentService studentService;
+    private final DecanateService decanateService;
 
-    public AuthController(AuthService authService) {
-        this.authService = authService;
+
+    public AuthController(AccountMongoRepository accounts,
+                          PasswordEncoder passwordEncoder,
+                          AuthenticationManager authManager,
+                          JwtUtil jwt,
+                          StudentService studentService,
+                          DecanateService decanateService) {
+        this.accounts = accounts;
+        this.passwordEncoder = passwordEncoder;
+        this.authManager = authManager;
+        this.jwt = jwt;
+        this.studentService = studentService;
+        this.decanateService = decanateService;
     }
 
-    /**
-     * Endpoint para autenticar usuarios en el sistema.
-     * 
-     * Recibe las credenciales del usuario (username y password) y valida
-     * su autenticidad contra la base de datos. Si las credenciales son válidas,
-     * retorna un token de autenticación junto con el nombre de usuario.
-     * 
-     * @param request objeto que contiene las credenciales de autenticación
-     *               (username y password). No debe ser null.
-     * @return ResponseEntity con AuthResponse conteniendo token y datos del usuario
-     * @throws SirhaException si las credenciales son inválidas o hay error en el proceso
-     */
-    
+    @PostMapping("/register-student")
+    @PreAuthorize("hasAnyRole('ADMIN', 'DEAN')")
+    public ResponseEntity<AuthResponse> registerStudent(@RequestBody RegisterRequest req) throws SirhaException {
+        if (accounts.existsByUsername(req.getUsername())) {
+            return ResponseEntity.badRequest().body(new AuthResponse(req.getUsername(), req.getEmail(), ErrorCodeSirha.USERNAME_ALREADY_EXISTS.getDefaultMessage()));
+        }
+
+        studentService.registerStudent(req);
+
+        var acc = new Account(req.getUsername(), req.getEmail(), passwordEncoder.encode(req.getPassword()), Role.STUDENT);
+        accounts.save(acc);
+
+        String token = jwt.generateAccessToken(acc.getUsername(), acc.getRole());
+        return ResponseEntity.ok(new AuthResponse(
+            acc.getUsername(), acc.getEmail(), token
+        ));
+    }
+
+
+    @PostMapping("/register-dean")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<AuthResponse> registerDean(@RequestBody RegisterRequest req) throws SirhaException {
+        if (accounts.existsByUsername(req.getUsername())) {
+            return ResponseEntity.badRequest().body(new AuthResponse(req.getUsername(), req.getEmail(), ErrorCodeSirha.USERNAME_ALREADY_EXISTS.getDefaultMessage()));
+        } 
+
+        decanateService.registerDecanate(req);
+
+        var acc = new Account(req.getUsername(), req.getEmail(), passwordEncoder.encode(req.getPassword()), Role.DEAN, req.getCareer());
+        accounts.save(acc);
+
+        String token = jwt.generateAccessToken(acc.getUsername(), acc.getRole());
+        return ResponseEntity.ok(new AuthResponse(
+            acc.getUsername(), acc.getEmail(), token
+        ));
+    }
+
+
+    @PostMapping("/register-admin")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<AuthResponse> registerAdmin(@RequestBody RegisterRequest req) {
+        if (accounts.existsByUsername(req.getUsername())) {
+            return ResponseEntity.badRequest().body(new AuthResponse(req.getUsername(), req.getEmail(), ErrorCodeSirha.USERNAME_ALREADY_EXISTS.getDefaultMessage()));
+        }
+        var acc = new Account(req.getUsername(), req.getEmail(), passwordEncoder.encode(req.getPassword()), Role.ADMIN);
+        accounts.save(acc);
+        String token = jwt.generateAccessToken(acc.getUsername(), acc.getRole());
+        return ResponseEntity.ok(new AuthResponse(
+            acc.getUsername(), acc.getEmail(), token
+        ));
+    }
+
+
+    @GetMapping("/me")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<MeResponse> me(@RequestHeader("Authorization") String authHeader){
+        String token = authHeader != null && authHeader.startsWith("Bearer ") ? authHeader.substring(7) : "";
+        var claims = jwt.parse(token);
+        return ResponseEntity.ok(new MeResponse(
+            claims.getSubject(),
+            claims.get("role", String.class)
+        ));
+    }
+
     @PostMapping("/login")
-    @Operation(summary = "Autenticar usuario", description = "Autentica un usuario con sus credenciales y retorna un token de acceso")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Login exitoso"),
-        @ApiResponse(responseCode = "401", description = "Credenciales inválidas"),
-        @ApiResponse(responseCode = "400", description = "Datos de entrada inválidos"),
-        @ApiResponse(responseCode = "500", description = "Error interno del servidor")
-    })
-    public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request) throws SirhaException {
-        AuthResponse response = authService.loginStudent(request);
-        return ResponseEntity.ok(response);
-    }
-
-    /**
-     * Endpoint para registrar nuevos usuarios en el sistema.
-     * 
-     * Crea un nuevo usuario en la base de datos con la información proporcionada.
-     * El sistema asigna automáticamente un ID único y hashea la contraseña
-     * antes del almacenamiento por seguridad.
-     * 
-     * Validaciones realizadas:
-     * - Username único en el sistema
-     * - Email único en el sistema
-     * - Código de estudiante único
-     * - Contraseña con formato adecuado
-     * - Datos obligatorios presentes
-     * 
-     * @param request objeto RegisterRequest con la información del nuevo usuario.
-     *               Debe contener username, email, password y datos personales válidos.
-     *               No debe ser null.
-     * @return ResponseEntity con AuthResponse conteniendo token y datos del usuario registrado
-     * @throws SirhaException si hay datos duplicados, inválidos o error en el proceso
-     */
-    @PostMapping("/register")
-    @Operation(summary = "Registrar nuevo usuario", description = "Registra un nuevo estudiante en el sistema y retorna un token de acceso")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "201", description = "Usuario registrado exitosamente"),
-        @ApiResponse(responseCode = "400", description = "Datos de entrada inválidos"),
-        @ApiResponse(responseCode = "409", description = "Usuario ya existe (username, email o código duplicado)"),
-        @ApiResponse(responseCode = "500", description = "Error interno del servidor")
-    })
-    public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest request) throws SirhaException {
-        AuthResponse response = authService.registerStudent(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    public ResponseEntity<AuthResponse> login(@RequestBody LoginRequest req) {
+        authManager.authenticate(new UsernamePasswordAuthenticationToken(req.getEmail(), req.getPassword()));
+        var acc = accounts.findByUsername(req.getUsername()).orElseThrow();
+        String token = jwt.generateAccessToken(acc.getUsername(), acc.getRole());
+        return ResponseEntity.ok(new AuthResponse(acc.getUsername(), acc.getEmail(), token));
     }
 }

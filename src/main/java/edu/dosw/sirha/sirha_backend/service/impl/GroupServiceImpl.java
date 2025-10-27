@@ -154,7 +154,7 @@ public class GroupServiceImpl implements GroupService {
         } catch (SirhaException e) {
             throw e;
         } catch (Exception e) {
-            throw SirhaException.of(ErrorCodeSirha.INTERNAL_ERROR, "Error interno al cerrar grupo: %s", e.getMessage());
+            throw SirhaException.of(ErrorCodeSirha.INTERNAL_ERROR, "Error interno al cerrar grupo: " + e.getMessage(), e);
         }
     }
 
@@ -173,7 +173,7 @@ public class GroupServiceImpl implements GroupService {
         } catch (SirhaException e) {
             throw e;
         } catch (Exception e) {
-            throw SirhaException.of(ErrorCodeSirha.INTERNAL_ERROR, "Error interno al abrir grupo: %s", e.getMessage());
+            throw SirhaException.of(ErrorCodeSirha.INTERNAL_ERROR, "Error interno al abrir grupo: " + e.getMessage(), e);
         }
     }
     
@@ -189,7 +189,7 @@ public class GroupServiceImpl implements GroupService {
         } catch (SirhaException e) {
             throw e;
         } catch (Exception e) {
-            throw SirhaException.of(ErrorCodeSirha.INTERNAL_ERROR, "Error interno al obtener horarios: %s", e.getMessage());
+            throw SirhaException.of(ErrorCodeSirha.INTERNAL_ERROR, "Error interno al obtener horarios: " + e.getMessage(), e);
         }
     }
 
@@ -205,7 +205,7 @@ public class GroupServiceImpl implements GroupService {
         } catch (SirhaException e) {
             throw e;
         } catch (Exception e) {
-            throw SirhaException.of(ErrorCodeSirha.INTERNAL_ERROR, "Error interno al verificar si el grupo está lleno: %s", e.getMessage());
+            throw SirhaException.of(ErrorCodeSirha.INTERNAL_ERROR, "Error interno al verificar si el grupo está lleno: " + e.getMessage(), e);
         }
     }
 
@@ -221,7 +221,7 @@ public class GroupServiceImpl implements GroupService {
         } catch (SirhaException e) {
             throw e;
         } catch (Exception e) {
-            throw SirhaException.of(ErrorCodeSirha.INTERNAL_ERROR, "Error interno al obtener asientos disponibles: %s", e.getMessage());
+            throw SirhaException.of(ErrorCodeSirha.INTERNAL_ERROR, "Error interno al obtener asientos disponibles: " + e.getMessage(), e);
         }
     }
 
@@ -244,7 +244,7 @@ public class GroupServiceImpl implements GroupService {
         } catch (SirhaException e) {
             throw e;
         } catch (Exception e) {
-            throw SirhaException.of(ErrorCodeSirha.DATABASE_ERROR, "Error interno al buscar grupo: %s", e.getMessage());
+            throw SirhaException.of(ErrorCodeSirha.DATABASE_ERROR, "Error interno al buscar grupo: " + e.getMessage(), e);
         }
     }
 

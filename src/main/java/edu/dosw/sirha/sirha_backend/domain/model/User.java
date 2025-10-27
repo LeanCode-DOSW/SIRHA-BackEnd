@@ -4,14 +4,12 @@ import org.springframework.data.annotation.*;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.*;
 import edu.dosw.sirha.sirha_backend.domain.port.Authenticable;
-import edu.dosw.sirha.sirha_backend.domain.port.Schedulable;
 import edu.dosw.sirha.sirha_backend.exception.ErrorCodeSirha;
 import edu.dosw.sirha.sirha_backend.exception.SirhaException;
 import edu.dosw.sirha.sirha_backend.util.PasswordUtils;
 import jakarta.validation.constraints.Email;
 
-//@Document(collection = "users")
-public abstract class User implements Authenticable, Schedulable {
+public abstract class User implements Authenticable {
     @Id
     private String id;
     @Field("username")
@@ -23,7 +21,7 @@ public abstract class User implements Authenticable, Schedulable {
     private String email;
     @Field("password")
     private String password;
-
+    
     protected User() {}
 
     protected User(String username, String email, String password) throws SirhaException {

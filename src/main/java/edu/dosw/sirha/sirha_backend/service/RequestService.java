@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import edu.dosw.sirha.sirha_backend.domain.model.enums.RequestStateEnum;
 import edu.dosw.sirha.sirha_backend.domain.model.staterequest.BaseRequest;
+import edu.dosw.sirha.sirha_backend.domain.port.RequestProcess;
 import edu.dosw.sirha.sirha_backend.exception.SirhaException;
 
 public interface RequestService {
@@ -16,4 +17,6 @@ public interface RequestService {
     BaseRequest getRequestById(String username, String requestId) throws SirhaException;
     List<BaseRequest> getRequestsHistory(String username) throws SirhaException; // el historial son las solicitudes que ya fueron aprobadas o rechazadas
     List<BaseRequest> getByStatus(RequestStateEnum status) throws SirhaException;
+
+    List<RequestProcess> getRequestProcesses(String requestId) throws SirhaException;
 }

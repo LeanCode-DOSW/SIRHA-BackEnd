@@ -2,6 +2,7 @@ package edu.dosw.sirha.sirha_backend.domain.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import edu.dosw.sirha.sirha_backend.domain.model.enums.Careers;
@@ -14,6 +15,8 @@ import edu.dosw.sirha.sirha_backend.exception.SirhaException;
 
 @Document("decanaturas")
 public class Decanate implements RequestReceiver {
+    @Id
+    private String id;
     private String name;
     private Careers career;
     private List<StudyPlan> studyPlans;
@@ -28,6 +31,11 @@ public class Decanate implements RequestReceiver {
         this();
         this.name = career.getDisplayName();
         this.career = career;
+    }
+
+    public Decanate(String username, Careers career) {
+        this(career);
+        this.name = username;
     }
     
     public String getName() {
@@ -103,6 +111,9 @@ public class Decanate implements RequestReceiver {
 
         receivedRequests.remove(request);
         updateRequestsAfterResolveOne();
+    }
+    public String getId() {
+        return id;
     }
 
     @Override

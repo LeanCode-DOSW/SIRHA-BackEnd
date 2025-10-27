@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import edu.dosw.sirha.sirha_backend.domain.model.Student;
 import edu.dosw.sirha.sirha_backend.domain.model.enums.RequestStateEnum;
 import edu.dosw.sirha.sirha_backend.domain.model.staterequest.BaseRequest;
+import edu.dosw.sirha.sirha_backend.domain.port.RequestProcess;
 import edu.dosw.sirha.sirha_backend.exception.ErrorCodeSirha;
 import edu.dosw.sirha.sirha_backend.exception.SirhaException;
 import edu.dosw.sirha.sirha_backend.repository.mongo.BaseRequestMongoRepository;
@@ -142,7 +143,7 @@ public class RequestServiceImpl implements RequestService {
             throw SirhaException.of(ErrorCodeSirha.INTERNAL_ERROR,"Error interno al consultar historial de solicitudes: " + e.getMessage(), e);
         }
     }
-
+    @Transactional
     @Override
     public List<BaseRequest> getByStatus(RequestStateEnum status) throws SirhaException {
         log.info("Consultando solicitudes con estado: {}", status);
@@ -152,6 +153,26 @@ public class RequestServiceImpl implements RequestService {
             return requests;
         } catch (Exception e) {
             throw SirhaException.of(ErrorCodeSirha.INTERNAL_ERROR,"Error interno al consultar solicitudes por estado: " + e.getMessage(), e);
+        }
+    }
+    @Transactional
+    @Override
+    public List<RequestProcess> getRequestProcesses(String requestId) throws SirhaException {
+        log.info("Consultando procesos de la solicitud ID: {}", requestId);
+        try {
+            Optional<BaseRequest> requestOpt = findById(requestId);
+            if (requestOpt.isEmpty()) {
+                log.warn("No se encontró solicitud con ID: {} para obtener procesos", requestId);
+                throw SirhaException.of(ErrorCodeSirha.REQUEST_NOT_FOUND, "Solicitud no encontrada");
+            }
+            BaseRequest request = requestOpt.get();
+            List<RequestProcess> processes = request.getProcesses();
+            log.info("Se encontraron {} procesos para la solicitud ID: {}", processes.size(), requestId);
+            return processes;
+        } catch (SirhaException e) {
+            throw e;
+        } catch (Exception e) {
+            throw SirhaException.of(ErrorCodeSirha.INTERNAL_ERROR,"Error interno al consultar procesos de la solicitud: " + e.getMessage(), e);
         }
     }
 }

@@ -41,7 +41,7 @@ public abstract class BaseRequest implements RequestTo {
     private LocalDateTime creadoEn;
     protected Student student;
     private AcademicPeriod currentPeriod;
-    private ArrayList<RequestProcess> procesos;
+    private ArrayList<RequestProcess> processes;
     private RequestState state;
     private int priority;
 
@@ -49,16 +49,16 @@ public abstract class BaseRequest implements RequestTo {
         this.creadoEn = LocalDateTime.now();
         this.student = student;
         setCurrentPeriod(currentPeriod);
-        this.procesos = new ArrayList<>();
+        this.processes = new ArrayList<>();
         state = new EstadoPendiente();
         changeState(new ResponseProcess(RequestStateEnum.PENDIENTE, "Solicitud creada y en estado pendiente."));
     }
 
     public void agregarProceso(RequestProcess proceso) {
-        this.procesos.add(proceso);
+        this.processes.add(proceso);
     }
 
-    public List<RequestProcess> getProcesos() {return procesos;}
+    public List<RequestProcess> getProcesses() {return processes;}
 
     public int getPriority() {
         return priority;
@@ -93,7 +93,7 @@ public abstract class BaseRequest implements RequestTo {
     public void setId(String id) {this.id = id;}
     void setState(RequestState state) {this.state = state;}
 
-    public RequestProcess getActualProcess(){return procesos.get(procesos.size() - 1);}
+    public RequestProcess getActualProcess(){return processes.get(processes.size() - 1);}
     public RequestStateEnum getActualState(){return getActualProcess().getStatus();}
     private void setActualState(RequestStateEnum estado){getActualProcess().setStatus(estado);}
 

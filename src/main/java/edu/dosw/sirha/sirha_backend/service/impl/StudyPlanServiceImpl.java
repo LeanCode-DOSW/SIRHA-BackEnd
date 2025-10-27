@@ -31,37 +31,44 @@ public class StudyPlanServiceImpl implements StudyPlanService {
     @Transactional
     @Override
     public List<StudyPlan> getStudyPlansByCareer(Careers career) throws SirhaException {
+        logger.info("Iniciando obtención de planes de estudio para la carrera: {}", career);
         logger.debug("Obteniendo planes de estudio para la carrera: {}", career);
         List<StudyPlan> plans = studyPlanRepository.findByCareer(career);
         if (plans.isEmpty()) {
+            logger.warn("No se encontraron planes de estudio para la carrera: {}", career);
             throw SirhaException.of(ErrorCodeSirha.STUDY_PLAN_NOT_FOUND);
         }
-        logger.debug("Planes de estudio encontrados: {}", plans.size());
+        logger.info("Planes de estudio encontrados ({}) para la carrera: {}", plans.size(), career);
         return plans;
     }
 
     @Override
     @Transactional
     public StudyPlan saveStudyPlan(StudyPlan studyPlan) throws SirhaException {
+        logger.info("Guardando plan de estudio");
         if (studyPlan == null) {
             logger.error("El plan de estudio proporcionado es nulo");
             throw SirhaException.of(ErrorCodeSirha.INVALID_ARGUMENT);
         }
         logger.debug("Guardando plan de estudio: {}", studyPlan.getName());
-        return studyPlanRepository.save(studyPlan);
+        StudyPlan saved = studyPlanRepository.save(studyPlan);
+        logger.info("Plan de estudio guardado: {}", saved.getName());
+        return saved;
     }
 
     @Transactional
     @Override
     public StudyPlan addSubjectToStudyPlan(String studyPlanName, String subjectName) throws SirhaException {
         try {
-            logger.debug("Agregando materia '{}' al plan '{}'", subjectName, studyPlanName);
+            logger.info("Agregando materia '{}' al plan '{}'", subjectName, studyPlanName);
+            logger.debug("Buscando plan de estudio: {}", studyPlanName);
             StudyPlan studyPlan = studyPlanRepository.findStudyPlanByName(studyPlanName);
             if (studyPlan == null) {
                 logger.error("Plan de estudio '{}' no encontrado", studyPlanName);
                 throw SirhaException.of(ErrorCodeSirha.STUDY_PLAN_NOT_FOUND);
             }
 
+            logger.debug("Buscando materia: {}", subjectName);
             Subject subject = subjectService.findByName(subjectName);
             if (subject == null) {
                 logger.error("Materia '{}' no encontrada", subjectName);
@@ -70,8 +77,9 @@ public class StudyPlanServiceImpl implements StudyPlanService {
 
             logger.debug("Materia encontrada: {}", subject.getName());
             studyPlan.addSubject(subject);
-            logger.debug("Materia agregada al plan de estudio: {}", studyPlan.getName());
-            return studyPlanRepository.save(studyPlan);
+            StudyPlan saved = studyPlanRepository.save(studyPlan);
+            logger.info("Materia '{}' agregada al plan '{}'", subjectName, saved.getName());
+            return saved;
         } catch (SirhaException e) {
             throw e;
         } catch (Exception e) {
@@ -83,13 +91,14 @@ public class StudyPlanServiceImpl implements StudyPlanService {
     @Override
     public StudyPlan getStudyPlanByName(String name) throws SirhaException {
         try {
-            logger.debug("Buscando plan de estudio por nombre: {}", name);
+            logger.info("Buscando plan de estudio por nombre: {}", name);
+            logger.debug("Consultando repositorio por plan: {}", name);
             StudyPlan studyPlan = studyPlanRepository.findStudyPlanByName(name);
             if (studyPlan == null) {
-                logger.error("Plan de estudio '{}' no encontrado", name);
+                logger.warn("Plan de estudio '{}' no encontrado", name);
                 throw SirhaException.of(ErrorCodeSirha.STUDY_PLAN_NOT_FOUND);
             }
-            logger.debug("Plan de estudio encontrado: {}", studyPlan.getName());
+            logger.info("Plan de estudio encontrado: {}", studyPlan.getName());
             return studyPlan;
         } catch (SirhaException e) {
             throw e;
