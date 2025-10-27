@@ -77,4 +77,21 @@ public class ValidationUtil {
             throw new IllegalArgumentException("Código estudiantil debe tener formato YYYY-NNNNNN");
         }
     }
+
+    public static void validateDecanateRegistration(String username, String email, 
+                                                 String password) {
+        if (!isValidUsername(username)) {
+            throw new IllegalArgumentException("Username inválido: debe tener 3-50 caracteres alfanuméricos");
+        }
+        
+        if (!isValidInstitutionalEmail(email)) {
+            throw new IllegalArgumentException("Email debe ser del dominio @universidad.edu.co");
+        }
+        
+        if (!isValidPassword(password)) {
+            throw new IllegalArgumentException("Contraseña debe tener al menos 8 caracteres, mayúscula, minúscula y número");
+        }
+    }
+
+    
 }

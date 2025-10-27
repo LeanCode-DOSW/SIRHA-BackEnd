@@ -10,9 +10,7 @@ import edu.dosw.sirha.sirha_backend.domain.model.Schedule;
 import edu.dosw.sirha.sirha_backend.domain.model.Student;
 import edu.dosw.sirha.sirha_backend.domain.model.enums.SemaforoColores;
 import edu.dosw.sirha.sirha_backend.domain.model.staterequest.BaseRequest;
-import edu.dosw.sirha.sirha_backend.dto.AuthResponse;
-import edu.dosw.sirha.sirha_backend.dto.LoginRequest;
-import edu.dosw.sirha.sirha_backend.dto.RegisterRequest;
+import edu.dosw.sirha.sirha_backend.dto.RegisterRequestStudent;
 import edu.dosw.sirha.sirha_backend.dto.RequestApprovalRateDTO;
 import edu.dosw.sirha.sirha_backend.dto.StudentDTO;
 import edu.dosw.sirha.sirha_backend.dto.StudentReportDTO;
@@ -22,9 +20,7 @@ import edu.dosw.sirha.sirha_backend.exception.SirhaException;
 import java.util.Map;
 
 public interface StudentService {
-    AuthResponse registerStudent(RegisterRequest request) throws SirhaException;
-    AuthResponse loginStudent(LoginRequest request) throws SirhaException;
-
+    Student registerStudent(RegisterRequestStudent request) throws SirhaException;
 
     List<Student> findAll() throws SirhaException;
     Optional<Student> findById(String id) throws SirhaException;

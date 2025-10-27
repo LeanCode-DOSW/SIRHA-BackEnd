@@ -16,13 +16,13 @@ import io.jsonwebtoken.security.Keys;
 import javax.crypto.SecretKey;
 
 @Component
-public class JwtService {
+public class JwtUtil {
 
     private final SecretKey key;
     private final String issuer;
     private final long accessTtlMinutes;
 
-    public JwtService(
+    public JwtUtil(
         @Value("${JWT_SECRET}") String secret,
         @Value("${JWT_ISSUER:sirha}") String issuer,
         @Value("${JWT_ACCESS_TTL:60}") long accessTtlMinutes

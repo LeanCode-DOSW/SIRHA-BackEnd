@@ -21,7 +21,8 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 
-import edu.dosw.sirha.sirha_backend.util.JwtService;
+import edu.dosw.sirha.sirha_backend.util.JwtUtil;
+import edu.dosw.sirha.sirha_backend.domain.model.enums.Role;
 import edu.dosw.sirha.sirha_backend.service.impl.CustomUserDetailsService;
 
 import java.util.List;
@@ -44,7 +45,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(
             HttpSecurity http,
-            JwtService jwtService,
+            JwtUtil jwtService,
             @Value("${FRONTEND_URL:http://localhost:5173}") String frontendUrl
     ) throws Exception {
 
@@ -74,7 +75,7 @@ public class SecurityConfig {
             .requestMatchers(HttpMethod.POST,
                 "/api/students/*/solicitudes/cambio-grupo",
                 "/api/students/*/solicitudes/cambio-materia"
-            ).hasRole("STUDENT")
+            ).hasRole(Role.STUDENT.name())
             // STUDENT / DEAN / ADMIN
             .requestMatchers(HttpMethod.GET,
                 "/api/students/schedule/**",
@@ -83,7 +84,7 @@ public class SecurityConfig {
                 "/api/students/*/percentage-by-color",
                 "/api/students/*/subjects/color/**",
                 "/api/students/*/requests/**"
-            ).hasAnyRole("STUDENT","DEAN","ADMIN")
+            ).hasAnyRole(Role.STUDENT.name(),Role.DEAN.name(),Role.ADMIN.name())
             // DEAN / ADMIN
             .requestMatchers(HttpMethod.GET,
                 "/api/students",
@@ -91,13 +92,13 @@ public class SecurityConfig {
                 "/api/students/username/*",
                 "/api/students/email/*",
                 "/api/students/*/basic-info"
-            ).hasAnyRole("DEAN","ADMIN")
+            ).hasAnyRole(Role.DEAN.name(),Role.ADMIN.name())
 
             // RequestController  (/api/requests/**)
             // DEAN / ADMIN
             .requestMatchers(
                 "/api/requests/**"
-            ).hasAnyRole("DEAN","ADMIN")
+            ).hasAnyRole(Role.DEAN.name(),Role.ADMIN.name())
 
             // DecanateController  (/api/decanates/**)
             // DEAN / ADMIN
@@ -110,15 +111,15 @@ public class SecurityConfig {
                 "/api/decanates/*/requests/*/reject",
                 "/api/decanates/*/study-plans",
                 "/api/decanates/*/statistics/**"
-            ).hasAnyRole("DEAN","ADMIN")
+            ).hasAnyRole(Role.DEAN.name(),Role.ADMIN.name())
             .requestMatchers(HttpMethod.GET,
                 "/api/decanates",
                 "/api/decanates/*",
                 "/api/decanates/students/*/basic-info"
-            ).hasAnyRole("DEAN","ADMIN")
+            ).hasAnyRole(Role.DEAN.name(),Role.ADMIN.name())
 
             // ADMIN
-            .requestMatchers(HttpMethod.POST, "/api/decanates").hasRole("ADMIN")
+            .requestMatchers(HttpMethod.POST, "/api/decanates").hasRole(Role.ADMIN.name())
 
             // SubjectAndGroupController  (/api/subjects/**)
 
@@ -135,25 +136,25 @@ public class SecurityConfig {
                 "/api/subjects/groups/*/schedules",
                 "/api/subjects/groups/*/full",
                 "/api/subjects/groups/*/available-seats"
-            ).hasAnyRole("STUDENT","DEAN","ADMIN")
+            ).hasAnyRole(Role.STUDENT.name(),Role.DEAN.name(),Role.ADMIN.name())
             // DEAN / ADMIN 
             .requestMatchers(HttpMethod.POST,
                 "/api/subjects/*/groups",
                 "/api/subjects/*/groups/add",
                 "/api/subjects/groups/*/schedules"
-            ).hasAnyRole("DEAN","ADMIN")
+            ).hasAnyRole(Role.DEAN.name(),Role.ADMIN.name())
             .requestMatchers(HttpMethod.PUT,
                 "/api/subjects/groups/*/professor",
                 "/api/subjects/groups/*/close",
                 "/api/subjects/groups/*/open"
-            ).hasAnyRole("DEAN","ADMIN")
+            ).hasAnyRole(Role.DEAN.name(),Role.ADMIN.name())
             .requestMatchers(HttpMethod.DELETE,
                 "/api/subjects/groups/*",
                 "/api/subjects/*/groups"
-            ).hasAnyRole("DEAN","ADMIN")
+            ).hasAnyRole(Role.DEAN.name(),Role.ADMIN.name())
             // ADMIN
-            .requestMatchers(HttpMethod.POST, "/api/subjects").hasRole("ADMIN")
-            .requestMatchers(HttpMethod.DELETE, "/api/subjects/*").hasRole("ADMIN")
+            .requestMatchers(HttpMethod.POST, "/api/subjects").hasRole(Role.ADMIN.name())
+            .requestMatchers(HttpMethod.DELETE, "/api/subjects/*").hasRole(Role.ADMIN.name())
 
             // any other request
             .anyRequest().authenticated()

@@ -1,6 +1,4 @@
 package edu.dosw.sirha.sirha_backend.controller;
-
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -143,19 +141,6 @@ public class StudentController {
     public ResponseEntity<Void> deleteById(@PathVariable String id) throws SirhaException {
         studentService.deleteById(id);
         return ResponseEntity.noContent().build();
-    }
-
-    @PostMapping
-    @Operation(summary = "Crear nuevo estudiante", description = "Crea un nuevo estudiante en el sistema con los datos proporcionados")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "201", description = "Estudiante creado exitosamente"),
-        @ApiResponse(responseCode = "400", description = "Datos del estudiante inválidos"),
-        @ApiResponse(responseCode = "409", description = "Estudiante ya existe - código o username duplicado"),
-        @ApiResponse(responseCode = "500", description = "Error interno del servidor")
-    })
-    public ResponseEntity<StudentDTO> create(@RequestBody StudentDTO dto) throws SirhaException {
-        Student student = studentService.save(dto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(StudentMapper.toDTO(student));
     }
 
     @GetMapping("/schedule/{username}")

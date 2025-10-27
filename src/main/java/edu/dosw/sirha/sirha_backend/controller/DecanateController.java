@@ -48,20 +48,6 @@ public class DecanateController {
         this.decanateService = decanateService;
     }
 
-    @PostMapping
-    @Operation(summary = "Crear una nueva decanatura", description = "Crea una nueva decanatura en el sistema con el nombre especificado")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "201", description = "Decanatura creada exitosamente"),
-        @ApiResponse(responseCode = "400", description = "Datos de la decanatura inválidos"),
-        @ApiResponse(responseCode = "409", description = "Decanatura ya existe"),
-        @ApiResponse(responseCode = "500", description = "Error interno del servidor")
-    })
-    public ResponseEntity<Decanate> createDecanate(@RequestBody Careers career) throws SirhaException {
-        Decanate createdDecanate = decanateService.saveDecanate(career);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdDecanate);
-    }
-
-
 
     @GetMapping
     @Operation(summary = "Obtener todas las decanaturas", description = "Retorna una lista completa de todas las decanaturas registradas en el sistema")

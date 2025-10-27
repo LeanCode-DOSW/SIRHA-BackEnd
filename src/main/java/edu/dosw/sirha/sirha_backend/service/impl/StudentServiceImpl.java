@@ -12,9 +12,7 @@ import edu.dosw.sirha.sirha_backend.domain.model.Subject;
 import edu.dosw.sirha.sirha_backend.domain.model.enums.SemaforoColores;
 import edu.dosw.sirha.sirha_backend.domain.model.stategroup.Group;
 import edu.dosw.sirha.sirha_backend.domain.model.staterequest.BaseRequest;
-import edu.dosw.sirha.sirha_backend.dto.AuthResponse;
-import edu.dosw.sirha.sirha_backend.dto.LoginRequest;
-import edu.dosw.sirha.sirha_backend.dto.RegisterRequest;
+import edu.dosw.sirha.sirha_backend.dto.RegisterRequestStudent;
 import edu.dosw.sirha.sirha_backend.dto.RequestApprovalRateDTO;
 import edu.dosw.sirha.sirha_backend.dto.StudentDTO;
 import edu.dosw.sirha.sirha_backend.dto.StudentReportDTO;
@@ -186,7 +184,7 @@ public class StudentServiceImpl implements StudentService {
 
     @Transactional
     @Override
-    public AuthResponse registerStudent(RegisterRequest request) throws SirhaException {
+    public Student registerStudent(RegisterRequestStudent request) throws SirhaException {
         log.info("Iniciando proceso de registro para usuario: {}", request.getUsername());
         
         try {
@@ -199,6 +197,11 @@ public class StudentServiceImpl implements StudentService {
             );
             log.debug("Validación exitosa para: {}", request.getUsername());
             
+            if (studentRepository.findByUsername(request.getUsername()).isPresent()) {
+                log.warn("Intento de registro con username duplicado: {}" , request.getUsername());
+                throw SirhaException.of(ErrorCodeSirha.USERNAME_ALREADY_EXISTS,"El username ya está registrado");
+            }
+
             if (studentRepository.existsByCodigo(request.getCodigo())) {
                 log.warn("Intento de registro con código duplicado: {} para usuario: {}", 
                         request.getCodigo(), request.getUsername());
@@ -224,13 +227,7 @@ public class StudentServiceImpl implements StudentService {
             log.info("Registro completado exitosamente para usuario: {} con código: {}", 
                     savedStudent.getUsername(), savedStudent.getCodigo());
             
-            return new AuthResponse(
-                savedStudent.getId(),
-                savedStudent.getUsername(),
-                savedStudent.getEmail(),
-                savedStudent.getCodigo(),
-                "Registro exitoso"
-            );
+            return savedStudent;
             
         } catch (SirhaException e) {
             throw e;
@@ -239,56 +236,6 @@ public class StudentServiceImpl implements StudentService {
         }
     }
 
-
-
-    private Optional<Student> loginStudent(String username, String password) throws SirhaException {
-        log.info("Intento de login para usuario: {}", username);
-        try {
-            Optional<Student> student = studentRepository.findByUsername(username)
-                    .filter(s -> s.verificarContrasena(password));
-            
-            if (!student.isPresent()) {
-                log.warn("Login fallido para usuario: {} - credenciales incorrectas", username);
-                throw SirhaException.of(ErrorCodeSirha.INVALID_CREDENTIALS,"Credenciales inválidas");
-            }
-            log.info("Login exitoso para usuario: {}", username);
-            return student;
-        } catch (SirhaException e) {
-            throw e;
-        } catch (Exception e) {
-            throw SirhaException.of(ErrorCodeSirha.INTERNAL_ERROR,"Error interno durante el login: " + e.getMessage(), e);
-        }
-    }
-
-    @Transactional
-    @Override
-    public AuthResponse loginStudent(LoginRequest request) throws SirhaException {
-        log.info("Iniciando proceso de login para usuario: {}", request.getUsername());
-        
-        try {
-            Optional<Student> userOpt = loginStudent(request.getUsername(), request.getPassword());
-            
-            Student student = userOpt.orElseThrow(() -> {
-                log.warn("Login fallido para usuario: {} - credenciales inválidas", request.getUsername());
-                return SirhaException.of(ErrorCodeSirha.INVALID_CREDENTIALS,"Credenciales inválidas");
-            });
-            
-            log.info("Login completado exitosamente para usuario: {}", student.getUsername());
-            
-            return new AuthResponse(
-                student.getId(),
-                student.getUsername(),
-                student.getEmail(),
-                student.getCodigo(),
-                "Login exitoso"
-            );
-
-        } catch (SirhaException e) {
-            throw e;
-        } catch (Exception e) {
-            throw SirhaException.of(ErrorCodeSirha.INTERNAL_ERROR,"Error interno durante el login: " + e.getMessage(), e);
-        }
-    }
 
     @Transactional
     @Override

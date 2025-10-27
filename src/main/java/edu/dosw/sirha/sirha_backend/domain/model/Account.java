@@ -1,8 +1,9 @@
-package edu.dosw.sirha.sirha_backend.domain.model.auth;
+package edu.dosw.sirha.sirha_backend.domain.model;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import edu.dosw.sirha.sirha_backend.domain.model.enums.Role;
+import edu.dosw.sirha.sirha_backend.domain.model.enums.Careers;
 
 @Document(collection = "accounts")
 public class Account {
@@ -13,16 +14,19 @@ public class Account {
     private String email;        
     private String passwordHash; 
     private Role role;           
-    private String linkedId;     
+    private Careers career;
 
     public Account() {}
 
-    public Account(String username, String email, String passwordHash, Role role, String linkedId) {
+    public Account(String username, String email, String passwordHash, Role role) {
         this.username = username;
         this.email = email;
         this.passwordHash = passwordHash;
         this.role = role;
-        this.linkedId = linkedId;
+    }
+    public Account(String username, String email, String passwordHash, Role role, Careers career) {
+        this(username, email, passwordHash, role);
+        this.career = career;
     }
 
     public String getId() { return id; }
@@ -30,7 +34,5 @@ public class Account {
     public String getEmail() { return email; }
     public String getPasswordHash() { return passwordHash; }
     public Role getRole() { return role; }
-    public String getLinkedId() { return linkedId; }
-
-    public void setPasswordHash(String passwordHash) { this.passwordHash = passwordHash; }
+    public Careers getCareer() { return career; }
 }

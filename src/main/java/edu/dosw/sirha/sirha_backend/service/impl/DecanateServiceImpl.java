@@ -5,11 +5,13 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import edu.dosw.sirha.sirha_backend.domain.model.Decanate;
 import edu.dosw.sirha.sirha_backend.domain.model.StudyPlan;
 import edu.dosw.sirha.sirha_backend.domain.model.enums.Careers;
 import edu.dosw.sirha.sirha_backend.domain.model.staterequest.BaseRequest;
+import edu.dosw.sirha.sirha_backend.dto.RegisterRequestDecanate;
 import edu.dosw.sirha.sirha_backend.dto.StudentDTO;
 import edu.dosw.sirha.sirha_backend.exception.ErrorCodeSirha;
 import edu.dosw.sirha.sirha_backend.exception.SirhaException;
@@ -17,10 +19,13 @@ import edu.dosw.sirha.sirha_backend.service.DecanateService;
 import edu.dosw.sirha.sirha_backend.service.RequestService;
 import edu.dosw.sirha.sirha_backend.service.StudentService;
 import edu.dosw.sirha.sirha_backend.service.StudyPlanService;
+import edu.dosw.sirha.sirha_backend.util.ValidationUtil;
 import edu.dosw.sirha.sirha_backend.repository.mongo.DecanateMongoRepository;
 
 @Service
 public class DecanateServiceImpl implements DecanateService {
+
+    private static final Logger log = LoggerFactory.getLogger(DecanateServiceImpl.class);
 
     private final DecanateMongoRepository decanateRepository;
     private final StudentService studentService;
@@ -42,6 +47,44 @@ public class DecanateServiceImpl implements DecanateService {
             return decanateRepository.save(newDecanate);
         } catch (Exception e) {
             throw new SirhaException(ErrorCodeSirha.DATABASE_ERROR, "Error al guardar la decanatura", e);
+        }
+    }
+
+    private Decanate registerDecanate(Decanate decanate) throws SirhaException {
+        log.info("Registrando decanatura: {}", decanate.getName() != null ? decanate.getName() : decanate.getCareer());
+        try {
+            Decanate registered = decanateRepository.save(decanate);
+            log.info("Decanatura registrada exitosamente: {} con ID: {}", registered.getName(), registered.getId());
+            return registered;
+        } catch (Exception e) {
+            throw SirhaException.of(ErrorCodeSirha.INTERNAL_ERROR, "Error interno al registrar decanatura: " + e.getMessage(), e);
+        }
+    }
+
+    @Transactional
+    @Override
+    public Decanate registerDecanate(RegisterRequestDecanate request) throws SirhaException {
+        log.info("Iniciando registro de decanatura: {}", request.getUsername());
+        try {
+            log.debug("Validando datos de registro para decanatura: {}", request.getUsername());
+            ValidationUtil.validateDecanateRegistration( request.getUsername(), request.getEmail(), request.getPassword());
+
+            // Verificar duplicados por nombre
+            if (decanateRepository.findByName(request.getUsername()).isPresent()) {
+                log.warn("Intento de registro fallido: Decanatura ya existe con nombre: {}", request.getUsername());
+                throw SirhaException.of(ErrorCodeSirha.USERNAME_ALREADY_EXISTS, "La decanatura ya existe: " + request.getUsername());
+            }
+
+            log.debug("Creando nueva Decanate: {} ({})", request.getUsername(), request.getCareer());
+            Decanate decanate = new Decanate(request.getUsername(), request.getCareer());
+
+            Decanate saved = registerDecanate(decanate);
+            log.info("Registro de decanatura completado: {} ({})", saved.getName(), saved.getCareer());
+            return saved;
+        } catch (SirhaException e) {
+            throw e;
+        } catch (Exception e) {
+            throw SirhaException.of(ErrorCodeSirha.INTERNAL_ERROR, "Error interno durante el registro de la decanatura: " + e.getMessage(), e);
         }
     }
 
