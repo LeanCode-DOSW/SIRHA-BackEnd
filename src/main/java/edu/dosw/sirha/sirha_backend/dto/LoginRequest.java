@@ -11,6 +11,8 @@ public class LoginRequest {
     @NotBlank(message = "La contraseña es obligatoria")
     private String password;
 
+    public LoginRequest() {}
+
     public LoginRequest(String username, String email, String password) {
         this.username = username;
         this.password = password;

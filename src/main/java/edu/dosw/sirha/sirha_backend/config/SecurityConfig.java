@@ -9,7 +9,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 
@@ -20,6 +19,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
+import jakarta.servlet.http.HttpServletResponse;
 
 import edu.dosw.sirha.sirha_backend.util.JwtUtil;
 import edu.dosw.sirha.sirha_backend.domain.model.enums.Role;
@@ -31,10 +31,12 @@ import java.util.List;
 @EnableMethodSecurity
 public class SecurityConfig {
 
-    private static final String SUBJECT_GROUPS_ENDPOINT = "/api/subjects/*/groups";
+      private static final String SUBJECT_GROUPS_ENDPOINT = "/api/subjects/groups";
 
     @Bean
-    public PasswordEncoder passwordEncoder(){ return new BCryptPasswordEncoder(); }
+    public PasswordEncoder passwordEncoder() { 
+        return new BCryptPasswordEncoder(); 
+    }
 
     @Bean
     public AuthenticationManager authenticationManager(CustomUserDetailsService uds, PasswordEncoder enc){
@@ -46,45 +48,54 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(
-            HttpSecurity http,
-            JwtUtil jwtService,
-            @Value("${FRONTEND_URL:http://localhost:5173}") String frontendUrl
+        HttpSecurity http,
+        JwtUtil jwtUtil ,
+        @Value("${FRONTEND_URL:http://localhost:5173}") String frontendUrl
     ) throws Exception {
 
-        http
-            .cors(cors -> cors.configurationSource(req -> {
-                var c = new CorsConfiguration();
-                c.setAllowedOrigins(List.of(frontendUrl, "http://localhost:3000", "http://localhost:5173"));
-                c.setAllowedMethods(List.of("GET","POST","PUT","PATCH","DELETE","OPTIONS"));
-                c.setAllowedHeaders(List.of("*"));
-                c.setAllowCredentials(true);
-                return c;
-            }))
-            .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .authorizeHttpRequests(auth -> auth
-            // AUTH & DOCS 
-            .requestMatchers(
-                "/v3/api-docs/**",
-                "/swagger-ui/**",
-                "/swagger-ui.html",
-                "/actuator/health",
-                "/api/auth/register-student"
-            ).permitAll()
+    http
+      .csrf(csrf -> csrf.disable())
+      .cors(cors -> cors.configurationSource(req -> {
+        var c = new CorsConfiguration();
+        c.setAllowedOrigins(List.of(frontendUrl, "http://localhost:3000", "http://localhost:5173"));
+        c.setAllowedMethods(List.of("GET","POST","PUT","PATCH","DELETE","OPTIONS"));
+        c.setAllowedHeaders(List.of("*"));
+        c.setAllowCredentials(true);
+        return c;
+      }))
+      .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+
+      .httpBasic(hb -> hb.disable())
+      .formLogin(fl -> fl.disable())
+      .logout(lo -> lo.disable())
+      .exceptionHandling(ex -> ex.authenticationEntryPoint((req, res, e) -> {
+        res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        res.setContentType("application/json");
+        res.getWriter().write("{\"error\":\"unauthorized\"}");
+      }))
+
+      .authorizeHttpRequests(auth -> auth
+        .requestMatchers(
+            
+          "/v3/api-docs/**",
+          "/swagger-ui/**",
+          "/swagger-ui.html",
+          "/actuator/health",
+          "/actuator/info"
+        ).permitAll()
             .requestMatchers(
                 HttpMethod.POST,
                 "/api/auth/login",
                 "/api/auth/refresh-token"
             ).permitAll()
-            .requestMatchers(
-                HttpMethod.GET,
-                "/api/auth/me"
-            ).authenticated()
-            .requestMatchers(
-                "/api/auth/register-dean"
-            ).hasAnyRole(Role.DEAN.name(),Role.ADMIN.name())
-            .requestMatchers(
-                "/api/auth/register-admin"
-            ).hasRole(Role.ADMIN.name())
+            .requestMatchers(HttpMethod.POST, "/api/auth/register-student")
+                .hasAnyRole(Role.DEAN.name(), Role.ADMIN.name())
+            .requestMatchers(HttpMethod.POST, "/api/auth/register-dean")
+                .hasAnyRole(Role.DEAN.name(), Role.ADMIN.name())
+            .requestMatchers(HttpMethod.POST, "/api/auth/register-admin")
+                .hasRole(Role.ADMIN.name())
+            .requestMatchers(HttpMethod.GET, "/api/auth/me")
+                .authenticated()
 
             // StudentController  (/api/students/**)
             // STUDENT 
@@ -183,11 +194,12 @@ public class SecurityConfig {
             .requestMatchers(HttpMethod.DELETE, "/api/subjects/*").hasRole(Role.ADMIN.name())
 
             // any other request
-            .anyRequest().authenticated()
+        .anyRequest().authenticated()
         )
-            .httpBasic(Customizer.withDefaults())
-            .addFilterBefore(new JwtAuthenticationFilter(jwtService), UsernamePasswordAuthenticationFilter.class);
+
+        .addFilterBefore(new JwtAuthenticationFilter(jwtUtil),
+                        UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
-}
+    }
