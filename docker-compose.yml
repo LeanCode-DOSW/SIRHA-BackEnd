@@ -1,12 +1,20 @@
+version: "3.9"
 services:
   sirha-backend:
-    build: .
-    container_name: sirha-backend
+    build:
+      context: .
+      dockerfile: Dockerfile
     ports:
-      - "8080:8080"   # host:container
-    environment:
-      SPRING_PROFILES_ACTIVE: "prod"       
-      SPRING_DATA_MONGODB_URI: "${SPRING_DATA_MONGODB_URI}"    
+      - "8080:8080"
     env_file:
       - .env
-    
+    environment:
+      SPRING_PROFILES_ACTIVE: "prod"
+      SPRING_DATA_MONGODB_URI: "${SPRING_DATA_MONGODB_URI}"
+      MANAGEMENT_ENDPOINT_HEALTH_SHOW_DETAILS: "ALWAYS"
+      MANAGEMENT_HEALTH_MONGO_ENABLED: "true"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8080/actuator/health"]
+      interval: 20s
+      timeout: 3s
+      retries: 5

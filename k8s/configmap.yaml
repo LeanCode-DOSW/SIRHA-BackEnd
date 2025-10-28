@@ -1,0 +1,32 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: sirha-backend-config
+  namespace: sirha
+  labels:
+    app: sirha-backend
+    project: SIRHA
+    team: Genesis
+  annotations:
+    description: "Configuración de la aplicación SIRHA Backend"
+    contact: "Equipo Genesis - DOSW 2025"
+data:
+  SPRING_PROFILES_ACTIVE: "prod"
+  SERVER_PORT: "8080"
+  APP_NAME: "SIRHA Backend"
+  APP_VERSION: "1.0.0"
+  TEAM_NAME: "Genesis"
+  PROJECT_NAME: "SIRHA"
+  COURSE: "DOSW 2025"
+  DESCRIPTION: "Sistema de Información de Recursos Humanos y Administrativos"
+  LOGGING_LEVEL_ROOT: "INFO"
+  LOGGING_LEVEL_EDU_DOSW_SIRHA: "DEBUG"
+  LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_DATA_MONGODB: "DEBUG"
+  SPRINGDOC_SWAGGER_UI_PATH: "/swagger-ui.html"
+  SPRINGDOC_API_DOCS_PATH: "/v3/api-docs"
+  SPRINGDOC_SWAGGER_UI_OPERATIONS_SORTER: "method"
+  MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: "health,info"
+  MANAGEMENT_ENDPOINT_HEALTH_PROBES_ENABLED: "true"
+  LOGGING_FILE_NAME: "logs/sirha-app.log"
+  LOGGING_PATTERN_FILE: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+  LOGGING_PATTERN_CONSOLE: "%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
