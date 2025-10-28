@@ -1,45 +1,37 @@
 package edu.dosw.sirha.sirha_backend.util;
+
 import edu.dosw.sirha.sirha_backend.domain.model.Subject;
 import edu.dosw.sirha.sirha_backend.dto.SubjectDTO;
+import edu.dosw.sirha.sirha_backend.exception.SirhaException;
 
 public class SubjectMapper {
-    
-    private SubjectMapper() {
-    }
-    
-    /**
-     * Convierte de SubjectDTO a Subject (entidad)
-     */
-    public static Subject toEntity(SubjectDTO dto) {
+
+    public static Subject toEntity(SubjectDTO dto) throws SirhaException {
         if (dto == null) {
             return null;
         }
-        try {
-            Subject subject = new Subject(
-                dto.getName(),
-                dto.getCredits()
-            );
-            subject.setPrerequisites(dto.getPrerequisites());
-            subject.setGroups(dto.getGroups());
-            return subject;
-        } catch (Exception e) {
-            return null;
-        }
+        return new Subject(dto.getName(), dto.getCredits());
     }
-    
-    /**
-     * Convierte de Subject (entidad) a SubjectDTO
-     */
-    public static SubjectDTO toDTO(Subject subject) {
-        if (subject == null) {
+
+    public static SubjectDTO toDTO(Subject entity) {
+        if (entity == null) {
             return null;
         }
-        
-        return new SubjectDTO(
-            subject.getName(),
-            subject.getCredits(),
-            subject.getGroups(),
-            subject.getPrerequisites()
+
+        SubjectDTO dto = new SubjectDTO(
+                entity.getName(),
+                entity.getCredits()
         );
+
+        // Si necesitas incluir los IDs de grupos
+        if (entity.getGroups() != null) {
+            dto.setGroupIds(
+                    entity.getGroups().stream()
+                            .map(group -> group.getId())
+                            .toList()
+            );
+        }
+
+        return dto;
     }
 }

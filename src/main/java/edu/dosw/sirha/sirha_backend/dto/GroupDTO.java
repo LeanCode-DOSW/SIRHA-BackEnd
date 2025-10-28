@@ -1,59 +1,84 @@
 package edu.dosw.sirha.sirha_backend.dto;
 
-import java.util.ArrayList;
 import java.util.List;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 
-import edu.dosw.sirha.sirha_backend.domain.model.AcademicPeriod;
-import edu.dosw.sirha.sirha_backend.domain.model.Professor;
-import edu.dosw.sirha.sirha_backend.domain.model.Schedule;
-import edu.dosw.sirha.sirha_backend.domain.model.Student;
-
+/**
+ * DTO para transferencia de datos de Group.
+ * Simplificado para operaciones de creación/actualización.
+ */
 public class GroupDTO {
-    private int capacidad;
-    private int inscritos;
-    private Professor profesor;
-    private AcademicPeriod currentPeriod;
-    private List<Schedule> schedules;
-    private String aula;
-    private List<Student> estudiantes;
 
-    public GroupDTO(int capacidad, int inscritos, Professor profesor, AcademicPeriod currentPeriod) {
+    @NotNull(message = "La capacidad es obligatoria")
+    @Positive(message = "La capacidad debe ser un número positivo")
+    private Integer capacidad;
+
+    @NotNull(message = "El periodo académico es obligatorio")
+    private String academicPeriodId;
+
+    private String professorId;
+    private String aula;
+    private List<ScheduleDTO> schedules;
+
+    // Constructor vacío para deserialización
+    public GroupDTO() {}
+
+    // Constructor básico para creación
+    public GroupDTO(Integer capacidad, String academicPeriodId) {
         this.capacidad = capacidad;
-        this.inscritos = inscritos;
-        this.profesor = profesor;
-        this.currentPeriod = currentPeriod;
-        this.schedules =  new ArrayList<>();
-        this.estudiantes = new ArrayList<>();
+        this.academicPeriodId = academicPeriodId;
     }
 
-    public int getCapacidad() {
+    // Constructor completo
+    public GroupDTO(Integer capacidad, String academicPeriodId, String professorId,
+                    String aula, List<ScheduleDTO> schedules) {
+        this.capacidad = capacidad;
+        this.academicPeriodId = academicPeriodId;
+        this.professorId = professorId;
+        this.aula = aula;
+        this.schedules = schedules;
+    }
+
+    // Getters
+    public Integer getCapacidad() {
         return capacidad;
     }
-    public int getInscritos() {
-        return inscritos;
+
+    public String getAcademicPeriodId() {
+        return academicPeriodId;
     }
-    public Professor getProfesor() {
-        return profesor;
+
+    public String getProfessorId() {
+        return professorId;
     }
-    public List<Schedule> getSchedules() {
-        return schedules;
-    }
+
     public String getAula() {
         return aula;
     }
-    public AcademicPeriod getCurrentPeriod() {
-        return currentPeriod;
+
+    public List<ScheduleDTO> getSchedules() {
+        return schedules;
     }
-    public List<Student> getEstudiantes() {
-        return estudiantes;
+
+    // Setters
+    public void setCapacidad(Integer capacidad) {
+        this.capacidad = capacidad;
     }
-    public void setSchedules(List<Schedule> schedules) {
-        this.schedules = schedules;
+
+    public void setAcademicPeriodId(String academicPeriodId) {
+        this.academicPeriodId = academicPeriodId;
     }
+
+    public void setProfessorId(String professorId) {
+        this.professorId = professorId;
+    }
+
     public void setAula(String aula) {
         this.aula = aula;
     }
-    public void setEstudiantes(List<Student> estudiantes) {
-        this.estudiantes = estudiantes;
+
+    public void setSchedules(List<ScheduleDTO> schedules) {
+        this.schedules = schedules;
     }
 }
