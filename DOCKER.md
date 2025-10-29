@@ -43,10 +43,10 @@ docker run -d \
 
 Una vez ejecutándose, la aplicación estará disponible en:
 
-- **API Base**: http://localhost:8080
-- **Swagger UI**: http://localhost:8080/swagger-ui.html
-- **Health Check**: http://localhost:8080/actuator/health
-- **API Docs**: http://localhost:8080/v3/api-docs
+- **API Base**: http://localhost:8443
+- **Swagger UI**: https://localhost:8443/swagger-ui/index.html
+- **Health Check**: https://localhost:8443/actuator/health
+- **API Docs**: http://localhost:8443/v3/api-docs
 
 ## Comandos Útiles
 

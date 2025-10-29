@@ -178,7 +178,7 @@ Contiene las configuraciones específicas de Spring Boot para seguridad, documen
 
     pruebas  ->  mvn test
 
-    swagger  -> http://localhost:8080/swagger-ui/index.html
+    swagger  -> https://localhost:8443/swagger-ui/index.html#
 
 
 ## Dockerización
@@ -193,12 +193,12 @@ Variables de entorno: la configuración sensible (como SPRING_DATA_MONGODB_URI) 
 
 Healthcheck: se valida automáticamente la disponibilidad de la aplicación a través del endpoint /actuator/health.
 
-http://localhost:8080/actuator/health
+https://localhost:8443/actuator/health
 
 
 Esto garantiza que la aplicación sea portable, reproducible y lista para producción, manteniendo buenas prácticas de despliegue continuo.
 
-http://localhost:8080/swagger-ui.html
+https://localhost:8443/swagger-ui/index.html
 
 
 ![Docker](docs/imagenes/docker.png)
