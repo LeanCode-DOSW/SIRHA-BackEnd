@@ -67,16 +67,35 @@ public class AcademicPeriodController {
         return ResponseEntity.ok(saved);
     }
 
-    @DeleteMapping("/{period}")
+    @Operation(
+            summary = "Eliminar un período académico por ID",
+            description = "Elimina el período académico correspondiente al ID proporcionado."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "El período fue eliminado correctamente."),
+            @ApiResponse(responseCode = "404", description = "No se encontró el período con el ID especificado."),
+            @ApiResponse(responseCode = "500", description = "Error interno del servidor.")
+    })
+    @DeleteMapping("/{id}")
     //@PreAuthorize("hasRole('ADMIN')") // Solo ADMIN puede eliminar un período académico
-    public ResponseEntity<Void> delete(@PathVariable String period) throws SirhaException {
-        if (!academicPeriodService.existsAcademicPeriod(period)) {
+    public ResponseEntity<Void> deleteById(
+            @io.swagger.v3.oas.annotations.Parameter(
+                    name = "id",
+                    description = "Identificador único del período académico (UUID de MongoDB)",
+                    example = "671c4a8fda918f68f04a9d12",
+                    required = true
+            )
+            @PathVariable String id) throws SirhaException {
+
+        if (!academicPeriodService.findById(id).isPresent()) {
             throw SirhaException.of(ErrorCodeSirha.ACADEMIC_PERIOD_NOT_FOUND,
-                    "Período: %s", period);
+                    "No se encontró un período con id: %s", id);
         }
-        academicPeriodService.deleteAcademicPeriod(period);
+
+        academicPeriodService.deleteAcademicPeriodById(id);
         return ResponseEntity.noContent().build();
     }
+
 
     @GetMapping("/exists/{period}")
     //@PreAuthorize("hasAnyRole('ADMIN','DEAN')") // ADMIN y DEAN pueden verificar si un período existe

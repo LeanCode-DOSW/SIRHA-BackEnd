@@ -9,9 +9,9 @@ public interface AcademicPeriodService {
     Optional<AcademicPeriod> getCurrentAcademicPeriod();
     AcademicPeriod saveAcademicPeriod(AcademicPeriod academicPeriod);
     boolean existsAcademicPeriod(String name);
-    void deleteAcademicPeriod(String name);
     Optional<AcademicPeriod> findByPeriod(String period);
     Optional<AcademicPeriod> findById(String id);
     List<AcademicPeriod> findAll();
+    void deleteAcademicPeriodById(String id);
 
 }

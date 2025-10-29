@@ -19,5 +19,5 @@ public interface AcademicPeriodMongoRepository extends MongoRepository<AcademicP
     }
 
     boolean existsByPeriod(String period);
-    void deleteByPeriod(String period);
+
 }
