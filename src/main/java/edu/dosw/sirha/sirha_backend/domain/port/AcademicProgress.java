@@ -118,4 +118,5 @@ public interface AcademicProgress {
     void unenrollSubjectFromGroup(String subject, Group group) throws SirhaException;
 
     void setSubjectSemester(String subjectName, int semester) throws SirhaException;
+    String getStudyPlanId();
 }

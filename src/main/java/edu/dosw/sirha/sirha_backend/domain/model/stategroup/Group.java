@@ -1,6 +1,8 @@
 package edu.dosw.sirha.sirha_backend.domain.model.stategroup;
 
 import java.util.*;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import edu.dosw.sirha.sirha_backend.domain.model.AcademicPeriod;
@@ -41,6 +43,7 @@ public class Group {
     private String id;
     private String code;
     private int capacidad;
+    @JsonIgnore
     private GroupState estadoGrupo; // State Pattern
     private Professor professor;
     private List<Schedule> schedules;
@@ -70,21 +73,17 @@ public class Group {
         setCapacidad(capacidad);
         setCode(subject);
         setCurrentPeriod(currentPeriod);
-        
-        addToSubject( subject );
     }
     void setEstadoGrupo(GroupState estado) {
         this.estadoGrupo = estado;
     }
 
-    private void addToSubject(Subject subject) throws SirhaException {
-        subject.addGroup(this);
-    }
 
     /**
      * Obtiene el estado actual del grupo.
      * @return estado actual del grupo, nunca null
      */
+    @JsonIgnore
     public GroupState getGroupState() {
         return estadoGrupo;
     }
@@ -358,5 +357,15 @@ public class Group {
 
     public boolean hasSchedule(Schedule schedule){
         return schedules.contains(schedule);
+    }
+    /**
+     * Obtiene el nombre del estado actual del grupo para serialización JSON.
+     * @return nombre del estado (OPEN, CLOSED, etc.)
+     */
+    public String getStateName() {
+        if (estadoGrupo == null) {
+            return "UNKNOWN";
+        }
+        return estadoGrupo.getClass().getSimpleName().replace("Status", "").toUpperCase();
     }
 }

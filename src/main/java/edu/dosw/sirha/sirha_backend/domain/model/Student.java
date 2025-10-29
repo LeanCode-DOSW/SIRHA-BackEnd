@@ -111,16 +111,6 @@ public class Student extends User implements SolicitudFactory, ScheduleManager, 
         }
         this.codigo = codigo;
     }
- 
-    /**
-     * Obtiene el plan de estudios asignado.
-     * @return plan de estudios del estudiante, puede ser null si no se ha asignado
-     */
-    public StudyPlan getPlanGeneral() {
-        return academicProgress.getStudyPlan();
-    }
- 
- 
 
     public AcademicProgress getAcademicProgress() {
         return academicProgress;
@@ -346,22 +336,25 @@ public class Student extends User implements SolicitudFactory, ScheduleManager, 
     }
 
     public boolean canEnroll(Subject subject) throws SirhaException {
-        // 1. Verificar que la materia esté en el plan de estudios
-        if (academicProgress.getStudyPlan() == null || !academicProgress.getStudyPlan().hasSubject(subject)) {
+        if (academicProgress == null) {
+            throw SirhaException.of(ErrorCodeSirha.INVALID_ARGUMENT, "El progreso académico no está inicializado");
+        }
+
+        // 1. Verificar que la materia esté en el semáforo (plan de estudios)
+        if (!academicProgress.hasSubject(subject)) {
             throw SirhaException.of(ErrorCodeSirha.INVALID_ARGUMENT, "La materia no está en el plan de estudios del estudiante");
         }
-        
-        // 2. Verificar que la materia no esté ya inscrita
 
+        // 2. Verificar que la materia no esté ya inscrita
         if (!isSubjectNoCursada(subject.getName())) {
             throw SirhaException.of(ErrorCodeSirha.OPERATION_NOT_ALLOWED, "La materia ya está inscrita");
         }
-        
+
         // 3. Verificar prerrequisitos
         if (subject.hasPrerequisites() && !subject.canEnroll(academicProgress)) {
             throw SirhaException.of(ErrorCodeSirha.OPERATION_NOT_ALLOWED, "No se cumplen los prerrequisitos para inscribir la materia");
-            }
-        
+        }
+
         return true;
     }
     
@@ -476,7 +469,8 @@ public class Student extends User implements SolicitudFactory, ScheduleManager, 
         if (academicProgress.hasSubject(newSubject) && !isSubjectNoCursada(newSubject.getName())) {
             throw SirhaException.of(ErrorCodeSirha.SUBJECT_ALREADY_ENROLLED, "El estudiante ya tiene la materia nueva inscrita o aprobada");
         }
-        if (!academicProgress.getStudyPlan().hasSubject(newSubject)) {
+        // ✅ CAMBIO: Usar hasSubject del academicProgress directamente
+        if (!academicProgress.hasSubject(newSubject)) {
             throw SirhaException.of(ErrorCodeSirha.SUBJECT_NOT_IN_STUDY_PLAN, "La materia nueva no está en el plan de estudios del estudiante");
         }
         if (newSubject.hasPrerequisites() && !newSubject.canEnroll(academicProgress)) {
@@ -752,7 +746,31 @@ public class Student extends User implements SolicitudFactory, ScheduleManager, 
         }
         return academicProgress.isSubjectNoCursada(subject);
     }
-    
+    /**
+     * Obtiene el ID del plan de estudios del estudiante.
+     * @return ID del plan de estudios, o null si no tiene progreso académico
+     */
+    public String getStudyPlanId() {
+        if (academicProgress == null) {
+            return null;
+        }
+        return academicProgress.getStudyPlanId();
+    }
+
+    /**
+     * Obtiene información resumida del plan de estudios.
+     * @return String con ID y carrera del plan
+     */
+    public String getStudyPlanInfo() {
+        if (academicProgress == null) {
+            return "Sin plan de estudios asignado";
+        }
+        return String.format("Plan: %s - Carrera: %s - Créditos totales: %d",
+                academicProgress.getStudyPlanId(),
+                academicProgress.getCareer().getDisplayName(),
+                academicProgress.getCreditsStudyPlan()
+        );
+    }
 
 }
 

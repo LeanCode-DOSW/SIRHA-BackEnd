@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import edu.dosw.sirha.sirha_backend.domain.model.Decanate;
 import edu.dosw.sirha.sirha_backend.domain.model.StudyPlan;
 import edu.dosw.sirha.sirha_backend.domain.model.enums.Careers;
@@ -32,35 +33,30 @@ public class DecanateServiceImpl implements DecanateService {
     private final RequestService requestService;
     private final StudyPlanService studyPlanService;
 
-    public DecanateServiceImpl(DecanateMongoRepository decanateRepository, StudentService studentService, RequestService requestService, StudyPlanService studyPlanService) {
+    public DecanateServiceImpl(
+            DecanateMongoRepository decanateRepository,
+            StudentService studentService,
+            RequestService requestService,
+            StudyPlanService studyPlanService) {
         this.decanateRepository = decanateRepository;
         this.studentService = studentService;
         this.requestService = requestService;
         this.studyPlanService = studyPlanService;
     }
 
+    // ========== CRUD de Decanatos (sin cambios) ==========
+
     @Transactional
     @Override
-    public Decanate saveDecanate(Careers decanate) throws SirhaException {
-        log.info("Guardando decanatura para career: {}", decanate);
+    public Decanate saveDecanate(Careers career) throws SirhaException {
+        log.info("Guardando decanatura para career: {}", career);
         try {
-            Decanate newDecanate = new Decanate(decanate);
+            Decanate newDecanate = new Decanate(career);
             Decanate saved = decanateRepository.save(newDecanate);
             log.info("Decanatura guardada: {} (id={})", saved.getName(), saved.getId());
             return saved;
         } catch (Exception e) {
             throw new SirhaException(ErrorCodeSirha.DATABASE_ERROR, "Error al guardar la decanatura", e);
-        }
-    }
-
-    private Decanate registerDecanate(Decanate decanate) throws SirhaException {
-        log.info("Registrando decanatura: {}", decanate.getName() != null ? decanate.getName() : decanate.getCareer());
-        try {
-            Decanate registered = decanateRepository.save(decanate);
-            log.info("Decanatura registrada exitosamente: {} con ID: {}", registered.getName(), registered.getId());
-            return registered;
-        } catch (Exception e) {
-            throw SirhaException.of(ErrorCodeSirha.INTERNAL_ERROR, "Error interno al registrar decanatura: " + e.getMessage(), e);
         }
     }
 
@@ -70,7 +66,7 @@ public class DecanateServiceImpl implements DecanateService {
         log.info("Iniciando registro de decanatura: {}", request.getUsername());
         try {
             log.debug("Validando datos de registro para decanatura: {}", request.getUsername());
-            ValidationUtil.validateDecanateRegistration( request.getUsername(), request.getEmail(), request.getPassword());
+            ValidationUtil.validateDecanateRegistration(request.getUsername(), request.getEmail(), request.getPassword());
 
             // Verificar duplicados por nombre
             if (decanateRepository.findByName(request.getUsername()).isPresent()) {
@@ -81,7 +77,7 @@ public class DecanateServiceImpl implements DecanateService {
             log.debug("Creando nueva Decanate: {} ({})", request.getUsername(), request.getCareer());
             Decanate decanate = new Decanate(request.getUsername(), request.getCareer());
 
-            Decanate saved = registerDecanate(decanate);
+            Decanate saved = decanateRepository.save(decanate);
             log.info("Registro de decanatura completado: {} ({})", saved.getName(), saved.getCareer());
             return saved;
         } catch (SirhaException e) {
@@ -103,7 +99,7 @@ public class DecanateServiceImpl implements DecanateService {
             throw new SirhaException(ErrorCodeSirha.DATABASE_ERROR, "Error al obtener todas las decanaturas", e);
         }
     }
-    
+
     @Transactional
     @Override
     public Decanate getDecanateByName(String name) throws SirhaException {
@@ -115,6 +111,20 @@ public class DecanateServiceImpl implements DecanateService {
         return decanateRepository.findByName(name)
                 .orElseThrow(() -> new SirhaException(ErrorCodeSirha.DECANATE_NOT_FOUND));
     }
+
+    @Transactional
+    @Override
+    public Decanate getDecanateById(String id) throws SirhaException {
+        if (id == null || id.trim().isEmpty()) {
+            log.warn("getDecanateById: id vacío");
+            throw new SirhaException(ErrorCodeSirha.INVALID_ARGUMENT, "El ID de la decanatura no puede estar vacío");
+        }
+        log.info("Buscando decanatura por ID: {}", id);
+        return decanateRepository.findById(id)
+                .orElseThrow(() -> new SirhaException(ErrorCodeSirha.DECANATE_NOT_FOUND, "Decanatura no encontrada con ID: " + id));
+    }
+
+    // ========== Gestión de Solicitudes (sin cambios) ==========
 
     @Transactional
     @Override
@@ -178,6 +188,7 @@ public class DecanateServiceImpl implements DecanateService {
             throw new SirhaException(ErrorCodeSirha.INVALID_ARGUMENT, "El ID de la solicitud no puede estar vacío");
         }
         log.info("Decanatura '{}' recibe solicitud '{}'", decanateName, requestId);
+
         Decanate decanate = decanateRepository.findByName(decanateName)
                 .orElseThrow(() -> {
                     log.warn("Decanatura no encontrada al recibir solicitud: {}", decanateName);
@@ -204,24 +215,21 @@ public class DecanateServiceImpl implements DecanateService {
     @Override
     public BaseRequest approveRequest(String decanateName, String requestId) throws SirhaException {
         log.info("Aprobando solicitud {} por decanatura {}", requestId, decanateName);
-         // Validar parámetros
-         if (decanateName == null || decanateName.trim().isEmpty()) {
-             throw new SirhaException(ErrorCodeSirha.INVALID_ARGUMENT, "El nombre de la decanatura no puede estar vacío");
-         }
-         if (requestId == null || requestId.trim().isEmpty()) {
-             throw new SirhaException(ErrorCodeSirha.INVALID_ARGUMENT, "El ID de la solicitud no puede estar vacío");
-         }
-        
-        // Buscar decanatura
+
+        if (decanateName == null || decanateName.trim().isEmpty()) {
+            throw new SirhaException(ErrorCodeSirha.INVALID_ARGUMENT, "El nombre de la decanatura no puede estar vacío");
+        }
+        if (requestId == null || requestId.trim().isEmpty()) {
+            throw new SirhaException(ErrorCodeSirha.INVALID_ARGUMENT, "El ID de la solicitud no puede estar vacío");
+        }
+
         Decanate decanate = decanateRepository.findByName(decanateName)
                 .orElseThrow(() -> new SirhaException(ErrorCodeSirha.DECANATE_NOT_FOUND));
-        
-        // Buscar solicitud
+
         BaseRequest request = requestService.findById(requestId)
                 .orElseThrow(() -> new SirhaException(ErrorCodeSirha.REQUEST_NOT_FOUND, "Solicitud no encontrada: %s", requestId));
-        
+
         try {
-            // Aprobar solicitud (puede lanzar excepciones de dominio)
             decanate.approveRequest(request);
             decanateRepository.save(decanate);
             log.info("Solicitud {} aprobada por {}", requestId, decanateName);
@@ -237,19 +245,17 @@ public class DecanateServiceImpl implements DecanateService {
     @Override
     public BaseRequest rejectRequest(String decanateName, String requestId) throws SirhaException {
         log.info("Rechazando solicitud {} por decanatura {}", requestId, decanateName);
-         // Validar parámetros
-         if (decanateName == null || decanateName.trim().isEmpty()) {
-             throw new SirhaException(ErrorCodeSirha.INVALID_ARGUMENT, "El nombre de la decanatura no puede estar vacío");
-         }
-         if (requestId == null || requestId.trim().isEmpty()) {
-             throw new SirhaException(ErrorCodeSirha.INVALID_ARGUMENT, "El ID de la solicitud no puede estar vacío");
-         }
-        
-        // Buscar decanatura
+
+        if (decanateName == null || decanateName.trim().isEmpty()) {
+            throw new SirhaException(ErrorCodeSirha.INVALID_ARGUMENT, "El nombre de la decanatura no puede estar vacío");
+        }
+        if (requestId == null || requestId.trim().isEmpty()) {
+            throw new SirhaException(ErrorCodeSirha.INVALID_ARGUMENT, "El ID de la solicitud no puede estar vacío");
+        }
+
         Decanate decanate = decanateRepository.findByName(decanateName)
                 .orElseThrow(() -> new SirhaException(ErrorCodeSirha.DECANATE_NOT_FOUND));
-        
-        // Buscar solicitud
+
         BaseRequest request = requestService.findById(requestId)
                 .orElseThrow(() -> new SirhaException(ErrorCodeSirha.REQUEST_NOT_FOUND));
 
@@ -265,54 +271,73 @@ public class DecanateServiceImpl implements DecanateService {
         }
     }
 
-    @Transactional
-    @Override
-    public StudentDTO getStudentBasicInfo(String username) throws SirhaException {
-        return studentService.getStudentBasicInfo(username);
-    }
+    // ========== Gestión de Study Plans (REFACTORIZADO) ==========
 
     @Transactional
     @Override
-    public List<StudyPlan> getStudyPlansByDecanateName(String decanateName) throws SirhaException {
+    public List<StudyPlan> getStudyPlansOfDecanate(String decanateName) throws SirhaException {
         if (decanateName == null || decanateName.trim().isEmpty()) {
             throw new SirhaException(ErrorCodeSirha.INVALID_ARGUMENT, "El nombre de la decanatura no puede estar vacío");
         }
-        
+
+        log.info("Obteniendo planes de estudio de la decanatura: {}", decanateName);
+
         Decanate decanate = decanateRepository.findByName(decanateName)
                 .orElseThrow(() -> new SirhaException(ErrorCodeSirha.DECANATE_NOT_FOUND, "Decanatura no encontrada: %s", decanateName));
-        
-        return decanate.getStudyPlans();
+
+        // ✅ Cargar cada StudyPlan por su ID
+        List<StudyPlan> studyPlans = new ArrayList<>();
+        for (String studyPlanId : decanate.getStudyPlanIds()) {
+            try {
+                StudyPlan plan = studyPlanService.getStudyPlanById(studyPlanId);
+                studyPlans.add(plan);
+            } catch (SirhaException e) {
+                log.warn("Plan de estudio con ID '{}' no encontrado en decanatura '{}'", studyPlanId, decanateName);
+                // Continuar con los demás planes
+            }
+        }
+
+        log.info("Total de planes cargados para '{}': {}", decanateName, studyPlans.size());
+        return studyPlans;
     }
 
     @Transactional
     @Override
-    public List<StudyPlan> addPlanToDecanate(String decanateName, String studyPlanName) throws SirhaException {
+    public Decanate addStudyPlanToDecanate(String decanateName, String studyPlanId) throws SirhaException {
         if (decanateName == null || decanateName.trim().isEmpty()) {
-            log.warn("addPlanToDecanate: decanateName vacío");
+            log.warn("addStudyPlanToDecanate: decanateName vacío");
             throw new SirhaException(ErrorCodeSirha.INVALID_ARGUMENT, "El nombre de la decanatura no puede estar vacío");
         }
-        if (studyPlanName == null || studyPlanName.trim().isEmpty()) {
-            log.warn("addPlanToDecanate: studyPlanName vacío");
-            throw new SirhaException(ErrorCodeSirha.INVALID_ARGUMENT, "El nombre del plan de estudio no puede estar vacío");
+        if (studyPlanId == null || studyPlanId.trim().isEmpty()) {
+            log.warn("addStudyPlanToDecanate: studyPlanId vacío");
+            throw new SirhaException(ErrorCodeSirha.INVALID_ARGUMENT, "El ID del plan de estudio no puede estar vacío");
         }
-        log.info("Agregando plan '{}' a decanatura '{}'", studyPlanName, decanateName);
-        StudyPlan studyPlan = studyPlanService.getStudyPlanByName(studyPlanName);
+
+        log.info("Agregando plan '{}' a decanatura '{}'", studyPlanId, decanateName);
+
+        // Verificar que el plan existe
+        StudyPlan studyPlan = studyPlanService.getStudyPlanById(studyPlanId);
+
+        // Buscar la decanatura
         Decanate decanate = decanateRepository.findByName(decanateName)
                 .orElseThrow(() -> {
                     log.warn("Decanatura no encontrada: {}", decanateName);
                     return new SirhaException(ErrorCodeSirha.DECANATE_NOT_FOUND, "Decanatura no encontrada: " + decanateName);
                 });
-        boolean planExists = decanate.getStudyPlans().stream()
-                .anyMatch(plan -> plan.getName().equals(studyPlan.getName()));
-        if (planExists) {
+
+        // Verificar si ya existe
+        if (decanate.hasStudyPlan(studyPlanId)) {
             log.warn("El plan {} ya existe en decanatura {}", studyPlan.getName(), decanateName);
-            throw new SirhaException(ErrorCodeSirha.INVALID_ARGUMENT, "El plan de estudio ya existe: " + studyPlan.getName());
+            throw new SirhaException(ErrorCodeSirha.INVALID_ARGUMENT, "El plan de estudio ya existe en la decanatura");
         }
+
         try {
-            decanate.addStudyPlan(studyPlan);
-            decanateRepository.save(decanate);
-            log.info("Plan '{}' agregado a decanatura '{}'", studyPlan.getName(), decanateName);
-            return decanate.getStudyPlans();
+            // Agregar el ID del plan
+            decanate.addStudyPlan(studyPlanId);
+            Decanate saved = decanateRepository.save(decanate);
+
+            log.info("Plan '{}' (ID: {}) agregado a decanatura '{}'", studyPlan.getName(), studyPlanId, decanateName);
+            return saved;
         } catch (Exception e) {
             throw new SirhaException(ErrorCodeSirha.DATABASE_ERROR, "Error al agregar el plan de estudio: %s", e.getMessage());
         }
@@ -320,21 +345,39 @@ public class DecanateServiceImpl implements DecanateService {
 
     @Transactional
     @Override
-    public StudyPlan addSubjectToStudyPlan(String studyPlanName, String subjectName) throws SirhaException {
-        return studyPlanService.addSubjectToStudyPlan(studyPlanName, subjectName);
+    public Decanate removeStudyPlanFromDecanate(String decanateName, String studyPlanId) throws SirhaException {
+        if (decanateName == null || decanateName.trim().isEmpty()) {
+            throw new SirhaException(ErrorCodeSirha.INVALID_ARGUMENT, "El nombre de la decanatura no puede estar vacío");
+        }
+        if (studyPlanId == null || studyPlanId.trim().isEmpty()) {
+            throw new SirhaException(ErrorCodeSirha.INVALID_ARGUMENT, "El ID del plan de estudio no puede estar vacío");
+        }
+
+        log.info("Eliminando plan '{}' de decanatura '{}'", studyPlanId, decanateName);
+
+        Decanate decanate = decanateRepository.findByName(decanateName)
+                .orElseThrow(() -> new SirhaException(ErrorCodeSirha.DECANATE_NOT_FOUND, "Decanatura no encontrada: " + decanateName));
+
+        if (!decanate.hasStudyPlan(studyPlanId)) {
+            throw new SirhaException(ErrorCodeSirha.INVALID_ARGUMENT, "El plan de estudio no está asociado a la decanatura");
+        }
+
+        try {
+            decanate.removeStudyPlan(studyPlanId);
+            Decanate saved = decanateRepository.save(decanate);
+
+            log.info("Plan '{}' eliminado de decanatura '{}'", studyPlanId, decanateName);
+            return saved;
+        } catch (Exception e) {
+            throw new SirhaException(ErrorCodeSirha.DATABASE_ERROR, "Error al eliminar el plan de estudio: %s", e.getMessage());
+        }
     }
-    
-    @Override
-    @Transactional
-    public StudyPlan saveStudyPlan(Careers career) throws SirhaException {
-        StudyPlan studyPlan = new StudyPlan(career);
-        return studyPlanService.saveStudyPlan(studyPlan);
-    }
+
+    // ========== Delegación ==========
 
     @Transactional
     @Override
-    public List<StudyPlan> getStudyPlansByCareer(Careers career) throws SirhaException {
-        return studyPlanService.getStudyPlansByCareer(career);
+    public StudentDTO getStudentBasicInfo(String username) throws SirhaException {
+        return studentService.getStudentBasicInfo(username);
     }
-
 }

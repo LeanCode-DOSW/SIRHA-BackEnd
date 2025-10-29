@@ -24,4 +24,5 @@ public interface SubjectService {
     // Query sobre grupos RELACIONADOS con la materia
     List<Group> getGroupsBySubjectName(String subjectName) throws SirhaException;
     List<Group> getOpenGroupsBySubjectName(String subjectName) throws SirhaException;
+
 }

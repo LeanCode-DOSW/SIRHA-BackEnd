@@ -1,4 +1,5 @@
 package edu.dosw.sirha.sirha_backend.domain.model;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,12 +20,15 @@ public class Decanate implements RequestReceiver {
     private String id;
     private String name;
     private Careers career;
-    private List<StudyPlan> studyPlans;
+
+    // ✅ CAMBIO: Solo guardar IDs de StudyPlan
+    private List<String> studyPlanIds; // En lugar de List<StudyPlan>
+
     private List<BaseRequest> receivedRequests;
 
     public Decanate() {
         this.receivedRequests = new ArrayList<>();
-        this.studyPlans = new ArrayList<>();
+        this.studyPlanIds = new ArrayList<>();
     }
 
     public Decanate(Careers career) {
@@ -37,7 +41,13 @@ public class Decanate implements RequestReceiver {
         this(career);
         this.name = username;
     }
-    
+
+    // ========== Getters básicos ==========
+
+    public String getId() {
+        return id;
+    }
+
     public String getName() {
         return name;
     }
@@ -45,15 +55,76 @@ public class Decanate implements RequestReceiver {
     public Careers getCareer() {
         return career;
     }
-    public List<StudyPlan> getStudyPlans() {
-        return studyPlans;
+
+    public List<String> getStudyPlanIds() {
+        return studyPlanIds;
     }
 
-    public void addStudyPlan(StudyPlan studyPlan) {
-        if (studyPlan != null && !studyPlans.contains(studyPlan)) {
-            studyPlans.add(studyPlan);
+    public List<BaseRequest> getReceivedRequests() {
+        return receivedRequests;
+    }
+
+    // ========== Setters ==========
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setCareer(Careers career) {
+        this.career = career;
+    }
+
+    public void setStudyPlanIds(List<String> studyPlanIds) {
+        this.studyPlanIds = studyPlanIds;
+    }
+
+    public void setReceivedRequests(List<BaseRequest> receivedRequests) {
+        this.receivedRequests = receivedRequests;
+    }
+
+    // ========== Métodos de StudyPlan (trabajan con IDs) ==========
+
+    /**
+     * Agrega un plan de estudio a la decanatura (solo el ID).
+     * @param studyPlanId ID del plan de estudio
+     */
+    public void addStudyPlan(String studyPlanId) {
+        if (studyPlanId != null && !studyPlanIds.contains(studyPlanId)) {
+            studyPlanIds.add(studyPlanId);
         }
     }
+
+    /**
+     * Verifica si la decanatura tiene un plan de estudio específico.
+     * @param studyPlanId ID del plan
+     * @return true si existe, false en caso contrario
+     */
+    public boolean hasStudyPlan(String studyPlanId) {
+        return studyPlanIds.contains(studyPlanId);
+    }
+
+    /**
+     * Elimina un plan de estudio de la decanatura.
+     * @param studyPlanId ID del plan a eliminar
+     * @return true si se eliminó, false si no existía
+     */
+    public boolean removeStudyPlan(String studyPlanId) {
+        return studyPlanIds.remove(studyPlanId);
+    }
+
+    /**
+     * Obtiene el número de planes de estudio asociados.
+     * @return cantidad de planes
+     */
+    public int getStudyPlanCount() {
+        return studyPlanIds.size();
+    }
+
+    // ========== Métodos de Request (sin cambios) ==========
 
     @Override
     public boolean canReceiveRequest(BaseRequest request) {
@@ -65,27 +136,26 @@ public class Decanate implements RequestReceiver {
         return this.career == studentCareer;
     }
 
-
     @Override
     public void receiveRequest(BaseRequest request) throws SirhaException {
         if (request == null) {
             throw SirhaException.of(ErrorCodeSirha.VALIDATION_ERROR);
         }
-        
+
         if (!canReceiveRequest(request)) {
-            throw SirhaException.of(ErrorCodeSirha.INVALID_CAREER, 
-                "Esta decanatura no puede recibir solicitudes de la carrera: %s", 
-                request.getStudentCareer());
+            throw SirhaException.of(ErrorCodeSirha.INVALID_CAREER,
+                    "Esta decanatura no puede recibir solicitudes de la carrera: %s",
+                    request.getStudentCareer());
         }
-        
-        setAutoPrioritie(request);
-        
+
+        setAutoPriority(request);
+
         receivedRequests.add(request);
 
         request.reviewRequest(new ResponseRequest("Solicitud recibida por la decanatura " + this.name, RequestStateEnum.EN_REVISION));
     }
 
-    private void setAutoPrioritie(BaseRequest request) { //FIFO??
+    private void setAutoPriority(BaseRequest request) {
         int priority = receivedRequests.size() + 1;
         request.setPriority(priority);
     }
@@ -93,8 +163,9 @@ public class Decanate implements RequestReceiver {
     @Override
     public List<BaseRequest> getPendingRequests() {
         return receivedRequests.stream()
-            .filter(req -> req.getActualState() == RequestStateEnum.EN_REVISION || req.getActualState() == RequestStateEnum.PENDIENTE)
-            .toList();
+                .filter(req -> req.getActualState() == RequestStateEnum.EN_REVISION ||
+                        req.getActualState() == RequestStateEnum.PENDIENTE)
+                .toList();
     }
 
     @Override
@@ -111,9 +182,6 @@ public class Decanate implements RequestReceiver {
 
         receivedRequests.remove(request);
         updateRequestsAfterResolveOne();
-    }
-    public String getId() {
-        return id;
     }
 
     @Override
@@ -133,7 +201,6 @@ public class Decanate implements RequestReceiver {
 
     @Override
     public void updateRequestsAfterResolveOne() {
-        
         List<BaseRequest> pendingRequests = getPendingRequests();
         for (int i = 0; i < pendingRequests.size(); i++) {
             BaseRequest req = pendingRequests.get(i);
