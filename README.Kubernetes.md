@@ -15,8 +15,10 @@ Este documento describe cómo desplegar la aplicación SIRHA Backend en un clust
 
 #### Opción 1: Aplicar todos los archivos individualmente
 ```bash
-# 1. Crear namespace
+# 1. Crear namespace y cambiar contexto
 kubectl apply -f k8s/namespace.yaml
+kubectl config set-context --current --namespace=sirha
+
 
 # 2. Aplicar ConfigMap
 kubectl apply -f k8s/configmap.yaml
