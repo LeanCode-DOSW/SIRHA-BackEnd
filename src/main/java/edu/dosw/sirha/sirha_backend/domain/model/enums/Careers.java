@@ -11,22 +11,15 @@ public enum Careers {
     INGENIERIA_BIOMEDICA("Ingeniería Biomédica"),
     INGENIERIA_AMBIENTAL("Ingeniería Ambiental"),
     INGENIERIA_ESTADISTICA("Ingeniería Estadística"),
-
     INGENIERIA_EN_BIOTECNOLOGIA("Ingeniería en Biotecnología"),
     INGENIERIA_DE_INTELIGENCIA_ARTIFICIAL("Ingeniería de Inteligencia Artificial"),
     INGENIERIA_DE_CIBERSEGURIDAD("Ingeniería de Ciberseguridad"),
-
     ADMINISTRACION_DE_EMPRESAS("Administración de Empresas"),
     ECONOMIA("Economía"),
     MATEMATICAS("Matemáticas");
 
     private final String displayName;
 
-    Careers(String displayName) {
-        this.displayName = displayName;
-    }
-
-    public String getDisplayName() {
-        return displayName;
-    }
+    Careers(String displayName) { this.displayName = displayName; }
+    public String getDisplayName() { return displayName; }
 }

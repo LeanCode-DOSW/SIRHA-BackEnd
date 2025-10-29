@@ -9,11 +9,19 @@ public class AuthResponse {
     private String token;
     private long timestamp;
 
-    public AuthResponse(String username, String email, String token) {
+    public AuthResponse() {
+        timestamp = System.currentTimeMillis();
+    }
+
+    public AuthResponse(String username, String token) {
+        this();
         this.username = username;
-        this.email = email;
         this.token = token;
-        this.timestamp = System.currentTimeMillis();
+    }
+
+    public AuthResponse(String username, String email, String token) {
+        this(username, token);
+        this.email = email;
     }
 
     public String getUsername() { return username; }

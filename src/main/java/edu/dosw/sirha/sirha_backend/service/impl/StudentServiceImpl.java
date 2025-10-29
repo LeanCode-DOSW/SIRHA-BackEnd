@@ -189,7 +189,7 @@ public class StudentServiceImpl implements StudentService {
         
         try {
             log.debug("Validando datos de registro para: {}", request.getUsername());
-            ValidationUtil.validateStudentRegistration(
+            ValidationUtil.validateRegistration(
                 request.getUsername(), 
                 request.getEmail(), 
                 request.getPassword(), 

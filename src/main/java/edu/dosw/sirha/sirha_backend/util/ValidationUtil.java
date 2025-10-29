@@ -14,7 +14,8 @@ public class ValidationUtil {
         Pattern.compile("^[a-zA-Z0-9._%+-]+@universidad\\.edu\\.co$");
     
     private static final Pattern CODIGO_ESTUDIANTIL = 
-        Pattern.compile("^\\d{4}-\\d{6}$");
+        // Formato: prefijo de 3 letras (ADM, EST o DEC) seguido de guion y 4 dígitos, case-insensitive
+        Pattern.compile("(?i)^(ADM|EST|DEC)-\\d{4}$");
     
     private static final Pattern USERNAME_VALIDO = 
         Pattern.compile("^[a-zA-Z0-9._-]{3,50}$");
@@ -59,7 +60,7 @@ public class ValidationUtil {
     /**
      * Valida todos los campos de registro de estudiante.
      */
-    public static void validateStudentRegistration(String username, String email, 
+    public static void validateRegistration(String username, String email, 
                                                  String password, String codigo) {
         if (!isValidUsername(username)) {
             throw new IllegalArgumentException("Username inválido: debe tener 3-50 caracteres alfanuméricos");
@@ -74,24 +75,8 @@ public class ValidationUtil {
         }
         
         if (!isValidStudentCode(codigo)) {
-            throw new IllegalArgumentException("Código estudiantil debe tener formato YYYY-NNNNNN");
+            throw new IllegalArgumentException("Código estudiantil debe tener formato XXX-NNNN (ej: ADM-0001, EST-0001, DEC-0001)");
         }
     }
-
-    public static void validateDecanateRegistration(String username, String email, 
-                                                 String password) {
-        if (!isValidUsername(username)) {
-            throw new IllegalArgumentException("Username inválido: debe tener 3-50 caracteres alfanuméricos");
-        }
-        
-        if (!isValidInstitutionalEmail(email)) {
-            throw new IllegalArgumentException("Email debe ser del dominio @universidad.edu.co");
-        }
-        
-        if (!isValidPassword(password)) {
-            throw new IllegalArgumentException("Contraseña debe tener al menos 8 caracteres, mayúscula, minúscula y número");
-        }
-    }
-
     
 }
