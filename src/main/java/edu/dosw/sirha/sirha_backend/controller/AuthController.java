@@ -8,8 +8,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.AuthenticationException;
-import java.util.Map;
-
 import edu.dosw.sirha.sirha_backend.domain.model.Account;
 import edu.dosw.sirha.sirha_backend.domain.model.enums.Role;
 import edu.dosw.sirha.sirha_backend.dto.AuthResponse;
@@ -22,6 +20,7 @@ import edu.dosw.sirha.sirha_backend.repository.mongo.AccountMongoRepository;
 import edu.dosw.sirha.sirha_backend.service.DecanateService;
 import edu.dosw.sirha.sirha_backend.service.StudentService;
 import edu.dosw.sirha.sirha_backend.util.JwtUtil;
+import edu.dosw.sirha.sirha_backend.util.ValidationUtil;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -87,6 +86,7 @@ public class AuthController {
     @PostMapping("/register-admin")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<AuthResponse> registerAdmin(@RequestBody RegisterRequest req) {
+        ValidationUtil.validateRegistration(req.getUsername(), req.getEmail(), req.getPassword(), req.getCodigo());
         if (accounts.existsByUsername(req.getUsername())) {
             return ResponseEntity.badRequest().body(
                 new AuthResponse(req.getUsername(), req.getEmail(), ErrorCodeSirha.USERNAME_ALREADY_EXISTS.getDefaultMessage())
@@ -112,7 +112,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequest req) {
+    public ResponseEntity<AuthResponse> login(@RequestBody LoginRequest req) {
         try {
             authManager.authenticate(new UsernamePasswordAuthenticationToken(req.getUsername(), req.getPassword()));
 
@@ -122,8 +122,9 @@ public class AuthController {
             return ResponseEntity.ok(new AuthResponse(acc.getUsername(), acc.getEmail(), token));
 
         } catch (AuthenticationException ex) {
+            AuthResponse resp = new AuthResponse(req.getUsername(), "invalid_credentials");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                                 .body(Map.of("error", "invalid_credentials"));
+                                 .body(resp);
         }
     }
 }

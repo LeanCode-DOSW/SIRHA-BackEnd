@@ -1,7 +1,6 @@
 package edu.dosw.sirha.sirha_backend.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import edu.dosw.sirha.sirha_backend.domain.model.enums.Careers;
@@ -16,19 +15,17 @@ public class RegisterRequest {
     @NotBlank
     private String email;
 
-    // Necesario para el login + registro
     @NotBlank
     private String password;
 
-    // OJO: el JSON te llega con "codigo" (lo vi en tu payload)
-    @JsonProperty("codigo")
     @NotBlank
     private String codigo;
 
-    // Si vas a registrar estudiante o decano
     private Careers career;
 
-    public RegisterRequest() {} // ← constructor vacío
+    public RegisterRequest() {
+        // constructor vacío
+    } 
 
     // getters y setters públicos
     public String getUsername() { return username; }

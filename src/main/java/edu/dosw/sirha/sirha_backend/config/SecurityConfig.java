@@ -88,6 +88,7 @@ public class SecurityConfig {
                 "/api/auth/login",
                 "/api/auth/refresh-token"
             ).permitAll()
+
             .requestMatchers(HttpMethod.POST, "/api/auth/register-student")
                 .hasAnyRole(Role.DEAN.name(), Role.ADMIN.name())
             .requestMatchers(HttpMethod.POST, "/api/auth/register-dean")
@@ -164,7 +165,6 @@ public class SecurityConfig {
                 "/api/subjects",
                 "/api/subjects/*",
                 "/api/subjects/*/exists",
-                "/api/subjects/groups",
                 SUBJECT_GROUPS_ENDPOINT,
                 "/api/subjects/groups/*/exists",
                 "/api/subjects/*/groups/open",

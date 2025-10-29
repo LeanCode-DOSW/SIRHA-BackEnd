@@ -70,7 +70,7 @@ public class DecanateServiceImpl implements DecanateService {
         log.info("Iniciando registro de decanatura: {}", request.getUsername());
         try {
             log.debug("Validando datos de registro para decanatura: {}", request.getUsername());
-            ValidationUtil.validateDecanateRegistration( request.getUsername(), request.getEmail(), request.getPassword());
+            ValidationUtil.validateRegistration( request.getUsername(), request.getEmail(), request.getPassword(), request.getCodigo());
 
             // Verificar duplicados por nombre
             if (decanateRepository.findByName(request.getUsername()).isPresent()) {
