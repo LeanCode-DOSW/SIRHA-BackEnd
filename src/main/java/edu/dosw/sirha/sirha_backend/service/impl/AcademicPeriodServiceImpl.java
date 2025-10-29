@@ -21,7 +21,7 @@ public class AcademicPeriodServiceImpl implements AcademicPeriodService {
 
     public AcademicPeriodServiceImpl(AcademicPeriodMongoRepository academicPeriodRepository) {
         this.academicPeriodRepository = academicPeriodRepository;
-        }
+    }
 
     @Override
     @Transactional(readOnly = true)
@@ -45,8 +45,9 @@ public class AcademicPeriodServiceImpl implements AcademicPeriodService {
 
     @Override
     @Transactional
-    public void deleteAcademicPeriod(String period) {
-        academicPeriodRepository.deleteByPeriod(period);
+    public void deleteAcademicPeriodById(String id) {
+        log.info("Deleting academic period by id: {}", id);
+        academicPeriodRepository.deleteById(id);
     }
 
     @Override

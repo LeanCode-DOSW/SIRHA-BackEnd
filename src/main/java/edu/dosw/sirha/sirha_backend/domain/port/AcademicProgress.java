@@ -19,52 +19,52 @@ import java.util.Collection;
 
 /**
  * Interface que define el contrato para el progreso académico de un estudiante.
- * 
- * Esta interface sigue el principio de Segregación de Interfaces (ISP) 
+ *
+ * Esta interface sigue el principio de Segregación de Interfaces (ISP)
  * separando las responsabilidades de gestión de progreso académico.
- * 
+ *
  * También implementa el principio de Inversión de Dependencias (DIP)
  * permitiendo que las clases dependan de abstracciones en lugar de concreciones.
  */
 public interface AcademicProgress {
-    
+
     /**
      * Obtiene todas las materias del semáforo académico.
      * @return colección de materias decoradas
      */
     Collection<SubjectDecorator> getSubjects();
-    
+
     /**
      * Obtiene las materias aprobadas (color verde).
      * @return lista de materias aprobadas
      */
     List<SubjectDecorator> getPassedSubjects();
-    
+
     /**
      * Obtiene las materias que se están cursando actualmente (color amarillo).
      * @return lista de materias en curso
      */
     List<SubjectDecorator> getSubjectsInProgress();
-    
+
     /**
      * Obtiene las materias reprobadas (color rojo).
      * @return lista de materias reprobadas
      */
     List<SubjectDecorator> getFailedSubjects();
-    
+
     /**
      * Obtiene las materias no cursadas (color gris).
      * @return lista de materias no cursadas
      */
     List<SubjectDecorator> getSubjectsNotTaken();
-    
+
     /**
      * Calcula el total de créditos por color de semáforo.
      * @param color el color del semáforo a filtrar
      * @return total de créditos
      */
     int getCreditsByColor(SemaforoColores color);
-    
+
 
     int getSubjectsByColorCount(SemaforoColores color);
     /**
@@ -73,7 +73,7 @@ public interface AcademicProgress {
      * @return lista de materias del semestre
      */
     List<SubjectDecorator> getSubjectsBySemester(int semestre);
-    
+
     /**
      * Obtiene contadores por estado académico.
      * @return array con [aprobadas, cursando, reprobadas, noCursadas]
@@ -108,7 +108,7 @@ public interface AcademicProgress {
     double getCompletedCreditsPercentage();
 
     AcademicIndicatorsDTO getAcademicIndicators();
-    
+
     int getCreditsStudyPlan();
     boolean verifyChangeGroup(Subject subject, Group newGroup) throws SirhaException;
     void enrollSubjectInGroup(Subject subject, Group group) throws SirhaException;
@@ -118,4 +118,5 @@ public interface AcademicProgress {
     void unenrollSubjectFromGroup(String subject, Group group) throws SirhaException;
 
     void setSubjectSemester(String subjectName, int semester) throws SirhaException;
+    String getStudyPlanId();
 }

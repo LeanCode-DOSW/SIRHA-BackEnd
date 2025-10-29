@@ -32,7 +32,7 @@ public class Subject {
         this.groups = new ArrayList<>();
         this.prerequisites = new ArrayList<>();
     }
-    
+
     public Subject(String id, String name, int credits) throws SirhaException {
         this(name, credits);
         this.id = id;
@@ -71,7 +71,7 @@ public class Subject {
 
     /**
      * Asocia un grupo a la materia.
-     * @throws SirhaException 
+     * @throws SirhaException
      */
     public void addGroup(Group g) throws SirhaException {
         if (g == null) {
@@ -82,7 +82,7 @@ public class Subject {
         }
         groups.add(g);
     }
-    
+
     public int getGroupCount() {return groups.size();}
 
     /**

@@ -1,6 +1,8 @@
 package edu.dosw.sirha.sirha_backend.domain.model.stategroup;
 
 import java.util.*;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import edu.dosw.sirha.sirha_backend.domain.model.AcademicPeriod;
@@ -41,6 +43,7 @@ public class Group {
     private String id;
     private String code;
     private int capacidad;
+    @JsonIgnore
     private GroupState estadoGrupo; // State Pattern
     private Professor professor;
     private List<Schedule> schedules;
@@ -59,7 +62,7 @@ public class Group {
      *
      * Inicializa el grupo con una capacidad específica y lo establece
      * en estado ABIERTO por defecto. La lista de estudiantes se inicializa vacía.
-     * @throws SirhaException 
+     * @throws SirhaException
      */
 
     public Group(Subject subject,int capacidad, AcademicPeriod currentPeriod) throws SirhaException {
@@ -70,21 +73,17 @@ public class Group {
         setCapacidad(capacidad);
         setCode(subject);
         setCurrentPeriod(currentPeriod);
-        
-        addToSubject( subject );
     }
     void setEstadoGrupo(GroupState estado) {
         this.estadoGrupo = estado;
     }
 
-    private void addToSubject(Subject subject) throws SirhaException {
-        subject.addGroup(this);
-    }
 
     /**
      * Obtiene el estado actual del grupo.
      * @return estado actual del grupo, nunca null
      */
+    @JsonIgnore
     public GroupState getGroupState() {
         return estadoGrupo;
     }
@@ -102,7 +101,7 @@ public class Group {
      * - Cambiar el estado del grupo si es necesario
      *
      * @param estudiante estudiante a inscribir en el grupo. No debe ser null.
-     * @throws SirhaException 
+     * @throws SirhaException
      */
     public void inscribirEstudiante(Student estudiante) throws SirhaException {
         if (estudiante == null) {
@@ -138,7 +137,7 @@ public class Group {
      * Validaciones realizadas:
      * - Verifica que el estudiante no esté ya inscrito
      * - Mantiene consistencia entre la lista y el contador
-     * @throws SirhaException 
+     * @throws SirhaException
      *
      */
     void addStudent(Student student) throws SirhaException {
@@ -154,7 +153,7 @@ public class Group {
      *
      * Elimina al estudiante de la lista y actualiza el contador.
      * Puede cambiar el estado del grupo si es necesario.
-     * @throws SirhaException 
+     * @throws SirhaException
      */
     void removeStudent(Student estudiante) throws SirhaException {
         if (!estudiantes.contains(estudiante) || estudiante == null) {
@@ -226,7 +225,7 @@ public class Group {
      * Solo debe modificarse si no hay estudiantes inscritos.
      *
      * @param capacidad nueva capacidad. Debe ser mayor a cero.
-     * @throws SirhaException 
+     * @throws SirhaException
      */
     public void setCapacidad(int capacidad) throws SirhaException {
         if (capacidad <= 0) {
@@ -358,5 +357,15 @@ public class Group {
 
     public boolean hasSchedule(Schedule schedule){
         return schedules.contains(schedule);
+    }
+    /**
+     * Obtiene el nombre del estado actual del grupo para serialización JSON.
+     * @return nombre del estado (OPEN, CLOSED, etc.)
+     */
+    public String getStateName() {
+        if (estadoGrupo == null) {
+            return "UNKNOWN";
+        }
+        return estadoGrupo.getClass().getSimpleName().replace("Status", "").toUpperCase();
     }
 }
