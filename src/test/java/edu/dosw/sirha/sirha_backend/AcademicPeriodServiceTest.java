@@ -37,6 +37,7 @@ class AcademicPeriodServiceTest {
         AcademicPeriod period = new AcademicPeriod();
         when(academicPeriodRepository.findById(1L)).thenReturn(Optional.of(period));
         assertNotNull(academicPeriodService.findById(1L));
+
     }
 
     @Test
