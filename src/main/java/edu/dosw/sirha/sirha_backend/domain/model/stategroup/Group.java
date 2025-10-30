@@ -1,6 +1,8 @@
 package edu.dosw.sirha.sirha_backend.domain.model.stategroup;
 
 import java.util.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import edu.dosw.sirha.sirha_backend.domain.model.AcademicPeriod;
@@ -41,6 +43,7 @@ public class Group {
     private String id;
     private String code;
     private int capacidad;
+    @JsonIgnore
     private GroupState estadoGrupo; // State Pattern
     private Professor professor;
     private List<Schedule> schedules;
@@ -82,11 +85,23 @@ public class Group {
     }
 
     /**
-     * Obtiene el estado actual del grupo.
-     * @return estado actual del grupo, nunca null
+     * Internal state object (State pattern). We ignore the raw state
+     * in JSON responses and expose a simple serializable string instead
+     * to avoid Jackson serialization problems for behavior-only objects.
      */
+    @JsonIgnore
     public GroupState getGroupState() {
         return estadoGrupo;
+    }
+
+    /**
+     * Public JSON-friendly representation of the group's state.
+     * Returns a simple string: "OPEN" or "CLOSED". This is used by
+     * API responses instead of serializing the state object itself.
+     */
+    @JsonProperty("state")
+    public String getState() {
+        return estadoGrupo instanceof StatusOpen ? "OPEN" : "CLOSED";
     }
 
     /**
