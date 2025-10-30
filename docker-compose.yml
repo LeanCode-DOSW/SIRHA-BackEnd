@@ -5,16 +5,16 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "8443:8443"                     # HTTPS expuesto
+      - "8080:8080"                     # HTTP expuesto para desarrollo (backend)
     env_file:
       - .env
     environment:
-      SPRING_PROFILES_ACTIVE: "prod,ssl"  # prod + ssl (ssl al final)
+      SPRING_PROFILES_ACTIVE: "prod"  # usar perfil 'prod' en docker-compose (sin ssl) para dev/local
       SPRING_DATA_MONGODB_URI: "${SPRING_DATA_MONGODB_URI}"
       MANAGEMENT_ENDPOINT_HEALTH_SHOW_DETAILS: "ALWAYS"
       MANAGEMENT_HEALTH_MONGO_ENABLED: "true"
     healthcheck:
-      test: ["CMD", "curl", "-kfsS", "https://localhost:8443/actuator/health"]
+      test: ["CMD", "curl", "-fsS", "http://localhost:8080/actuator/health"]
       interval: 20s
       timeout: 3s
       retries: 5

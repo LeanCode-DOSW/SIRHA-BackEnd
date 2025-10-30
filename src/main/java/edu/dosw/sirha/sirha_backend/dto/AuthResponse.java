@@ -1,5 +1,7 @@
 package edu.dosw.sirha.sirha_backend.dto;
 
+import javax.management.relation.Role;
+
 /**
  * DTO para respuestas de autenticación exitosa.
  */
@@ -7,6 +9,7 @@ public class AuthResponse {
     private String username;
     private String email;
     private String token;
+    private String role;
     private long timestamp;
 
     public AuthResponse() {
@@ -18,10 +21,14 @@ public class AuthResponse {
         this.username = username;
         this.token = token;
     }
-
     public AuthResponse(String username, String email, String token) {
         this(username, token);
         this.email = email;
+    }
+
+    public AuthResponse(String username, String email, String role, String token) {
+        this(username, email, token);
+        this.role = role;
     }
 
     public String getUsername() { return username; }
@@ -35,5 +42,7 @@ public class AuthResponse {
 
     public long getTimestamp() { return timestamp; }
     public void setTimestamp(long timestamp) { this.timestamp = timestamp; }
+
+    public String getRole() { return role; }
     
 }
