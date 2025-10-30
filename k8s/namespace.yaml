@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: sirha
+  labels:
+    name: sirha
+    app: sirha-backend

@@ -1,0 +1,20 @@
+version: "3.9"
+services:
+  sirha-backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8443:8443"                     # HTTPS expuesto
+    env_file:
+      - .env
+    environment:
+      SPRING_PROFILES_ACTIVE: "prod,ssl"  # prod + ssl (ssl al final)
+      SPRING_DATA_MONGODB_URI: "${SPRING_DATA_MONGODB_URI}"
+      MANAGEMENT_ENDPOINT_HEALTH_SHOW_DETAILS: "ALWAYS"
+      MANAGEMENT_HEALTH_MONGO_ENABLED: "true"
+    healthcheck:
+      test: ["CMD", "curl", "-kfsS", "https://localhost:8443/actuator/health"]
+      interval: 20s
+      timeout: 3s
+      retries: 5

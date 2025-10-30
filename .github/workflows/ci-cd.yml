@@ -1,0 +1,96 @@
+name: CI/CD - Build, Push (GHCR) & Deploy (K8s opcional)
+
+on:
+  push:
+    branches: [ "main", "develop" ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  REGISTRY: ghcr.io
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set image name (lowercase)
+        id: img
+        run: |
+          echo "IMAGE_NAME=${GITHUB_REPOSITORY,,}" >> $GITHUB_OUTPUT
+          if [[ "${GITHUB_REF_NAME}" == "main" ]]; then
+            echo "TAG=latest" >> $GITHUB_OUTPUT
+          else
+            echo "TAG=${GITHUB_REF_NAME}" >> $GITHUB_OUTPUT
+          fi
+          echo "SHA_TAG=${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
+
+      - name: Login GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build & Push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/${{ steps.img.outputs.IMAGE_NAME }}:${{ steps.img.outputs.TAG }}
+            ${{ env.REGISTRY }}/${{ steps.img.outputs.IMAGE_NAME }}:${{ steps.img.outputs.SHA_TAG }}
+
+  deploy:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    if: ${{ secrets.KUBE_CONFIG != '' }} 
+    env:
+      K8S_NAMESPACE: sirha
+      DEPLOYMENT_NAME: sirha-backend
+      CONTAINER_NAME: sirha-backend
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure kubectl from KUBE_CONFIG secret
+        shell: bash
+        run: |
+          echo "${KUBE_CONFIG}" | base64 -d > $HOME/kubeconfig
+          echo "KUBECONFIG=$HOME/kubeconfig" >> $GITHUB_ENV
+        env:
+          KUBE_CONFIG: ${{ secrets.KUBE_CONFIG }}
+
+      - name: Check cluster
+        run: |
+          kubectl cluster-info
+          kubectl get ns
+
+      - name: Apply base manifests
+        run: |
+          kubectl apply -f namespace.yaml
+          kubectl -n ${{ env.K8S_NAMESPACE }} apply -f configmap.yaml
+          kubectl -n ${{ env.K8S_NAMESPACE }} apply -f secret.yaml
+          kubectl -n ${{ env.K8S_NAMESPACE }} apply -f service.yaml
+          kubectl -n ${{ env.K8S_NAMESPACE }} apply -f ingress.yaml
+          kubectl -n ${{ env.K8S_NAMESPACE }} apply -f deployment.yaml
+
+      - name: Select tag for deploy
+        id: dvars
+        run: |
+          if [[ "${GITHUB_REF_NAME}" == "main" ]]; then
+            echo "TAG=latest" >> $GITHUB_OUTPUT
+          else
+            echo "TAG=${GITHUB_REF_NAME}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Bump image & rollout
+        run: |
+          IMG="${{ env.REGISTRY }}/${{ github.repository }}"  # Ojo: sin minúsculas
+          IMG="${IMG,,}"                                      # forzamos minúsculas aquí también
+          kubectl -n ${{ env.K8S_NAMESPACE }} set image deploy/${{ env.DEPLOYMENT_NAME }} \
+            ${{ env.CONTAINER_NAME }}=${IMG}:${{ steps.dvars.outputs.TAG }}
+          kubectl -n ${{ env.K8S_NAMESPACE }} rollout status deploy/${{ env.DEPLOYMENT_NAME }} --timeout=180s
