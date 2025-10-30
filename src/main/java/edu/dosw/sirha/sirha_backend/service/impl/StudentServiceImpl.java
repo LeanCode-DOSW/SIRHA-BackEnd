@@ -12,6 +12,7 @@ import edu.dosw.sirha.sirha_backend.domain.model.Subject;
 import edu.dosw.sirha.sirha_backend.domain.model.enums.SemaforoColores;
 import edu.dosw.sirha.sirha_backend.domain.model.stategroup.Group;
 import edu.dosw.sirha.sirha_backend.domain.model.staterequest.BaseRequest;
+import edu.dosw.sirha.sirha_backend.domain.port.AcademicProgress;
 import edu.dosw.sirha.sirha_backend.dto.RegisterRequest;
 import edu.dosw.sirha.sirha_backend.dto.RequestApprovalRateDTO;
 import edu.dosw.sirha.sirha_backend.dto.StudentDTO;
@@ -245,7 +246,7 @@ public class StudentServiceImpl implements StudentService {
         try {
             Student student = studentRepository.findByUsername(username)
                 .orElseThrow(() -> {
-                    log.warn("Estudiante no encontrado para consulta de horario: {}", username);
+                    log.warn(ErrorCodeSirha.STUDENT_NOT_FOUND.getDefaultMessage(), "{}", username);
                     return SirhaException.of(ErrorCodeSirha.STUDENT_NOT_FOUND);
                 });
                 
@@ -268,7 +269,7 @@ public class StudentServiceImpl implements StudentService {
         try {
             Student student = studentRepository.findByUsername(username)
                 .orElseThrow(() -> {
-                    log.warn(ErrorCodeSirha.STUDENT_NOT_FOUND.getDefaultMessage(),"{}", username);
+                    log.warn(ErrorCodeSirha.STUDENT_NOT_FOUND.getDefaultMessage(), "{}", username);
                     return SirhaException.of(ErrorCodeSirha.STUDENT_NOT_FOUND);
                 });
                 
@@ -297,7 +298,7 @@ public class StudentServiceImpl implements StudentService {
         try {
             Student student = studentRepository.findByUsername(username)
                 .orElseThrow(() -> {
-                    log.warn(ErrorCodeSirha.STUDENT_NOT_FOUND.getDefaultMessage(),"{}", username);
+                    log.warn(ErrorCodeSirha.STUDENT_NOT_FOUND.getDefaultMessage(), "{}", username);
                     return SirhaException.of(ErrorCodeSirha.STUDENT_NOT_FOUND);
                 });
                 
@@ -320,7 +321,7 @@ public class StudentServiceImpl implements StudentService {
         try {
             Student student = studentRepository.findByUsername(username)
                 .orElseThrow(() -> {
-                    log.warn(ErrorCodeSirha.STUDENT_NOT_FOUND.getDefaultMessage(),"{}", username);
+                    log.warn(ErrorCodeSirha.STUDENT_NOT_FOUND.getDefaultMessage(), "{}", username);
                     return SirhaException.of(ErrorCodeSirha.STUDENT_NOT_FOUND);
                 });
                 
@@ -349,10 +350,10 @@ public class StudentServiceImpl implements StudentService {
         try {
             Student student = studentRepository.findByUsername(studentName)
                 .orElseThrow(() -> {
-                    log.warn("Estudiante no encontrado para cambio de grupo: {}", studentName);
+                    log.warn(ErrorCodeSirha.STUDENT_NOT_FOUND.getDefaultMessage(), "{}", studentName);
                     return SirhaException.of(ErrorCodeSirha.STUDENT_NOT_FOUND);
                 });
-            
+
             Subject subject = subjectRepository.findByName(subjectName)
                 .orElseThrow(() -> {
                     log.warn("Materia no encontrada: {}", subjectName);
@@ -457,7 +458,7 @@ public class StudentServiceImpl implements StudentService {
         try {
             Student student = studentRepository.findByUsername(username)
                 .orElseThrow(() -> {
-                    log.warn(ErrorCodeSirha.STUDENT_NOT_FOUND.getDefaultMessage(),"{}", username);
+                    log.warn(ErrorCodeSirha.STUDENT_NOT_FOUND.getDefaultMessage(), "{}", username);
                     return SirhaException.of(ErrorCodeSirha.STUDENT_NOT_FOUND);
                 });
                 
@@ -523,7 +524,7 @@ public class StudentServiceImpl implements StudentService {
         try {
             Student student = studentRepository.findByUsername(username)
                 .orElseThrow(() -> {
-                    log.warn(ErrorCodeSirha.STUDENT_NOT_FOUND.getDefaultMessage(),"{}", username);
+                    log.warn(ErrorCodeSirha.STUDENT_NOT_FOUND.getDefaultMessage(), "{}", username);
                     return SirhaException.of(ErrorCodeSirha.STUDENT_NOT_FOUND);
                 });
 
@@ -543,7 +544,7 @@ public class StudentServiceImpl implements StudentService {
         try {
             Student student = studentRepository.findByUsername(username)
                 .orElseThrow(() -> {
-                    log.warn(ErrorCodeSirha.STUDENT_NOT_FOUND.getDefaultMessage(),"{}", username);
+                    log.warn(ErrorCodeSirha.STUDENT_NOT_FOUND.getDefaultMessage(), "{}", username);
                     return SirhaException.of(ErrorCodeSirha.STUDENT_NOT_FOUND);
                 });
 
@@ -724,7 +725,7 @@ public class StudentServiceImpl implements StudentService {
         try {
             Student student = studentRepository.findByUsername(username)
                 .orElseThrow(() -> {
-                    log.warn("Estudiante no encontrado para inscripción de materia: {}", username);
+                    log.warn(ErrorCodeSirha.STUDENT_NOT_FOUND.getDefaultMessage(), "{}", username);
                     return SirhaException.of(ErrorCodeSirha.STUDENT_NOT_FOUND);
                 });
 
@@ -787,5 +788,57 @@ public class StudentServiceImpl implements StudentService {
         }
     }
 
+    @Override
+    public AcademicPeriod setAcademicPeriodForStudent(String username, String period) throws SirhaException {
+        log.info("Estableciendo período académico '{}' para usuario: {}", period, username);
+        try {
+            Student student = studentRepository.findByUsername(username)
+                .orElseThrow(() -> {
+                    log.warn(ErrorCodeSirha.STUDENT_NOT_FOUND.getDefaultMessage(), "{}", username);
+                    return SirhaException.of(ErrorCodeSirha.STUDENT_NOT_FOUND);
+                });
+
+            AcademicPeriod academicPeriod = academicPeriodRepository.findByPeriod(period)
+                .orElseThrow(() -> {
+                    log.warn("Período académico no encontrado: {}", period);
+                    return SirhaException.of(ErrorCodeSirha.ACADEMIC_PERIOD_NOT_FOUND);
+                });
+
+            student.setCurrentPeriod(academicPeriod);
+            studentRepository.save(student);
+            
+            log.info("Período académico '{}' establecido exitosamente para usuario: {}", period, username);
+            return academicPeriod;
+
+        } catch (SirhaException e) {
+            throw e;
+        } catch (Exception e) {
+            throw SirhaException.of(ErrorCodeSirha.INTERNAL_ERROR,"Error interno al establecer período académico: " + e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public AcademicProgress setAcademicProgressForStudent(String username, AcademicProgress academicProgress)
+            throws SirhaException {
+        log.info("Estableciendo progreso académico para usuario: {}", username);
+        try {
+            Student student = studentRepository.findByUsername(username)
+                .orElseThrow(() -> {
+                    log.warn(ErrorCodeSirha.STUDENT_NOT_FOUND.getDefaultMessage(), "{}", username);
+                    return SirhaException.of(ErrorCodeSirha.STUDENT_NOT_FOUND);
+                });
+
+            student.setAcademicProgress(academicProgress);
+            studentRepository.save(student);
+
+            log.info("Progreso académico establecido exitosamente para usuario: {}", username);
+            return academicProgress;
+
+        } catch (SirhaException e) {
+            throw e;
+        } catch (Exception e) {
+            throw SirhaException.of(ErrorCodeSirha.INTERNAL_ERROR,"Error interno al establecer progreso académico: " + e.getMessage(), e);
+        }
+    }
 
 }

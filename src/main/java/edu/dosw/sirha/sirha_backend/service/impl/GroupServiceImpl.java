@@ -76,8 +76,11 @@ public class GroupServiceImpl implements GroupService {
                 throw SirhaException.of( ErrorCodeSirha.GROUP_NOT_FOUND, "Grupo no existe");
             }
 
-            Group group = groupRepository.findById(id)
-                    .orElseThrow(() -> SirhaException.of( ErrorCodeSirha.GROUP_NOT_FOUND, "Grupo no encontrado"));
+        Group group = groupRepository.findById(id)
+            .orElseThrow(() -> {
+                log.warn("Grupo a borrar no encontrado: {}", id);
+                return SirhaException.of(ErrorCodeSirha.GROUP_NOT_FOUND);
+            });
             log.info("Grupo encontrado - Código: {}, Inscritos: {}", 
                     group.getCode(), 
                     group.getInscritos());
@@ -103,7 +106,11 @@ public class GroupServiceImpl implements GroupService {
             }
 
             log.info("Asignando profesor {} al grupo con ID: {}", professor.getUsername(), groupId);
-            Group group = findById(groupId);
+        Group group = groupRepository.findById(groupId)
+            .orElseThrow(() -> {
+                log.warn("Grupo no encontrado para asignar profesor: {}", groupId);
+                return SirhaException.of(ErrorCodeSirha.GROUP_NOT_FOUND);
+            });
             group.setProfessor(professor);
             Group updatedGroup = groupRepository.save(group);
             log.info("Profesor {} asignado exitosamente al grupo con ID: {}", professor.getUsername(), groupId);
@@ -126,7 +133,11 @@ public class GroupServiceImpl implements GroupService {
                 log.error("Error: El horario no puede ser null");
                 throw SirhaException.of( ErrorCodeSirha.INVALID_ARGUMENT, "El horario no puede ser null");
             }
-            Group group = findById(groupId);
+        Group group = groupRepository.findById(groupId)
+            .orElseThrow(() -> {
+                log.warn("Grupo no encontrado para añadir horario: {}", groupId);
+                return SirhaException.of(ErrorCodeSirha.GROUP_NOT_FOUND);
+            });
             group.addSchedule(schedule);
             log.info("Horario agregado exitosamente al grupo con ID: {}", groupId);
             Group updatedGroup = groupRepository.save(group);
@@ -144,7 +155,11 @@ public class GroupServiceImpl implements GroupService {
     public Group closeGroup(String groupId) throws SirhaException {
         log.info("Cerrando grupo con ID: {}", groupId);
         try{
-            Group group = findById(groupId);
+        Group group = groupRepository.findById(groupId)
+            .orElseThrow(() -> {
+                log.warn("Grupo no encontrado para cerrar");
+                return SirhaException.of(ErrorCodeSirha.GROUP_NOT_FOUND);
+            });
             log.info("Estado actual del grupo (antes de cerrar): {}", group.getGroupState().getClass().getSimpleName());
             group.closeGroup();
             log.info("Estado actual del grupo (después de cerrar): {}", group.getGroupState().getClass().getSimpleName());
@@ -163,7 +178,11 @@ public class GroupServiceImpl implements GroupService {
     public Group openGroup(String groupId) throws SirhaException {
         log.info("Abriendo grupo con ID: {}", groupId);
         try{
-            Group group = findById(groupId);
+        Group group = groupRepository.findById(groupId)
+            .orElseThrow(() -> {
+                log.warn("Grupo no encontrado para abrir");
+                return SirhaException.of(ErrorCodeSirha.GROUP_NOT_FOUND);
+            });
             log.info("Estado actual del grupo (antes de abrir): {}", group.getGroupState().getClass().getSimpleName());
             group.openGroup();
             log.info("Estado actual del grupo (después de abrir): {}", group.getGroupState().getClass().getSimpleName());
@@ -182,7 +201,11 @@ public class GroupServiceImpl implements GroupService {
     public List<Schedule> getSchedules(String groupId) throws SirhaException {
         log.info("Obteniendo horarios del grupo con ID: {}", groupId);
         try {
-            Group group = findById(groupId);
+        Group group = groupRepository.findById(groupId)
+            .orElseThrow(() -> {
+                log.warn("Grupo no encontrado para obtener horarios");
+                return SirhaException.of(ErrorCodeSirha.GROUP_NOT_FOUND);
+            });
             List<Schedule> schedules = group.getSchedules();
             log.info("Horarios obtenidos exitosamente para el grupo con ID: {}", groupId);
             return schedules;
@@ -198,7 +221,11 @@ public class GroupServiceImpl implements GroupService {
     public boolean isFull(String groupId) throws SirhaException     {
         log.info("Verificando si el grupo con ID {} está lleno", groupId);
         try {
-            Group group = findById(groupId);
+        Group group = groupRepository.findById(groupId)
+            .orElseThrow(() -> {
+                log.warn("Grupo no encontrado para verificar si está lleno");
+                return SirhaException.of(ErrorCodeSirha.GROUP_NOT_FOUND);
+            });
             boolean isFull = group.isFull();
             log.info("El grupo con ID {} está {}", groupId, isFull ? "lleno" : "disponible");
             return isFull;
@@ -214,7 +241,11 @@ public class GroupServiceImpl implements GroupService {
     public int getAvailableSeats(String groupId) throws SirhaException {
         log.info("Obteniendo asientos disponibles del grupo con ID: {}", groupId);
         try {
-            Group group = findById(groupId);
+        Group group = groupRepository.findById(groupId)
+            .orElseThrow(() -> {
+                log.warn("Grupo no encontrado: {}", groupId);
+                return SirhaException.of(ErrorCodeSirha.GROUP_NOT_FOUND);
+            });
             int availableSeats = group.getCuposDisponibles();
             log.info("El grupo con ID {} tiene {} asientos disponibles", groupId, availableSeats);
             return availableSeats;
@@ -235,10 +266,10 @@ public class GroupServiceImpl implements GroupService {
             }
             log.info("Buscando grupo con ID: {}", id);
             Group group = groupRepository.findById(id)
-                    .orElseThrow(() -> {
-                        log.warn("Grupo con ID {} no encontrado", id);
-                        return SirhaException.of( ErrorCodeSirha.GROUP_NOT_FOUND, "Grupo con id " + id + " no encontrado");
-                    });
+                .orElseThrow(() -> {
+                    log.warn("Grupo con id {} no encontrado", id);
+                    return SirhaException.of(ErrorCodeSirha.GROUP_NOT_FOUND);
+                });
             log.info("Grupo encontrado: {}", group);
             return group;
         } catch (SirhaException e) {
@@ -253,7 +284,11 @@ public class GroupServiceImpl implements GroupService {
     public Professor getProfessor(String groupId) throws SirhaException {
         log.info("Obteniendo profesor del grupo con ID: {}", groupId);
         try {
-            Group group = findById(groupId);
+        Group group = groupRepository.findById(groupId)
+            .orElseThrow(() -> {
+                log.warn("Grupo no encontrado para obtener profesor");
+                return SirhaException.of(ErrorCodeSirha.GROUP_NOT_FOUND);
+            });
             Professor professor = group.getProfessor();
             if (professor == null) {
                 log.warn("El grupo con ID {} no tiene un profesor asignado", groupId);

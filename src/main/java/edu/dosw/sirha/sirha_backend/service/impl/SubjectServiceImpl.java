@@ -17,6 +17,8 @@ import edu.dosw.sirha.sirha_backend.exception.SirhaException;
 import edu.dosw.sirha.sirha_backend.repository.mongo.SubjectMongoRepository;
 import edu.dosw.sirha.sirha_backend.service.GroupService;
 import edu.dosw.sirha.sirha_backend.service.SubjectService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.ObjectProvider;
 
 @Service
 public class SubjectServiceImpl implements SubjectService {
@@ -25,11 +27,18 @@ public class SubjectServiceImpl implements SubjectService {
 
     private final SubjectMongoRepository subjectRepository;
     private final GroupService groupService;
+    // provider for the proxy self-injection to avoid circular creation during context startup
+    private ObjectProvider<SubjectService> selfProvider;
 
     public SubjectServiceImpl(SubjectMongoRepository subjectRepository, GroupService groupService ) {
         this.subjectRepository = subjectRepository;
         this.groupService = groupService;
         log.info("SubjectServiceImpl inicializado correctamente");
+    }
+
+    @Autowired
+    public void setSelf(ObjectProvider<SubjectService> selfProvider) {
+        this.selfProvider = selfProvider;
     }
 
     @Transactional
@@ -123,7 +132,12 @@ public class SubjectServiceImpl implements SubjectService {
                 log.warn("Materia '{}' tiene {} grupos asociados, eliminando grupos primero", 
                         name, subject.getGroups().size());
                 
-                List<Group> deletedGroups = deleteGroupsBySubjectName(name);
+                SubjectService proxy = selfProvider.getIfAvailable();
+                if (proxy == null) {
+                    // fallback: should not happen in normal runtime, but preserve behavior
+                    proxy = this;
+                }
+                List<Group> deletedGroups = proxy.deleteGroupsBySubjectName(name);
                 log.info("Grupos eliminados asociados a materia '{}' - Total: {}", 
                         name, deletedGroups.size());
                 subject.deleteGroups();

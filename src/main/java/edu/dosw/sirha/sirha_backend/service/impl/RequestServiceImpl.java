@@ -78,7 +78,7 @@ public class RequestServiceImpl implements RequestService {
     public BaseRequest deleteById(String id) throws SirhaException {
         log.info("Eliminando solicitud por ID: {}", id);
         try {
-            Optional<BaseRequest> existingRequest = findById(id);
+            Optional<BaseRequest> existingRequest = repository.findById(id);
             if (existingRequest.isEmpty()) {
                 log.warn("No se encontró solicitud con ID: {} para eliminar", id);
                 throw SirhaException.of(ErrorCodeSirha.REQUEST_NOT_FOUND, "Solicitud no encontrada");
@@ -160,7 +160,7 @@ public class RequestServiceImpl implements RequestService {
     public List<RequestProcess> getRequestProcesses(String requestId) throws SirhaException {
         log.info("Consultando procesos de la solicitud ID: {}", requestId);
         try {
-            Optional<BaseRequest> requestOpt = findById(requestId);
+            Optional<BaseRequest> requestOpt = repository.findById(requestId);
             if (requestOpt.isEmpty()) {
                 log.warn("No se encontró solicitud con ID: {} para obtener procesos", requestId);
                 throw SirhaException.of(ErrorCodeSirha.REQUEST_NOT_FOUND, "Solicitud no encontrada");

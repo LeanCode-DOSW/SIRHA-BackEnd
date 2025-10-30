@@ -12,9 +12,11 @@ import edu.dosw.sirha.sirha_backend.domain.model.AcademicPeriod;
 import edu.dosw.sirha.sirha_backend.domain.model.CambioGrupo;
 import edu.dosw.sirha.sirha_backend.domain.model.CambioMateria;
 import edu.dosw.sirha.sirha_backend.domain.model.Schedule;
+import edu.dosw.sirha.sirha_backend.domain.model.Semaforo;
 import edu.dosw.sirha.sirha_backend.domain.model.Student;
 import edu.dosw.sirha.sirha_backend.domain.model.enums.SemaforoColores;
 import edu.dosw.sirha.sirha_backend.domain.model.staterequest.BaseRequest;
+import edu.dosw.sirha.sirha_backend.domain.port.AcademicProgress;
 import edu.dosw.sirha.sirha_backend.dto.StudentDTO;
 import edu.dosw.sirha.sirha_backend.dto.SubjectDecoratorDTO;
 import edu.dosw.sirha.sirha_backend.dto.StudentReportDTO;
@@ -150,6 +152,36 @@ public class StudentController {
     public ResponseEntity<Void> deleteById(@PathVariable String id) throws SirhaException {
         studentService.deleteById(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{username}/academic-period")
+    @Operation(summary = "Establecer período académico del estudiante", description = "Asigna el período académico actual al estudiante especificado")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Período académico establecido exitosamente"),
+        @ApiResponse(responseCode = "404", description = "Estudiante o período no encontrado"),
+        @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    })
+    @PreAuthorize("hasAnyRole('DEAN','ADMIN') or (hasRole('STUDENT') and authentication.name == #username)")
+    public ResponseEntity<AcademicPeriod> setAcademicPeriodForStudent(@PathVariable String username,
+                                                                       @RequestParam String period) throws SirhaException {
+        AcademicPeriod ap = studentService.setAcademicPeriodForStudent(username, period);
+        return ResponseEntity.ok(ap);
+    }
+
+    @PostMapping("/{username}/academic-progress")
+    @Operation(summary = "Establecer progreso académico del estudiante", description = "Establece el objeto de progreso académico para el estudiante (Semáforo)")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Progreso académico actualizado exitosamente"),
+        @ApiResponse(responseCode = "400", description = "Payload inválido"),
+        @ApiResponse(responseCode = "404", description = "Estudiante no encontrado"),
+        @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    })
+    @PreAuthorize("hasAnyRole('DEAN','ADMIN') or (hasRole('STUDENT') and authentication.name == #username)")
+    public ResponseEntity<AcademicProgress> setAcademicProgressForStudent(
+            @PathVariable String username,
+            @RequestBody Semaforo academicProgress) throws SirhaException {
+        AcademicProgress result = studentService.setAcademicProgressForStudent(username, academicProgress);
+        return ResponseEntity.ok(result);
     }
 
     @GetMapping("/schedule/{username}")

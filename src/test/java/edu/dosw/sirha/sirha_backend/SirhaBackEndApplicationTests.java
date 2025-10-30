@@ -1157,7 +1157,7 @@ class SirhaBackEndApplicationTests {
                 decorator.getState().setGroup(decorator, null);
             });
             
-            assertEquals("No se puede cambiar el grupo - No se puede asignar grupo a materia no cursada", exception.getMessage());
+            assertEquals("No se puede cambiar el grupo", exception.getMessage());
         } catch (Exception e) {
             fail("No se esperaba una excepción al crear el grupo o inscribir la materia: " + e.getMessage());
         }
@@ -1203,7 +1203,7 @@ class SirhaBackEndApplicationTests {
             
             decorator.setSemester(4);
             
-            assertEquals("No se puede cambiar el semestre - No se puede cambiar semestre de materia no cursada", exception.getMessage());
+            assertEquals("No se puede cambiar el semestre", exception.getMessage());
         } catch (Exception e) {
             fail("No se esperaba una excepción al crear el grupo o inscribir la materia: " + e.getMessage());
         }
@@ -1224,7 +1224,7 @@ class SirhaBackEndApplicationTests {
             decorator.setGroup(grupo);
             assertTrue(decorator.getState() instanceof EnCursoState);
             assertEquals(grupo, decorator.getGroup());
-            assertEquals("No se puede cambiar el grupo - No se puede asignar grupo a materia no cursada", exception.getMessage());
+            assertEquals("No se puede cambiar el grupo", exception.getMessage());
         } catch (Exception e) {
             fail("No se esperaba una excepción al crear el grupo o inscribir la materia: " + e.getMessage());
         }

@@ -34,9 +34,22 @@ public class JwtUtil {
 
   private SecretKey buildKey(String secret) {
     try {
-      return Keys.hmacShaKeyFor(Decoders.BASE64.decode(secret)); // Base64
+      byte[] decoded = Decoders.BASE64.decode(secret); // try base64 first
+      // Ensure key is at least 256 bits (32 bytes). If not, fall through to hashing below.
+      if (decoded.length >= 32) {
+        return Keys.hmacShaKeyFor(decoded);
+      }
     } catch (IllegalArgumentException ex) {
-      return Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8)); 
+      // ignore - we'll derive a proper-length key from the raw secret below
+    }
+
+    try {
+      // Derive a 256-bit key from the provided secret using SHA-256 as a safe fallback
+      byte[] hashed = java.security.MessageDigest.getInstance("SHA-256").digest(secret.getBytes(StandardCharsets.UTF_8));
+      return Keys.hmacShaKeyFor(hashed);
+    } catch (java.security.NoSuchAlgorithmException e) {
+      // Extremely unlikely - rethrow as runtime
+      throw new IllegalStateException("SHA-256 not available for key derivation", e);
     }
   }
 

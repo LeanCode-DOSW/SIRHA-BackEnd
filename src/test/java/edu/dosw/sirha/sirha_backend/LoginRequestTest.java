@@ -8,6 +8,7 @@ class LoginRequestTest {
 
     @Test
     void constructorAndSettersGetters() {
+        new LoginRequest();
         LoginRequest lr = new LoginRequest("user", "pass1234");
         assertEquals("user", lr.getUsername());
         assertEquals("pass1234", lr.getPassword());

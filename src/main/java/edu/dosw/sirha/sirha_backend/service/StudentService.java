@@ -10,6 +10,7 @@ import edu.dosw.sirha.sirha_backend.domain.model.Schedule;
 import edu.dosw.sirha.sirha_backend.domain.model.Student;
 import edu.dosw.sirha.sirha_backend.domain.model.enums.SemaforoColores;
 import edu.dosw.sirha.sirha_backend.domain.model.staterequest.BaseRequest;
+import edu.dosw.sirha.sirha_backend.domain.port.AcademicProgress;
 import edu.dosw.sirha.sirha_backend.dto.RegisterRequest;
 import edu.dosw.sirha.sirha_backend.dto.RequestApprovalRateDTO;
 import edu.dosw.sirha.sirha_backend.dto.StudentDTO;
@@ -60,5 +61,8 @@ public interface StudentService {
 
     void enrollSubject( String username, String subjectName, String groupCode ) throws SirhaException;
     void unenrollSubject( String username, String subjectName, String groupCode ) throws SirhaException;
+
+    AcademicPeriod setAcademicPeriodForStudent( String username, String period ) throws SirhaException;
+    AcademicProgress setAcademicProgressForStudent( String username, AcademicProgress academicProgress ) throws SirhaException;
 
 }

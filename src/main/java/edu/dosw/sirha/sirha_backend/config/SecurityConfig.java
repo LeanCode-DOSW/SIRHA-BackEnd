@@ -47,14 +47,17 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain filterChain(
+        @SuppressWarnings("squid:S4502") // justified: API is stateless and uses JWT Bearer tokens for auth
+        public SecurityFilterChain filterChain(
         HttpSecurity http,
         JwtUtil jwtUtil ,
         @Value("${FRONTEND_URL:http://localhost:5173}") String frontendUrl
     ) throws Exception {
-
-    http
-      .csrf(csrf -> csrf.disable())
+        // CSRF is intentionally disabled because this application exposes a stateless
+        // REST API that authenticates requests using JWT bearer tokens (no session cookies).
+        // Operators: we also configure CORS and stateless session management. See Sonar rule S4502.
+        http
+            .csrf(csrf -> csrf.disable())
       .cors(cors -> cors.configurationSource(req -> {
         var c = new CorsConfiguration();
         c.setAllowedOrigins(List.of(
@@ -160,6 +163,27 @@ public class SecurityConfig {
                 "/api/decanates/*",
                 "/api/decanates/students/*/basic-info"
             ).hasAnyRole(Role.DEAN.name(),Role.ADMIN.name())
+
+            // AcademicPeriodController (/api/academic-periods/**)
+            .requestMatchers(HttpMethod.GET, 
+                "/api/academic-periods/current"
+            ).hasAnyRole(Role.STUDENT.name(), Role.DEAN.name(), Role.ADMIN.name())
+            .requestMatchers(HttpMethod.GET,
+                "/api/academic-periods",
+                "/api/academic-periods/*",
+                "/api/academic-periods/exists/*"
+            ).hasAnyRole(Role.DEAN.name(), Role.ADMIN.name())
+            .requestMatchers(HttpMethod.POST, "/api/academic-periods").hasRole(Role.ADMIN.name())
+
+            // StudyPlanController (/api/study-plans/**)
+            .requestMatchers(HttpMethod.GET,
+                "/api/study-plans/career/*",
+                "/api/study-plans/name/*"
+            ).hasAnyRole(Role.DEAN.name(), Role.ADMIN.name())
+            .requestMatchers(HttpMethod.POST,
+                "/api/study-plans",
+                "/api/study-plans/*/subjects/*"
+            ).hasAnyRole(Role.DEAN.name(), Role.ADMIN.name())
 
             // ADMIN
             .requestMatchers(HttpMethod.POST, "/api/decanates").hasRole(Role.ADMIN.name())
